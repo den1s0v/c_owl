@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <rdf:RDF xmlns="http://vstu.ru/poas/se/c#"
      xml:base="http://vstu.ru/poas/se/c"
+     xmlns:c="http://vstu.ru/poas/se/c#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
@@ -69,6 +70,8 @@
 
     <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#hasEntryPoint">
         <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c#hasLabel"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
     </owl:ObjectProperty>
     
 
@@ -89,6 +92,8 @@
 
     <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#hasExitPoint">
         <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c#hasLabel"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
     </owl:ObjectProperty>
     
 
@@ -96,7 +101,6 @@
     <!-- http://vstu.ru/poas/se/c#hasLabel -->
 
     <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#hasLabel">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
         <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c#AlgStruct"/>
@@ -203,6 +207,7 @@
             </owl:Restriction>
         </owl:equivalentClass>
         <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#Statement"/>
+        <owl:disjointWith rdf:resource="http://vstu.ru/poas/se/c#AtomicStatement"/>
     </owl:Class>
     
 
@@ -235,6 +240,7 @@
 
     <owl:Class rdf:about="http://vstu.ru/poas/se/c#Label">
         <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
+        <owl:disjointWith rdf:resource="http://vstu.ru/poas/se/c#Statement"/>
     </owl:Class>
     
 
@@ -306,6 +312,121 @@
         <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#ExecContext"/>
         <rdfs:label>РўСЂР°СЃСЃР°</rdfs:label>
     </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#BOmain -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#BOmain">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#Label"/>
+        <rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c#doSmth"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#Beg_main_lbl -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#Beg_main_lbl">
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#BOmain"/>
+        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c#doAct"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#EOmain -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#EOmain"/>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#End_main_lbl -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#End_main_lbl">
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#EOmain"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#doAct -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#doAct">
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#doSmth"/>
+        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c#doAct2"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#doAct2 -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#doAct2">
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#doSmth2"/>
+        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c#End_main_lbl"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#doSmth -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#doSmth">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#AtomicStatement"/>
+        <rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c#doSmth2"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#doSmth2 -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#doSmth2">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#AtomicStatement"/>
+        <rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c#EOmain"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#trace_of_main -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#trace_of_main">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#Trace"/>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#main()"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c#main() -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#main()">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#Sequence"/>
+        <hasEntryPoint rdf:resource="http://vstu.ru/poas/se/c#BOmain"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#doSmth"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#doSmth2"/>
+        </owl:distinctMembers>
+    </rdf:Description>
     
 
 
