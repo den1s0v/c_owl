@@ -11,6 +11,6 @@
 
 - OWL 2 + SWRL
 - Pellet 2+ reasoner
-- Prot`eg`e 5.5
+- Protege 5.5
 - [?] SPARQL endpoint
 - [?] Stardog knoledge base
