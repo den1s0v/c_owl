@@ -498,7 +498,15 @@
 
     <!-- http://vstu.ru/poas/se/c_schema#LOG -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#LOG"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#LOG">
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://vstu.ru/poas/se/c_schema#message"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">100</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Class>
     
 
 
