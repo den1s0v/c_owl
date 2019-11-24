@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<rdf:RDF xmlns="http://vstu.ru/poas/se/c#"
-     xml:base="http://vstu.ru/poas/se/c"
-     xmlns:c="http://vstu.ru/poas/se/c#"
+<rdf:RDF xmlns="http://vstu.ru/poas/se/c_schema#"
+     xml:base="http://vstu.ru/poas/se/c_schema"
+     xmlns:alg="http://vstu.ru/poas/se/c_schema/alg#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
@@ -10,7 +10,9 @@
      xmlns:swrl="http://www.w3.org/2003/11/swrl#"
      xmlns:swrla="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#"
      xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
-     xmlns:c_schema="http://vstu.ru/poas/se/c_schema#">
+     xmlns:trace="http://vstu.ru/poas/se/c_schema/trace#"
+     xmlns:c_schema="http://vstu.ru/poas/se/c_schema#"
+     xmlns:c_schema@2019-11="http://vstu.ru/poas/se/c/c_schema@2019-11#">
     <owl:Ontology rdf:about="http://vstu.ru/poas/se/c_schema">
         <owl:versionIRI rdf:resource="http://vstu.ru/poas/se/c/c_schema@2019-11"/>
         <rdfs:comment>Program Analysis for С programming language. This is root ontology.</rdfs:comment>
@@ -346,7 +348,7 @@
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#BOmain">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#Label"/>
-        <c_schema:rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth"/>
+        <rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth"/>
     </owl:NamedIndividual>
     
 
@@ -354,8 +356,8 @@
     <!-- http://vstu.ru/poas/se/c_schema#Beg_main_lbl -->
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#Beg_main_lbl">
-        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
-        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#BOmain"/>
+        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#BOmain"/>
     </owl:NamedIndividual>
     
 
@@ -379,8 +381,8 @@
     <!-- http://vstu.ru/poas/se/c_schema#End_main_lbl -->
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#End_main_lbl">
-        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
-        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
+        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
     </owl:NamedIndividual>
     
 
@@ -388,9 +390,9 @@
     <!-- http://vstu.ru/poas/se/c_schema#c2_beg -->
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#c2_beg">
-        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
-        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#BOmain"/>
-        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#c2_do"/>
+        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#BOmain"/>
+        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#c2_do"/>
     </owl:NamedIndividual>
     
 
@@ -398,9 +400,9 @@
     <!-- http://vstu.ru/poas/se/c_schema#c2_do -->
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#c2_do">
-        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
-        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doAct"/>
-        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#c2_end"/>
+        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doAct"/>
+        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#c2_end"/>
     </owl:NamedIndividual>
     
 
@@ -408,8 +410,8 @@
     <!-- http://vstu.ru/poas/se/c_schema#c2_do2 -->
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#c2_do2">
-        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
-        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doAct2"/>
+        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doAct2"/>
     </owl:NamedIndividual>
     
 
@@ -417,9 +419,9 @@
     <!-- http://vstu.ru/poas/se/c_schema#c2_end -->
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#c2_end">
-        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
-        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
-        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#c2_do2"/>
+        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
+        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#c2_do2"/>
     </owl:NamedIndividual>
     
 
@@ -427,9 +429,9 @@
     <!-- http://vstu.ru/poas/se/c_schema#doAct -->
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#doAct">
-        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
-        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth"/>
-        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#Beg_main_lbl"/>
+        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth"/>
+        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#Beg_main_lbl"/>
     </owl:NamedIndividual>
     
 
@@ -437,9 +439,9 @@
     <!-- http://vstu.ru/poas/se/c_schema#doAct2 -->
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#doAct2">
-        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
-        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth2"/>
-        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#End_main_lbl"/>
+        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth2"/>
+        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#End_main_lbl"/>
     </owl:NamedIndividual>
     
 
@@ -448,7 +450,7 @@
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#doSmth">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#AtomicStatement"/>
-        <c_schema:rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth2"/>
+        <rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth2"/>
     </owl:NamedIndividual>
     
 
@@ -457,7 +459,7 @@
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#doSmth2">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#AtomicStatement"/>
-        <c_schema:rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
+        <rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
     </owl:NamedIndividual>
     
 
@@ -465,8 +467,8 @@
     <!-- http://vstu.ru/poas/se/c_schema#mainContext2 -->
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#mainContext2">
-        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#main()"/>
-        <c_schema:hasIndex rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</c_schema:hasIndex>
+        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#main()"/>
+        <hasIndex rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</hasIndex>
     </owl:NamedIndividual>
     
 
@@ -483,8 +485,8 @@
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#main()">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#Program"/>
-        <c_schema:hasEntryPoint rdf:resource="http://vstu.ru/poas/se/c_schema#BOmain"/>
-        <c_schema:hasExitPoint rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
+        <hasEntryPoint rdf:resource="http://vstu.ru/poas/se/c_schema#BOmain"/>
+        <hasExitPoint rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
     </owl:NamedIndividual>
     
 
