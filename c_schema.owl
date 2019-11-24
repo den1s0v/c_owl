@@ -9,10 +9,11 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:swrl="http://www.w3.org/2003/11/swrl#"
      xmlns:swrla="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#"
-     xmlns:swrlb="http://www.w3.org/2003/11/swrlb#">
-    <owl:Ontology rdf:about="http://vstu.ru/poas/se/c">
-        <owl:versionIRI rdf:resource="http://vstu.ru/poas/se/c/c_2019-11"/>
-        <rdfs:comment>Program Analysis for РЎ programming language</rdfs:comment>
+     xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
+     xmlns:c_schema="http://vstu.ru/poas/se/c_schema#">
+    <owl:Ontology rdf:about="http://vstu.ru/poas/se/c_schema">
+        <owl:versionIRI rdf:resource="http://vstu.ru/poas/se/c/c_schema@2019-11"/>
+        <rdfs:comment>Program Analysis for С programming language. This is root ontology.</rdfs:comment>
     </owl:Ontology>
     
 
@@ -45,108 +46,108 @@
     
 
 
-    <!-- http://vstu.ru/poas/se/c#beforeAct -->
+    <!-- http://vstu.ru/poas/se/c_schema#beforeAct -->
 
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#beforeAct">
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#beforeAct">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c#Act"/>
+        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#beforeOp -->
+    <!-- http://vstu.ru/poas/se/c_schema#beforeOp -->
 
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#beforeOp">
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#beforeOp">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
-        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
+        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
+        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#hasEntryPoint -->
+    <!-- http://vstu.ru/poas/se/c_schema#hasEntryPoint -->
 
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#hasEntryPoint">
-        <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c#hasLabel"/>
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#hasEntryPoint">
+        <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c_schema#hasLabel"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#hasExecContext -->
+    <!-- http://vstu.ru/poas/se/c_schema#hasExecContext -->
 
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#hasExecContext">
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#hasExecContext">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c#ExecContext"/>
+        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c_schema#ExecContext"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#hasExitPoint -->
+    <!-- http://vstu.ru/poas/se/c_schema#hasExitPoint -->
 
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#hasExitPoint">
-        <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c#hasLabel"/>
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#hasExitPoint">
+        <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c_schema#hasLabel"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#hasLabel -->
+    <!-- http://vstu.ru/poas/se/c_schema#hasLabel -->
 
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#hasLabel">
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#hasLabel">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c#AlgStruct"/>
-        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c#Label"/>
+        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c_schema#AlgStruct"/>
+        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c_schema#Label"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#hasOrigin -->
+    <!-- http://vstu.ru/poas/se/c_schema#hasOrigin -->
 
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#hasOrigin">
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#hasOrigin">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
+        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#isIN -->
+    <!-- http://vstu.ru/poas/se/c_schema#isIN -->
 
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#isIN">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
-        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c#AlgStruct"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://vstu.ru/poas/se/c#rightBeforeAct -->
-
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#rightBeforeAct">
-        <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c#beforeAct"/>
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#isIN">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
+        <rdfs:range rdf:resource="http://vstu.ru/poas/se/c_schema#AlgStruct"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#rightBeforeOp -->
+    <!-- http://vstu.ru/poas/se/c_schema#rightBeforeAct -->
 
-    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c#rightBeforeOp">
-        <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c#beforeOp"/>
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#rightBeforeAct">
+        <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c_schema#beforeAct"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c_schema#rightBeforeOp -->
+
+    <owl:ObjectProperty rdf:about="http://vstu.ru/poas/se/c_schema#rightBeforeOp">
+        <rdfs:subPropertyOf rdf:resource="http://vstu.ru/poas/se/c_schema#beforeOp"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
@@ -165,19 +166,19 @@
     
 
 
-    <!-- http://vstu.ru/poas/se/c#hasIndex -->
+    <!-- http://vstu.ru/poas/se/c_schema#hasIndex -->
 
-    <owl:DatatypeProperty rdf:about="http://vstu.ru/poas/se/c#hasIndex">
+    <owl:DatatypeProperty rdf:about="http://vstu.ru/poas/se/c_schema#hasIndex">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c#ExecContext"/>
+        <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c_schema#ExecContext"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#positiveInteger"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#message -->
+    <!-- http://vstu.ru/poas/se/c_schema#message -->
 
-    <owl:DatatypeProperty rdf:about="http://vstu.ru/poas/se/c#message">
+    <owl:DatatypeProperty rdf:about="http://vstu.ru/poas/se/c_schema#message">
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
     
@@ -194,138 +195,138 @@
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Act -->
+    <!-- http://vstu.ru/poas/se/c_schema#Act -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#Act"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Act"/>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#AlgStruct -->
+    <!-- http://vstu.ru/poas/se/c_schema#AlgStruct -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#AlgStruct">
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#AlgStruct">
         <owl:equivalentClass>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://vstu.ru/poas/se/c#hasEntryPoint"/>
+                <owl:onProperty rdf:resource="http://vstu.ru/poas/se/c_schema#hasEntryPoint"/>
                 <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:cardinality>
             </owl:Restriction>
         </owl:equivalentClass>
         <owl:equivalentClass>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://vstu.ru/poas/se/c#hasExitPoint"/>
+                <owl:onProperty rdf:resource="http://vstu.ru/poas/se/c_schema#hasExitPoint"/>
                 <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:cardinality>
             </owl:Restriction>
         </owl:equivalentClass>
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#Statement"/>
-        <owl:disjointWith rdf:resource="http://vstu.ru/poas/se/c#AtomicStatement"/>
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Statement"/>
+        <owl:disjointWith rdf:resource="http://vstu.ru/poas/se/c_schema#AtomicStatement"/>
     </owl:Class>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#AtomicStatement -->
+    <!-- http://vstu.ru/poas/se/c_schema#AtomicStatement -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#AtomicStatement">
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#Statement"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#AtomicStatement">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Statement"/>
     </owl:Class>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Errors -->
+    <!-- http://vstu.ru/poas/se/c_schema#Errors -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#Errors"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Errors"/>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#ExecContext -->
+    <!-- http://vstu.ru/poas/se/c_schema#ExecContext -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#ExecContext">
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#Act"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#ExecContext">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
     </owl:Class>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#IF_Statement -->
+    <!-- http://vstu.ru/poas/se/c_schema#IF_Statement -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#IF_Statement">
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#AlgStruct"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#IF_Statement">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#AlgStruct"/>
     </owl:Class>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Label -->
+    <!-- http://vstu.ru/poas/se/c_schema#Label -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#Label">
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
-        <owl:disjointWith rdf:resource="http://vstu.ru/poas/se/c#Statement"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Label">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
+        <owl:disjointWith rdf:resource="http://vstu.ru/poas/se/c_schema#Statement"/>
     </owl:Class>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Loop -->
+    <!-- http://vstu.ru/poas/se/c_schema#Loop -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#Loop">
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#AlgStruct"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Loop">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#AlgStruct"/>
     </owl:Class>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Operator -->
+    <!-- http://vstu.ru/poas/se/c_schema#Operator -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#Operator"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Operator"/>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Program -->
+    <!-- http://vstu.ru/poas/se/c_schema#Program -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#Program">
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Program">
         <owl:equivalentClass>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#Program"/>
+                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#Program"/>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="http://vstu.ru/poas/se/c#isIN"/>
+                        <owl:onProperty rdf:resource="http://vstu.ru/poas/se/c_schema#isIN"/>
                         <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">0</owl:qualifiedCardinality>
-                        <owl:onClass rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
+                        <owl:onClass rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
                     </owl:Restriction>
                 </owl:intersectionOf>
             </owl:Class>
         </owl:equivalentClass>
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#Sequence"/>
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Sequence"/>
     </owl:Class>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Sequence -->
+    <!-- http://vstu.ru/poas/se/c_schema#Sequence -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#Sequence">
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#AlgStruct"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Sequence">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#AlgStruct"/>
     </owl:Class>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Statement -->
+    <!-- http://vstu.ru/poas/se/c_schema#Statement -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#Statement">
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Statement">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
     </owl:Class>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Trace -->
+    <!-- http://vstu.ru/poas/se/c_schema#Trace -->
 
-    <owl:Class rdf:about="http://vstu.ru/poas/se/c#Trace">
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Trace">
         <owl:equivalentClass>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#Trace"/>
+                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#Trace"/>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="http://vstu.ru/poas/se/c#hasOrigin"/>
-                        <owl:allValuesFrom rdf:resource="http://vstu.ru/poas/se/c#Program"/>
+                        <owl:onProperty rdf:resource="http://vstu.ru/poas/se/c_schema#hasOrigin"/>
+                        <owl:allValuesFrom rdf:resource="http://vstu.ru/poas/se/c_schema#Program"/>
                     </owl:Restriction>
                 </owl:intersectionOf>
             </owl:Class>
         </owl:equivalentClass>
-        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c#ExecContext"/>
-        <rdfs:label>РўСЂР°СЃСЃР°</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#ExecContext"/>
+        <rdfs:label>Трасса</rdfs:label>
     </owl:Class>
     
 
@@ -341,149 +342,149 @@
     
 
 
-    <!-- http://vstu.ru/poas/se/c#BOmain -->
+    <!-- http://vstu.ru/poas/se/c_schema#BOmain -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#BOmain">
-        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#Label"/>
-        <rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c#doSmth"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#BOmain">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#Label"/>
+        <c_schema:rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#Beg_main_lbl -->
+    <!-- http://vstu.ru/poas/se/c_schema#Beg_main_lbl -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#Beg_main_lbl">
-        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c#trace_of_main"/>
-        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#BOmain"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#Beg_main_lbl">
+        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#BOmain"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#EOmain -->
+    <!-- http://vstu.ru/poas/se/c_schema#EOmain -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#EOmain">
-        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#Label"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#EOmain">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#Label"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#ERRORS -->
+    <!-- http://vstu.ru/poas/se/c_schema#ERRORS -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#ERRORS">
-        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#Errors"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#ERRORS">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#Errors"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#End_main_lbl -->
+    <!-- http://vstu.ru/poas/se/c_schema#End_main_lbl -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#End_main_lbl">
-        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c#trace_of_main"/>
-        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#EOmain"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#End_main_lbl">
+        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#c2_beg -->
+    <!-- http://vstu.ru/poas/se/c_schema#c2_beg -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#c2_beg">
-        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c#mainContext2"/>
-        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#BOmain"/>
-        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c#c2_do"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#c2_beg">
+        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
+        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#BOmain"/>
+        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#c2_do"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#c2_do -->
+    <!-- http://vstu.ru/poas/se/c_schema#c2_do -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#c2_do">
-        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c#mainContext2"/>
-        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#doAct"/>
-        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c#c2_end"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#c2_do">
+        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
+        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doAct"/>
+        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#c2_end"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#c2_do2 -->
+    <!-- http://vstu.ru/poas/se/c_schema#c2_do2 -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#c2_do2">
-        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c#mainContext2"/>
-        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#doAct2"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#c2_do2">
+        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
+        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doAct2"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#c2_end -->
+    <!-- http://vstu.ru/poas/se/c_schema#c2_end -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#c2_end">
-        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c#mainContext2"/>
-        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#EOmain"/>
-        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c#c2_do2"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#c2_end">
+        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#mainContext2"/>
+        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
+        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#c2_do2"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#doAct -->
+    <!-- http://vstu.ru/poas/se/c_schema#doAct -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#doAct">
-        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c#trace_of_main"/>
-        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#doSmth"/>
-        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c#Beg_main_lbl"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#doAct">
+        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth"/>
+        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#Beg_main_lbl"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#doAct2 -->
+    <!-- http://vstu.ru/poas/se/c_schema#doAct2 -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#doAct2">
-        <hasExecContext rdf:resource="http://vstu.ru/poas/se/c#trace_of_main"/>
-        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#doSmth2"/>
-        <rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c#End_main_lbl"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#doAct2">
+        <c_schema:hasExecContext rdf:resource="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth2"/>
+        <c_schema:rightBeforeAct rdf:resource="http://vstu.ru/poas/se/c_schema#End_main_lbl"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#doSmth -->
+    <!-- http://vstu.ru/poas/se/c_schema#doSmth -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#doSmth">
-        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#AtomicStatement"/>
-        <rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c#doSmth2"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#doSmth">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#AtomicStatement"/>
+        <c_schema:rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c_schema#doSmth2"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#doSmth2 -->
+    <!-- http://vstu.ru/poas/se/c_schema#doSmth2 -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#doSmth2">
-        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#AtomicStatement"/>
-        <rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c#EOmain"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#doSmth2">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#AtomicStatement"/>
+        <c_schema:rightBeforeOp rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#mainContext2 -->
+    <!-- http://vstu.ru/poas/se/c_schema#mainContext2 -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#mainContext2">
-        <hasOrigin rdf:resource="http://vstu.ru/poas/se/c#main()"/>
-        <hasIndex rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</hasIndex>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#mainContext2">
+        <c_schema:hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#main()"/>
+        <c_schema:hasIndex rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</c_schema:hasIndex>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#trace_of_main -->
+    <!-- http://vstu.ru/poas/se/c_schema#trace_of_main -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#trace_of_main">
-        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#Trace"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#trace_of_main">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#Trace"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://vstu.ru/poas/se/c#main() -->
+    <!-- http://vstu.ru/poas/se/c_schema#main() -->
 
-    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c#main()">
-        <rdf:type rdf:resource="http://vstu.ru/poas/se/c#Program"/>
-        <hasEntryPoint rdf:resource="http://vstu.ru/poas/se/c#BOmain"/>
-        <hasExitPoint rdf:resource="http://vstu.ru/poas/se/c#EOmain"/>
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#main()">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#Program"/>
+        <c_schema:hasEntryPoint rdf:resource="http://vstu.ru/poas/se/c_schema#BOmain"/>
+        <c_schema:hasExitPoint rdf:resource="http://vstu.ru/poas/se/c_schema#EOmain"/>
     </owl:NamedIndividual>
     
 
@@ -499,23 +500,44 @@
     <rdf:Description>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
         <owl:distinctMembers rdf:parseType="Collection">
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#BOmain"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#Beg_main_lbl"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#EOmain"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#End_main_lbl"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#doAct"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#doAct2"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#doSmth"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#doSmth2"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#trace_of_main"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#main()"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#BOmain"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#Beg_main_lbl"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#EOmain"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#ERRORS"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#End_main_lbl"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#c2_beg"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#c2_do"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#c2_do2"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#c2_end"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doAct"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doAct2"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doSmth"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doSmth2"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#mainContext2"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#main()"/>
         </owl:distinctMembers>
     </rdf:Description>
     <rdf:Description>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
         <owl:distinctMembers rdf:parseType="Collection">
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#doSmth"/>
-            <rdf:Description rdf:about="http://vstu.ru/poas/se/c#doSmth2"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#BOmain"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#Beg_main_lbl"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#EOmain"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#End_main_lbl"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doAct"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doAct2"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doSmth"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doSmth2"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#trace_of_main"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#main()"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doSmth"/>
+            <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#doSmth2"/>
         </owl:distinctMembers>
     </rdf:Description>
     
@@ -529,28 +551,28 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <rdf:Description rdf:about="http://vstu.ru/poas/se/a">
-        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
-    </rdf:Description>
     <rdf:Description rdf:about="http://vstu.ru/poas/se/b">
         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
     </rdf:Description>
     <rdf:Description rdf:about="http://vstu.ru/poas/se/c">
         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
     </rdf:Description>
-    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#c">
-        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#seq">
-        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
-    </rdf:Description>
-    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#entry">
+    <rdf:Description rdf:about="http://vstu.ru/poas/se/a">
         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
     </rdf:Description>
     <rdf:Description rdf:about="http://vstu.ru/poas/se/c#begin">
         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
     </rdf:Description>
+    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#entry">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
     <rdf:Description rdf:about="http://vstu.ru/poas/se/c#act">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#c">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#seq">
         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
     </rdf:Description>
     <rdf:Description rdf:about="http://vstu.ru/poas/se/c#index">
@@ -582,7 +604,7 @@
                 <rdf:first>
                     <rdf:Description>
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
+                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
                         <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/a"/>
                     </rdf:Description>
                 </rdf:first>
@@ -592,7 +614,7 @@
                         <rdf:first>
                             <rdf:Description>
                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
+                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
                                 <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/b"/>
                             </rdf:Description>
                         </rdf:first>
@@ -601,9 +623,10 @@
                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                 <rdf:first>
                                     <rdf:Description>
-                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Operator"/>
-                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c"/>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#beforeOp"/>
+                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/a"/>
+                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/b"/>
                                     </rdf:Description>
                                 </rdf:first>
                                 <rdf:rest>
@@ -612,9 +635,9 @@
                                         <rdf:first>
                                             <rdf:Description>
                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#beforeOp"/>
-                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/a"/>
-                                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/b"/>
+                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#beforeOp"/>
+                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/b"/>
+                                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c"/>
                                             </rdf:Description>
                                         </rdf:first>
                                         <rdf:rest>
@@ -622,10 +645,9 @@
                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                 <rdf:first>
                                                     <rdf:Description>
-                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#beforeOp"/>
-                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/b"/>
-                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c"/>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Operator"/>
+                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c"/>
                                                     </rdf:Description>
                                                 </rdf:first>
                                                 <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
@@ -645,7 +667,7 @@
                 <rdf:first>
                     <rdf:Description>
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#beforeOp"/>
+                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#beforeOp"/>
                         <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/a"/>
                         <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c"/>
                     </rdf:Description>
@@ -665,7 +687,7 @@
                 <rdf:first>
                     <rdf:Description>
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Program"/>
+                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Program"/>
                         <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#p"/>
                     </rdf:Description>
                 </rdf:first>
@@ -675,7 +697,7 @@
                         <rdf:first>
                             <rdf:Description>
                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Trace"/>
+                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Trace"/>
                                 <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#t"/>
                             </rdf:Description>
                         </rdf:first>
@@ -689,10 +711,10 @@
                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                 <rdf:first>
                     <rdf:Description>
-                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasOrigin"/>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasIndex"/>
                         <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#t"/>
-                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#p"/>
+                        <swrl:argument2 rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</swrl:argument2>
                     </rdf:Description>
                 </rdf:first>
                 <rdf:rest>
@@ -700,10 +722,10 @@
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                         <rdf:first>
                             <rdf:Description>
-                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
-                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasIndex"/>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasOrigin"/>
                                 <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#t"/>
-                                <swrl:argument2 rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</swrl:argument2>
+                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#p"/>
                             </rdf:Description>
                         </rdf:first>
                         <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
@@ -724,8 +746,8 @@
                 <rdf:first>
                     <rdf:Description>
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
-                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#message"/>
-                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#ERRORS"/>
+                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#message"/>
+                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c_schema#ERRORS"/>
                         <swrl:argument2 rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Data Prop test </swrl:argument2>
                     </rdf:Description>
                 </rdf:first>
@@ -744,8 +766,8 @@
                 <rdf:first>
                     <rdf:Description>
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/a"/>
+                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/b"/>
                     </rdf:Description>
                 </rdf:first>
                 <rdf:rest>
@@ -754,8 +776,8 @@
                         <rdf:first>
                             <rdf:Description>
                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/b"/>
+                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c"/>
                             </rdf:Description>
                         </rdf:first>
                         <rdf:rest>
@@ -764,8 +786,8 @@
                                 <rdf:first>
                                     <rdf:Description>
                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c"/>
+                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/a"/>
                                     </rdf:Description>
                                 </rdf:first>
                                 <rdf:rest>
@@ -774,7 +796,7 @@
                                         <rdf:first>
                                             <rdf:Description>
                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#beforeAct"/>
+                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#beforeAct"/>
                                                 <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/a"/>
                                                 <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/b"/>
                                             </rdf:Description>
@@ -785,7 +807,7 @@
                                                 <rdf:first>
                                                     <rdf:Description>
                                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#beforeAct"/>
+                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#beforeAct"/>
                                                         <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/b"/>
                                                         <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c"/>
                                                     </rdf:Description>
@@ -807,7 +829,7 @@
                 <rdf:first>
                     <rdf:Description>
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#beforeAct"/>
+                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#beforeAct"/>
                         <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/a"/>
                         <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c"/>
                     </rdf:Description>
@@ -818,7 +840,7 @@
     </rdf:Description>
     <rdf:Description>
         <swrla:isRuleEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrla:isRuleEnabled>
-        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(Р°РєС‚ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РїРµСЂРµРґ РЅР°С‡Р°Р»РѕРј СЃР»РµРґРѕРІР°РЅРёСЏ)</rdfs:comment>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(акт выполняется перед началом следования)</rdfs:comment>
         <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ActBeforeStartOfSequenceError</rdfs:label>
         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
         <swrl:body>
@@ -827,8 +849,8 @@
                 <rdf:first>
                     <rdf:Description>
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#ExecContext"/>
-                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
+                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#begin"/>
                     </rdf:Description>
                 </rdf:first>
                 <rdf:rest>
@@ -837,9 +859,9 @@
                         <rdf:first>
                             <rdf:Description>
                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasOrigin"/>
-                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
-                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
+                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasOrigin"/>
+                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#begin"/>
+                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#entry"/>
                             </rdf:Description>
                         </rdf:first>
                         <rdf:rest>
@@ -847,9 +869,10 @@
                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                 <rdf:first>
                                     <rdf:Description>
-                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Sequence"/>
-                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#beforeAct"/>
+                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#act"/>
+                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#begin"/>
                                     </rdf:Description>
                                 </rdf:first>
                                 <rdf:rest>
@@ -858,9 +881,9 @@
                                         <rdf:first>
                                             <rdf:Description>
                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasEntryPoint"/>
-                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
-                                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#entry"/>
+                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasOrigin"/>
+                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
+                                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
                                             </rdf:Description>
                                         </rdf:first>
                                         <rdf:rest>
@@ -868,10 +891,10 @@
                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                 <rdf:first>
                                                     <rdf:Description>
-                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasOrigin"/>
-                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#begin"/>
-                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#entry"/>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasIndex"/>
+                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
+                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#index"/>
                                                     </rdf:Description>
                                                 </rdf:first>
                                                 <rdf:rest>
@@ -879,9 +902,23 @@
                                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                         <rdf:first>
                                                             <rdf:Description>
-                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Label"/>
-                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#entry"/>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#BuiltinAtom"/>
+                                                                <swrl:builtin rdf:resource="http://www.w3.org/2003/11/swrlb#stringConcat"/>
+                                                                <swrl:arguments>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                        <rdf:first rdf:resource="http://vstu.ru/poas/se/c#msg"/>
+                                                                        <rdf:rest>
+                                                                            <rdf:Description>
+                                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ActBeforeStartOfSequenceError: context №</rdf:first>
+                                                                                <rdf:rest rdf:parseType="Collection">
+                                                                                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#index"/>
+                                                                                </rdf:rest>
+                                                                            </rdf:Description>
+                                                                        </rdf:rest>
+                                                                    </rdf:Description>
+                                                                </swrl:arguments>
                                                             </rdf:Description>
                                                         </rdf:first>
                                                         <rdf:rest>
@@ -889,9 +926,10 @@
                                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                                 <rdf:first>
                                                                     <rdf:Description>
-                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#begin"/>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasExecContext"/>
+                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#act"/>
+                                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#c"/>
                                                                     </rdf:Description>
                                                                 </rdf:first>
                                                                 <rdf:rest>
@@ -900,8 +938,8 @@
                                                                         <rdf:first>
                                                                             <rdf:Description>
                                                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                                                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-                                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#act"/>
+                                                                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Label"/>
+                                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#entry"/>
                                                                             </rdf:Description>
                                                                         </rdf:first>
                                                                         <rdf:rest>
@@ -909,10 +947,9 @@
                                                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                                                 <rdf:first>
                                                                                     <rdf:Description>
-                                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasExecContext"/>
-                                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#act"/>
-                                                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#c"/>
+                                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Sequence"/>
+                                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
                                                                                     </rdf:Description>
                                                                                 </rdf:first>
                                                                                 <rdf:rest>
@@ -921,9 +958,9 @@
                                                                                         <rdf:first>
                                                                                             <rdf:Description>
                                                                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#beforeAct"/>
-                                                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#act"/>
-                                                                                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#begin"/>
+                                                                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasEntryPoint"/>
+                                                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
+                                                                                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#entry"/>
                                                                                             </rdf:Description>
                                                                                         </rdf:first>
                                                                                         <rdf:rest>
@@ -931,10 +968,9 @@
                                                                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                                                                 <rdf:first>
                                                                                                     <rdf:Description>
-                                                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
-                                                                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasIndex"/>
-                                                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
-                                                                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#index"/>
+                                                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+                                                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#act"/>
                                                                                                     </rdf:Description>
                                                                                                 </rdf:first>
                                                                                                 <rdf:rest>
@@ -942,23 +978,9 @@
                                                                                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                                                                         <rdf:first>
                                                                                                             <rdf:Description>
-                                                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#BuiltinAtom"/>
-                                                                                                                <swrl:builtin rdf:resource="http://www.w3.org/2003/11/swrlb#stringConcat"/>
-                                                                                                                <swrl:arguments>
-                                                                                                                    <rdf:Description>
-                                                                                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
-                                                                                                                        <rdf:first rdf:resource="http://vstu.ru/poas/se/c#msg"/>
-                                                                                                                        <rdf:rest>
-                                                                                                                            <rdf:Description>
-                                                                                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
-                                                                                                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ActBeforeStartOfSequenceError: context в„–</rdf:first>
-                                                                                                                                <rdf:rest rdf:parseType="Collection">
-                                                                                                                                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#index"/>
-                                                                                                                                </rdf:rest>
-                                                                                                                            </rdf:Description>
-                                                                                                                        </rdf:rest>
-                                                                                                                    </rdf:Description>
-                                                                                                                </swrl:arguments>
+                                                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                                                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#ExecContext"/>
+                                                                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
                                                                                                             </rdf:Description>
                                                                                                         </rdf:first>
                                                                                                         <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
@@ -992,8 +1014,8 @@
                 <rdf:first>
                     <rdf:Description>
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
-                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#message"/>
-                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#ERRORS"/>
+                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#message"/>
+                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c_schema#ERRORS"/>
                         <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#msg"/>
                     </rdf:Description>
                 </rdf:first>
@@ -1003,7 +1025,7 @@
     </rdf:Description>
     <rdf:Description>
         <swrla:isRuleEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrla:isRuleEnabled>
-        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(Р°РєС‚ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РїРѕСЃР»Рµ РєРѕРЅС†Р° СЃР»РµРґРѕРІР°РЅРёСЏ)</rdfs:comment>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(акт выполняется после конца следования)</rdfs:comment>
         <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ActAfterEndOfSequenceError</rdfs:label>
         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
         <swrl:body>
@@ -1011,9 +1033,10 @@
                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                 <rdf:first>
                     <rdf:Description>
-                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#ExecContext"/>
-                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasExitPoint"/>
+                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
+                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#exit"/>
                     </rdf:Description>
                 </rdf:first>
                 <rdf:rest>
@@ -1022,9 +1045,9 @@
                         <rdf:first>
                             <rdf:Description>
                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasOrigin"/>
-                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
-                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
+                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasOrigin"/>
+                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#end"/>
+                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#exit"/>
                             </rdf:Description>
                         </rdf:first>
                         <rdf:rest>
@@ -1033,8 +1056,8 @@
                                 <rdf:first>
                                     <rdf:Description>
                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Sequence"/>
-                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
+                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Label"/>
+                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#exit"/>
                                     </rdf:Description>
                                 </rdf:first>
                                 <rdf:rest>
@@ -1042,10 +1065,9 @@
                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                         <rdf:first>
                                             <rdf:Description>
-                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasExitPoint"/>
-                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
-                                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#exit"/>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#end"/>
                                             </rdf:Description>
                                         </rdf:first>
                                         <rdf:rest>
@@ -1054,9 +1076,9 @@
                                                 <rdf:first>
                                                     <rdf:Description>
                                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasOrigin"/>
+                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#beforeAct"/>
                                                         <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#end"/>
-                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#exit"/>
+                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#act"/>
                                                     </rdf:Description>
                                                 </rdf:first>
                                                 <rdf:rest>
@@ -1064,9 +1086,10 @@
                                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                         <rdf:first>
                                                             <rdf:Description>
-                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Label"/>
-                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#exit"/>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasOrigin"/>
+                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
+                                                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
                                                             </rdf:Description>
                                                         </rdf:first>
                                                         <rdf:rest>
@@ -1074,9 +1097,10 @@
                                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                                 <rdf:first>
                                                                     <rdf:Description>
-                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#end"/>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasIndex"/>
+                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
+                                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#index"/>
                                                                     </rdf:Description>
                                                                 </rdf:first>
                                                                 <rdf:rest>
@@ -1084,9 +1108,23 @@
                                                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                                         <rdf:first>
                                                                             <rdf:Description>
-                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
-                                                                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c#Act"/>
-                                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#act"/>
+                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#BuiltinAtom"/>
+                                                                                <swrl:builtin rdf:resource="http://www.w3.org/2003/11/swrlb#stringConcat"/>
+                                                                                <swrl:arguments>
+                                                                                    <rdf:Description>
+                                                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                                        <rdf:first rdf:resource="http://vstu.ru/poas/se/c#msg"/>
+                                                                                        <rdf:rest>
+                                                                                            <rdf:Description>
+                                                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+                                                                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ActAfterEndOfSequenceError: context №</rdf:first>
+                                                                                                <rdf:rest rdf:parseType="Collection">
+                                                                                                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#index"/>
+                                                                                                </rdf:rest>
+                                                                                            </rdf:Description>
+                                                                                        </rdf:rest>
+                                                                                    </rdf:Description>
+                                                                                </swrl:arguments>
                                                                             </rdf:Description>
                                                                         </rdf:first>
                                                                         <rdf:rest>
@@ -1095,7 +1133,7 @@
                                                                                 <rdf:first>
                                                                                     <rdf:Description>
                                                                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasExecContext"/>
+                                                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#hasExecContext"/>
                                                                                         <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#act"/>
                                                                                         <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#c"/>
                                                                                     </rdf:Description>
@@ -1105,10 +1143,9 @@
                                                                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                                                         <rdf:first>
                                                                                             <rdf:Description>
-                                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
-                                                                                                <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#beforeAct"/>
-                                                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#end"/>
-                                                                                                <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#act"/>
+                                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Sequence"/>
+                                                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#seq"/>
                                                                                             </rdf:Description>
                                                                                         </rdf:first>
                                                                                         <rdf:rest>
@@ -1116,10 +1153,9 @@
                                                                                                 <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                                                                 <rdf:first>
                                                                                                     <rdf:Description>
-                                                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
-                                                                                                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#hasIndex"/>
-                                                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
-                                                                                                        <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#index"/>
+                                                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                                                        <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
+                                                                                                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#act"/>
                                                                                                     </rdf:Description>
                                                                                                 </rdf:first>
                                                                                                 <rdf:rest>
@@ -1127,23 +1163,9 @@
                                                                                                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
                                                                                                         <rdf:first>
                                                                                                             <rdf:Description>
-                                                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#BuiltinAtom"/>
-                                                                                                                <swrl:builtin rdf:resource="http://www.w3.org/2003/11/swrlb#stringConcat"/>
-                                                                                                                <swrl:arguments>
-                                                                                                                    <rdf:Description>
-                                                                                                                        <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
-                                                                                                                        <rdf:first rdf:resource="http://vstu.ru/poas/se/c#msg"/>
-                                                                                                                        <rdf:rest>
-                                                                                                                            <rdf:Description>
-                                                                                                                                <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
-                                                                                                                                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ActAfterEndOfSequenceError: context в„–</rdf:first>
-                                                                                                                                <rdf:rest rdf:parseType="Collection">
-                                                                                                                                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c#index"/>
-                                                                                                                                </rdf:rest>
-                                                                                                                            </rdf:Description>
-                                                                                                                        </rdf:rest>
-                                                                                                                    </rdf:Description>
-                                                                                                                </swrl:arguments>
+                                                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                                                                <swrl:classPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#ExecContext"/>
+                                                                                                                <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#c"/>
                                                                                                             </rdf:Description>
                                                                                                         </rdf:first>
                                                                                                         <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
@@ -1177,8 +1199,8 @@
                 <rdf:first>
                     <rdf:Description>
                         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
-                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c#message"/>
-                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c#ERRORS"/>
+                        <swrl:propertyPredicate rdf:resource="http://vstu.ru/poas/se/c_schema#message"/>
+                        <swrl:argument1 rdf:resource="http://vstu.ru/poas/se/c_schema#ERRORS"/>
                         <swrl:argument2 rdf:resource="http://vstu.ru/poas/se/c#msg"/>
                     </rdf:Description>
                 </rdf:first>
@@ -1191,4 +1213,4 @@
 
 
 <!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
- 
+
