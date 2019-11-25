@@ -96,7 +96,7 @@
         <rdfs:domain>
             <owl:Class>
                 <owl:unionOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#Decision"/>
+                    <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#If_else"/>
                     <rdf:Description rdf:about="http://vstu.ru/poas/se/c_schema#Loop"/>
                 </owl:unionOf>
             </owl:Class>
@@ -177,7 +177,7 @@
         <rdfs:domain rdf:resource="http://vstu.ru/poas/se/c_schema#Statement"/>
         <rdfs:range rdf:resource="http://vstu.ru/poas/se/c_schema#Block"/>
         <rdfs:comment>belongs to Block</rdfs:comment>
-        <rdfs:label>has-Block-scope</rdfs:label>
+        <rdfs:label>Block-scope</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -353,6 +353,14 @@
     
 
 
+    <!-- http://vstu.ru/poas/se/c_schema#BlockContext -->
+
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#BlockContext">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Context"/>
+    </owl:Class>
+    
+
+
     <!-- http://vstu.ru/poas/se/c_schema#Branching -->
 
     <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Branching">
@@ -420,6 +428,14 @@
     
 
 
+    <!-- http://vstu.ru/poas/se/c_schema#DecisionContext -->
+
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#DecisionContext">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Context"/>
+    </owl:Class>
+    
+
+
     <!-- http://vstu.ru/poas/se/c_schema#Declaration -->
 
     <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Declaration">
@@ -437,6 +453,14 @@
     
 
 
+    <!-- http://vstu.ru/poas/se/c_schema#DoWhileLoopContext -->
+
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#DoWhileLoopContext">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#LoopContext"/>
+    </owl:Class>
+    
+
+
     <!-- http://vstu.ru/poas/se/c_schema#Expression -->
 
     <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Expression">
@@ -450,6 +474,14 @@
     <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#ExpressionStmt">
         <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Statement"/>
         <rdfs:label>Expression Statement</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c_schema#ForContext -->
+
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#ForContext">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#LoopContext"/>
     </owl:Class>
     
 
@@ -496,6 +528,22 @@
     
 
 
+    <!-- http://vstu.ru/poas/se/c_schema#If_elseContext -->
+
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#If_elseContext">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#DecisionContext"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c_schema#IterationContext -->
+
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#IterationContext">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Context"/>
+    </owl:Class>
+    
+
+
     <!-- http://vstu.ru/poas/se/c_schema#LOG -->
 
     <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#LOG">
@@ -531,6 +579,14 @@
     <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#Loop">
         <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#ControlFlow"/>
         <rdfs:label>Loop Statement</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c_schema#LoopContext -->
+
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#LoopContext">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Context"/>
     </owl:Class>
     
 
@@ -594,6 +650,14 @@
 
     <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#WhileLoop">
         <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#Loop"/>
+    </owl:Class>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c_schema#WhileLoopContext -->
+
+    <owl:Class rdf:about="http://vstu.ru/poas/se/c_schema#WhileLoopContext">
+        <rdfs:subClassOf rdf:resource="http://vstu.ru/poas/se/c_schema#LoopContext"/>
     </owl:Class>
     
 
@@ -670,6 +734,7 @@
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#_c1">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#FunctionInvocation"/>
         <hasNext rdf:resource="http://vstu.ru/poas/se/c_schema#_c2"/>
+        <hasScope rdf:resource="http://vstu.ru/poas/se/c_schema#_b1"/>
         <hasSource>printf(&quot;hello - 1&quot;)</hasSource>
         <rdfs:label>printf(&quot;hello - 1&quot;);</rdfs:label>
     </owl:NamedIndividual>
@@ -681,6 +746,7 @@
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#_c2">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#FunctionInvocation"/>
         <hasNext rdf:resource="http://vstu.ru/poas/se/c_schema#_c3"/>
+        <hasScope rdf:resource="http://vstu.ru/poas/se/c_schema#_b1"/>
         <hasLocationSuffix>@main&gt;block1</hasLocationSuffix>
         <hasSource>printf(&quot;hello - 2&quot;);</hasSource>
         <rdfs:label>printf(&quot;hello - 2&quot;);</rdfs:label>
@@ -692,6 +758,7 @@
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#_c3">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#FunctionInvocation"/>
+        <hasScope rdf:resource="http://vstu.ru/poas/se/c_schema#_b1"/>
         <hasSource>printf(&quot;hello - 3&quot;)</hasSource>
         <rdfs:label>printf(&quot;hello - 3&quot;);</rdfs:label>
     </owl:NamedIndividual>
@@ -705,6 +772,14 @@
         <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#_b1"/>
         <hasIndex rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5</hasIndex>
         <rdfs:label>main context</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://vstu.ru/poas/se/c_schema#cond_1 -->
+
+    <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#cond_1">
+        <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#If_else"/>
     </owl:NamedIndividual>
     
 
