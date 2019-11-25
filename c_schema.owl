@@ -647,6 +647,7 @@
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#_a3">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
         <hasContext rdf:resource="http://vstu.ru/poas/se/c_schema#_tc1"/>
+        <hasNext rdf:resource="http://vstu.ru/poas/se/c_schema#extra_act"/>
         <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#_c3"/>
         <rdfs:label>act printf 3</rdfs:label>
     </owl:NamedIndividual>
@@ -713,7 +714,6 @@
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#extra_act">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#Act"/>
         <hasContext rdf:resource="http://vstu.ru/poas/se/c_schema#_tc1"/>
-        <hasNext rdf:resource="http://vstu.ru/poas/se/c_schema#_a1"/>
         <hasOrigin rdf:resource="http://vstu.ru/poas/se/c_schema#_c2"/>
     </owl:NamedIndividual>
     
