@@ -1,8 +1,16 @@
-#############		 Paste rules to to Protege`s SWRL Tab 			 ##############
-############# (*.py extension is just used for syntax highlighting :) ##############
+#############		 Paste rules to to Protege`s SWRL Tab 			  #############
+############# (*.py extension is just used for syntax highlighting :) #############
+### Rule format structure: blocks separated by blank line:
+### - variables (`?x`, `?my_var`) type declaration.
+### - conditions & restrictions; last line is exact rule trigger.
+### - strings assignment; last line is concatenation of result message.
+### > line starting with `->` is a rule body - saves message as new data property assigned to LOG (global individual). 
+
+
 
 # BeforeActTransitive
 c_schema:Act(?b) ^ c_schema:Act(?c) ^ c_schema:Act(?a) ^ c_schema:beforeAct(?a, ?b) ^ c_schema:beforeAct(?b, ?c) -> c_schema:beforeAct(?a, ?c)
+
 
 # 1
 # ActBeforeStartOfBlockError
@@ -51,8 +59,6 @@ swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: act `", ?src, "` (", ?stlbl, 
 
 # 3
 # ActsPairMisorderError
-# # c_schema:Block(?block)
-# # c_schema:hasOrigin(?c, ?block)
 c_schema:Context(?c)
 c_schema:Statement(?stmt_1)
 c_schema:Statement(?stmt_2)
