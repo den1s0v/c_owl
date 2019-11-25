@@ -95,5 +95,29 @@ c_schema:hasSource(?stmt_act1, ?src_a1)
 c_schema:hasSource(?stmt_act2, ?src_a2) 
 c_schema:hasSource(?stmt_2, ?src2) 
 swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: `", ?src_a1, "` must be followed by `", ?src2, "` , not `", ?src_a2, "`.")
+
+
+# 5
+# ActCannotPrecedeActError
+c_schema:Context(?c)
+c_schema:Statement(?stmt_act1)
+c_schema:Statement(?stmt_act2)
+c_schema:Act(?act1)
+c_schema:Act(?act2)
+c_schema:Statement(?stmt_1)
+
+c_schema:hasContext(?act1, ?c)
+c_schema:hasContext(?act2, ?c)
+c_schema:hasNext(?act1, ?act2)
+c_schema:hasNext(?stmt_1, ?stmt_act2)
+c_schema:hasOrigin(?act1, ?stmt_act1)
+c_schema:hasOrigin(?act2, ?stmt_act2)
+
+differentFrom(?stmt_act1, ?stmt_1)
+
+c_schema:hasSource(?stmt_act1, ?src_a1)
+c_schema:hasSource(?stmt_act2, ?src_a2)
+c_schema:hasSource(?stmt_1, ?src1)
+swrlb:stringConcat(?msg, "ActCannotPrecedeActError: `", ?src_a2, "` must be preceeded by `", ?src1, "` , not `", ?src_a1, "`.")
  -> c_schema:message(c_schema:ERRORS, ?msg)
 
