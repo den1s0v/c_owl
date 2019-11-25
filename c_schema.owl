@@ -691,6 +691,7 @@
 
     <owl:NamedIndividual rdf:about="http://vstu.ru/poas/se/c_schema#_c3">
         <rdf:type rdf:resource="http://vstu.ru/poas/se/c_schema#FunctionInvocation"/>
+        <hasSource>printf(&quot;hello - 3&quot;)</hasSource>
         <rdfs:label>printf(&quot;hello - 3&quot;);</rdfs:label>
     </owl:NamedIndividual>
     
