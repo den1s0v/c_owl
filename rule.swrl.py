@@ -23,7 +23,7 @@ c_schema:hasIndex(?c, ?index)
 c_schema:hasOrigin(?act, ?stmt) 
 c_schema:hasSource(?stmt, ?src) 
 c_schema:hasLocationSuffix(?stmt, ?stlbl) 
-swrlb:stringConcat(?msg, "ActBeforeStartOfBlockError: ", ?src, ?stlbl, "#", ?index, " is placed before start of block.")
+swrlb:stringConcat(?msg, "ActBeforeStartOfBlockError: act `", ?src, "` (", ?stlbl, "#", ?index, ") is placed before start of block.")
  -> c_schema:message(c_schema:ERRORS, ?msg)
 
 # 2
@@ -45,7 +45,7 @@ c_schema:hasIndex(?c, ?index)
 c_schema:hasOrigin(?act, ?stmt) 
 c_schema:hasSource(?stmt, ?src) 
 c_schema:hasLocationSuffix(?stmt, ?stlbl) 
-swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: ", ?src, ?stlbl, "#", ?index, " is placed after end of block.")
+swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: act `", ?src, "` (", ?stlbl, "#", ?index, ") is placed after end of block.")
  -> c_schema:message(c_schema:ERRORS, ?msg)
 
 
@@ -69,7 +69,7 @@ c_schema:before(?act2, ?act1)
 c_schema:hasIndex(?c, ?index)
 c_schema:hasSource(?stmt_1, ?src1) 
 c_schema:hasSource(?stmt_2, ?src2) 
-swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: ", ?src1, " and ", ?src2, " are placed in reversed order.")
+swrlb:stringConcat(?msg, "ActsPairMisorderError: acts `", ?src2, "` and `", ?src1, "` are placed in reversed order.")
  -> c_schema:message(c_schema:ERRORS, ?msg)
 
 
@@ -94,7 +94,8 @@ differentFrom(?stmt_act2, ?stmt_2)
 c_schema:hasSource(?stmt_act1, ?src_a1) 
 c_schema:hasSource(?stmt_act2, ?src_a2) 
 c_schema:hasSource(?stmt_2, ?src2) 
-swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: `", ?src_a1, "` must be followed by `", ?src2, "` , not `", ?src_a2, "`.")
+swrlb:stringConcat(?msg, "ActCannotFollowActError: `", ?src_a1, "` must be followed by `", ?src2, "` , not `", ?src_a2, "`.")
+ -> c_schema:message(c_schema:ERRORS, ?msg)
 
 
 # 5
