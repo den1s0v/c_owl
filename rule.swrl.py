@@ -50,7 +50,7 @@ swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: ", ?src, ?stlbl, "#", ?index,
 
 
 # 3
-# ActsPairMisorderErro
+# ActsPairMisorderError
 # # c_schema:Block(?block)
 # # c_schema:hasOrigin(?c, ?block)
 c_schema:Context(?c)
@@ -71,3 +71,29 @@ c_schema:hasSource(?stmt_1, ?src1)
 c_schema:hasSource(?stmt_2, ?src2) 
 swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: ", ?src1, " and ", ?src2, " are placed in reversed order.")
  -> c_schema:message(c_schema:ERRORS, ?msg)
+
+
+# 4
+# ActCannotFollowActError
+c_schema:Context(?c)
+c_schema:Statement(?stmt_act1)
+c_schema:Statement(?stmt_act2)
+c_schema:Act(?act1)
+c_schema:Act(?act2)
+c_schema:Statement(?stmt_2)
+
+c_schema:hasContext(?act1, ?c)
+c_schema:hasContext(?act2, ?c)
+c_schema:hasNext(?act1, ?act2)
+c_schema:hasNext(?stmt_act1, ?stmt_2)
+c_schema:hasOrigin(?act1, ?stmt_act1)
+c_schema:hasOrigin(?act2, ?stmt_act2)
+
+differentFrom(?stmt_act2, ?stmt_2)
+
+c_schema:hasSource(?stmt_act1, ?src_a1) 
+c_schema:hasSource(?stmt_act2, ?src_a2) 
+c_schema:hasSource(?stmt_2, ?src2) 
+swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: `", ?src_a1, "` must be followed by `", ?src2, "` , not `", ?src_a2, "`.")
+ -> c_schema:message(c_schema:ERRORS, ?msg)
+
