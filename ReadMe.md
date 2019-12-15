@@ -9,8 +9,10 @@
 
 ## Технологии
 
-- OWL 2 + SWRL
+- OWL 2 + SWRL ([tutorial](http://dior.ics.muni.cz/~makub/owl))
 - Pellet 2+ reasoner
-- Protege 5.5
-- [?] SPARQL endpoint
-- [?] Stardog knoledge base
+- Ontology & rules editor: Protege 5.5 ([official docs](http://protegeproject.github.io/protege/class-expression-syntax/), [SWRL docs](https://github.com/protegeproject/swrlapi/wiki))
+- [?] Stardog knoledge base ([?] SPARQL endpoint)
+- [Owlready2 Python library](https://pypi.org/project/Owlready2/) ships with Pellet2 ([docs](https://owlready2.readthedocs.io/))
+
+
