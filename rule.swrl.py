@@ -14,6 +14,8 @@ c_schema:Act(?b) ^ c_schema:Act(?c) ^ c_schema:Act(?a) ^ c_schema:beforeAct(?a, 
 
 # 1
 # ActBeforeStartOfBlockError
+# Срабатывает, если для блока есть акт `act`, стоящий ДО первого акта следования `act1`:
+# act < act1
 c_schema:Context(?c) 
 c_schema:Block(?block) 
 c_schema:Statement(?stmt1) 
@@ -36,6 +38,8 @@ swrlb:stringConcat(?msg, "ActBeforeStartOfBlockError: act `", ?src, "` (", ?stlb
 
 # 2
 # ActAfterEndOfBlockError
+# Срабатывает, если для блока есть акт `act`, стоящий ПОСЛЕ последнего акта следования `end`:
+# end < act
 c_schema:Context(?c) 
 c_schema:Block(?block) 
 c_schema:Statement(?stmt_end) 
@@ -59,6 +63,9 @@ swrlb:stringConcat(?msg, "ActAfterEndOfBlockError: act `", ?src, "` (", ?stlbl, 
 
 # 3
 # ActsPairMisorderError
+# Срабатывает, если акты `act1` и `act2` для последовательных действий блока `stmt_1` и `stmt_2` стоят в обратном порядке:
+# stmt_1 << stmt_2 ,
+# act2 < act1
 c_schema:Context(?c)
 c_schema:Statement(?stmt_1)
 c_schema:Statement(?stmt_2)
@@ -81,6 +88,10 @@ swrlb:stringConcat(?msg, "ActsPairMisorderError: acts `", ?src2, "` and `", ?src
 
 # 4
 # ActCannotFollowActError
+# Срабатывает, если действия `stmt_act1` и `stmt_act2` последовательных актов `act1` и `act2` не последовательны, и вместо `stmt_act2` должно стоять `stmt_2`:
+# stmt_act1 << stmt_2 ,
+# act1 << act2 ,
+# stmt_act2 != stmt_2
 c_schema:Context(?c)
 c_schema:Statement(?stmt_act1)
 c_schema:Statement(?stmt_act2)
@@ -106,6 +117,10 @@ swrlb:stringConcat(?msg, "ActCannotFollowActError: `", ?src_a1, "` must be follo
 
 # 5
 # ActCannotPrecedeActError
+# Срабатывает, если действия `stmt_act1` и `stmt_act2` последовательных актов `act1` и `act2` не последовательны, и вместо `stmt_act1` должно стоять `stmt_1`:
+# stmt_1 << stmt_act2 ,
+# act1 << act2 ,
+# stmt_act1 != stmt_1
 c_schema:Context(?c)
 c_schema:Statement(?stmt_act1)
 c_schema:Statement(?stmt_act2)
