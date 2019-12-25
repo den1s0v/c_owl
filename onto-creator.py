@@ -20,9 +20,11 @@ with c_schema:
 	####################################
 	
 	# >
-	class hasPart( FunctionalProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty): pass  # direct part
+	class referencesTo( FunctionalProperty, AsymmetricProperty, IrreflexiveProperty): pass  # direct part
 	# >
-	class hasSibling( FunctionalProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty): pass  # base for Next
+	class hasPart( FunctionalProperty, AsymmetricProperty, IrreflexiveProperty): pass  # direct part
+	# >
+	class hasSibling( FunctionalProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty): pass  # (directed) base for any Next
 	# >
 	class hasPartTransitive( TransitiveProperty,  # transitive !
 		FunctionalProperty, AsymmetricProperty, IrreflexiveProperty): pass  # base for FirstAct
@@ -70,7 +72,7 @@ with c_schema:
 	######## Code Properties ########
 	#################################
 	
-	"""In addition, the following subclasses of Property are available: FunctionalProperty, InverseFunctionalProperty, TransitiveProperty, SymmetricProperty, AsymmetricProperty, ReflexiveProperty, IrreflexiveProperty. They should be used in addition to ObjectProperty or DataProperty (or the ‘domain >> range’ syntax)."""
+	""" |  In addition, the following subclasses of Property are available: FunctionalProperty, InverseFunctionalProperty, TransitiveProperty, SymmetricProperty, AsymmetricProperty, ReflexiveProperty, IrreflexiveProperty. They should be used in addition to ObjectProperty or DataProperty (or the ‘domain >> range’ syntax)."""
 	
 	# ->
 	class hasFirstSt( Block >> Statement , hasPart): pass
@@ -129,13 +131,10 @@ with c_schema:
 	class DO_Context(LoopContext): pass
 	
 	
-
-
-
-	
-	###########################№######
+    
+	##################################
 	######## Trace Properties ########
-	###########################№######
+	##################################
 	
 	# >
 	class hasFirstAct( Context >> Act , hasPartTransitive): pass  # over hasFirst(c, a) & Act(a)
@@ -155,9 +154,92 @@ with c_schema:
 	class before( Context >> TraceElement , hasPartTransitive): pass  # over hasNextL
 		
 	# ->
-	class hasOrigin( TraceElement >> CodeElement , hasPart): pass
+	class hasOrigin( TraceElement >> CodeElement , referencesTo): pass
 	
 	# >
 	class evalsTo( ConditionAct >> bool , DataProperty): pass
 		
 	
+    
+
+	
+	##############################
+	######## Rule Classes ########
+	##############################
+	
+	# >
+	class GenericRule(Thing):
+		comment = 'Base for all rules'
+        # name
+	# ->
+	class TraceRule(GenericRule):
+		comment = 'Base for all trace rules'
+	
+	# -->
+	class StartActBeforeEndActRule(SequenceRule): pass
+
+	# -->
+	class SequenceRule(TraceRule): pass
+	# --->
+	class ActIsContainedInSequenceRule(SequenceRule): pass
+	# --->
+	class OnlyOneActExcecutionInSequenceRule(SequenceRule): pass
+	# --->
+	class ExecuteActABeforeActBInSequenceRule(SequenceRule): pass
+	
+	# -->
+	class AlternativeRule(TraceRule): pass
+	# --->
+	class AlternativeActExecuteRule(AlternativeRule): pass
+	
+	# -->
+	class LoopRule(TraceRule): pass
+	# --->
+	class ExecuteBodyActAfterFalseConditionActRule(LoopRule): pass
+	
+    # --->
+	class WHILE_Rule(LoopRule): pass
+	# ---->
+	class WhileLoopBodyActExecuteRule(WHILE_Rule): pass
+
+
+
+	#################################
+	######## Rule Properties ########
+	#################################
+	
+	# >
+	class description( GenericRule >> bool , DataProperty, FunctionalProperty): pass
+	
+
+	
+	###############################
+	######## Error Classes ########
+	###############################
+	
+	# >
+	class GenericError(Thing):
+		comment = 'Base for all errors'
+	# ->
+	# class Act(TraceElement): pass  # atomic "Act"
+
+
+	##################################
+	######## Error Properties ########
+	##################################
+	
+
+	
+    
+    
+	############################
+	######## SWRL Rules ########
+	############################
+	
+	rules = {
+# 		"BeforeActTransitive": """ Act(?b) ^ Act(?c) ^ c_schema:Act(?a) ^ beforeAct(?a, ?b) ^ beforeAct(?b, ?c) -> beforeAct(?a, ?c) """ ,
+		"NextL_to_before": """ hasNext(?a, ?b) -> beforeAct(?a, ?b) """ ,
+		
+# 		"NextL_to_before": """ 
+#         """ ,
+	}
