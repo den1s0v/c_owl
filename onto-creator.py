@@ -16,8 +16,17 @@ with c_schema:
 
 
 	####################################
-	######## General Properties ########
+#	######## General Properties ########
 	####################################
+
+	""" |  In addition, the following subclasses of Property are available: FunctionalProperty, InverseFunctionalProperty, TransitiveProperty, SymmetricProperty, AsymmetricProperty, ReflexiveProperty, IrreflexiveProperty. They should be used in addition to ObjectProperty or DataProperty (or the ‘domain >> range’ syntax)."""
+
+	# mixins to be used with property constructor call
+	references = [AsymmetricProperty, IrreflexiveProperty]
+	referencesToUnique = [FunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
+	referencedByUnique = [InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
+	mutualUnique = [FunctionalProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
+	hasUniqueData = [FunctionalProperty, DataProperty]  # should I remove DataProperty ?
 
 	# # >
 	# class referencesTo( FunctionalProperty, AsymmetricProperty, IrreflexiveProperty): pass  # direct part
@@ -31,15 +40,13 @@ with c_schema:
 	# # >
 	# class hasUniqueData( FunctionalProperty, DataProperty): pass  # datatype property base
 
-	references = [AsymmetricProperty, IrreflexiveProperty]
-	referencesToUnique = [FunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
-	referencedByUnique = [InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
-	mutualUnique = [FunctionalProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
-	hasUniqueData = [FunctionalProperty, DataProperty]
+	class hasDirectPart( ObjectProperty , *references ): pass
+	class hasPart(  ObjectProperty , TransitiveProperty , *references ): pass  # transitive ! over hasDirectPart
+
 
 
 	###############################
-	######## Code Classes ########
+#	######## Code Classes ########
 	###############################
 
 	# >
@@ -47,8 +54,10 @@ with c_schema:
 		comment = 'Root of an algorithm tree.'
 	# >
 	class CodeElement(Thing):
-		"""docstring for CodeElement"""
 		comment = 'Base for Statements & Expresions, etc.'
+	# ->
+	class Atom(CodeElement):
+		comment = 'Abstract atomic executable thing, i.e. a Statement or Expresion executed "in one step".'
 	# ->
 	class Function(CodeElement): pass
 	# ->
@@ -56,7 +65,8 @@ with c_schema:
 	# -->
 	class Empty_st(Statement): pass
 	# -->
-	class FuncCall(Statement): pass
+	class FuncCall(Statement , Atom):  #
+		comment = 'let a FuncCall is an Atom, for now ...'
 	# -->
 	class Block(Statement): pass
 	# --->
@@ -77,39 +87,38 @@ with c_schema:
 	class DO_st(Loop): pass
 
 	# -->
-	class BREAK_st(Statement): pass
+	class BREAK_st(Statement , Atom): pass
 	# -->
-	class CONTINUE_st(Statement): pass
+	class CONTINUE_st(Statement , Atom): pass
 	# -->
-	class RETURN_st(Statement): pass
+	class RETURN_st(Statement , Atom): pass
 
 	# ->
-	class Expression(CodeElement): pass
+	class Expression(CodeElement , Atom): pass
 
 
 
 
 
 	#################################
-	######## Code Properties ########
+#	######## Code Properties ########
 	#################################
 
-	""" |  In addition, the following subclasses of Property are available: FunctionalProperty, InverseFunctionalProperty, TransitiveProperty, SymmetricProperty, AsymmetricProperty, ReflexiveProperty, IrreflexiveProperty. They should be used in addition to ObjectProperty or DataProperty (or the ‘domain >> range’ syntax)."""
-
 	# ->
-	# class hasSubExpr( CodeElement >> Expression , *references): pass
+	class hasSubExpr( CodeElement >> Expression , hasDirectPart): pass
+	# ->
+	class hasSubStmt( CodeElement >> Statement ,  hasDirectPart): pass
+
 	# -->
-	class hasCondition( (Decision | Loop) >> Expression , *referencesToUnique): pass
-	class hasFORInit(   FOR_st >> Expression , 			  *referencesToUnique): pass
-	class hasFORUpdate( FOR_st >> Expression , 			  *referencesToUnique): pass
+	class hasCondition( (Decision | Loop) >> Expression , hasSubExpr , *referencesToUnique): pass
+	class hasFORInit(   FOR_st >> Expression , 			  hasSubStmt , *referencesToUnique): pass
+	class hasFORUpdate( FOR_st >> Expression , 			  hasSubStmt , *referencesToUnique): pass
 
 	# ->
-	class hasSubStmt( CodeElement >> Statement , *references): pass
+	class hasBody( (Loop | Function) >> Statement ,  hasSubStmt , *referencesToUnique): pass
 	# ->
-	class hasBody( (Loop | Function) >> Statement , *referencesToUnique): pass
-	# ->
-	class hasThenBranch( IF_st >> Statement , *referencesToUnique): pass
-	class hasElseBranch( IF_st >> Statement , *referencesToUnique): pass
+	class hasThenBranch( IF_st >> Statement ,  hasSubStmt , *referencesToUnique): pass
+	class hasElseBranch( IF_st >> Statement ,  hasSubStmt , *referencesToUnique): pass
 
 	# ->
 	class hasFirstSt( Block >> Statement , *referencesToUnique): pass
@@ -139,75 +148,72 @@ with c_schema:
 
 
 	###############################
-	######## Trace Classes ########
+#	######## Trace Classes ########
 	###############################
 
 	# >
+	class Trace(Thing):
+		comment = 'A trace based on an Algorithm'
+	# >
 	class TraceElement(Thing):
-		comment = 'Base for Act & Context trace elements'
+		comment = 'Base for Acts & other trace elements (if added in future)'
 	# ->
 	class Act(TraceElement): pass  # atomic "Act"
 	# -->
 	class ConditionAct(Act): pass  # expression Act, evals to True or False
 
+	# # ->
+	# class Context(TraceElement): pass
+	# # -->
+	# class BlockContext(Context): pass
+	# # -->
+	# class DecisionContext(Context): pass
+	# # --->
+	# class IF_Context(DecisionContext): pass
+	# # -->
+	# class LoopContext(Context): pass
+	# # --->
+	# class WHILE_Context(LoopContext): pass
+	# # --->
+	# class FOR_Context(LoopContext): pass
+	# # --->
+	# class DO_Context(LoopContext): pass
+
+
+	##################################
+#	######## Trace Properties ########
+	##################################
+
+	# >
+	class hasFirstAct( Trace >> Act , *referencesToUnique):
+		comment = 'Should always be used with non-empty Trace.'
+	# >
+	class hasLastAct( Trace >> Act , *referencesToUnique): pass
+
+	# Остаётся минимум - только последовательность актов и транзитивное "ДО"
+	# >
+	class hasNextAct( Act >> Act , *mutualUnique): pass
 	# ->
-	class Context(TraceElement): pass
-	# -->
-	class BlockContext(Context): pass
-	# -->
-	class DecisionContext(Context): pass
-	# --->
-	class IF_Context(DecisionContext): pass
-	# -->
-	class LoopContext(Context): pass
-	# --->
-	class WHILE_Context(LoopContext): pass
-	# --->
-	class FOR_Context(LoopContext): pass
-	# --->
-	class DO_Context(LoopContext): pass
+	class beforeAct( Act >> Act , TransitiveProperty , *references): pass  # transitive over hasNextAct
 
+	# ->
+	class hasOrigin( TraceElement >> CodeElement , *referencesToUnique): pass
 
-
-	##################################
-	######## Trace Properties ########
-	##################################
-
-	# # >
-	# class hasFirstAct( Context >> Act , hasOnePartTransitive): pass  # over hasFirst(c, a) & Act(a)
-	# # >
-	# class hasLastAct( Context >> Act , hasOnePartTransitive): pass  # over hasLast(c, a) & Act(a)
-	# # ->
-	# class hasFirst( Context >> TraceElement , hasOnePart): pass
-	# # ->
-	# class hasLast( Context >> TraceElement , hasOnePart): pass
-
-
-	# # >
-	# class hasNextAct( Act >> Act , hasSibling): pass
-	# # ->
-	# class hasNext( Context >> TraceElement , hasSibling): pass  # (hasNextL - on same nesting Level)
-	# # ->
-	# class before( Context >> TraceElement , hasOnePartTransitive): pass  # over hasNextL
-
-	# # ->
-	# class hasOrigin( TraceElement >> CodeElement , referencesTo): pass
-
-	# # >
-	# class evalsTo( ConditionAct >> bool , DataProperty): pass
+	# >
+	class evalsTo( ConditionAct >> bool , *hasUniqueData): pass
 
 
 
 
 
 	##############################
-	######## Rule Classes ########
+#	######## Rule Classes ########
 	##############################
 
 	# >
 	class GenericRule(Thing):
 		comment = 'Base for all rules'
-        # name
+		# name
 	# ->
 	class TraceRule(GenericRule):
 		comment = 'Base for all trace rules'
@@ -234,7 +240,7 @@ with c_schema:
 	# --->
 	class ExecuteBodyActAfterFalseConditionActRule(LoopRule): pass
 
-    # --->
+	# --->
 	class WHILE_Rule(LoopRule): pass
 	# ---->
 	class WhileLoopBodyActExecuteRule(WHILE_Rule): pass
@@ -242,7 +248,7 @@ with c_schema:
 
 
 	#################################
-	######## Rule Properties ########
+#	######## Rule Properties ########
 	#################################
 
 	# >
@@ -251,7 +257,7 @@ with c_schema:
 
 
 	###############################
-	######## Error Classes ########
+#	######## Error Classes ########
 	###############################
 
 	# >
@@ -262,7 +268,7 @@ with c_schema:
 
 
 	##################################
-	######## Error Properties ########
+#	######## Error Properties ########
 	##################################
 
 
@@ -270,24 +276,29 @@ with c_schema:
 
 
 	############################
-	######## SWRL Rules ########
+#	######## SWRL Rules ########
 	############################
 
 	rules = {
 # 		"BeforeActTransitive": """ Act(?b) ^ Act(?c) ^ c_schema:Act(?a) ^ beforeAct(?a, ?b) ^ beforeAct(?b, ?c) -> beforeAct(?a, ?c) """ ,
-		"NextL_to_before": """ hasNext(?a, ?b) -> beforeAct(?a, ?b) """ ,
+		"hasNextAct_to_beforeAct": """ hasNextAct(?a, ?b) -> beforeAct(?a, ?b) """ ,
+		"hasDirectPart_to_hasPart": """ hasDirectPart(?a, ?b) -> hasPart(?a, ?b) """ ,
 
 # 		"NextL_to_before": """
 #         """ ,
 	}
+
+	for r in rules.values():
+		Imp().set_as_rule(r)
+
 
 
 def upload_rdf_to_SPARQL_endpoint(graphStore_url, rdf_file_path):
 	import requests
 	with open(rdf_file_path, 'rb') as f:
 		r = requests.post(
-		    graphStore_url,  # ex. 'http://localhost:3030/my_dataset/data',
-		    files={'file': ('onto.rdf', f, 'rdf/xml')}
+			graphStore_url,  # ex. 'http://localhost:3030/my_dataset/data',
+			files={'file': ('onto.rdf', f, 'rdf/xml')}
 		)
 
 	if r.status_code != 200:
@@ -316,4 +327,8 @@ def main():
 
 
 if __name__ == '__main__':
+	print()
+	print('TODO: переделать транзитивные свойства на обычные, но с SWRL-правилами')
+	print('TODO: А то ризонер ругается :)')
+	print()
 	main()
