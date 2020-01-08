@@ -1,0 +1,318 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xml:base="http://vstu.ru/poas/se/c_schema_2020-01"
+         xmlns="http://vstu.ru/poas/se/c_schema_2020-01#">
+
+<owl:Ontology rdf:about="http://vstu.ru/poas/se/c_schema_2020-01"/>
+
+<owl:ObjectProperty rdf:about="#hasCondition">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasFORInit">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#FOR_st"/>
+  <rdfs:range rdf:resource="#Expression"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasFORUpdate">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#FOR_st"/>
+  <rdfs:range rdf:resource="#Expression"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasSubStmt">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#CodeElement"/>
+  <rdfs:range rdf:resource="#Statement"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasBody">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasThenBranch">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#IF_st"/>
+  <rdfs:range rdf:resource="#Statement"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasElseBranch">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#IF_st"/>
+  <rdfs:range rdf:resource="#Statement"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasFirstSt">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#Block"/>
+  <rdfs:range rdf:resource="#Statement"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasLastSt">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#Block"/>
+  <rdfs:range rdf:resource="#Statement"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasNextSt">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#Statement"/>
+  <rdfs:range rdf:resource="#Statement"/>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ordering within Block</rdfs:comment>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasFunc">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#Algorithm"/>
+  <rdfs:range rdf:resource="#Function"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#callOf">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#FuncCall"/>
+  <rdfs:range rdf:resource="#Function"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#breaksLoop">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#BREAK_st"/>
+  <rdfs:range rdf:resource="#Loop"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#continuesLoop">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#CONTINUE_st"/>
+  <rdfs:range rdf:resource="#Loop"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#returnsFrom">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#RETURN_st"/>
+  <rdfs:range rdf:resource="#Function"/>
+</owl:ObjectProperty>
+
+<owl:DatatypeProperty rdf:about="#hasName">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdfs:domain rdf:resource="#Function"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#description">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  <rdfs:domain rdf:resource="#GenericRule"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+
+<owl:Class rdf:about="#Algorithm">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Root of an algorithm tree.</rdfs:comment>
+</owl:Class>
+
+<owl:Class rdf:about="#CodeElement">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Base for Statements &amp; Expresions, etc.</rdfs:comment>
+</owl:Class>
+
+<owl:Class rdf:about="#Function">
+  <rdfs:subClassOf rdf:resource="#CodeElement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Statement">
+  <rdfs:subClassOf rdf:resource="#CodeElement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Empty_st">
+  <rdfs:subClassOf rdf:resource="#Statement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#FuncCall">
+  <rdfs:subClassOf rdf:resource="#Statement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Block">
+  <rdfs:subClassOf rdf:resource="#Statement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#ControlFlow">
+  <rdfs:subClassOf rdf:resource="#Statement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Decision">
+  <rdfs:subClassOf rdf:resource="#ControlFlow"/>
+</owl:Class>
+
+<owl:Class rdf:about="#IF_st">
+  <rdfs:subClassOf rdf:resource="#Decision"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Loop">
+  <rdfs:subClassOf rdf:resource="#ControlFlow"/>
+</owl:Class>
+
+<owl:Class rdf:about="#FOR_st">
+  <rdfs:subClassOf rdf:resource="#Loop"/>
+</owl:Class>
+
+<owl:Class rdf:about="#WHILE_st">
+  <rdfs:subClassOf rdf:resource="#Loop"/>
+</owl:Class>
+
+<owl:Class rdf:about="#DO_st">
+  <rdfs:subClassOf rdf:resource="#Loop"/>
+</owl:Class>
+
+<owl:Class rdf:about="#BREAK_st">
+  <rdfs:subClassOf rdf:resource="#Statement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#CONTINUE_st">
+  <rdfs:subClassOf rdf:resource="#Statement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#RETURN_st">
+  <rdfs:subClassOf rdf:resource="#Statement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Expression">
+  <rdfs:subClassOf rdf:resource="#CodeElement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#TraceElement">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Base for Act &amp; Context trace elements</rdfs:comment>
+</owl:Class>
+
+<owl:Class rdf:about="#Act">
+  <rdfs:subClassOf rdf:resource="#TraceElement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#ConditionAct">
+  <rdfs:subClassOf rdf:resource="#Act"/>
+</owl:Class>
+
+<owl:Class rdf:about="#Context">
+  <rdfs:subClassOf rdf:resource="#TraceElement"/>
+</owl:Class>
+
+<owl:Class rdf:about="#BlockContext">
+  <rdfs:subClassOf rdf:resource="#Context"/>
+</owl:Class>
+
+<owl:Class rdf:about="#DecisionContext">
+  <rdfs:subClassOf rdf:resource="#Context"/>
+</owl:Class>
+
+<owl:Class rdf:about="#IF_Context">
+  <rdfs:subClassOf rdf:resource="#DecisionContext"/>
+</owl:Class>
+
+<owl:Class rdf:about="#LoopContext">
+  <rdfs:subClassOf rdf:resource="#Context"/>
+</owl:Class>
+
+<owl:Class rdf:about="#WHILE_Context">
+  <rdfs:subClassOf rdf:resource="#LoopContext"/>
+</owl:Class>
+
+<owl:Class rdf:about="#FOR_Context">
+  <rdfs:subClassOf rdf:resource="#LoopContext"/>
+</owl:Class>
+
+<owl:Class rdf:about="#DO_Context">
+  <rdfs:subClassOf rdf:resource="#LoopContext"/>
+</owl:Class>
+
+<owl:Class rdf:about="#GenericRule">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Base for all rules</rdfs:comment>
+</owl:Class>
+
+<owl:Class rdf:about="#TraceRule">
+  <rdfs:subClassOf rdf:resource="#GenericRule"/>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Base for all trace rules</rdfs:comment>
+</owl:Class>
+
+<owl:Class rdf:about="#SequenceRule">
+  <rdfs:subClassOf rdf:resource="#TraceRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#StartActBeforeEndActRule">
+  <rdfs:subClassOf rdf:resource="#SequenceRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#ActIsContainedInSequenceRule">
+  <rdfs:subClassOf rdf:resource="#SequenceRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#OnlyOneActExcecutionInSequenceRule">
+  <rdfs:subClassOf rdf:resource="#SequenceRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#ExecuteActABeforeActBInSequenceRule">
+  <rdfs:subClassOf rdf:resource="#SequenceRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#AlternativeRule">
+  <rdfs:subClassOf rdf:resource="#TraceRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#AlternativeActExecuteRule">
+  <rdfs:subClassOf rdf:resource="#AlternativeRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#LoopRule">
+  <rdfs:subClassOf rdf:resource="#TraceRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#ExecuteBodyActAfterFalseConditionActRule">
+  <rdfs:subClassOf rdf:resource="#LoopRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#WHILE_Rule">
+  <rdfs:subClassOf rdf:resource="#LoopRule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#WhileLoopBodyActExecuteRule">
+  <rdfs:subClassOf rdf:resource="#WHILE_Rule"/>
+</owl:Class>
+
+<owl:Class rdf:about="#GenericError">
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Base for all errors</rdfs:comment>
+</owl:Class>
+
+
+</rdf:RDF>
