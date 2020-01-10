@@ -232,7 +232,7 @@ class BlockNode(AlgNode):
 			(self.node_name, OWLPredicate["type"], "Block"),
 		]
 		if self.statements:
-			triples = [
+			triples += [
 				(self.node_name, "hasFirstSt", self.statements[0].node_name),
 				(self.node_name, "hasLastSt", self.statements[-1].node_name),
 			]
