@@ -220,7 +220,7 @@ class BlockNode(AlgNode):
             if self.statements[-1].at != 'NA':
                 loc[1] = self.statements[-1].at.line
 #         self.at = "%s-%s" % (str(loc[0]), str(loc[1]))
-        self.at = "%s%s" % (str(loc[0]),  '+'  if len(self.statements) > 1 else  '')
+		self.at = "%s%s" % (str(loc[0]),  '_'  if len(self.statements) > 1 else  '')
 
     def get_triples(self):
         triples = [
@@ -255,7 +255,6 @@ class FuncCallNode(AlgNode):
                               attributes={
                                   "name":ast_node.name.name,
                               })
-        self.make_node_name(name = "call~%s()" % self.attributes["name"])
         self.called_func = None
         print(self.node_name)
     def get_triples(self):
@@ -269,6 +268,7 @@ class FuncCallNode(AlgNode):
                 (self.node_name, "callOf", self.called_func.node_name),
             ]
         return triples
+		self.make_node_name(name = "call-%s()" % self.attributes["name"])
 
 
 class IfNode(AlgNode):
