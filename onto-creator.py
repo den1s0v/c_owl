@@ -160,30 +160,30 @@ with c_schema:
 	# ->
 	class Act(TraceElement): pass  # atomic "Act"
 	# -->
-	class ConditionAct(Act): pass  # expression Act, evals to True or False
+	class ExpressionAct(Act): pass  # expression Act, evals to some typed value
+	# --->
+	class ConditionAct(ExpressionAct): pass  # boolean expression Act, evals to True or False
 
-	# # ->
-	# class Context(TraceElement): pass
-	# # -->
-	# class BlockContext(Context): pass
-	# # -->
-	# class DecisionContext(Context): pass
-	# # --->
-	# class IF_Context(DecisionContext): pass
-	# # -->
-	# class LoopContext(Context): pass
-	# # --->
-	# class WHILE_Context(LoopContext): pass
-	# # --->
-	# class FOR_Context(LoopContext): pass
-	# # --->
-	# class DO_Context(LoopContext): pass
+	# # >
+	# class ActLabel(Thing):
+	# 	comment = 'A mark attached to Act'
+	# ->
+	class ActContext(TraceElement): pass
+
+	# ->
+	class BeginLabel(TraceElement):
+		comment = 'A mark pointing to begin of a Context (compound Act)'
+	# ->
+	class EndLabel(TraceElement):
+		comment = 'A mark pointing to end of a Context (compound Act)'
 
 
 	##################################
 #	######## Trace Properties ########
 	##################################
 
+	# >
+	class hasAct( Trace >> Act , *references): pass
 	# >
 	class hasFirstAct( Trace >> Act , *referencesToUnique):
 		comment = 'Should always be used with non-empty Trace.'
@@ -196,14 +196,21 @@ with c_schema:
 	# ->
 	class beforeAct( Act >> Act , TransitiveProperty , *references): pass  # transitive over hasNextAct
 
-	# ->
+	# >
 	class hasOrigin( TraceElement >> CodeElement , *referencesToUnique): pass
+	# >
+	class hasN( TraceElement >> int , *hasUniqueData): pass
 
 	# >
 	class evalsTo( ConditionAct >> bool , *hasUniqueData): pass
 
+	# >
+	class hasBeginLabel( Act >> BeginLabel , *references): pass
+	# >
+	class hasEndLabel( Act >> EndLabel , *references): pass
 
-
+	# >
+	class isLabelOf( (BeginLabel | EndLabel) >> ActContext , *referencesToUnique): pass
 
 
 	##############################
