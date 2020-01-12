@@ -5,7 +5,14 @@ from tkinter.ttk import Checkbutton, Notebook
 from tkinter import filedialog
 from tkinter import scrolledtext
 
+import stardog
+
 from c2onto import *
+
+"""
+External dependencies:
+$ pip install pystardog pycparser
+"""
 
 class App:
     def __init__(self):
