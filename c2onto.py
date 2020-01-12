@@ -469,6 +469,28 @@ class ReturnNode(AlgNode):
 ## блок в notebook ##
 #####################
 
+
+
+# обработать префиксы сущностей OWL
+def make_namespace_prefix(name, default_prefix=':', known_prefixes=None):
+    """ Prepends default_prefix to name if required and no one of known_prefixes present """
+    if name.startswith(default_prefix):
+        return name
+    if name.startswith( tuple(known_prefixes or () ) ):
+        return name
+    # no known_prefix present
+    return default_prefix + name
+
+
+def triple_to_sparql_insert(triple, prefix_str=""):
+
+    s = """INSERT DATA
+{
+%s %s %s .
+}""" % triple
+    return prefix_str + s
+
+
 print('definitions OK')
 
 if __name__ == "__main__":
