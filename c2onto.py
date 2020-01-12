@@ -101,7 +101,7 @@ class AlgNode:
 class Algorithm(AlgNode):
 	""" Root for an algoritmh tree created from pycparser`s AST, """
 	def __init__(self, ast_node=None, entry_func_name='main'):
-		AlgNode.__init__(self, type_name='Algorithm',
+		AlgNode.__init__(self, type_name='ALG',
 							  ast_node=ast_node,
 							  at='root',
 							  parent = None,
@@ -207,23 +207,25 @@ class FuncDefNode(AlgNode):
 
 class BlockNode(AlgNode):
 	def __init__(self, ast_node, parent):
-		AlgNode.__init__(self, type_name='Seq',
+		AlgNode.__init__(self, type_name='seq',
 							  ast_node=ast_node,
 							  at='NA',
 							  parent = parent,
 						)
 		self.statements = [parse_ast_node_as_stmt(node, self)
-						  for node in ast_node.block_items]
+						  for node in ast_node.block_items] if ast_node.block_items else []
 		self.find_location()
 		self.make_node_name()
 
 	def find_location(self):
 		loc = ['?','?']
 		if self.statements:
-			if self.statements[0].at != 'NA':
-				loc[0] = self.statements[0].at.line
-			if self.statements[-1].at != 'NA':
-				loc[1] = self.statements[-1].at.line
+			first_at = self.statements[0].at
+			if not isinstance(first_at,str):
+				loc[0] = first_at.line
+			last_at = self.statements[-1].at
+			if not isinstance(last_at,str):
+				loc[1] = last_at.line
 #         self.at = "%s-%s" % (str(loc[0]), str(loc[1]))
 		self.at = "%s%s" % (str(loc[0]),  '_'  if len(self.statements) > 1 else  '')
 
