@@ -192,11 +192,20 @@ class App:
         #   'dropdb':     self.server_db_drop_var.get(),
         # }
         assert self.conn_details
+
         if self.conn_details['createdb']:
             dbname = self.conn_details['dbname']
+            schema_file = stardog.content.File(self.conn_details['schemafile'])
+            print('Probably schema_file OK: ',self.conn_details['schemafile'])
+
             with stardog.Admin(**self.open_conn_details) as admin:
                 db = admin.new_database(dbname)
                 db = None  # forget pointer
+                # init schema
+                with stardog.Connection(dbname, **self.open_conn_details) as conn:
+                    conn.begin()
+                    conn.add(schema_file)
+                    conn.commit()
 
     def stardog_drop_db_if_set(self):
         assert self.conn_details
