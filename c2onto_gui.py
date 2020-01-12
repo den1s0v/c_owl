@@ -180,6 +180,35 @@ class App:
             print(e)
             return str(e)
 
+    def download_ontology(self, save_as, progress_callback=None):
+        try:
+            assert self.conn_details
+            if progress_callback: progress_callback("establishing connection ...")
+
+            dbname = self.conn_details['dbname']
+
+            with stardog.Connection(dbname, **self.open_conn_details) as conn:
+                if progress_callback: progress_callback("connection OK")
+                contents = str(conn.export())
+                # contents = contents[2:-1]  # ??
+                contents = contents.replace('\\n', '\n')
+
+                # запись в файл
+                if not save_as.endswith('.ttl'):
+                    save_as += '.ttl'
+                if progress_callback: progress_callback("writing to file: " + save_as[-50:])
+                with open(save_as, 'w') as f:
+                    f.write(contents)
+
+
+            if progress_callback: progress_callback("dropping database if set so...")
+            self.stardog_drop_db_if_set()
+
+            if progress_callback: progress_callback("finished!")
+        except Exception as e:
+            print(e)
+            return str(e)
+
 
     def stardog_create_db_if_set(self):
         # conn_details = {
