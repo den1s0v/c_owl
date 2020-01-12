@@ -157,7 +157,7 @@ class TabsPanel(Frame):
         # self.code_modified_label.pack(expand=True, fill=X)
         self.code_modified_label.pack(side=LEFT)
 
-        self.get_triples_button = Button(f, text="Convert code to triples ...", padx="15", command=self.on_get_triples_button)
+        self.get_triples_button = Button(f, text="Convert code to triples ...", padx="15", bg='#bbddbb', command=self.on_get_triples_button)
         self.get_triples_button.pack(side=RIGHT)
         # self.code_modified_label["text"] = 'ABCDE!'
         return (f, 'Code')
@@ -203,16 +203,22 @@ class TabsPanel(Frame):
 
     def highlight_char_by_error(self, err_string):
         sep = ':'
-        # dd = err_string.strip(sep).split(sep)
-        # try:
-        #     r,c = dd[:2]
-        #     r = int(r)
-        #     c = int(c)
-        # except:
-        #     return
+        # print(err_string)
+        dd = err_string.strip(sep).split(sep)
+        # print(dd)
+        try:
+            r,c = dd[:2]
+            r = int(r)
+            c = int(c)
+        except:
+            return
         # f = "%d.%d" % (r,c)
         # t = "%d.%d" % (r,c+1)
-        # self.code_edit.selection_set(f,t)
+        f = "%d.0" % (r,)
+        t = "%d.end" % (r,)
+         # self.code_edit.selection_set(f,t)
+        # print(f,t)
+        self.code_edit.tag_add(SEL, f, t)
 
     def make_triples_tab(self):
         f = Frame(self.tab)
