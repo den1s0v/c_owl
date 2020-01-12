@@ -113,4 +113,15 @@ with stardog.Admin(**conn_details) as admin:
 			# pprint(results)
 
 
+		contents = str(conn.export())
+		contents = contents[2:]
+		contents = contents[:-1]
+		contents = contents.replace('\\n', '\n')
+		#pprint(contents)
+		# запись в файл
+		my_file = open('semDB_output.ttl', 'w')
+		my_file.write(contents)
+		my_file.close()
+
+
 # теперь можно проверять содержимое базы ...
