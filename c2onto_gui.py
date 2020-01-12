@@ -109,6 +109,21 @@ class App:
         else:
             return ast_to_code(self.code_ast)
 
+    def get_code_triples(self):
+        """ -> (triples_list, error_str) """
+        if not self.code_ast:
+            return [], None
+        try:
+            uniq_names.clear()
+            alg = Algorithm(self.code_ast)
+            triples = alg.get_triples()
+        except Exception as e:
+            # raise e
+            return [], str(e)
+        return triples, None
+
+
+
 
 class TabsPanel(Frame):
     """All tabs in main screen"""
@@ -188,8 +203,16 @@ class TabsPanel(Frame):
             messagebox.showinfo('Code error', error)
             # print(error)
             self.code_used_str = None
-        else:
-            self.tab.select(1)
+            return
+
+        triples, error = self.app.get_code_triples()
+        if error:
+            messagebox.showinfo('Triples obtaining error', error)
+            # print(error)
+            self.code_used_str = None
+            return
+        self.triples_list = triples
+        self.tab.select(1)
 
     def on_format_code(self):
         # call app action ...
@@ -229,14 +252,35 @@ class TabsPanel(Frame):
 
         self.triples_list = None
 
-        self.goto_upload_button = Button(f, text="Proceed to upload ...", padx="15", command=lambda *_: self.tab.select(2))
-        self.goto_upload_button.pack()  # (side=RIGHT)
+        self.triples_count_label = Label(f, text='Click "Code to Triples" button first', justify='left')
+        self.triples_count_label.pack(side=LEFT)
+
+        self.goto_upload_button = Button(f, text="Proceed to upload ...", padx="15", bg='#bbddbb', command=lambda *_: self.tab.select(2))
+        self.goto_upload_button.pack(side=RIGHT)
 
         return (f, 'Triples')
 
     def check_triples_exist(self):
         button_state = NORMAL if self.triples_list else DISABLED
         self.goto_upload_button["state"] = button_state
+
+        if self.triples_list:
+            count_text = 'Triples count: %d' % len(self.triples_list)
+        else:
+            count_text = 'No triples'
+        self.triples_count_label["text"] = count_text
+        self.show_triples()
+
+    def show_triples(self):
+        if self.triples_list:
+            triples_str = '\n'.join(map(str, self.triples_list))
+        else:
+            triples_str = 'No triples generated from code'
+        self.triples_edit.delete(1.0,END)
+        self.triples_edit.insert(1.0, triples_str)
+
+
+
 
     def on_tab_changed(self, ev):
         # print('on_tab_changed:')
