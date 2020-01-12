@@ -25,6 +25,8 @@ class App:
         # init data
         # self.ontology = Ontology()
         self.code_ast = None
+        self.conn_details = None
+        self.open_conn_details = None
 
         # setup widgets
         # self.file_panel = FilePanel(self.window, self.ontology)
@@ -129,6 +131,81 @@ class App:
             return [], str(e)
         return triples, None
 
+    def set_connection_details(self, conn_details):
+        # conn_details = {
+        #   'endpoint':   self.server_url_var.get(),
+        #   'username': 'admin',
+        #   'password': 'admin',
+        #   'schemafile': self.schema_file_var.get(),
+        #   'dbname':     self.server_dbname_var.get(),
+        #   'createdb':   self.server_db_create_var.get(),
+        #   'dropdb':     self.server_db_drop_var.get(),
+        # }
+        self.conn_details = conn_details
+        self.open_conn_details = {
+          key: self.conn_details[key]
+            for key in ('endpoint','username','password')
+        }
+
+    def upload_triples(self, triples, progress_callback=None):
+        try:
+            assert self.conn_details
+            if progress_callback: progress_callback("establishing connection ...")
+
+            self.stardog_create_db_if_set()
+
+            prefix_str = """
+            BASE <http://vstu.ru/poas/se/c_schema_2020-01#>
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            """
+            f = lambda s: make_namespace_prefix(s, default_prefix=':', known_prefixes=('rdf'))
+
+            dbname = self.conn_details['dbname']
+
+            with stardog.Connection(dbname, **self.open_conn_details) as conn:
+                if progress_callback: progress_callback("connection OK")
+
+                for i,trpl in enumerate(triples):
+                    # ensure prefixes OK
+                    trpl = tuple(f(a) for a in trpl)
+
+                    q = triple_to_sparql_insert(trpl, prefix_str)
+                    print('Send: ', trpl, end='')
+                    # отправка запросов SPARQL UPDATE
+                    results = conn.update(q, reasoning=False)
+                    print(' done!')
+                    if progress_callback: progress_callback("%d/%d done" % ((i+1), len(triples)))
+            if progress_callback: progress_callback("100% finished!")
+        except Exception as e:
+            print(e)
+            return str(e)
+
+
+    def stardog_create_db_if_set(self):
+        # conn_details = {
+        #   'endpoint':   self.server_url_var.get(),
+        #   'username': 'admin',
+        #   'password': 'admin',
+        #   'schemafile': self.schema_file_var.get(),
+        #   'dbname':     self.server_dbname_var.get(),
+        #   'createdb':   self.server_db_create_var.get(),
+        #   'dropdb':     self.server_db_drop_var.get(),
+        # }
+        assert self.conn_details
+        if self.conn_details['createdb']:
+            dbname = self.conn_details['dbname']
+            with stardog.Admin(**self.open_conn_details) as admin:
+                db = admin.new_database(dbname)
+                db = None  # forget pointer
+
+    def stardog_drop_db_if_set(self):
+        assert self.conn_details
+        if self.conn_details['dropdb']:
+            dbname = self.conn_details['dbname']
+            with stardog.Admin(**self.open_conn_details) as admin:
+                db = admin.database(dbname)
+                db.drop()
+
 
 
 
@@ -147,6 +224,7 @@ class TabsPanel(Frame):
         created_tab = [
             self.make_code_tab(),
             self.make_triples_tab(),
+            self.make_upload_tab(),
         ]
         for frame,name in created_tab:
             self.tab.add(frame, text=name)
@@ -221,6 +299,9 @@ class TabsPanel(Frame):
         self.triples_list = triples
         self.tab.select(1)
 
+        self.set_upload_status("Ready to upload triples to server")
+
+
     def on_format_code(self):
         # call app action ...
         error = self.app.parse_code(self.code_var.get())
@@ -270,6 +351,7 @@ class TabsPanel(Frame):
     def check_triples_exist(self):
         button_state = NORMAL if self.triples_list else DISABLED
         self.goto_upload_button["state"] = button_state
+        self.run_upload_button["state"] = button_state
 
         if self.triples_list:
             count_text = 'Triples count: %d' % len(self.triples_list)
@@ -286,6 +368,93 @@ class TabsPanel(Frame):
         self.triples_edit.delete(1.0,END)
         self.triples_edit.insert(1.0, triples_str)
 
+    def make_upload_tab(self):
+        f = Frame(self.tab)
+        Label(f, text='Set up connection and click "Upload"').pack()
+
+        # Remote configuration
+        g = LabelFrame(f, text="Remote configuration")
+
+        row = 0
+
+        Label(g, text='Stardog server location:').grid(row=row, column=0, rowspan=1, sticky=E, padx=20, pady=5)
+
+        self.server_url_var = StringVar()
+        serv_url = Entry(g, width=60, textvariable=self.server_url_var)
+        self.server_url_var.set("http://localhost:5820")
+        serv_url.grid(row=row, column=1, sticky=W)
+
+        row += 1
+
+        Label(g, text='(Using default username & password: admin, admin)').grid(row=row, column=0, columnspan=2)
+
+        row += 1
+
+        Label(g, text='Stardog database name:').grid(row=row, column=0, rowspan=1, sticky=E, padx=20, pady=5)
+
+        self.server_dbname_var = StringVar()
+        serv_dbname = Entry(g, width=60, textvariable=self.server_dbname_var)
+        self.server_dbname_var.set("sem_alg_db")
+        serv_dbname.grid(row=row, column=1, sticky=W)
+
+        row += 1
+
+        Label(g, text='Ontology schema file:').grid(row=row, column=0, rowspan=1, sticky=E, padx=20, pady=5)
+
+        self.schema_file_var = StringVar()
+        serv_dbname = Entry(g, width=60, textvariable=self.schema_file_var)
+        self.schema_file_var.set("c_schema_2020-01.rdf")
+        serv_dbname.grid(row=row, column=1, sticky=W)
+
+        row += 1
+
+        self.server_db_create_var = BooleanVar()
+        self.server_db_create_var.set(1)
+        chk = Checkbutton(g, text="Create a new DB on server", variable=self.server_db_create_var, onvalue=1, offvalue=0)
+        chk.grid(row=row, column=1, sticky=W)
+
+        row += 1
+
+        self.server_db_drop_var = BooleanVar()
+        self.server_db_drop_var.set(1)
+        chk = Checkbutton(g, text="Drop DB on closing connection", variable=self.server_db_drop_var, onvalue=1, offvalue=0)
+        chk.grid(row=row, column=1, sticky=W)
+        # text="Drop DB after whole data export"
+
+        g.pack(expand=1, fill=X)
+
+        self.run_upload_button = Button(f, text="Upload !", bg='#ff99dd', command=self.on_upload_button)
+        self.run_upload_button.pack(expand=1, fill=BOTH, padx=50, pady=45)
+
+        self.upload_status_label = Label(f, text='No upload performed', justify='left')
+        self.upload_status_label.pack(side=LEFT)
+
+        return (f, 'Upload data')
+
+    def get_conn_details(self):
+        conn_details = {
+          'endpoint':   self.server_url_var.get(),
+          'username': 'admin',
+          'password': 'admin',
+          'schemafile': self.schema_file_var.get(),
+          'dbname':     self.server_dbname_var.get(),
+          'createdb':   self.server_db_create_var.get(),
+          'dropdb':     self.server_db_drop_var.get(),
+        }
+        return conn_details
+
+    def on_upload_button(self):
+        self.set_upload_status("Upload in progress ...")
+        self.app.set_connection_details(self.get_conn_details())
+        error = self.app.upload_triples(self.triples_list, progress_callback=self.set_upload_status)
+        if error:
+            messagebox.showinfo('Upload error', error)
+            self.set_upload_status("Upload error")
+        else:
+            self.set_upload_status("Upload success")
+
+    def set_upload_status(self, text):
+            self.upload_status_label["text"] = str(text)
 
 
 
