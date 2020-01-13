@@ -41,6 +41,8 @@ class App:
 
         self.init_menu()
 
+        self.window.resizable(False, False)
+
         # run GUI
         self.window.mainloop()
 
