@@ -481,7 +481,12 @@ class TabsPanel(Frame):
         g.pack(expand=1, fill=X)
 
         self.run_upload_button = Button(f, text="Upload !", bg='#ff99dd', command=self.on_upload_button)
-        self.run_upload_button.pack(expand=1, fill=BOTH, padx=50, pady=45)
+        self.run_upload_button.pack(expand=1, fill=BOTH, padx=50, pady=15)
+
+        # debug button
+        self.run_download_button = Button(f, text="Download ontology (debug)", bg='#dd99ff', command=self.on_download_button)
+        self.run_download_button.pack(expand=1, fill=BOTH, padx=50, pady=5)
+        self.run_download_button["state"] = DISABLED
 
         self.upload_status_label = Label(f, text='No upload performed', justify='left')
         self.upload_status_label.pack(side=LEFT)
@@ -509,9 +514,20 @@ class TabsPanel(Frame):
             self.set_upload_status("Upload error")
         else:
             self.set_upload_status("Upload success")
+            self.run_download_button["state"] = NORMAL
 
     def set_upload_status(self, text):
             self.upload_status_label["text"] = str(text)
+
+    def on_download_button(self):
+        self.set_upload_status("Download in progress ...")
+        self.app.set_connection_details(self.get_conn_details())
+        error = self.app.download_ontology('downloaded_onto!', progress_callback=self.set_upload_status)
+        if error:
+            messagebox.showinfo('Download error', error)
+            self.set_upload_status("Download error")
+        else:
+            self.set_upload_status("Download success")
 
 
 
