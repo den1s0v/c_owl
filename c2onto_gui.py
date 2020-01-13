@@ -193,7 +193,7 @@ class App:
             with stardog.Connection(dbname, **self.open_conn_details) as conn:
                 if progress_callback: progress_callback("connection OK")
                 contents = str(conn.export())
-                # contents = contents[2:-1]  # ??
+                contents = contents[2:-1]  # remove b'...' chars
                 contents = contents.replace('\\n', '\n')
 
                 # запись в файл
