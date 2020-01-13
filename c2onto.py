@@ -1,5 +1,6 @@
 from pycparser import parse_file, c_parser, c_ast, c_generator, plyparser
 from collections import defaultdict
+import re
 
 
 def ast_to_code(ast_node):
@@ -28,6 +29,15 @@ class FuncDefFinder(c_ast.NodeVisitor):
 		"The name is special : visit_<NodeName>"
 		# print('%s at %s' % (node.decl.name, node.decl.coord))
 		self.functions.append(node)
+
+_iri_re = None
+
+def iri_name_prepare(s):
+	global _iri_re
+	if not _iri_re:
+		_iri_re = re.compile(r'[^\w\d\/#-]')
+	return _iri_re.sub('', s)
+
 
 
 def find_func_defs(ast):
@@ -89,7 +99,7 @@ class AlgNode:
 		# print('=== %20s created.' % self.type_name)
 	def make_node_name(self, name=None, loc=None):
 #         self.node_name = "%s@%s" % (ensure_unique(name or self.type_name), loc or coord2str(self.at))
-		self.node_name = "%s" % (ensure_unique(name or self.type_name), )
+		self.node_name = iri_name_prepare("%s" % (ensure_unique(name or self.type_name), ))
 	def search_up(self, node_class):
 		if isinstance(self, node_class): return self
 		elif self.parent:   return self.parent.search_up(node_class)
@@ -176,8 +186,8 @@ class GenericExprNode(AlgNode):
 							  parent = parent
 						)
 		self.code_string = ast_to_code(ast_node)
-		code4iri = self.code_string.replace(' ','').replace('\t','')[:15]  # remove spaces that not allowed in IRI
-		self.make_node_name(name='expr{%s}' % code4iri)
+		# remove spaces that not allowed in IRI
+		self.make_node_name(name='expr-%s' % self.code_string)
 	def get_triples(self):
 		triples = [
 			(self.node_name, OWLPredicate["type"], "Expression"),
@@ -193,7 +203,7 @@ class FuncDefNode(AlgNode):
 							  attributes={
 								  "name":ast_node.decl.name,
 							  })
-		self.make_node_name(name=self.attributes["name"]+'()')
+		self.make_node_name(name='funcdecl-'+self.attributes["name"]+'()')
 		print(self.node_name)
 		self.body = parse_ast_node_as_stmt(ast_node.body, self)
 	def get_triples(self):
@@ -288,7 +298,7 @@ class IfNode(AlgNode):
 		self.cond    = parse_ast_node_as_expr(ast_node.cond,  self)
 		self.iftrue  = parse_ast_node_as_stmt(ast_node.iftrue,  self)
 		self.iffalse = parse_ast_node_as_stmt(ast_node.iffalse, self, make_empty=False)
-		self.make_node_name(name="if(%s)" % self.cond.code_string[:20])
+		self.make_node_name(name="if-%s" % self.cond.code_string[:20])
 		print(self.node_name)
 	def get_triples(self):
 		triples = [
@@ -336,7 +346,7 @@ class ForNode(LoopNode):
 							  parent = parent
 						)
 		init_code = ast_to_code(ast_node.init)
-		self.make_node_name(name="for(%s;%s;%s)" % (init_code, self.cond.code_string, ast_to_code(ast_node.next)))
+		self.make_node_name(name="for-%s-%s-%s" % (init_code, self.cond.code_string, ast_to_code(ast_node.next)))
 		self.init = parse_ast_node_as_stmt(self.ast_node.init,  self)
 		self.next = parse_ast_node_as_stmt(self.ast_node.next,  self)
 
@@ -375,7 +385,7 @@ class WhileNode(LoopNode):
 							  at=ast_node.coord,
 							  parent = parent
 						)
-		self.make_node_name(name="while(%s)" % self.cond.code_string[:20])
+		self.make_node_name(name="while-%s" % self.cond.code_string[:20])
 
 	def get_triples(self):
 		triples = [
@@ -393,7 +403,7 @@ class DoWhileNode(LoopNode):
 							  at=ast_node.coord,
 							  parent = parent
 						)
-		self.make_node_name(name="do-while(%s)" % self.cond.code_string[:20])
+		self.make_node_name(name="do-while-%s" % self.cond.code_string[:20])
 
 	def get_triples(self):
 		triples = [
@@ -450,9 +460,9 @@ class ReturnNode(AlgNode):
 							  at=ast_node.coord,
 							  parent = parent
 						)
-		self.make_node_name(name="return")
 		self.expr = parse_ast_node_as_expr(ast_node.expr,  self)
 		self.function = self.parent.search_up(FuncDefNode)
+		self.make_node_name(name="return-from-"+self.function.attributes["name"])
 	def get_triples(self):
 		triples = [
 			(self.node_name, OWLPredicate["type"], "RETURN_st"),
