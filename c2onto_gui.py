@@ -227,10 +227,17 @@ class App:
 
         if self.conn_details['createdb']:
             dbname = self.conn_details['dbname']
+
             schema_file = stardog.content.File(self.conn_details['schemafile'])
             print('Probably schema_file OK: ',self.conn_details['schemafile'])
 
             with stardog.Admin(**self.open_conn_details) as admin:
+                # check if database already exist and drop it
+                try:
+                    self.stardog_drop_db_if_set(force=True)
+                except:
+                    pass
+
                 db = admin.new_database(dbname)
                 db = None  # forget pointer
                 # init schema
@@ -239,9 +246,9 @@ class App:
                     conn.add(schema_file)
                     conn.commit()
 
-    def stardog_drop_db_if_set(self):
+    def stardog_drop_db_if_set(self, force=False):
         assert self.conn_details
-        if self.conn_details['dropdb']:
+        if self.conn_details['dropdb'] or force:
             dbname = self.conn_details['dbname']
             with stardog.Admin(**self.open_conn_details) as admin:
                 db = admin.database(dbname)
