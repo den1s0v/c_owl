@@ -4,6 +4,7 @@ from tkinter import Menu
 from tkinter.ttk import Checkbutton, Notebook
 from tkinter import filedialog
 from tkinter import scrolledtext
+import os
 
 import stardog
 
@@ -84,19 +85,21 @@ class App:
 
     def on_menu_file_open(self, *args):
         # messagebox.showinfo('Меню/Файл', 'Open!..')
-        filepath = filedialog.askopenfilename(filetypes = (("RDF/XML files","*.rdf;*.xml;*.owl;*.n3;*.turtle"),("All files","*.*")))
-        if not os.path.exists(filepath):
-            self.status_label.configure(text='Открытие файла отменено: файл не найден: ' + filepath)
-            return
+        filepath = filedialog.askopenfilename(initialdir='.', filetypes = (("All files","*.*"),))
+        # if not os.path.exists(filepath):
+        if os.path.exists(filepath):
+            self.tabs_panel.load_file(filepath)
+            # self.status_label.configure(text='Открытие файла отменено: файл не найден: ' + filepath)
+            # return
 
-        # error = self.ontology.load(filepath)
-        if error is not None:
-            self.status_label.configure(text='Открыть файл: ошибка: ' + error[:100])
-            messagebox.showerror('Открыть файл: ошибка', error)
-            filepath = None  # to clear status in file_panel
+        # # error = self.ontology.load(filepath)
+        # if error is not None:
+        #     self.status_label.configure(text='Открыть файл: ошибка: ' + error[:100])
+        #     messagebox.showerror('Открыть файл: ошибка', error)
+        #     filepath = None  # to clear status in file_panel
 
-        self.file_panel.set_filepath(filepath)
-        self.status_label.configure(text='Открытие и загрузка файла прошли успешно')
+        # self.file_panel.set_filepath(filepath)
+        # self.status_label.configure(text='Открытие и загрузка файла прошли успешно')
 
     def on_menu_file_save(self, *args):
         # self.ontology.save_as()
@@ -298,7 +301,23 @@ class TabsPanel(Frame):
         self.get_triples_button = Button(f, text="Convert code to triples ...", padx="15", bg='#bbddbb', command=self.on_get_triples_button)
         self.get_triples_button.pack(side=RIGHT)
         # self.code_modified_label["text"] = 'ABCDE!'
+
+        self.load_file('default.c')
+
         return (f, 'Code')
+
+    def load_file(self, filepath):
+        try:
+            with open(filepath) as f:
+                t = f.read()
+            self.code_var.set(t)
+            self.code_modified_label["text"] = "loaded file: "+filepath
+        except:
+            err_msg = "file no found: "+filepath
+            self.code_modified_label["text"] = err_msg
+            print(err_msg)
+
+
 
     def check_code_modified(self, *_):
         if self.code_var.get() == self.code_used_str:
@@ -454,7 +473,7 @@ class TabsPanel(Frame):
         row += 1
 
         self.server_db_drop_var = BooleanVar()
-        self.server_db_drop_var.set(1)
+        self.server_db_drop_var.set(0)
         chk = Checkbutton(g, text="Drop DB on closing connection", variable=self.server_db_drop_var, onvalue=1, offvalue=0)
         chk.grid(row=row, column=1, sticky=W)
         # text="Drop DB after whole data export"
