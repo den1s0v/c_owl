@@ -22,10 +22,10 @@ with c_schema:
 	""" |  In addition, the following subclasses of Property are available: FunctionalProperty, InverseFunctionalProperty, TransitiveProperty, SymmetricProperty, AsymmetricProperty, ReflexiveProperty, IrreflexiveProperty. They should be used in addition to ObjectProperty or DataProperty (or the ‘domain >> range’ syntax)."""
 
 	# mixins to be used with property constructor call
-	references = [AsymmetricProperty, IrreflexiveProperty]
-	referencesToUnique = [FunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
-	referencedByUnique = [InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
-	mutualUnique = [FunctionalProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
+	references = [ObjectProperty, AsymmetricProperty, IrreflexiveProperty]
+	referencesToUnique = [ObjectProperty, FunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
+	referencedByUnique = [ObjectProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
+	mutualUnique = [ObjectProperty, FunctionalProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
 	hasUniqueData = [FunctionalProperty, DataProperty]  # should I remove DataProperty ?
 
 	# # >
