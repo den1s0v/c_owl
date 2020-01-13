@@ -161,7 +161,7 @@ class App:
             BASE <http://vstu.ru/poas/se/c_schema_2020-01#>
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             """
-            f = lambda s: make_namespace_prefix(s, default_prefix=':', known_prefixes=('rdf'))
+            f = lambda s: make_namespace_prefix(s, default_prefix=':', known_prefixes={'rdf'})
 
             dbname = self.conn_details['dbname']
 
