@@ -192,15 +192,15 @@ class App:
 
             with stardog.Connection(dbname, **self.open_conn_details) as conn:
                 if progress_callback: progress_callback("connection OK")
-                contents = str(conn.export())
-                contents = contents[2:-1]  # remove b'...' chars
-                contents = contents.replace('\\n', '\n')
+                # conn.export(content_type='application/rdf+xml')  # to get RDF/XML
+                contents = conn.export()
 
                 # запись в файл
-                if not save_as.endswith('.ttl'):
-                    save_as += '.ttl'
+                ext = '.ttl'
+                if not save_as.endswith(ext):
+                    save_as += ext
                 if progress_callback: progress_callback("writing to file: " + save_as[-50:])
-                with open(save_as, 'w') as f:
+                with open(save_as, 'wb') as f:
                     f.write(contents)
 
 
