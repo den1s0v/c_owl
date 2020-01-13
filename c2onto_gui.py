@@ -266,13 +266,10 @@ class TabsPanel(Frame):
             self.make_code_tab(),
             self.make_triples_tab(),
             self.make_upload_tab(),
+            self.make_download_tab(),
         ]
         for frame,name in created_tab:
             self.tab.add(frame, text=name)
-#         self.tabs[0] = Frame(self.editor_tab)
-#         self.tabs[1] = Frame(self.editor_tab)
-#         self.tab.add(self.editor_tabs[0], text='SELECT/ASK')
-#         self.tab.add(self.editor_tabs[1], text='INSERT/DELETE')
         self.tab.grid(column=0, row=0)
 
     def updateUI(self):
@@ -317,7 +314,8 @@ class TabsPanel(Frame):
             self.code_modified_label["text"] = err_msg
             print(err_msg)
 
-
+        if hasattr(self, "triples_list"): # tabs not ready workaround
+            self.tab.select(0)
 
     def check_code_modified(self, *_):
         if self.code_var.get() == self.code_used_str:
@@ -358,8 +356,8 @@ class TabsPanel(Frame):
 
         self.set_upload_status("Ready to upload triples to server")
 
-
     def on_format_code(self):
+        self.tab.select(0)
         # call app action ...
         error = self.app.parse_code(self.code_var.get())
         if error:
@@ -478,20 +476,50 @@ class TabsPanel(Frame):
         chk.grid(row=row, column=1, sticky=W)
         # text="Drop DB after whole data export"
 
-        g.pack(expand=1, fill=X)
+        g.pack(expand=1, padx=20, fill=X)
 
         self.run_upload_button = Button(f, text="Upload !", bg='#ff99dd', command=self.on_upload_button)
-        self.run_upload_button.pack(expand=1, fill=BOTH, padx=50, pady=15)
-
-        # debug button
-        self.run_download_button = Button(f, text="Download ontology (debug)", bg='#dd99ff', command=self.on_download_button)
-        self.run_download_button.pack(expand=1, fill=BOTH, padx=50, pady=5)
-        self.run_download_button["state"] = DISABLED
+        self.run_upload_button.pack(expand=1, fill=BOTH, padx=50, pady=25)
 
         self.upload_status_label = Label(f, text='No upload performed', justify='left')
         self.upload_status_label.pack(side=LEFT)
 
         return (f, 'Upload data')
+
+    def make_download_tab(self):
+        f = Frame(self.tab)
+        Label(f, text='Click "Download" to export ontology and store locally').pack()
+
+        # Export configuration
+        g = LabelFrame(f, text="Export configuration")
+
+        row = 0
+
+        Label(g, text='Source database name:').grid(row=row, column=0, rowspan=1, sticky=E, padx=20, pady=5)
+
+        self.export_dbname_label = Label(g, width=60, text='~ run upload first ~')
+        self.export_dbname_label.grid(row=row, column=1, sticky=W)
+
+        row += 1
+
+        Label(g, text='Save .ttl file as:').grid(row=row, column=0, rowspan=1, sticky=E, padx=20, pady=5)
+
+        self.save_filename_var = StringVar()
+        save_filename = Entry(g, width=60, textvariable=self.save_filename_var)
+        self.save_filename_var.set("exported_onto")
+        save_filename.grid(row=row, column=1, sticky=W)
+
+        g.pack(expand=1, padx=20, fill=X, side=TOP)
+
+        self.run_download_button = Button(f, text="Download ontology", bg='#dd99ff', command=self.on_download_button)
+        self.run_download_button.pack(expand=1, fill=BOTH, padx=50, pady=5)
+        self.run_download_button["state"] = DISABLED
+
+        self.download_status_label = Label(f, text='No download performed', justify='left')
+        self.download_status_label.pack(side=LEFT)
+
+        return (f, 'Export ontology')
+
 
     def get_conn_details(self):
         conn_details = {
@@ -515,19 +543,28 @@ class TabsPanel(Frame):
         else:
             self.set_upload_status("Upload success")
             self.run_download_button["state"] = NORMAL
+            self.export_dbname_label["text"] = self.server_dbname_var.get()
+            self.tab.select(3)
 
     def set_upload_status(self, text):
             self.upload_status_label["text"] = str(text)
+    def set_download_status(self, text):
+            self.download_status_label["text"] = str(text)
 
     def on_download_button(self):
-        self.set_upload_status("Download in progress ...")
+        save_as_fnm = self.save_filename_var.get()
+        if not save_as_fnm:
+            messagebox.showinfo('Please specify a filename!', error)
+            self.set_download_status('Incorrect fields')
+
+        self.set_download_status("Download in progress ...")
         self.app.set_connection_details(self.get_conn_details())
-        error = self.app.download_ontology('downloaded_onto!', progress_callback=self.set_upload_status)
+        error = self.app.download_ontology(save_as_fnm, progress_callback=self.set_download_status)
         if error:
             messagebox.showinfo('Download error', error)
-            self.set_upload_status("Download error")
+            self.set_download_status("Download error")
         else:
-            self.set_upload_status("Download success")
+            self.set_download_status("Download success")
 
 
 
