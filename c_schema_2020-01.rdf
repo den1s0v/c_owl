@@ -15,7 +15,6 @@
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#hasPart">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
 </owl:ObjectProperty>
@@ -181,7 +180,6 @@
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#beforeAct">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
   <rdfs:domain rdf:resource="#Act"/>
@@ -424,6 +422,46 @@
 
 <swrl:Variable rdf:about="urn:swrl#b"/>
 
+<swrl:Variable rdf:about="urn:swrl#c"/>
+
+<swrl:Imp>
+  <swrl:body>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasPart"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest>
+        <rdf:Description>
+          <rdf:first>
+            <swrl:IndividualPropertyAtom>
+              <swrl:propertyPredicate rdf:resource="#hasPart"/>
+              <swrl:argument1 rdf:resource="urn:swrl#b"/>
+              <swrl:argument2 rdf:resource="urn:swrl#c"/>
+            </swrl:IndividualPropertyAtom>
+          </rdf:first>
+          <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+        </rdf:Description>
+      </rdf:rest>
+    </rdf:Description>
+  </swrl:body>
+  <swrl:head>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasPart"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#c"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:head>
+</swrl:Imp>
+
 <swrl:Imp>
   <swrl:body>
     <rdf:Description>
@@ -444,6 +482,44 @@
           <swrl:propertyPredicate rdf:resource="#hasPart"/>
           <swrl:argument1 rdf:resource="urn:swrl#a"/>
           <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:head>
+</swrl:Imp>
+
+<swrl:Imp>
+  <swrl:body>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#beforeAct"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest>
+        <rdf:Description>
+          <rdf:first>
+            <swrl:IndividualPropertyAtom>
+              <swrl:propertyPredicate rdf:resource="#beforeAct"/>
+              <swrl:argument1 rdf:resource="urn:swrl#b"/>
+              <swrl:argument2 rdf:resource="urn:swrl#c"/>
+            </swrl:IndividualPropertyAtom>
+          </rdf:first>
+          <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+        </rdf:Description>
+      </rdf:rest>
+    </rdf:Description>
+  </swrl:body>
+  <swrl:head>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#beforeAct"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#c"/>
         </swrl:IndividualPropertyAtom>
       </rdf:first>
       <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>

@@ -41,7 +41,7 @@ with c_schema:
 	# class hasUniqueData( FunctionalProperty, DataProperty): pass  # datatype property base
 
 	class hasDirectPart( ObjectProperty , *references ): pass
-	class hasPart(  ObjectProperty , TransitiveProperty , *references ): pass  # transitive ! over hasDirectPart
+	class hasPart(  ObjectProperty , *references ): pass  # transitive over hasDirectPart (defined thru SWRL!)
 
 
 
@@ -194,7 +194,7 @@ with c_schema:
 	# >
 	class hasNextAct( Act >> Act , *mutualUnique): pass
 	# ->
-	class beforeAct( Act >> Act , TransitiveProperty , *references): pass  # transitive over hasNextAct
+	class beforeAct( Act >> Act , *references): pass  # transitive over hasNextAct (defined thru SWRL!)
 
 	# >
 	class hasOrigin( TraceElement >> CodeElement , *referencesToUnique): pass
@@ -288,8 +288,19 @@ with c_schema:
 
 	rules = {
 # 		"BeforeActTransitive": """ Act(?b) ^ Act(?c) ^ c_schema:Act(?a) ^ beforeAct(?a, ?b) ^ beforeAct(?b, ?c) -> beforeAct(?a, ?c) """ ,
-		"hasNextAct_to_beforeAct": """ hasNextAct(?a, ?b) -> beforeAct(?a, ?b) """ ,
-		"hasDirectPart_to_hasPart": """ hasDirectPart(?a, ?b) -> hasPart(?a, ?b) """ ,
+		"hasNextAct_to_beforeAct": """
+			 hasNextAct(?a, ?b) -> beforeAct(?a, ?b)
+		 """ ,
+		"beforeAct_transitive": """
+			 beforeAct(?a, ?b), beforeAct(?b, ?c) -> beforeAct(?a, ?c)
+		""" ,
+
+		"hasDirectPart_to_hasPart": """
+			 hasDirectPart(?a, ?b) -> hasPart(?a, ?b)
+		""" ,
+		"hasPart_transitive": """
+			 hasPart(?a, ?b), hasPart(?b, ?c) -> hasPart(?a, ?c)
+		""" ,
 
 # 		"NextL_to_before": """
 #         """ ,
@@ -334,8 +345,8 @@ def main():
 
 
 if __name__ == '__main__':
-	print()
-	print('TODO: переделать транзитивные свойства на обычные, но с SWRL-правилами')
-	print('TODO: А то ризонер ругается :)')
-	print()
+	# print()
+	# print('TODO: переделать транзитивные свойства на обычные, но с SWRL-правилами')
+	# print('TODO: А то ризонер ругается :)')
+	# print()
 	main()
