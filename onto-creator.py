@@ -217,6 +217,8 @@ with c_schema:
 #	######## Rule Classes ########
 	##############################
 
+	swrl_rules = []
+
 	# >
 	class GenericRule(Thing):
 		comment = 'Base for all rules'
@@ -225,11 +227,57 @@ with c_schema:
 	class TraceRule(GenericRule):
 		comment = 'Base for all trace rules'
 
+	# Тестовый алгоритм
+		# void main()
+		# {		# main_body
+		#     A();
+		#     B();
+		#     C();
+		#     D();
+		# }
+	# Правильная трасса
+		# :begin main_body#1
+		#     A#1
+		#     B#1
+		#     C#1
+		#     D#1
+		# :end main_body#1
+
 
 	# -->
 	class SequenceRule(TraceRule): pass
 	# --->
 	class StartActBeforeEndActRule(SequenceRule): pass
+	# Тестовая трасса
+		#     A#1
+		# :begin main_body#1
+		#     A#2
+		#     B#1
+		#     C#1
+		#     D#1
+		# :end main_body#1
+	swrl_rules += """  !!!!!
+		c_schema:Context(?c)
+		c_schema:Block(?block)
+		c_schema:Statement(?stmt1)
+		c_schema:Act(?act1)
+		c_schema:Act(?act)
+
+		c_schema:hasContext(?act1, ?c)
+		c_schema:hasContext(?act,  ?c)
+		c_schema:hasFirst(?block, ?stmt1)
+		c_schema:hasOrigin(?c, ?block)
+		c_schema:hasOrigin(?act1, ?stmt1)
+		c_schema:before(?act, ?act1)
+
+		c_schema:hasIndex(?c, ?index)
+		c_schema:hasOrigin(?act, ?stmt)
+		c_schema:hasSource(?stmt, ?src)
+		c_schema:hasLocationSuffix(?stmt, ?stlbl)
+		swrlb:stringConcat(?msg, "ActBeforeStartOfBlockError: act `", ?src, "` (", ?stlbl, "#", ?index, ") is placed before start of block.")
+		 -> c_schema:message(c_schema:ERRORS, ?msg)
+		"""
+
 	# ---->
 	class ActIsContainedInSequenceRule(SequenceRule): pass
 	# ---->
