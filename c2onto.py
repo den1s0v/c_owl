@@ -206,6 +206,9 @@ class FuncDefNode(AlgNode):
 		self.make_node_name(name='funcdecl-'+self.attributes["name"]+'()')
 		print(self.node_name)
 		self.body = parse_ast_node_as_stmt(ast_node.body, self)
+		if isinstance(self.body, BlockNode):
+			# зададим блоку явное имя тела функции
+			self.body.make_node_name(name='seq-'+self.attributes["name"]+'-body')
 	def get_triples(self):
 		triples = [
 			(self.node_name, OWLPredicate["type"], "Function"),
@@ -300,6 +303,11 @@ class IfNode(AlgNode):
 		self.iffalse = parse_ast_node_as_stmt(ast_node.iffalse, self, make_empty=False)
 		self.make_node_name(name="if-%s" % self.cond.code_string[:20])
 		print(self.node_name)
+		# зададим блокам явное имя ветви ветвления
+		if isinstance(self.iftrue, BlockNode):
+			self.iftrue.make_node_name(name="seq-if-true-%s" % self.cond.code_string[:20])
+		if isinstance(self.iffalse, BlockNode):
+			self.iffalse.make_node_name(name="seq-if-false-%s" % self.cond.code_string[:20])
 	def get_triples(self):
 		triples = [
 			(self.node_name, OWLPredicate["type"], "IF_st"),
@@ -324,6 +332,9 @@ class LoopNode(AlgNode):
 		AlgNode.__init__(self, **kwargs)
 		self.stmt  = parse_ast_node_as_stmt(self.ast_node.stmt,  self)
 		self.cond    = parse_ast_node_as_expr(self.ast_node.cond,  self)
+		# зададим блокам явное имя тела цикла
+		if isinstance(self.stmt, BlockNode):
+			self.stmt.make_node_name(name="seq-%s-body-%s" % (self.type_name, self.cond.code_string[:20]))
 
 	def get_triples(self):
 		triples = []
@@ -501,7 +512,7 @@ def triple_to_sparql_insert(triple, prefix_str=""):
     return prefix_str + s
 
 
-print('definitions OK')
+print('c2onto definitions OK')
 
 if __name__ == "__main__":
 
