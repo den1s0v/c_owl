@@ -97,9 +97,19 @@ class AlgNode:
 		# calculated attributes
 		self.make_node_name()
 		# print('=== %20s created.' % self.type_name)
+
+		# добавить вновь созданный узел к алгоритму в список
+		if self.parent:
+			alg = self.parent.search_up(Algorithm)
+			if alg:
+				alg.nodes.append(self)
+
 	def make_node_name(self, name=None, loc=None):
+		# точка расширения для настройки имён
+		# ...
+		self.attributes["id"] = iri_name_prepare(ensure_unique(name or self.type_name))
 #         self.node_name = "%s@%s" % (ensure_unique(name or self.type_name), loc or coord2str(self.at))
-		self.node_name = iri_name_prepare("%s" % (ensure_unique(name or self.type_name), ))
+		self.node_name = iri_name_prepare("%s" % self.attributes["id"])
 	def search_up(self, node_class):
 		if isinstance(self, node_class): return self
 		elif self.parent:   return self.parent.search_up(node_class)
@@ -116,6 +126,7 @@ class Algorithm(AlgNode):
 							  at='root',
 							  parent = None,
 							 )
+		self.nodes = []  # list of all nodes, using for simpler search
 		self.functions = [FuncDefNode(node, self)
 						  for node in find_func_defs(ast_node)]
 		# search for 'main' function
@@ -138,6 +149,26 @@ class Algorithm(AlgNode):
 			if func_name == func.attributes["name"]:
 				return func
 		return None
+	def find_candidates_by_subname(self, subname, reverse_check=False, exclude_types=None):
+		""" -> dict of form: "<name>": <AlgNode instance>
+			where `name` starts with `subname`.
+			If `reverse_check` is True, instead, the opposite case is checked when `subname` starts with `name`.
+			`exclude_types` is defauled to {FuncDefNode, Algorithm} if left None. """
+		exclude_types = exclude_types or {FuncDefNode, Algorithm}
+		candidates = dict()
+		if not subname:
+			return candidates
+		for node in self.nodes:
+			if type(node) in exclude_types:
+				continue
+			for name in [
+					node.attributes.get("id", False),
+					node.attributes.get("name", False),
+					]:
+				if name and (name.startswith(subname) if not reverse_check else subname.startswith(name)):
+					candidates[name] = node
+					continue
+		return candidates
 
 
 def parse_ast_node_as_stmt(ast_node, parent, make_empty=True):
