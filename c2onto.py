@@ -103,7 +103,7 @@ class AlgNode:
 	def search_up(self, node_class):
 		if isinstance(self, node_class): return self
 		elif self.parent:   return self.parent.search_up(node_class)
-		else: print('!!! %s not found in tree!' % node_class.__name__); return None
+		else: print('!!! %s not found in Algorithm tree!' % node_class.__name__); return None
 	def get_triples(self):
 		return []
 
@@ -121,7 +121,7 @@ class Algorithm(AlgNode):
 		# search for 'main' function
 		self.entry_func = [f for f in self.functions if f.attributes["name"] == entry_func_name]
 		self.entry_func = None  if not self.entry_func else self.entry_func[0]
-		# set ALG start to main's first statement
+		# set ALG start to main's first statement (?)
 	def get_triples(self):
 		triples = [
 			(self.node_name, OWLPredicate["type"], "Algorithm"),
@@ -133,7 +133,7 @@ class Algorithm(AlgNode):
 			]
 			triples += func.get_triples()
 		return triples
-	def find_finction_by_name(self, func_name):
+	def find_function_by_name(self, func_name):
 		for func in self.functions:
 			if func_name == func.attributes["name"]:
 				return func
@@ -280,7 +280,7 @@ class FuncCallNode(AlgNode):
 		print(self.node_name)
 	def get_triples(self):
 		# calc later, because possibly not all functions are known by root Algorithm instance at init() stage :)
-		self.called_func = self.search_up(Algorithm).find_finction_by_name(self.attributes["name"])  # can be None
+		self.called_func = self.search_up(Algorithm).find_function_by_name(self.attributes["name"])  # can be None
 		triples = [
 			(self.node_name, OWLPredicate["type"], "FuncCall"),
 		]
