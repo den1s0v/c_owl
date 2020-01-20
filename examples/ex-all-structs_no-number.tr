@@ -1,0 +1,24 @@
+:begin main-body
+    A
+    B
+    :begin For
+        For-init
+        For-cond -> true
+        :begin For-body
+            :begin If
+                If-cond -> false
+                    D
+            :end If
+        :end For-body
+        For-update
+        For-cond -> true
+        :begin For-body
+            :begin If
+                If-cond -> true
+                    C
+            :end If
+        :end For-body
+        For-update
+        For-cond -> false
+    :end For
+:end main-body
