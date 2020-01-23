@@ -24,6 +24,7 @@ with c_schema:
 	# mixins to be used with property constructor call
 	references = [ObjectProperty, AsymmetricProperty, IrreflexiveProperty]
 	referencesToUnique = [ObjectProperty, FunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
+	referencesToUniqueOrSelf = [ObjectProperty, FunctionalProperty, AsymmetricProperty]
 	referencedByUnique = [ObjectProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
 	mutualUnique = [ObjectProperty, FunctionalProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
 	hasUniqueData = [FunctionalProperty, DataProperty]  # should I remove DataProperty ?
@@ -152,30 +153,32 @@ with c_schema:
 	###############################
 
 	# >
-	class Trace(Thing):
-		comment = 'A trace based on an Algorithm'
-	# >
 	class TraceElement(Thing):
 		comment = 'Base for Acts & other trace elements (if added in future)'
 	# ->
-	class Act(TraceElement): pass  # atomic "Act"
+	class Act(TraceElement): pass  # atomic or compound "Act"
+
+	# -->
+	class Trace(Act):
+		comment = 'A trace based on an Algorithm'
+
 	# -->
 	class ExpressionAct(Act): pass  # expression Act, evals to some typed value
 	# --->
 	class ConditionAct(ExpressionAct): pass  # boolean expression Act, evals to True or False
 
-	# # >
-	# class ActLabel(Thing):
-	# 	comment = 'A mark attached to Act'
-	# ->
-	class ActContext(TraceElement): pass
+	# # # >
+	# # class ActLabel(Thing):
+	# # 	comment = 'A mark attached to Act'
+	# # ->
+	# class ActContext(TraceElement): pass
 
-	# ->
-	class BeginLabel(TraceElement):
-		comment = 'A mark pointing to begin of a Context (compound Act)'
-	# ->
-	class EndLabel(TraceElement):
-		comment = 'A mark pointing to end of a Context (compound Act)'
+	# # ->
+	# class BeginLabel(TraceElement):
+	# 	comment = 'A mark pointing to begin of a Context (compound Act)'
+	# # ->
+	# class EndLabel(TraceElement):
+	# 	comment = 'A mark pointing to end of a Context (compound Act)'
 
 
 	##################################
@@ -183,12 +186,12 @@ with c_schema:
 	##################################
 
 	# >
-	class hasAct( Trace >> Act , *references): pass
+	class hasAct( Act >> Act , *references): pass
 	# >
-	class hasFirstAct( Trace >> Act , *referencesToUnique):
+	class hasFirstAct( Act >> Act , *referencesToUniqueOrSelf):
 		comment = 'Should always be used with non-empty Trace.'
 	# >
-	class hasLastAct( Trace >> Act , *referencesToUnique): pass
+	class hasLastAct( Act >> Act , *referencesToUniqueOrSelf): pass
 
 	# Остаётся минимум - только последовательность актов и транзитивное "ДО"
 	# >
@@ -197,20 +200,23 @@ with c_schema:
 	class beforeAct( Act >> Act , *references): pass  # transitive over hasNextAct (defined thru SWRL!)
 
 	# >
+	class hasContext( Act >> Act , *referencesToUnique): pass
+
+	# >
 	class hasOrigin( TraceElement >> CodeElement , *referencesToUnique): pass
 	# >
-	class hasN( TraceElement >> int , *hasUniqueData): pass
+	class hasN( Act >> int , *hasUniqueData): pass
 
 	# >
 	class evalsTo( ConditionAct >> bool , *hasUniqueData): pass
 
-	# >
-	class hasBeginLabel( Act >> BeginLabel , *references): pass
-	# >
-	class hasEndLabel( Act >> EndLabel , *references): pass
+	# # >
+	# class hasBeginLabel( Act >> BeginLabel , *references): pass
+	# # >
+	# class hasEndLabel( Act >> EndLabel , *references): pass
 
-	# >
-	class isLabelOf( (BeginLabel | EndLabel) >> ActContext , *referencesToUnique): pass
+	# # >
+	# class isLabelOf( (BeginLabel | EndLabel) >> ActContext , *referencesToUnique): pass
 
 
 	##############################
@@ -226,6 +232,9 @@ with c_schema:
 	# ->
 	class TraceRule(GenericRule):
 		comment = 'Base for all trace rules'
+
+	# -->
+	class SequenceRule(TraceRule): pass
 
 	# Тестовый алгоритм
 		# void main()
@@ -247,7 +256,19 @@ with c_schema:
 	# -->
 	class SequenceRule(TraceRule): pass
 	# --->
-	class StartActBeforeEndActRule(SequenceRule): pass
+	class ActOutOfContextRule(SequenceRule): pass
+	# Срабатывает, если есть акт `act`, непосредственно вложенный в акт `act_c` (контекст),
+	# в то время как их первоисточники в алгоритме (st и st_c) не состоят в таком же отношении вложенности (контекст st - st_c_actual - отличается от st_c, указанного в трассе):
+	swrl_rules += """
+		hasContext(?act, ?act_c)
+		hasOrigin(?act, ?st)
+		hasOrigin(?act_с, ?st_с)
+		hasDirectPart(?st_c_actual, ?st)
+
+		DifferentFrom(?st_с, ?st_c_actual)
+		 -> message(ERRORS, "ActOutOfContextError")
+		"""
+
 	# Тестовая трасса
 		#     A#1
 		# :begin main_body#1
@@ -257,23 +278,23 @@ with c_schema:
 		#     D#1
 		# :end main_body#1
 	swrl_rules += """  !!!!!
-		c_schema:Context(?c)
-		c_schema:Block(?block)
-		c_schema:Statement(?stmt1)
-		c_schema:Act(?act1)
-		c_schema:Act(?act)
+		:Context(?c)
+		:Block(?block)
+		:Statement(?stmt1)
+		:Act(?act1)
+		:Act(?act)
 
-		c_schema:hasContext(?act1, ?c)
-		c_schema:hasContext(?act,  ?c)
-		c_schema:hasFirst(?block, ?stmt1)
-		c_schema:hasOrigin(?c, ?block)
-		c_schema:hasOrigin(?act1, ?stmt1)
-		c_schema:before(?act, ?act1)
+		:hasContext(?act1, ?c)
+		:hasContext(?act,  ?c)
+		:hasFirst(?block, ?stmt1)
+		:hasOrigin(?c, ?block)
+		:hasOrigin(?act1, ?stmt1)
+		:before(?act, ?act1)
 
-		c_schema:hasIndex(?c, ?index)
-		c_schema:hasOrigin(?act, ?stmt)
-		c_schema:hasSource(?stmt, ?src)
-		c_schema:hasLocationSuffix(?stmt, ?stlbl)
+		:hasIndex(?c, ?index)
+		:hasOrigin(?act, ?stmt)
+		:hasSource(?stmt, ?src)
+		:hasLocationSuffix(?stmt, ?stlbl)
 		swrlb:stringConcat(?msg, "ActBeforeStartOfBlockError: act `", ?src, "` (", ?stlbl, "#", ?index, ") is placed before start of block.")
 		 -> c_schema:message(c_schema:ERRORS, ?msg)
 		"""
@@ -335,7 +356,7 @@ with c_schema:
 	############################
 
 	rules = {
-# 		"BeforeActTransitive": """ Act(?b) ^ Act(?c) ^ c_schema:Act(?a) ^ beforeAct(?a, ?b) ^ beforeAct(?b, ?c) -> beforeAct(?a, ?c) """ ,
+# 		"BeforeActTransitive": """ Act(?b) ^ Act(?c) ^ :Act(?a) ^ beforeAct(?a, ?b) ^ beforeAct(?b, ?c) -> beforeAct(?a, ?c) """ ,
 		"hasNextAct_to_beforeAct": """
 			 hasNextAct(?a, ?b) -> beforeAct(?a, ?b)
 		 """ ,
