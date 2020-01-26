@@ -3,6 +3,40 @@ from collections import defaultdict
 import re
 
 
+# множество использованных уникальных имён. Желательно очистить перед новым проходом с использованием функции ensure_unique()
+uniq_names = set()
+
+def ensure_unique(name, suffix_sep = '_'):
+	""" ensure_unique(name, suffix_sep = '_') -> name of <name with suffix> if already in use.
+	Проверяет, есть ли name в uniq_names, и если да, то для достижения уникальности прибавляет к нему суффикс `_X`, где X - целое число. Разделитель по умолчанию "_" можно изменить, указав параметр suffix_sep.
+	Пример:
+
+		>>> ensure_unique('no-name')
+		no-name
+		>>> ensure_unique('no-name')
+		no-name_1
+		>>> ensure_unique('no-name')
+		no-name_2
+	"""
+	if name in uniq_names:
+		i = 1
+		new_name = name+suffix_sep+str(i)
+		while new_name in uniq_names:
+			i += 1
+			new_name = name+suffix_sep+str(i)
+		name = new_name
+
+	uniq_names.add(name)
+	return name
+
+def retract_unique_name(name):
+	if name in uniq_names:
+		uniq_names.remove(name)
+
+def clear_unique_set():
+	uniq_names.clear()
+
+
 def ast_to_code(ast_node):
 	""" ast_to_code(ast_node) -> str
 	Восстанавливает код Си по узлу pycparser-AST в нормализованном форматировании.
@@ -50,32 +84,6 @@ def find_func_defs(ast):
 # 	print(">: [%5s - %5s - %5s]", (s,p,o))
 
 
-# множество использованных уникальных имён. Желательно очистить перед новым проходом с использованием функции ensure_unique()
-uniq_names = set()
-
-def ensure_unique(name, suffix_sep = '_'):
-	""" ensure_unique(name, suffix_sep = '_') -> name of <name with suffix> if already in use.
-	Проверяет, есть ли name в uniq_names, и если да, то для достижения уникальности прибавляет к нему суффикс `_X`, где X - целое число. Разделитель по умолчанию "_" можно изменить, указав параметр suffix_sep.
-	Пример:
-
-		>>> ensure_unique('no-name')
-		no-name
-		>>> ensure_unique('no-name')
-		no-name_1
-		>>> ensure_unique('no-name')
-		no-name_2
-	"""
-	if name in uniq_names:
-		i = 1
-		new_name = name+suffix_sep+str(i)
-		while new_name in uniq_names:
-			i += 1
-			new_name = name+suffix_sep+str(i)
-		name = new_name
-
-	uniq_names.add(name)
-	return name
-
 # известные стандартные предикаты для RDF
 OWLPredicate = {
 	"type" : 'rdf:type',
@@ -107,8 +115,12 @@ class AlgNode:
 	def make_node_name(self, name=None, loc=None):
 		# точка расширения для настройки имён
 		# ...
+		# удалить текущее имя из уникальных, если есть
+		if "id" in self.attributes:
+			retract_unique_name(self.attributes["id"])
+
 		self.attributes["id"] = iri_name_prepare(ensure_unique(name or self.type_name))
-#         self.node_name = "%s@%s" % (ensure_unique(name or self.type_name), loc or coord2str(self.at))
+		# self.node_name = "%s@%s" % (ensure_unique(name or self.type_name), loc or coord2str(self.at))
 		self.node_name = iri_name_prepare("%s" % self.attributes["id"])
 	def search_up(self, node_class):
 		if isinstance(self, node_class): return self
@@ -149,15 +161,17 @@ class Algorithm(AlgNode):
 			if func_name == func.attributes["name"]:
 				return func
 		return None
-	def find_candidates_by_subname(self, subname, reverse_check=False, exclude_types=None):
+	def find_candidates_by_subname(self, subname, reverse_check=False, exclude_types=None, ignore_case=True):
 		""" -> dict of form: "<name>": <AlgNode instance>
 			where `name` starts with `subname`.
 			If `reverse_check` is True, instead, the opposite case is checked when `subname` starts with `name`.
-			`exclude_types` is defauled to {FuncDefNode, Algorithm} if left None. """
+			`exclude_types` is defaulted to {FuncDefNode, Algorithm} if left None.
+			`ignore_case` affects strings matching, default is True. """
 		exclude_types = exclude_types or {FuncDefNode, Algorithm}
+		if ignore_case: subname = subname.lower()
 		candidates = dict()
-		if not subname:
-			return candidates
+		# if not subname:
+		# 	return candidates
 		for node in self.nodes:
 			if type(node) in exclude_types:
 				continue
@@ -165,6 +179,7 @@ class Algorithm(AlgNode):
 					node.attributes.get("id", False),
 					node.attributes.get("name", False),
 					]:
+				if ignore_case: name = name.lower()
 				if name and (name.startswith(subname) if not reverse_check else subname.startswith(name)):
 					candidates[name] = node
 					continue
@@ -185,8 +200,9 @@ def parse_ast_node_as_stmt(ast_node, parent, make_empty=True):
 	if(isinstance(ast_node, c_ast.Continue)):        return ContinueNode(ast_node, parent)
 	if(isinstance(ast_node, c_ast.Return)):        return ReturnNode(ast_node, parent)
 
+	# simplest solution: generic Stmt class - for now
+	return GenericStmtNode(ast_node, parent)
 	# default: unknown
-	return AlgNode('UNKN')
 
 def parse_ast_node_as_expr(ast_node, parent):
 # def parse_ast_node_as_expr(ast_node, parent, make_empty=True):
@@ -206,6 +222,22 @@ class EmptyStmtNode(AlgNode):
 	def get_triples(self):
 		triples = [
 			(self.node_name, OWLPredicate["type"], "Empty_st"),
+		]
+		return triples
+
+class GenericStmtNode(AlgNode):
+	def __init__(self, ast_node, parent):
+		AlgNode.__init__(self, type_name='Stmt',
+							  ast_node=ast_node,
+							  at=ast_node.coord if ast_node else parent.at,
+							  parent = parent
+						)
+		self.code_string = ast_to_code(ast_node)
+		# remove spaces that not allowed in IRI
+		self.make_node_name(name='stmt-%s' % self.code_string)
+	def get_triples(self):
+		triples = [
+			(self.node_name, OWLPredicate["type"], "Statement"),
 		]
 		return triples
 
@@ -240,6 +272,7 @@ class FuncDefNode(AlgNode):
 		if isinstance(self.body, BlockNode):
 			# зададим блоку явное имя тела функции
 			self.body.make_node_name(name='seq-'+self.attributes["name"]+'-body')
+			self.body.attributes["name"] = ensure_unique(self.attributes["name"]+'-body')
 	def get_triples(self):
 		triples = [
 			(self.node_name, OWLPredicate["type"], "Function"),
@@ -361,11 +394,17 @@ class IfNode(AlgNode):
 class LoopNode(AlgNode):
 	def __init__(self, **kwargs):
 		AlgNode.__init__(self, **kwargs)
+		self.attributes["name"] = ensure_unique(self.type_name)
 		self.stmt  = parse_ast_node_as_stmt(self.ast_node.stmt,  self)
 		self.cond    = parse_ast_node_as_expr(self.ast_node.cond,  self)
-		# зададим блокам явное имя тела цикла
+		# зададим блоку явное имя тела цикла
+		self.stmt.attributes["name"] = ensure_unique("%s-body" % self.type_name)
 		if isinstance(self.stmt, BlockNode):
-			self.stmt.make_node_name(name="seq-%s-body-%s" % (self.type_name, self.cond.code_string[:20]))
+			self.stmt.make_node_name(name="seq-%s" % self.stmt.attributes["name"])
+		# зададим условию явное имя
+		if isinstance(self.cond, GenericExprNode):
+			self.cond.attributes["name"] = ensure_unique(iri_name_prepare("%s-cond-%s" % (self.type_name, self.cond.code_string[:20])))
+			self.cond.make_node_name(name="expr-%s" % self.cond.attributes["name"])
 
 	def get_triples(self):
 		triples = []
@@ -391,6 +430,15 @@ class ForNode(LoopNode):
 		self.make_node_name(name="for-%s-%s-%s" % (init_code, self.cond.code_string, ast_to_code(ast_node.next)))
 		self.init = parse_ast_node_as_stmt(self.ast_node.init,  self)
 		self.next = parse_ast_node_as_stmt(self.ast_node.next,  self)
+
+		# self.body.attributes["name"] = ensure_unique(self.attributes["name"]+'-body')
+		# зададим init и next явные имена
+		if isinstance(self.init, AlgNode):
+			self.init.attributes["name"] = ensure_unique("FOR-init")
+			self.init.make_node_name(name="stmt-%s" % self.init.attributes["name"])
+		if isinstance(self.next, AlgNode):
+			self.next.attributes["name"] = ensure_unique("FOR-update")
+			self.next.make_node_name(name="stmt-%s" % self.next.attributes["name"])
 
 		# "починить" позиции для пустых частей заголовка for
 		if(isinstance(self.init, EmptyStmtNode)):
