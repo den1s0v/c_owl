@@ -10,6 +10,7 @@
 <owl:Ontology rdf:about="http://vstu.ru/poas/se/c_schema_2020-01"/>
 
 <owl:ObjectProperty rdf:about="#hasDirectPart">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
 </owl:ObjectProperty>
@@ -146,37 +147,43 @@
   <rdfs:range rdf:resource="#Function"/>
 </owl:ObjectProperty>
 
-<owl:ObjectProperty rdf:about="#hasAct">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-  <rdfs:domain rdf:resource="#Trace"/>
-  <rdfs:range rdf:resource="#Act"/>
-</owl:ObjectProperty>
-
 <owl:ObjectProperty rdf:about="#hasFirstAct">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-  <rdfs:domain rdf:resource="#Trace"/>
+  <rdfs:domain rdf:resource="#Act"/>
   <rdfs:range rdf:resource="#Act"/>
+  <rdfs:subPropertyOf rdf:resource="#hasDirectPart"/>
   <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Should always be used with non-empty Trace.</rdfs:comment>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasBegin">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#Act"/>
+  <rdfs:range rdf:resource="#Act"/>
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#hasLastAct">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-  <rdfs:domain rdf:resource="#Trace"/>
+  <rdfs:domain rdf:resource="#Act"/>
   <rdfs:range rdf:resource="#Act"/>
+  <rdfs:subPropertyOf rdf:resource="#hasDirectPart"/>
 </owl:ObjectProperty>
 
-<owl:ObjectProperty rdf:about="#hasNextAct">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
+<owl:ObjectProperty rdf:about="#hasEnd">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
   <rdfs:domain rdf:resource="#Act"/>
   <rdfs:range rdf:resource="#Act"/>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasNextAct">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+  <rdfs:domain rdf:resource="#Act"/>
+  <rdfs:range rdf:resource="#Act"/>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"></rdfs:comment>
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#beforeAct">
@@ -194,26 +201,6 @@
   <rdfs:range rdf:resource="#CodeElement"/>
 </owl:ObjectProperty>
 
-<owl:ObjectProperty rdf:about="#hasBeginLabel">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-  <rdfs:domain rdf:resource="#Act"/>
-  <rdfs:range rdf:resource="#BeginLabel"/>
-</owl:ObjectProperty>
-
-<owl:ObjectProperty rdf:about="#hasEndLabel">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-  <rdfs:domain rdf:resource="#Act"/>
-  <rdfs:range rdf:resource="#EndLabel"/>
-</owl:ObjectProperty>
-
-<owl:ObjectProperty rdf:about="#isLabelOf">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-</owl:ObjectProperty>
-
 <owl:DatatypeProperty rdf:about="#hasName">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
   <rdfs:domain rdf:resource="#Function"/>
@@ -222,7 +209,7 @@
 
 <owl:DatatypeProperty rdf:about="#hasN">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-  <rdfs:domain rdf:resource="#TraceElement"/>
+  <rdfs:domain rdf:resource="#Act"/>
   <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
 </owl:DatatypeProperty>
 
@@ -323,11 +310,6 @@
   <rdfs:subClassOf rdf:resource="#CodeElement"/>
 </owl:Class>
 
-<owl:Class rdf:about="#Trace">
-  <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A trace based on an Algorithm</rdfs:comment>
-</owl:Class>
-
 <owl:Class rdf:about="#TraceElement">
   <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
   <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Base for Acts &amp; other trace elements (if added in future)</rdfs:comment>
@@ -337,26 +319,33 @@
   <rdfs:subClassOf rdf:resource="#TraceElement"/>
 </owl:Class>
 
+<owl:Class rdf:about="#Trace">
+  <rdfs:subClassOf rdf:resource="#Act"/>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A trace based on an Algorithm</rdfs:comment>
+</owl:Class>
+
+<owl:Class rdf:about="#TraceAtom">
+  <rdfs:subClassOf rdf:resource="#Act"/>
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <rdf:Description rdf:about="#Act"/>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="#hasDirectPart"/>
+          <owl:hasValue rdf:resource="http://www.w3.org/2002/07/owl#Nothing"/>
+        </owl:Restriction>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An atomic act that does not contain any acts</rdfs:comment>
+</owl:Class>
+
 <owl:Class rdf:about="#ExpressionAct">
   <rdfs:subClassOf rdf:resource="#Act"/>
 </owl:Class>
 
 <owl:Class rdf:about="#ConditionAct">
   <rdfs:subClassOf rdf:resource="#ExpressionAct"/>
-</owl:Class>
-
-<owl:Class rdf:about="#ActContext">
-  <rdfs:subClassOf rdf:resource="#TraceElement"/>
-</owl:Class>
-
-<owl:Class rdf:about="#BeginLabel">
-  <rdfs:subClassOf rdf:resource="#TraceElement"/>
-  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A mark pointing to begin of a Context (compound Act)</rdfs:comment>
-</owl:Class>
-
-<owl:Class rdf:about="#EndLabel">
-  <rdfs:subClassOf rdf:resource="#TraceElement"/>
-  <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A mark pointing to end of a Context (compound Act)</rdfs:comment>
 </owl:Class>
 
 <owl:Class rdf:about="#GenericRule">
@@ -373,7 +362,7 @@
   <rdfs:subClassOf rdf:resource="#TraceRule"/>
 </owl:Class>
 
-<owl:Class rdf:about="#StartActBeforeEndActRule">
+<owl:Class rdf:about="#ActOutOfContextRule">
   <rdfs:subClassOf rdf:resource="#SequenceRule"/>
 </owl:Class>
 
@@ -418,78 +407,40 @@
   <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Base for all errors</rdfs:comment>
 </owl:Class>
 
+<swrl:Imp rdf:about="#hasNextAct_to_beforeAct">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <swrl:body>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasNextAct"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:body>
+  <swrl:head>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#beforeAct"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:head>
+</swrl:Imp>
+
 <swrl:Variable rdf:about="urn:swrl#a"/>
 
 <swrl:Variable rdf:about="urn:swrl#b"/>
 
-<swrl:Variable rdf:about="urn:swrl#c"/>
-
-<swrl:Imp>
-  <swrl:body>
-    <rdf:Description>
-      <rdf:first>
-        <swrl:IndividualPropertyAtom>
-          <swrl:propertyPredicate rdf:resource="#hasPart"/>
-          <swrl:argument1 rdf:resource="urn:swrl#a"/>
-          <swrl:argument2 rdf:resource="urn:swrl#b"/>
-        </swrl:IndividualPropertyAtom>
-      </rdf:first>
-      <rdf:rest>
-        <rdf:Description>
-          <rdf:first>
-            <swrl:IndividualPropertyAtom>
-              <swrl:propertyPredicate rdf:resource="#hasPart"/>
-              <swrl:argument1 rdf:resource="urn:swrl#b"/>
-              <swrl:argument2 rdf:resource="urn:swrl#c"/>
-            </swrl:IndividualPropertyAtom>
-          </rdf:first>
-          <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-        </rdf:Description>
-      </rdf:rest>
-    </rdf:Description>
-  </swrl:body>
-  <swrl:head>
-    <rdf:Description>
-      <rdf:first>
-        <swrl:IndividualPropertyAtom>
-          <swrl:propertyPredicate rdf:resource="#hasPart"/>
-          <swrl:argument1 rdf:resource="urn:swrl#a"/>
-          <swrl:argument2 rdf:resource="urn:swrl#c"/>
-        </swrl:IndividualPropertyAtom>
-      </rdf:first>
-      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    </rdf:Description>
-  </swrl:head>
-</swrl:Imp>
-
-<swrl:Imp>
-  <swrl:body>
-    <rdf:Description>
-      <rdf:first>
-        <swrl:IndividualPropertyAtom>
-          <swrl:propertyPredicate rdf:resource="#hasDirectPart"/>
-          <swrl:argument1 rdf:resource="urn:swrl#a"/>
-          <swrl:argument2 rdf:resource="urn:swrl#b"/>
-        </swrl:IndividualPropertyAtom>
-      </rdf:first>
-      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    </rdf:Description>
-  </swrl:body>
-  <swrl:head>
-    <rdf:Description>
-      <rdf:first>
-        <swrl:IndividualPropertyAtom>
-          <swrl:propertyPredicate rdf:resource="#hasPart"/>
-          <swrl:argument1 rdf:resource="urn:swrl#a"/>
-          <swrl:argument2 rdf:resource="urn:swrl#b"/>
-        </swrl:IndividualPropertyAtom>
-      </rdf:first>
-      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
-    </rdf:Description>
-  </swrl:head>
-</swrl:Imp>
-
-<swrl:Imp>
+<swrl:Imp rdf:about="#beforeAct_transitive">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <swrl:body>
     <rdf:Description>
       <rdf:first>
@@ -527,12 +478,15 @@
   </swrl:head>
 </swrl:Imp>
 
-<swrl:Imp>
+<swrl:Variable rdf:about="urn:swrl#c"/>
+
+<swrl:Imp rdf:about="#hasDirectPart_to_hasPart">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <swrl:body>
     <rdf:Description>
       <rdf:first>
         <swrl:IndividualPropertyAtom>
-          <swrl:propertyPredicate rdf:resource="#hasNextAct"/>
+          <swrl:propertyPredicate rdf:resource="#hasDirectPart"/>
           <swrl:argument1 rdf:resource="urn:swrl#a"/>
           <swrl:argument2 rdf:resource="urn:swrl#b"/>
         </swrl:IndividualPropertyAtom>
@@ -544,9 +498,182 @@
     <rdf:Description>
       <rdf:first>
         <swrl:IndividualPropertyAtom>
-          <swrl:propertyPredicate rdf:resource="#beforeAct"/>
+          <swrl:propertyPredicate rdf:resource="#hasPart"/>
           <swrl:argument1 rdf:resource="urn:swrl#a"/>
           <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:head>
+</swrl:Imp>
+
+<swrl:Imp rdf:about="#hasPart_transitive">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <swrl:body>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasPart"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest>
+        <rdf:Description>
+          <rdf:first>
+            <swrl:IndividualPropertyAtom>
+              <swrl:propertyPredicate rdf:resource="#hasPart"/>
+              <swrl:argument1 rdf:resource="urn:swrl#b"/>
+              <swrl:argument2 rdf:resource="urn:swrl#c"/>
+            </swrl:IndividualPropertyAtom>
+          </rdf:first>
+          <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+        </rdf:Description>
+      </rdf:rest>
+    </rdf:Description>
+  </swrl:body>
+  <swrl:head>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasPart"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#c"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:head>
+</swrl:Imp>
+
+<swrl:Imp rdf:about="#hasFirstAct_to_hasBegin">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <swrl:body>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasFirstAct"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:body>
+  <swrl:head>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasBegin"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:head>
+</swrl:Imp>
+
+<swrl:Imp rdf:about="#hasBegin_transitive">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <swrl:body>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasBegin"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest>
+        <rdf:Description>
+          <rdf:first>
+            <swrl:IndividualPropertyAtom>
+              <swrl:propertyPredicate rdf:resource="#hasBegin"/>
+              <swrl:argument1 rdf:resource="urn:swrl#b"/>
+              <swrl:argument2 rdf:resource="urn:swrl#c"/>
+            </swrl:IndividualPropertyAtom>
+          </rdf:first>
+          <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+        </rdf:Description>
+      </rdf:rest>
+    </rdf:Description>
+  </swrl:body>
+  <swrl:head>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasBegin"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#c"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:head>
+</swrl:Imp>
+
+<swrl:Imp rdf:about="#hasLastAct_to_hasEnd">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <swrl:body>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasLastAct"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:body>
+  <swrl:head>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasEnd"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:head>
+</swrl:Imp>
+
+<swrl:Imp rdf:about="#hasEnd_transitive">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <swrl:body>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasEnd"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest>
+        <rdf:Description>
+          <rdf:first>
+            <swrl:IndividualPropertyAtom>
+              <swrl:propertyPredicate rdf:resource="#hasEnd"/>
+              <swrl:argument1 rdf:resource="urn:swrl#b"/>
+              <swrl:argument2 rdf:resource="urn:swrl#c"/>
+            </swrl:IndividualPropertyAtom>
+          </rdf:first>
+          <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+        </rdf:Description>
+      </rdf:rest>
+    </rdf:Description>
+  </swrl:body>
+  <swrl:head>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasEnd"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#c"/>
         </swrl:IndividualPropertyAtom>
       </rdf:first>
       <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>

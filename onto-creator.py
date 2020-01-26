@@ -41,7 +41,7 @@ with c_schema:
 	# # >
 	# class hasUniqueData( FunctionalProperty, DataProperty): pass  # datatype property base
 
-	class hasDirectPart( ObjectProperty , *references ): pass
+	class hasDirectPart( ObjectProperty , *referencedByUnique ): pass  # a part of unique whole
 	class hasPart(  ObjectProperty , *references ): pass  # transitive over hasDirectPart (defined thru SWRL!)
 
 
@@ -163,22 +163,28 @@ with c_schema:
 		comment = 'A trace based on an Algorithm'
 
 	# -->
+	class TraceAtom(Act):
+		comment = 'An atomic act that does not contain any acts'
+		equivalent_to = [Act & hasDirectPart.value(Nothing)]
+		# an act should be classified as TraceAtom by its hasDirectPart value set to Nothing
+
+	# -->
 	class ExpressionAct(Act): pass  # expression Act, evals to some typed value
 	# --->
 	class ConditionAct(ExpressionAct): pass  # boolean expression Act, evals to True or False
 
 	# # # >
-	# # class ActLabel(Thing):
-	# # 	comment = 'A mark attached to Act'
-	# # ->
-	# class ActContext(TraceElement): pass
+		# # class ActLabel(Thing):
+		# # 	comment = 'A mark attached to Act'
+		# # ->
+		# class ActContext(TraceElement): pass
 
-	# # ->
-	# class BeginLabel(TraceElement):
-	# 	comment = 'A mark pointing to begin of a Context (compound Act)'
-	# # ->
-	# class EndLabel(TraceElement):
-	# 	comment = 'A mark pointing to end of a Context (compound Act)'
+		# # ->
+		# class BeginLabel(TraceElement):
+		# 	comment = 'A mark pointing to begin of a Context (compound Act)'
+		# # ->
+		# class EndLabel(TraceElement):
+		# 	comment = 'A mark pointing to end of a Context (compound Act)'
 
 
 	##################################
@@ -186,21 +192,36 @@ with c_schema:
 	##################################
 
 	# >
-	class hasAct( Act >> Act , *references): pass
+	# class hasAct( Act >> Act , AsymmetricProperty): pass  # Reflexive allowed
+
+	# use hasDirectPart and hasPart to express acts nesting!
+	# set A.hasDirectPart = Nothing to describe atomic act.
+
 	# >
-	class hasFirstAct( Act >> Act , *referencesToUniqueOrSelf):
+	class hasFirstAct( Act >> Act , hasDirectPart,  *referencesToUniqueOrSelf):
 		comment = 'Should always be used with non-empty Trace.'
 	# >
-	class hasLastAct( Act >> Act , *referencesToUniqueOrSelf): pass
+	class hasBegin( Act >> Act , *references): pass  # transitive over hasFirstAct (defined thru SWRL!)
 
-	# Остаётся минимум - только последовательность актов и транзитивное "ДО"
 	# >
-	class hasNextAct( Act >> Act , *mutualUnique): pass
-	# ->
+	class hasLastAct( Act >> Act , hasDirectPart, *referencesToUniqueOrSelf): pass
+	# >
+	class hasEnd( Act >> Act , *references): pass  # transitive over hasLastAct (defined thru SWRL!)
+
+	# связь "следующий" в последовательности простых и составных актов (в началах и концах составных актов будет ветвление - разделение и схождение этих связей, соответственно).
+	# >
+	class hasNextAct( Act >> Act , *references):
+		comment = ''
+	# # >
+	# class hasNextAtom( TraceAtom >> TraceAtom , *mutualUnique):
+	# 	comment = 'sequential link between TarceAtom instances'
+
+	# транзитивное "ДО"
+	# >
 	class beforeAct( Act >> Act , *references): pass  # transitive over hasNextAct (defined thru SWRL!)
 
-	# >
-	class hasContext( Act >> Act , *referencesToUnique): pass
+	# # >
+	# class hasContext( Act >> Act , *referencesToUnique): pass  # use hasDirectPart (as inverse) instead
 
 	# >
 	class hasOrigin( TraceElement >> CodeElement , *referencesToUnique): pass
@@ -371,12 +392,26 @@ with c_schema:
 			 hasPart(?a, ?b), hasPart(?b, ?c) -> hasPart(?a, ?c)
 		""" ,
 
+		"hasFirstAct_to_hasBegin": """
+			 hasFirstAct(?a, ?b) -> hasBegin(?a, ?b)
+		""" ,
+		"hasBegin_transitive": """
+			 hasBegin(?a, ?b), hasBegin(?b, ?c) -> hasBegin(?a, ?c)
+		""" ,
+
+		"hasLastAct_to_hasEnd": """
+			 hasLastAct(?a, ?b) -> hasEnd(?a, ?b)
+		""" ,
+		"hasEnd_transitive": """
+			 hasEnd(?a, ?b), hasEnd(?b, ?c) -> hasEnd(?a, ?c)
+		""" ,
+
 # 		"NextL_to_before": """
 #         """ ,
 	}
 
-	for r in rules.values():
-		Imp().set_as_rule(r)
+	for name, r in rules.items():
+		Imp(name).set_as_rule(r)
 
 
 
