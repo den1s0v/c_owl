@@ -2,7 +2,7 @@
 :begin main-body
     A
     
-    :begin For
+    :begin For-inti0
         For-init
         For-cond -> true
         :begin For-body
@@ -15,7 +15,7 @@
         :end For-body
         For-update
         For-cond -> false
-    :end For
+    :end For-inti0
     
     C
 :end main-body

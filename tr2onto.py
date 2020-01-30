@@ -60,12 +60,14 @@ class TraceNode:
 
 class ActNode(TraceNode):
 	""" Act of trace """
-	def __init__(self, parent, alg_node=None, name='unkn_act', N=-1):
-		super().__init__(type_name='Act',
+	def __init__(self, parent, alg_node=None, name='unkn_act', N=-1, type_name=None, attributes=None):
+		super().__init__(type_name=type_name or'Act',
 							  alg_node=alg_node,
 							  parent=parent,
 							  attributes={ "name":name, "N":N }
 						  )
+		if attributes:
+			self.attributes.update(attributes)
 		self.sub_acts = []
 		self.next_acts = []
 
@@ -75,10 +77,14 @@ class ActNode(TraceNode):
 		]
 		# call parent
 		triples += super().get_triples()
-		# при отсутствии явно заданных начала и конца - перенаправляем на NOTHING для определённости
+		# при отсутствии явно заданных начала и конца - атомарный акт
 		if not self.sub_acts:
 			triples += [
+				# перенаправляем на NOTHING для определённости
 				(self.node_name, "hasDirectPart", NOTHING),
+				# замкнуть начало и конец на себе самом
+				(self.node_name, "hasFirstAct", self.node_name),
+				(self.node_name, "hasLastAct", self.node_name),
 			]
 			return triples
 
@@ -107,20 +113,42 @@ class ActNode(TraceNode):
 			]
 		return triples
 
+
+class ConditionActNode(ActNode):  ## No transt inheritance for now ConditionAct < ExpressionAct < ActNode.
+	""" Condition Act of a loop or IF """
+	def __init__(self, parent, alg_node=None, name='unkn_cond', N=-1, evals_to=None):
+		super().__init__(type_name='ConditionAct',
+							  parent=parent,
+							  alg_node=alg_node,
+							  name=name,
+							  attributes={ "name":name, "N":N, "evals_to": bool(evals_to) }
+						  )
+	def get_triples(self):
+		triples = [
+			# (self.node_name, OWLPredicate["type"], self.type_name),
+		]
+		if self.attributes["evals_to"] is not None:
+			triples += [
+				(self.node_name, "evals_to", self.attributes["evals_to"]),
+			]
+		# call parent
+		triples += super().get_triples()
+		return triples
+
 class Trace(ActNode):
 	""" Root for trace tree created from .tr file """
 	def __init__(self, alg_root=None, text_to_parse=None):
 		super().__init__(alg_node=alg_root,
 							  parent = None,
-							  name='Trace',
+							  name='TRACE',
 							 )
 		self.type_name = 'Trace'
 		# self.make_node_name(N='omit')  # also works OK with `name='Trace'` at __init__
 
 		self.nodes = []  # all trace tree nodes
 		self.plain_acts_sequence = []  # "leaf" nodes only
-		# {name_str -> obj} - use in parsing lookup
-		self.act_names = dict()
+		# {name_str -> alg_obj} - use in parsing lookup
+		self.name2alg = dict()
 
 		if text_to_parse:
 			self.parse(text_to_parse)
@@ -129,29 +157,105 @@ class Trace(ActNode):
 		assert self.alg_node, 'Algorithm root is not set to Trace.alg_node !'
 
 		labeled_tokens = self._parse_text(text)
-		print(labeled_tokens)
+		print(repr(labeled_tokens))
+
+		self._resolve_names([ [n,*bs,*es] for n,bs,es,_ in labeled_tokens ])
 
 		context_stack = [self]  # the Trace is the context for everything else
+		# finished_acts = []      # acts finished on previous iteration
 
+		# цикл составления трассы
 		for act_name, beg_lbs, end_lbs, val in labeled_tokens:
-			for begin_name in beg_lbs:
-				act = self._make_act(begin_name, parent=context_stack[-1], is_new=True)
-				context_stack.append(act)
+			# new_acts = []
 
-			act = self._make_act(act_name, parent=context_stack[-1], is_new=True)
+			for begin_name in beg_lbs:
+				act = self._make_act(begin_name, parent=context_stack[-1])
+				context_stack.append(act)
+				# new_acts.append(act)
+
+			act = self._make_act(act_name, parent=context_stack[-1], evals_to=val)
 			self.plain_acts_sequence.append(act)
+			# new_acts.append(act)
+
+			# if finished_acts:
+				# 	for pr_act in finished_acts:
+				# 		for new_act in new_acts:
+				# 			pr_act.next_acts.append(new_act)
+				# finished_acts.clear()
+				# finished_acts.append(act)
 
 			for end_name in end_lbs:
-				act = context_stack[-1]
-				if act.attributes["name"] == end_name: ### нужно сравнение с оглядкой на алгоритм!
+				act_to_close = context_stack[-1]
+				is_ok = False
+				if act_to_close.attributes["name"] == end_name:
+					is_ok = True
+				elif act_to_close.alg_node == self.name2alg[end_name]:  # сравнение с оглядкой на алгоритм
+					is_ok = True
+					print("Trace warning: Using different names to open and close the same compound act `%S`: `%s`, `%s`" % (act_to_close.alg_node.attributes["name"], act_to_close.attributes["name"], end_name))
+				if is_ok:
 					context_stack.pop()
 				else:
-					raise Exception("Trace Error: Cannot close %s after %s because current context is %s." % (end_name, act_name, act.attributes["name"]))
+					raise Exception("Trace Error: Cannot close %s after %s because the context is %s." % (end_name, act_name, act_to_close.attributes["name"]))
 
+				# finished_acts.append(act)   # ... TODO
+		if context_stack != [self]:
+			print("Trace warning: The trace is not complete or contains errors. The contexts stack remaining at the end of provided trace is expected to contain the Trace only, but found: [%s]" % str(list(map(lambda a:"%s[%s]"%(a.attributes["name"],a.node_name), self.context_stack))))
 
+	def _resolve_names(self, names):
+		""" fills self.name2alg dict with a mapping the given names to algorithm nodes. """
+		for items in names:
+			if isinstance(items, str):
+				items = (items, )
+			for item in items:
+				if item in self.name2alg:
+					continue
 
+				alg_node_found = self._resolve_name(item)
+				if alg_node_found:
+					# имена-синонимы ...
+					if alg_node_found in self.name2alg.values():
+						print("Trace warning: Using different names to refer the same algorithm node `%s`: {%s}" % (alg_node_found.node_name, str([key for (key, value) in self.name2alg.items() if value == alg_node_found])))
 
+					self.name2alg[item] = alg_node_found
 
+				else:
+					raise Exception("Trace Error: Cannot resolve act name %s over algorithm." % (item, ))
+
+	def _resolve_name(self, name):
+		""" -> resolved alg_node or None or Exception if the name is ambiguious.
+		searches given name within the algorithm nodes. """
+		attempt_params = [
+			{
+				"args": dict(reverse_check=0, ignore_case=0),
+				"many_is_ok": False		# `Cat` matches `Cat`, `Catty`.
+			},{
+				"args": dict(reverse_check=0, ignore_case=1),
+				"many_is_ok": True		# `Cat` matches `cat`, `category`, `CATTY`.
+			},{
+				"args": dict(reverse_check=1, ignore_case=0),
+				"many_is_ok": True		# `Cat` matches `Cat`, `Ca`, `C`.
+			},{
+				"args": dict(reverse_check=1, ignore_case=1),
+				"many_is_ok": True		# `Cat` matches `cat`, `c`, `CAT`.
+			},
+		]
+		candidates = None
+
+		for params in attempt_params:
+			found_candidates = self.alg_node.find_candidates_by_subname(name, **params["args"
+				])
+			if not candidates or 1 <= len(found_candidates) < len(candidates):
+				candidates = found_candidates
+			if len(candidates) == 1:
+				break
+			# if len(candidates) == 0:
+			# 	continue
+			if len(candidates) > 1 and not params["many_is_ok"]:
+				break
+
+		if len(candidates) > 1:
+			raise Exception("Trace Error: Cannot resolve ambiguious act name `%s` over algorithm. Possible resolutons are: {%s}" % (name, tuple(candidates.keys())))
+		return next(iter(candidates.values()))  if candidates else  None
 
 	def _parse_text(self, text):
 		""" -> list of labelled tokens.
@@ -177,7 +281,7 @@ class Trace(ActNode):
 		curr_act = None  # (string) token representing an act
 		begin_labels = []
 		end_labels = []
-		evals_to = ""
+		evals_to = None
 
 		for line_i, line_tokens in enumerate(tokens_list):
 			if not line_tokens:
@@ -236,28 +340,29 @@ class Trace(ActNode):
 						evals_to,
 				) )
 				begin_labels.clear()
-				evals_to = ""
+				evals_to = None
 		return labeled_tokens
 
-	def _resolve_alg_name(self, token):
-		""" -> resolved alg_node or Exception """
-		if token in self.act_names:
-			return self.act_names[token]
-		else:
-			return None ### !
+	# def _resolve_alg_name(self, token):
+		# 	""" -> resolved alg_node or Exception """
+		# 	if token in self.name2alg:
+		# 		return self.name2alg[token]
+		# 	else:
+		# 		return None ### !
 
-	def _make_act(self, token, parent, is_new=False):
+	def _make_act(self, name, parent, evals_to=None):
 		""" -> ActNode object """
-		if token in self.act_names:
-			return self.act_names[token]
+		alg_node = self.name2alg[name]
+
+		if evals_to is not None:
+			# пока поддерживается парсинг только логических значений (для условий циклов/развилок)
+			act = ConditionActNode(parent=parent, name=name, alg_node=alg_node, evals_to=self._parse_cond_value(evals_to))
+			print("\t\t\t ^ this is a Condition !")
 		else:
-			name, N = parse_trace_token(token)
-			### заглушка!
-			act = ActNode(self, parent=parent, name=name, N=N)
-			parent.sub_acts.append(act)
-			self.act_names[token] = act
-			self.nodes.append(act)
-			return act
+			act = ActNode(parent=parent, name=name, alg_node=alg_node)
+		parent.sub_acts.append(act)
+		self.nodes.append(act)
+		return act
 
 	def _parse_cond_value(self, token):
 		""" _parse_cond_value(str) -> True/False """
@@ -275,101 +380,32 @@ class Trace(ActNode):
 
 	def get_triples(self):
 		triples = [
-			(self.node_name, OWLPredicate["type"], self.type_name),
+			# (self.node_name, OWLPredicate["type"], self.type_name),
 		]
-		# call parent
-		triples += ActNode.get_triples(self)
-		# при отсутствии явно заданных начала и конца - замыкаемся на себя (могут быть проблемы с концом неполной трассы)
-		if not self.acts:
-			self.acts.append(self)
+		# при отсутствии явно заданных начала и конца - замыкаемся на себя (могут быть проблемы с концом неполной трассы?)
+		if not self.plain_acts_sequence:
+			self.plain_acts_sequence.append(self)
 		# стандартная отправка списка ...
-		if self.acts:
+		if self.plain_acts_sequence:
 			triples += [
-				(self.node_name, "hasFirstAct", self.acts[0].node_name),
-				(self.node_name, "hasLastAct", self.acts[-1].node_name),
+				(self.node_name, "hasBegin", self.plain_acts_sequence[0].node_name),
+				(self.node_name, "hasEnd", self.plain_acts_sequence[-1].node_name),
 			]
 		prev_act = None
-		for act in self.acts:
-			triples += [
-				(self.node_name, "hasAct", act.node_name),
-			]
-			triples += act.get_triples()
+		for act in self.plain_acts_sequence:
 			if prev_act:
 				triples += [
 					(prev_act.node_name, "hasNextAct", act.node_name),
 				]
 			prev_act = act
+		# call parent
+		triples += super().get_triples()
 		return triples
 
 
-# class ActContextNode(TraceNode):
-#     """ Context (compound Act) can be labelled with BeginLabel and/or EndLabel """
-#     def __init__(self, parent, alg_node=None, name='unkn_context', N=-1):
-#         TraceNode.__init__(self, type_name='ActContext',
-#                               alg_node=alg_node,
-#                               parent = parent,
-#                               N = N,
-#                               attributes={ "name":name, }
-#                           )
-#         self.begin = None
-#         self.end = None
-#     def get_begin(self):
-#         if not self.begin:
-#             self.begin = BeginLabelNode(self)
-#         return self.begin
-#     def get_end(self):
-#         if not self.end:
-#             self.end = EndLabelNode(self)
-#         return self.end
-#     def get_triples(self):
-#         triples = [
-#             (self.node_name, OWLPredicate["type"], self.type_name),
-#         ]
-#         # call parent
-#         triples += TraceNode.get_triples(self)
-#         return triples
 
-# class AbstractLabelNode(TraceNode):
-#     """ Abstract Act's label """
-#     def __init__(self, parent, type_name='Any~Label'):
-#         assert isinstance(parent, ActContextNode), 'Label must be connected to ActContextNode via parent parameter.'
-#         TraceNode.__init__(self, type_name=type_name,
-#                               parent = parent,
-#                               attributes={ "name":parent.node_name+'_'+type_name, }
-#                           )
-#     def get_triples(self):
-#         triples = [
-#             (self.node_name, OWLPredicate["type"], self.type_name),
-#             (self.node_name, "isLabelOf", self.parent.node_name),
-#         ]
-#         # call parent  -  unnesessary (no appropriate properties assigned)
-# #         triples += TraceNode.get_triples(self)
-#         # call context
-#         triples += self.parent.get_triples()
-#         #         # call context, & prevent duplicates
-#         #         parent_triples = self.parent.get_triples()
-#         #         for pt in parent_triples:
-#         #             if pt not in triples:
-#         #                 triples.append(pt)
-#         return triples
+print('tr2onto definitions OK')
 
-# class BeginLabelNode(AbstractLabelNode):
-#     """ Act's labell: begin of Context """
-#     def __init__(self, parent):
-#         AbstractLabelNode.__init__(self, type_name='BeginLabel',  parent = parent)
-# class EndLabelNode(AbstractLabelNode):
-#     """ Act's label: end of Context """
-#     def __init__(self, parent):
-#         AbstractLabelNode.__init__(self, type_name='EndLabel', parent = parent)
-
-
-# uniq_names.clear()
-# using existing alg
-
-# tr = Trace(alg)
-
-
-
-print('\n\o/')
+print('\n\\o/')
 print(' H')
 print('/|')
