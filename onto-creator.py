@@ -406,6 +406,12 @@ with c_schema:
 			 hasEnd(?a, ?b), hasEnd(?b, ?c) -> hasEnd(?a, ?c)
 		""" ,
 
+		# связь before между началами и концами составных актов - через атомарные
+		"beforeAct_up": """
+			 hasNextAct(?e, ?b), hasEnd(?a, ?e), hasBegin(?n, ?b) -> beforeAct(?a, ?n)
+		""" ,
+
+
 # 		"NextL_to_before": """
 #         """ ,
 	}
