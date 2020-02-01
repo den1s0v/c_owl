@@ -80,10 +80,42 @@ def extend_from_triples(onto, triples_list, names_map=None):
 
 # print("Resolving Nothing:", vars().get("Nothing", 'None!'))  # OK!
 
+def _make_alg_and_trace_triples():
+		from pycparser import parse_file
+
+		c2onto.clear_unique_set()
+
+		alg_filename = 'examples/ex-1-loop.c'
+		ast = parse_file(alg_filename, use_cpp=False)
+		alg = c2onto.Algorithm(ast)
+
+		alg_triples = alg.get_triples()
+
+		trace_filename = 'examples/ex-1-loop.tr'
+		with open(trace_filename) as f:
+			trace_text = f.read()
+		tr = tr2onto.Trace(alg)
+		tr.parse(trace_text)
+
+		trace_triples = tr.get_triples()
+
+		return alg_triples + trace_triples
+
+# c2onto = None
+# tr2onto = None
+
 def _main():
+
+	global c2onto, tr2onto
+	import tr2onto
+	c2onto = tr2onto.c2onto
 
 	c_schema = make_ontology()
 
+	extend_from_triples(c_schema, _make_alg_and_trace_triples(),
+	                                tr2onto.OWLPredicate)
+
+	print("Triples imported!")
 
 	############################
 	######## Export RDF ########
