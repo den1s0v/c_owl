@@ -407,6 +407,10 @@
   <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Base for all errors</rdfs:comment>
 </owl:Class>
 
+<owl:Nothing rdf:about="#CustomNothing">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+</owl:Nothing>
+
 <swrl:Imp rdf:about="#hasNextAct_to_beforeAct">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <swrl:body>
@@ -680,6 +684,60 @@
     </rdf:Description>
   </swrl:head>
 </swrl:Imp>
+
+<swrl:Imp rdf:about="#beforeAct_up">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <swrl:body>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#hasNextAct"/>
+          <swrl:argument1 rdf:resource="urn:swrl#e"/>
+          <swrl:argument2 rdf:resource="urn:swrl#b"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest>
+        <rdf:Description>
+          <rdf:first>
+            <swrl:IndividualPropertyAtom>
+              <swrl:propertyPredicate rdf:resource="#hasEnd"/>
+              <swrl:argument1 rdf:resource="urn:swrl#a"/>
+              <swrl:argument2 rdf:resource="urn:swrl#e"/>
+            </swrl:IndividualPropertyAtom>
+          </rdf:first>
+          <rdf:rest>
+            <rdf:Description>
+              <rdf:first>
+                <swrl:IndividualPropertyAtom>
+                  <swrl:propertyPredicate rdf:resource="#hasBegin"/>
+                  <swrl:argument1 rdf:resource="urn:swrl#n"/>
+                  <swrl:argument2 rdf:resource="urn:swrl#b"/>
+                </swrl:IndividualPropertyAtom>
+              </rdf:first>
+              <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+          </rdf:rest>
+        </rdf:Description>
+      </rdf:rest>
+    </rdf:Description>
+  </swrl:body>
+  <swrl:head>
+    <rdf:Description>
+      <rdf:first>
+        <swrl:IndividualPropertyAtom>
+          <swrl:propertyPredicate rdf:resource="#beforeAct"/>
+          <swrl:argument1 rdf:resource="urn:swrl#a"/>
+          <swrl:argument2 rdf:resource="urn:swrl#n"/>
+        </swrl:IndividualPropertyAtom>
+      </rdf:first>
+      <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+    </rdf:Description>
+  </swrl:head>
+</swrl:Imp>
+
+<swrl:Variable rdf:about="urn:swrl#e"/>
+
+<swrl:Variable rdf:about="urn:swrl#n"/>
 
 
 </rdf:RDF>
