@@ -12,6 +12,7 @@ def extend_from_triples(onto, triples_list, names_map=None):
 	"""
 	assert isinstance(onto, Ontology), "expected an instance of owlready2.namespace.Ontology"
 	assert not names_map or isinstance(names_map, dict), "expected None or an instance of dict"
+	show_warn_suffix = 1
 
 	if names_map:
 		names_map = {v: k for k, v in names_map.items()}
@@ -58,21 +59,23 @@ def extend_from_triples(onto, triples_list, names_map=None):
 
 			object_class = predicate.range  # primitive value classes (like bool, int, str) are also OK!
 			if not object_class:
-				print("* extend_from_triples() warning: attempting to find object `%s` in ontology or add as string value, as property `%s` is not declared with Range within given ontology (`%s`)" % (o, p, onto.base_iri))
+				print(("* extend_from_triples() warning: attempting to find object `%s` in ontology or consider as string value, as property `%s` is not declared with Range" % (o, p)) + show_warn_suffix * ("within given ontology (`%s`)" % onto.base_iri))
+				show_warn_suffix = 0
 				object_ = (
 					onto[o]  # try find in ontology by name
 					or  globals().get(o, None)  # try find in current scope (i.e. imported with `from owlready2 import *`)
 					or  o  # leave plain string (OK if a string literal is expected)
 					)
-				print("* _ type", type(object_), "is chosen for", object_, end='\n'*2)
+				if show_warn_suffix: print("*_> type", type(object_), "is chosen for", object_, end='\n'*2)
 
 			else:
 				object_class = object_class.first()  # extract from list
 				object_ = object_class(o)
 				if issubclass(object_class, Thing) and not object_:
-					raise ValueError("* extend_from_triples() error: object `%s` is not recognized as a declared (with `rdf:type`) entity of given ontology (`%s`)" % (s, onto.base_iri))
+					raise ValueError(("* extend_from_triples() error: object `%s` is not recognized as an entity declared (with `rdf:type`)"%s) + show_warn_suffix * ("of given ontology (`%s`)" % onto.base_iri))
+					show_warn_suffix = 0
 
-			print("Go: ",subject,predicate,object_)
+			# print("Go: ",subject,predicate,object_)
 			# add relation (the most stable method to do it, tested on Owlready2 v0.23)
 			predicate[subject].append(object_)
 		# end of for

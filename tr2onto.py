@@ -17,7 +17,7 @@ class TraceNode:
 			self.attributes["N"] = -1  # execution count (nth time)
 		# calculated attributes
 		self.make_node_name(name=attributes["name"] if (attributes and "name" in attributes) else None)
-		print('=== %20s created.' % self.node_name)
+		# print('=== %20s created.' % self.node_name)
 
 	def make_node_name(self, name=None, N=None):
 		""" set N="omit" to disable appending of N.

@@ -267,7 +267,7 @@ class FuncDefNode(AlgNode):
 								  "name":ast_node.decl.name,
 							  })
 		self.make_node_name(name='funcdecl-'+self.attributes["name"]+'()')
-		print(self.node_name)
+		# print(self.node_name)
 		self.body = parse_ast_node_as_stmt(ast_node.body, self)
 		if isinstance(self.body, BlockNode):
 			# зададим блоку явное имя тела функции
@@ -341,7 +341,7 @@ class FuncCallNode(AlgNode):
 							  })
 		self.make_node_name(name = "call-%s()" % self.attributes["name"])
 		self.called_func = None
-		print(self.node_name)
+		# print(self.node_name)
 	def get_triples(self):
 		# calc later, because possibly not all functions are known by root Algorithm instance at init() stage :)
 		self.called_func = self.search_up(Algorithm).find_function_by_name(self.attributes["name"])  # can be None
@@ -366,7 +366,7 @@ class IfNode(AlgNode):
 		self.iftrue  = parse_ast_node_as_stmt(ast_node.iftrue,  self)
 		self.iffalse = parse_ast_node_as_stmt(ast_node.iffalse, self, make_empty=False)
 		self.make_node_name(name="if-%s" % self.cond.code_string[:20])
-		print(self.node_name)
+		# print(self.node_name)
 		# зададим блокам явное имя ветви ветвления
 		if isinstance(self.iftrue, BlockNode):
 			self.iftrue.make_node_name(name="seq-if-true-%s" % self.cond.code_string[:20])
