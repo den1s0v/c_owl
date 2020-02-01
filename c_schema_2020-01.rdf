@@ -16,7 +16,6 @@
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#hasPart">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
 </owl:ObjectProperty>
 
@@ -109,7 +108,6 @@
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#hasFunc">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
   <rdfs:domain rdf:resource="#Algorithm"/>
   <rdfs:range rdf:resource="#Function"/>
@@ -157,7 +155,6 @@
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#hasBegin">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
   <rdfs:domain rdf:resource="#Act"/>
   <rdfs:range rdf:resource="#Act"/>
@@ -172,14 +169,12 @@
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#hasEnd">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
   <rdfs:domain rdf:resource="#Act"/>
   <rdfs:range rdf:resource="#Act"/>
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#hasNextAct">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
   <rdfs:domain rdf:resource="#Act"/>
   <rdfs:range rdf:resource="#Act"/>
@@ -187,7 +182,6 @@
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#beforeAct">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
   <rdfs:domain rdf:resource="#Act"/>
   <rdfs:range rdf:resource="#Act"/>

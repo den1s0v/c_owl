@@ -19,10 +19,10 @@ def make_ontology(iri=None):
 		""" |  In addition, the following subclasses of Property are available: FunctionalProperty, InverseFunctionalProperty, TransitiveProperty, SymmetricProperty, AsymmetricProperty, ReflexiveProperty, IrreflexiveProperty. They should be used in addition to ObjectProperty or DataProperty (or the ‘domain >> range’ syntax)."""
 
 		# mixins to be used with property constructor call
-		references = [ObjectProperty, AsymmetricProperty, IrreflexiveProperty]
+		references = [ObjectProperty]
 		referencesToUnique = [ObjectProperty, FunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
-		referencesToUniqueOrSelf = [ObjectProperty, FunctionalProperty, AsymmetricProperty]
-		referencedByUnique = [ObjectProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
+		referencesToUniqueOrSelf = [ObjectProperty, FunctionalProperty]
+		referencedByUnique = [ObjectProperty, InverseFunctionalProperty, ]
 		mutualUnique = [ObjectProperty, FunctionalProperty, InverseFunctionalProperty, AsymmetricProperty, IrreflexiveProperty]
 		hasUniqueData = [FunctionalProperty, DataProperty]  # should I remove DataProperty ?
 
@@ -38,7 +38,7 @@ def make_ontology(iri=None):
 		# # >
 		# class hasUniqueData( FunctionalProperty, DataProperty): pass  # datatype property base
 
-		class hasDirectPart( ObjectProperty , *referencedByUnique ): pass  # a part of unique whole
+		class hasDirectPart( ObjectProperty , *references ): pass  # a part of unique whole
 		class hasPart(  ObjectProperty , *references ): pass  # transitive over hasDirectPart (defined thru SWRL!)
 
 
