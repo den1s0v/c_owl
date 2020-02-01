@@ -82,8 +82,8 @@ class ActNode(TraceNode):
 		# при отсутствии явно заданных начала и конца - атомарный акт
 		if not self.sub_acts:
 			triples += [
-				# перенаправляем на NOTHING для определённости
-				(self.node_name, "hasDirectPart", OWLStdEntity["Nothing"]),
+				# перенаправляем на СЕБЯ для определённости
+				(self.node_name, "hasDirectPart", self.node_name),
 				# замкнуть начало и конец на себе самом
 				(self.node_name, "hasFirstAct", self.node_name),
 				(self.node_name, "hasLastAct", self.node_name),
@@ -159,7 +159,6 @@ class Trace(ActNode):
 		assert self.alg_node, 'Algorithm root is not set to Trace.alg_node !'
 
 		labeled_tokens = self._parse_text(text)
-		print(repr(labeled_tokens))
 
 		self._resolve_names([ [n,*bs,*es] for n,bs,es,_ in labeled_tokens ])
 

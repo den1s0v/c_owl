@@ -42,8 +42,6 @@ def make_ontology(iri=None):
 		class hasPart(  ObjectProperty , *references ): pass  # transitive over hasDirectPart (defined thru SWRL!)
 
 
-		# make an instance of Nothing (to be within our ontology)
-		Nothing("CustomNothing")
 
 		###############################
 	#	######## Code Classes ########
