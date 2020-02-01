@@ -18,13 +18,13 @@ c_schema:Act(?b) ^ c_schema:Act(?c) ^ c_schema:Act(?a) ^ c_schema:beforeAct(?a, 
 # ActOutOfContextError
 # Срабатывает, если есть акт `act`, непосредственно вложенный в акт `act_c` (контекст),
 # в то время как их первоисточники в алгоритме (st и st_c) не состоят в таком же отношении вложенности (контекст st - st_c_actual - отличается от st_c, указанного в трассе):
-hasContext(?act, ?act_c)
-hasOrigin(?act, ?st)
-hasOrigin(?act_с, ?st_с)
-hasDirectPart(?st_c_actual, ?st)
+hasDirectPart(?act_c, ?act),
+hasOrigin(?act, ?st),
+hasOrigin(?act_c, ?st_c),
+hasDirectPart(?st_c_actual, ?st),
 
-DifferentFrom(?st_с, ?st_c_actual)
- -> message(ERRORS, "ActOutOfContextError")
+DifferentFrom(?st_c, ?st_c_actual)
+ -> message(ERRORS, "ActOutOfContextError(No detalization yet.)")
 
 # ==================================
 
@@ -172,16 +172,15 @@ swrlb:stringConcat(?msg, "ActCannotPrecedeActError: `", ?src_a2, "` must be prec
 # Утв-1 : Ош-3
 # Оператор Б (st) входит в следование А (block), при этом между  началом акта А и концом акта А содержится БОЛЬШЕ ОДНОГО (два) акта Б (act1,act2)
 # DuplicateActsOfStmtError
-Block(?block)
-hasOrigin(?block_act, ?block)
-hasDirectPart(?st, ?block_act)
+Block(?block) ^
+hasOrigin(?block_act, ?block) ^
 
-hasOrigin(?act1, ?st)
-hasOrigin(?act2, ?st)
-hasContext(?act1, ?block_act)
-hasContext(?act2, ?block_act)
+hasOrigin(?act1, ?st) ^
+hasOrigin(?act2, ?st) ^
+hasDirectPart(?block_act, ?act1) ^
+hasDirectPart(?block_act, ?act2) ^
 
-DifferentFrom(?st_с, ?st_c_actual)
+differentFrom(?act1, ?act2)
  -> message(ERRORS, "DuplicateActsOfStmtError")
 
 
@@ -198,6 +197,13 @@ before(?end, ?begin)
 
 
 # Утв-3 : Синтаксис и "Акт вне своего Контекста"
+hasDirectPart(?act_c, ?act),
+hasOrigin(?act, ?st),
+hasOrigin(?act_c, ?st_c),
+hasDirectPart(?st_c_actual, ?st),
+
+DifferentFrom(?st_c, ?st_c_actual)
+ -> message(ERRORS, "ActOutOfContextError(No detalization yet.)")
 
 # Утв-5 : Ош-1
 # А является альтернативой, Б её условие, В - первая ветка, а Г - вторая, но для акта А, при истинном Б не существует акта В

@@ -94,7 +94,8 @@ def _make_alg_and_trace_triples():
 
 		alg_triples = alg.get_triples()
 
-		trace_filename = 'examples/ex-1-loop.tr'
+		# trace_filename = 'examples/ex-1-loop.tr'
+		trace_filename = 'examples/ex-1-loop_bad1.tr'
 		with open(trace_filename) as f:
 			trace_text = f.read()
 		tr = tr2onto.Trace(alg)
@@ -104,10 +105,10 @@ def _make_alg_and_trace_triples():
 
 		return alg_triples + trace_triples
 
-# c2onto = None
-# tr2onto = None
+c2onto = None
+tr2onto = None
 
-def _main():
+def _main(run_reasoner=False):
 
 	global c2onto, tr2onto
 	import tr2onto
@@ -115,8 +116,7 @@ def _main():
 
 	c_schema = make_ontology()
 
-	extend_from_triples(c_schema, _make_alg_and_trace_triples(),
-	                                tr2onto.OWLPredicate)
+	extend_from_triples(c_schema, _make_alg_and_trace_triples(), tr2onto.OWLPredicate)
 
 	print("Triples imported!")
 
@@ -132,7 +132,21 @@ def _main():
 
 	# upload_rdf_to_SPARQL_endpoint('http://localhost:3030/c_owl/data', rdf_filename)
 
+	if run_reasoner:
+		with c_schema:
+			sync_reasoner_pellet(infer_property_values=True, infer_data_property_values=True)
+
+		rdf_filename = onto_name + '_inferred' + '.rdf'
+
+		c_schema.save(file=rdf_filename, format='rdfxml')
+		print("Saved RDF file: {} !".format(rdf_filename))
+
+		rdf_filename = onto_name + '_inferred' + '.n3'
+
+		c_schema.save(file=rdf_filename, format='ntriples')
+		print("Saved RDF file: {} !".format(rdf_filename))
+
 
 
 if __name__ == '__main__':
-	_main()
+	_main(run_reasoner=0)

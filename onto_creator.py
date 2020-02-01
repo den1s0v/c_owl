@@ -241,7 +241,7 @@ def make_ontology(iri=None):
 	#	######## Rule Classes ########
 		##############################
 
-		swrl_rules = []
+		swrl_rules = {}
 
 		# >
 		class GenericRule(Thing):
@@ -277,15 +277,15 @@ def make_ontology(iri=None):
 		class ActOutOfContextRule(SequenceRule): pass
 		# Срабатывает, если есть акт `act`, непосредственно вложенный в акт `act_c` (контекст),
 		# в то время как их первоисточники в алгоритме (st и st_c) не состоят в таком же отношении вложенности (контекст st - st_c_actual - отличается от st_c, указанного в трассе):
-		swrl_rules += """
-			hasContext(?act, ?act_c)
-			hasOrigin(?act, ?st)
-			hasOrigin(?act_с, ?st_с)
-			hasDirectPart(?st_c_actual, ?st)
+		swrl_rules["ActOutOfContextError"] = """
+			hasDirectPart(?act_c, ?act),
+			hasOrigin(?act, ?st),
+			hasOrigin(?act_c, ?st_c),
+			hasDirectPart(?st_c_actual, ?st),
 
-			DifferentFrom(?st_с, ?st_c_actual)
-			 -> message(ERRORS, "ActOutOfContextError")
-			"""
+			DifferentFrom(?st_c, ?st_c_actual)
+			 -> message(ERRORS, "ActOutOfContextError(No detalization yet.)")
+		"""
 
 		# Тестовая трасса
 			#     A#1
@@ -295,32 +295,26 @@ def make_ontology(iri=None):
 			#     C#1
 			#     D#1
 			# :end main_body#1
-		swrl_rules += """  !!!!!
-			:Context(?c)
-			:Block(?block)
-			:Statement(?stmt1)
-			:Act(?act1)
-			:Act(?act)
 
-			:hasContext(?act1, ?c)
-			:hasContext(?act,  ?c)
-			:hasFirst(?block, ?stmt1)
-			:hasOrigin(?c, ?block)
-			:hasOrigin(?act1, ?stmt1)
-			:before(?act, ?act1)
-
-			:hasIndex(?c, ?index)
-			:hasOrigin(?act, ?stmt)
-			:hasSource(?stmt, ?src)
-			:hasLocationSuffix(?stmt, ?stlbl)
-			swrlb:stringConcat(?msg, "ActBeforeStartOfBlockError: act `", ?src, "` (", ?stlbl, "#", ?index, ") is placed before start of block.")
-			 -> c_schema:message(c_schema:ERRORS, ?msg)
-			"""
 
 		# ---->
 		class ActIsContainedInSequenceRule(SequenceRule): pass
 		# ---->
 		class OnlyOneActExcecutionInSequenceRule(SequenceRule): pass
+		swrl_rules["DuplicateActsOfStmtError"] = """
+			Block(?block),
+			hasOrigin(?block_act, ?block),
+			hasDirectPart(?block, ?st),
+
+			hasOrigin(?act1, ?st),
+			hasOrigin(?act2, ?st),
+			hasDirectPart(?block_act, ?act1),
+			hasDirectPart(?block_act, ?act2),
+
+			DifferentFrom(?act1, ?act2)
+		 -> message(ERRORS, "DuplicateActsOfStmtError")
+		 """
+
 		# ---->
 		class ExecuteActABeforeActBInSequenceRule(SequenceRule): pass
 
@@ -358,14 +352,17 @@ def make_ontology(iri=None):
 		class GenericError(Thing):
 			comment = 'Base for all errors'
 		# ->
-		# class Act(TraceElement): pass  # atomic "Act"
+
+		# persistent instance (global object)
+		GenericError("ERRORS")  # to attach log messages
 
 
 		##################################
 	#	######## Error Properties ########
 		##################################
 
-
+		# >
+		class message( GenericError >> str ): pass
 
 
 
@@ -413,7 +410,7 @@ def make_ontology(iri=None):
 	        # """ ,
 		}
 
-		for name, r in rules.items():
+		for name, r in [*rules.items(), *swrl_rules.items()]:
 			Imp(name).set_as_rule(r)
 
 	return c_schema
