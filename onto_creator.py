@@ -162,7 +162,7 @@ def make_ontology(iri=None):
 		# -->
 		class TraceAtom(Act):
 			comment = 'An atomic act that does not contain any acts'
-			equivalent_to = [Act & hasDirectPart.value(Nothing)]
+			equivalent_to = [Act & hasDirectPart.has_self(True)]
 			# an act should be classified as TraceAtom by its hasDirectPart value set to Nothing
 
 		# -->
