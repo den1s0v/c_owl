@@ -1,7 +1,9 @@
 import c2onto
 from c2onto import ensure_unique, retract_unique_name, iri_name_prepare, OWLPredicate
 
-NOTHING = 'owl:Nothing'  # replace to some appropriate value
+# NOTHING = 'owl:Nothing'  # replace with some appropriate value
+OWLStdEntity = {"Nothing": 'CustomNothing'}
+OWLStdEntity.update(OWLPredicate)
 
 
 class TraceNode:
@@ -81,7 +83,7 @@ class ActNode(TraceNode):
 		if not self.sub_acts:
 			triples += [
 				# перенаправляем на NOTHING для определённости
-				(self.node_name, "hasDirectPart", NOTHING),
+				(self.node_name, "hasDirectPart", OWLStdEntity["Nothing"]),
 				# замкнуть начало и конец на себе самом
 				(self.node_name, "hasFirstAct", self.node_name),
 				(self.node_name, "hasLastAct", self.node_name),
@@ -127,12 +129,12 @@ class ConditionActNode(ActNode):  ## No transt inheritance for now ConditionAct 
 		triples = [
 			# (self.node_name, OWLPredicate["type"], self.type_name),
 		]
-		if self.attributes["evals_to"] is not None:
-			triples += [
-				(self.node_name, "evals_to", self.attributes["evals_to"]),
-			]
 		# call parent
 		triples += super().get_triples()
+		if self.attributes["evals_to"] is not None:
+			triples += [
+				(self.node_name, "evalsTo", self.attributes["evals_to"]),
+			]
 		return triples
 
 class Trace(ActNode):
@@ -357,7 +359,6 @@ class Trace(ActNode):
 		if evals_to is not None:
 			# пока поддерживается парсинг только логических значений (для условий циклов/развилок)
 			act = ConditionActNode(parent=parent, name=name, alg_node=alg_node, evals_to=self._parse_cond_value(evals_to))
-			print("\t\t\t ^ this is a Condition !")
 		else:
 			act = ActNode(parent=parent, name=name, alg_node=alg_node)
 		parent.sub_acts.append(act)
