@@ -5,7 +5,7 @@ from owlready2 import *
 
 def make_ontology(iri=None):
 	""" -> Owlready2 ontology object """
-	my_iri = iri or 'http://vstu.ru/poas/se/c_schema_2020-01'
+	my_iri = iri or 'http://vstu.ru/poas/se/seqloopalt_20-03'
 
 	c_schema = get_ontology(my_iri)
 
@@ -42,16 +42,27 @@ def make_ontology(iri=None):
 		class hasPart(  ObjectProperty , *references ): pass  # transitive over hasDirectPart (defined thru SWRL!)
 
 
-
-		###############################
-	#	######## Code Classes ########
-		###############################
+		###################################
+	#	######### General Classes #########
+		###################################
 
 		# >
-		class Algorithm(Thing):
+		class WithID(Thing):
+			comment = 'Root of an algorithm tree.'
+
+		class hasID(  WithID >> int , *hasUniqueData ): pass  # instead of stating individuals AllDifferent
+
+
+
+		##############################
+	#	######## Code Classes ########
+		##############################
+
+		# >
+		class Algorithm(WithID):
 			comment = 'Root of an algorithm tree.'
 		# >
-		class CodeElement(Thing):
+		class CodeElement(WithID):
 			comment = 'Base for Statements & Expresions, etc.'
 		# ->
 		class Atom(CodeElement):
@@ -119,9 +130,9 @@ def make_ontology(iri=None):
 		class hasElseBranch( IF_st >> Statement ,  hasSubStmt , *referencesToUnique): pass
 
 		# ->
-		class hasFirstSt( Block >> Statement , *referencesToUnique): pass
+		class hasFirstSt( Block >> Statement , hasSubStmt , *referencesToUnique): pass
 		# ->
-		class hasLastSt( Block >> Statement , *referencesToUnique): pass
+		class hasLastSt( Block >> Statement  , hasSubStmt , *referencesToUnique): pass
 		# ->
 		class hasNextSt( Statement >> Statement , *mutualUnique):
 			comment = 'Ordering within Block'
@@ -150,20 +161,27 @@ def make_ontology(iri=None):
 		###############################
 
 		# >
-		class TraceElement(Thing):
+		class TraceElement(WithID):
 			comment = 'Base for Acts & other trace elements (if added in future)'
 		# ->
 		class Act(TraceElement): pass  # atomic or compound "Act"
+
+		# -->
+		class ActBegin(Act):
+			pass
+		# -->
+		class ActEnd(Act):
+			pass
 
 		# -->
 		class Trace(Act):
 			comment = 'A trace based on an Algorithm'
 
 		# -->
-		class TraceAtom(Act):
-			comment = 'An atomic act that does not contain any acts'
-			equivalent_to = [Act & hasDirectPart.has_self(True)]
-			# an act should be classified as TraceAtom by its hasDirectPart value set to Nothing
+		# class TraceAtom(Act):
+		# 	comment = 'An atomic act that does not contain any acts'
+		# 	equivalent_to = [Act & hasDirectPart.has_self(True)]
+		# 	# an act should be classified as TraceAtom by its hasDirectPart value set to Nothing
 
 		# -->
 		class ExpressionAct(Act): pass  # expression Act, evals to some typed value
@@ -171,7 +189,7 @@ def make_ontology(iri=None):
 		class ConditionAct(ExpressionAct): pass  # boolean expression Act, evals to True or False
 
 		# # # >
-			# # class ActLabel(Thing):
+			# # class ActLabel(WithID):
 			# # 	comment = 'A mark attached to Act'
 			# # ->
 			# class ActContext(TraceElement): pass
@@ -194,20 +212,20 @@ def make_ontology(iri=None):
 		# use hasDirectPart and hasPart to express acts nesting!
 		# set A.hasDirectPart = Nothing to describe atomic act.
 
+		# # >
+		# class hasFirstAct( Act >> Act , hasDirectPart,  *referencesToUniqueOrSelf):
+		# 	comment = 'Should always be used with non-empty Trace.'
 		# >
-		class hasFirstAct( Act >> Act , hasDirectPart,  *referencesToUniqueOrSelf):
-			comment = 'Should always be used with non-empty Trace.'
-		# >
-		class hasBegin( Act >> Act , *references): pass  # transitive over hasFirstAct (defined thru SWRL!)
+		class hasBegin( Act >> ActBegin , *referencesToUnique): pass  # transitive over hasFirstAct (defined thru SWRL!)
 
+		# # >
+		# class hasLastAct( Act >> Act , hasDirectPart, *referencesToUniqueOrSelf): pass
 		# >
-		class hasLastAct( Act >> Act , hasDirectPart, *referencesToUniqueOrSelf): pass
-		# >
-		class hasEnd( Act >> Act , *references): pass  # transitive over hasLastAct (defined thru SWRL!)
+		class hasEnd( Act >> ActEnd , *referencesToUnique): pass  # transitive over hasLastAct (defined thru SWRL!)
 
 		# связь "следующий" в последовательности простых и составных актов (в началах и концах составных актов будет ветвление - разделение и схождение этих связей, соответственно).
 		# >
-		class hasNextAct( Act >> Act , *references):
+		class hasNextAct( Act >> Act , *mutualUnique):
 			comment = ''
 		# # >
 		# class hasNextAtom( TraceAtom >> TraceAtom , *mutualUnique):
@@ -221,7 +239,7 @@ def make_ontology(iri=None):
 		# class hasContext( Act >> Act , *referencesToUnique): pass  # use hasDirectPart (as inverse) instead
 
 		# >
-		class hasOrigin( TraceElement >> CodeElement , *referencesToUnique): pass
+		class executes( TraceElement >> CodeElement , *referencesToUnique): pass
 		# >
 		class hasN( Act >> int , *hasUniqueData): pass
 
@@ -241,18 +259,34 @@ def make_ontology(iri=None):
 	#	######## Rule Classes ########
 		##############################
 
+		def makeStringConcatPredicates(res_var : str, message : str, field_var_tuples: list) -> str:
+
+			retry_ids = ""
+			arguments = ""
+			for field,var in field_var_tuples:
+				retry_ids += "hasID(%s, %s_id), " % (var,var)
+				arguments += """, "%s: ", %s_id""" % (field,var)
+
+			return """%s swrlb:stringConcat(%s, "%s "%s, ".")
+		""" % (retry_ids, res_var, message, arguments)
+
+
+
+		# print(makeStringConcatPredicates("?msg", "ActBeforeStartOfBlockError", [("a", "?a_act"),("b", "?b_act")]))
+
+
 		swrl_rules = {}
 
 		# >
-		class GenericRule(Thing):
-			comment = 'Base for all rules'
+		# class GenericRule(WithID):
+		# 	comment = 'Base for all rules'
 			# name
 		# ->
-		class TraceRule(GenericRule):
-			comment = 'Base for all trace rules'
+		# class TraceRule(GenericRule):
+		# 	comment = 'Base for all trace rules'
 
 		# -->
-		class SequenceRule(TraceRule): pass
+		# class SequenceRule(TraceRule): pass
 
 		# Тестовый алгоритм
 			# void main()
@@ -272,20 +306,20 @@ def make_ontology(iri=None):
 
 
 		# -->
-		class SequenceRule(TraceRule): pass
+		# class SequenceRule(TraceRule): pass
 		# --->
-		class ActOutOfContextRule(SequenceRule): pass
+		# class ActOutOfContextRule(SequenceRule): pass
 		# Срабатывает, если есть акт `act`, непосредственно вложенный в акт `act_c` (контекст),
 		# в то время как их первоисточники в алгоритме (st и st_c) не состоят в таком же отношении вложенности (контекст st - st_c_actual - отличается от st_c, указанного в трассе):
 		swrl_rules["ActOutOfContextError"] = """
 			hasDirectPart(?act_c, ?act),
-			hasOrigin(?act, ?st),
-			hasOrigin(?act_c, ?st_c),
+			executes(?act, ?st),
+			executes(?act_c, ?st_c),
 			hasDirectPart(?st_c_actual, ?st),
 
-			DifferentFrom(?st_c, ?st_c_actual)
-			 -> message(ERRORS, "ActOutOfContextError(No detalization yet.)")
-		"""
+			DifferentFrom(?st_c, ?st_c_actual),
+			 %s -> message(ERRORS, ?msg)
+		""" % makeStringConcatPredicates("?msg", "ActOutOfContextError", [("act", "?act"),("context_stmt_expected", "?st_c_actual"),("context_stmt_found", "?st_c")])
 
 		# Тестовая трасса
 			#     A#1
@@ -298,16 +332,16 @@ def make_ontology(iri=None):
 
 
 		# ---->
-		class ActIsContainedInSequenceRule(SequenceRule): pass
+		# class ActIsContainedInSequenceRule(SequenceRule): pass
 		# ---->
-		class OnlyOneActExcecutionInSequenceRule(SequenceRule): pass
+		# class OnlyOneActExcecutionInSequenceRule(SequenceRule): pass
 		swrl_rules["DuplicateActsOfStmtError"] = """
 			Block(?block),
-			hasOrigin(?block_act, ?block),
+			executes(?block_act, ?block),
 			hasDirectPart(?block, ?st),
 
-			hasOrigin(?act1, ?st),
-			hasOrigin(?act2, ?st),
+			executes(?act1, ?st),
+			executes(?act2, ?st),
 			hasDirectPart(?block_act, ?act1),
 			hasDirectPart(?block_act, ?act2),
 
@@ -316,22 +350,22 @@ def make_ontology(iri=None):
 		 """
 
 		# ---->
-		class ExecuteActABeforeActBInSequenceRule(SequenceRule): pass
+		# class ExecuteActABeforeActBInSequenceRule(SequenceRule): pass
 
 		# -->
-		class AlternativeRule(TraceRule): pass
+		# class AlternativeRule(TraceRule): pass
 		# --->
-		class AlternativeActExecuteRule(AlternativeRule): pass
+		# class AlternativeActExecuteRule(AlternativeRule): pass
 
 		# -->
-		class LoopRule(TraceRule): pass
+		# class LoopRule(TraceRule): pass
 		# --->
-		class ExecuteBodyActAfterFalseConditionActRule(LoopRule): pass
+		# class ExecuteBodyActAfterFalseConditionActRule(LoopRule): pass
 
 		# --->
-		class WHILE_Rule(LoopRule): pass
+		# class WHILE_Rule(LoopRule): pass
 		# ---->
-		class WhileLoopBodyActExecuteRule(WHILE_Rule): pass
+		# class WhileLoopBodyActExecuteRule(WHILE_Rule): pass
 
 
 
@@ -340,7 +374,7 @@ def make_ontology(iri=None):
 		#################################
 
 		# >
-		class description( GenericRule >> str , DataProperty, FunctionalProperty): pass
+		# class description( GenericRule >> str , DataProperty, FunctionalProperty): pass
 
 
 
@@ -386,24 +420,24 @@ def make_ontology(iri=None):
 				 hasPart(?a, ?b), hasPart(?b, ?c) -> hasPart(?a, ?c)
 			""" ,
 
-			"hasFirstAct_to_hasBegin": """
-				 hasFirstAct(?a, ?b) -> hasBegin(?a, ?b)
-			""" ,
-			"hasBegin_transitive": """
-				 hasBegin(?a, ?b), hasBegin(?b, ?c) -> hasBegin(?a, ?c)
-			""" ,
+			# "hasFirstAct_to_hasBegin": """
+			# 	 hasFirstAct(?a, ?b) -> hasBegin(?a, ?b)
+			# """ ,
+			# "hasBegin_transitive": """
+			# 	 hasBegin(?a, ?b), hasBegin(?b, ?c) -> hasBegin(?a, ?c)
+			# """ ,
 
-			"hasLastAct_to_hasEnd": """
-				 hasLastAct(?a, ?b) -> hasEnd(?a, ?b)
-			""" ,
-			"hasEnd_transitive": """
-				 hasEnd(?a, ?b), hasEnd(?b, ?c) -> hasEnd(?a, ?c)
-			""" ,
+			# "hasLastAct_to_hasEnd": """
+			# 	 hasLastAct(?a, ?b) -> hasEnd(?a, ?b)
+			# """ ,
+			# "hasEnd_transitive": """
+			# 	 hasEnd(?a, ?b), hasEnd(?b, ?c) -> hasEnd(?a, ?c)
+			# """ ,
 
-			# связь before между началами и концами составных актов - через атомарные
-			"beforeAct_up": """
-				 hasNextAct(?e, ?b), hasEnd(?a, ?e), hasBegin(?n, ?b) -> beforeAct(?a, ?n)
-			""" ,
+			# # связь before между началами и концами составных актов - через атомарные
+			# "beforeAct_up": """
+			# 	 hasNextAct(?e, ?b), hasEnd(?a, ?e), hasBegin(?n, ?b) -> beforeAct(?a, ?n)
+			# """ ,
 
 
 			# "NextL_to_before": """
