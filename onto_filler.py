@@ -149,4 +149,4 @@ def _main(run_reasoner=False):
 
 
 if __name__ == '__main__':
-	_main(run_reasoner=0)
+	_main(run_reasoner=1)

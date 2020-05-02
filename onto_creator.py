@@ -267,7 +267,7 @@ def make_ontology(iri=None):
 				retry_ids += "hasID(%s, %s_id), " % (var,var)
 				arguments += """, "%s: ", %s_id""" % (field,var)
 
-			return """%s swrlb:stringConcat(%s, "%s "%s, ".")
+			return """%s stringConcat(%s, "%s "%s, ".")
 		""" % (retry_ids, res_var, message, arguments)
 
 
