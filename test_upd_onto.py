@@ -1,10 +1,6 @@
 # test_upd_onto.py
 
 from upd_onto import *
-
-
-
-from upd_onto import *
 import shutil
 
 
@@ -13,6 +9,7 @@ import shutil
 
 
 onto_path.append(r"onto")
+onto_path.append(r"c:\D\Нинь\Dev\ML_exp\owlready\onto")
 
 
 # Пути неверные! См. ipynb в \Dev\ML_exp\owlready\TestUpdOnto.ipynb

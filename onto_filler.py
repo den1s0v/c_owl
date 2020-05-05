@@ -5,6 +5,8 @@ from owlready2 import *
 # import function make_ontology() that defines all classes & SWRL rules
 from onto_creator import make_ontology
 
+import tr2onto
+
 
 def extend_from_triples(onto, triples_list, names_map=None):
 	""" -> changed onto
@@ -111,7 +113,7 @@ tr2onto = None
 def _main(run_reasoner=False):
 
 	global c2onto, tr2onto
-	import tr2onto
+	# import tr2onto
 	c2onto = tr2onto.c2onto
 
 	c_schema = make_ontology()

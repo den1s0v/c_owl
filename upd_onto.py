@@ -34,6 +34,8 @@ CREATE(INSTANCE , "Class1{prop1=value1; prop2=value2}")  # назначение 
 """
 
 import re
+import types
+
 from owlready2 import *
 
 
