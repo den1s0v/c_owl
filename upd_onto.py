@@ -186,19 +186,20 @@ def create_instance(onto, str_formatted):
 	str_formatted example: "Class1{prop1=value1; prop2=value2}"
 	"""
 	if "class_fields" not in _regexes:
+		# <class_name> with optional {...}
 		_regexes["class_fields"] = re.compile(r"([\w\d_#~/&%$@()+=-]+)\s*(?:\{(.*)\})?", re.I)
-		_regexes["keyvalue_pairs"] = re.compile(r"([\w\d_#~/&%$@()+=-]+)\s*=\s*([\w\d_#~/&%$@()+=-]+);?\s*", re.I)
+		# <prop_name> = <short IRI> or [...a string...]
+		_regexes["keyvalue_pairs"] = re.compile(r"([\w\d_#~/&%$@()+=-]+)\s*=\s*([\w\d_#~/&%$@()+=-]+|\[[^\]]+?\]);?\s*", re.I)
 
 	m = _regexes["class_fields"].match(str_formatted)
 	assert m
 	class_name, fields_str = m.groups()
-#     print(class_name, fields_str)
+	# print(class_name, fields_str)
 
 	# создаём объект
 	class_ = onto[class_name]
 	assert class_ , (class_name)
 	obj = class_()
-	print("Instance of {} created : {}".format(class_name, obj.name))
 
 	if fields_str:
 		fields = _regexes["keyvalue_pairs"].findall(fields_str)
@@ -212,6 +213,8 @@ def create_instance(onto, str_formatted):
 
 		if DataProperty in prop.is_a:
 			# скалярный тип данных  -  преобразуем значение из строки
+			if isinstance(value, str) and value.startswith('[') and value.endswith(']'):
+				value = value[1:-1]
 			range_class = prop.range[0]
 			value_actual = range_class(value)
 		else:

@@ -63,7 +63,7 @@ RULES_DICT = {
 	
 	IRI(?act2, ?act2_iri),
 	
-	stringConcat(?cmd, "trace_error{message=DuplicateActsOfStmtError; arg=", ?act2_iri, "}")
+	stringConcat(?cmd, "trace_error{arg=", ?act2_iri, "; message=[Duplicate Acts Of Stmt Error]; }")
 	 -> CREATE(INSTANCE, ?cmd)
 """,
 
