@@ -5,7 +5,7 @@ RULES_DICT = {
 # помечаем минусом в начале отключенные правила
 
 "hasNextAct_to_beforeAct": """
-	 next(?a, ?b) -> before(?a, ?b)
+	next(?a, ?b) -> before(?a, ?b)
  """ ,
 
 "BeforeActTransitive": """
@@ -15,6 +15,41 @@ RULES_DICT = {
 	# act(?b),
 	# act(?c),
 	
+
+"DepthOfProgramIs0": """
+	algorithm(?a), executes(?p, ?a) -> depth(?p, 0)
+	""",
+
+"DepthIncr": """
+	act_begin(?a), next(?a, ?b), act_begin(?b), 
+	depth(?a, ?da), add(?db, ?da, 1)
+	 -> depth(?b, ?db), parent_of(?a, ?b)
+	""",
+
+"DepthSame_be": """
+	act_begin(?a), next(?a, ?b), act_end(?b), 
+	depth(?a, ?da), parent_of(?p, ?a)
+	 -> depth(?b, ?da), parent_of(?p, ?b), corresponding_end(?a, ?b)
+	""",
+ # добавить проверку на Начало А - Конец Б (должен был быть Конец А)
+"DepthSame_eb": """
+	act_end(?a), next(?a, ?b), act_begin(?b), 
+	depth(?a, ?da), parent_of(?p, ?a)
+	 -> depth(?b, ?da), parent_of(?p, ?b)
+	""",
+
+"DepthDecr": """
+	act_end(?a), next(?a, ?b), act_end(?b), 
+	depth(?a, ?da), subtract(?db, ?da, 1), 
+	parent_of(?p, ?a)
+	 -> depth(?b, ?db), corresponding_end(?p, ?b)
+	""",
+
+"SameParentOfCorrACts": """
+	corresponding_end(?a, ?b), parent_of(?p, ?a)
+	 -> parent_of(?p, ?b)
+	""",
+
 
 
 "-ActStartsAfterEnd": """
