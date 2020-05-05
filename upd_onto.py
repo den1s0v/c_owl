@@ -225,21 +225,27 @@ def create_instance(onto, str_formatted):
 		# создаём триплет (см. также make_triple())
 		prop[obj].append(value_actual)
 
+	print("Instance of {} created : {}, fields: {}".format(class_name, obj.name, str(fields)))
 
-def augment_ontology(onto, autoremove=True):
-	""" When `autoremove` == True (the default), remove special
+
+def augment_ontology(onto, apply_changes=True, autoremove=True):
+	"""
+	Find all specials intended to make changes in the ontology.
+	When `apply_changes` == True (the default), apply the changes to the ontology.
+	When `autoremove` == True (the default), remove special
 	properties asserted/inferred after use. Leave them untouched otherwise (if possible).
-	returns report of found (and used) special properties.
+	returns report of special properties found.
 	"""
 	report = []
 
 	with onto:
 		# удаляем объекты, которые подцеплены к классу DESTROY_INSTANCE
 		for o in onto.DESTROY_INSTANCE.instances():
-			destroy_entity(o)
-			print("DESTROY_INSTANCE: \t", o.name)
+			if apply_changes:
+				destroy_entity(o)
+				print("DESTROY_INSTANCE: \t", o.name)
+				# информацию об указании удалить нельзя оставить, т.к. удаляется её носитель.
 			report += [(onto.DESTROY_INSTANCE.name, o.name)]
-			# информацию об указании удалить нельзя оставить, т.к. удаляется её носитель.
 
 		# создаём и разрываем указанные связи (LINK_ , UNLINK_)
 
@@ -247,26 +253,29 @@ def augment_ontology(onto, autoremove=True):
 			if p.name.startswith("LINK_"):
 				real_p = onto[ p.name.replace("LINK_", "") ]
 				for s,o in p.get_relations():
-					make_triple(s, real_p, o)
 					report += [(s.name, p.name, getattr(o,"name",o))]
-					if autoremove:
-						remove_triple(s, p, o)
+					if apply_changes:
+						make_triple(s, real_p, o)
+						if autoremove:
+							remove_triple(s, p, o)
 
 			if p.name.startswith("UNLINK_"):
 				real_p = onto[ p.name.replace("UNLINK_", "") ]
 				for s,o in p.get_relations():
-					remove_triple(s, real_p, o)
 					report += [(s.name, p.name, getattr(o,"name",o))]
-					if autoremove:
-						remove_triple(s, p, o)
+					if apply_changes:
+						remove_triple(s, real_p, o)
+						if autoremove:
+							remove_triple(s, p, o)
 
 		# создаём новые объекты
 		for str_formatted in onto.INSTANCE.CREATE:
-			print("INSTANCE.CREATE : str_formatted: {}".format(str_formatted))
-			create_instance(onto, str_formatted)
 			report += [(onto.INSTANCE.name, onto.CREATE.name, str_formatted)]
-			if autoremove:
-				remove_triple(onto.INSTANCE, onto.CREATE, str_formatted)
+			if apply_changes:
+				print("<INSTANCE.CREATE> : {}".format(str_formatted))
+				create_instance(onto, str_formatted)
+				if autoremove:
+					remove_triple(onto.INSTANCE, onto.CREATE, str_formatted)
 
 	return report
 
@@ -274,7 +283,7 @@ def augment_ontology(onto, autoremove=True):
 def prepare_ontology_for_reasoning(onto):
 	""" Ensure all instances have an IRI property assigned """
 	with onto:
-		prop = onto.IRI
+		assert onto.IRI
 		for o in onto.individuals():
 #             print(o.name)
 			if not o.IRI:
