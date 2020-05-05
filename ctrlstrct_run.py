@@ -248,19 +248,68 @@ def load_swrl_rules(onto, rules_dict):
 
 		for k in rules_dict:
 			if k.startswith("-"):
-				print("skipping SWRL rule: \t", k)
+				print("skipping SWRL rule due to minus: \t", k)
 				continue
 			
 			rule = rules_dict[k]
 			try:
 				Imp().set_as_rule(rule)
 			except Exception as e:
-				print("Error with SWRL rule: \t", k)
+				print("Error in SWRL rule: \t", k)
 				print(e)
 				raise e
 			
 	return onto
 		
+
+def extact_mistakes(onto) -> dict:
+	properties_to_extract = ("name", onto.message, onto.arg, )
+
+	mistakes = {}
+
+	for inst in onto.trace_error.instances():
+	    for prop in properties_to_extract:
+	        values = []
+	        if isinstance(prop, str):
+	            prop_name = prop
+	            values.append(getattr(inst, prop))
+	        else:
+	            prop_name = prop.name
+	            for o,s in prop.get_relations():
+	                if o == inst:
+	                    values.append(s.name if hasattr(s, "name") else s)
+	        d = mistakes.get(inst.name, {})
+	        d[prop_name] = values
+	        mistakes[inst.name] = d
+	
+	return mistakes
+
+
+def process_algtr(alg_json, trace_json, verbose=1, ) -> "onto, mistakes_list":
+	# каркас онтологии, наполненный минимальными фактами об алгоритме и трассе
+	onto = make_up_ontology(alg_json, trace_json)
+
+	# обёртка для расширенного логического вывода:
+	 # при создании наполняет базовую онтологию вспомогательными сущностями
+	wr_onto = AugmentingOntology(onto)
+
+	# после наложения обёртки можно добавлять SWRL-правила
+	from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
+	load_swrl_rules(onto, swrl_rules_dict)
+	
+	if not verbose:
+		print("Extended reasoning started ...",)
+
+	# расширенное обновление онтологии и сохранение с новыми фактами
+	wr_onto.sync(runs_limit=5, verbose=verbose)
+
+	if not verbose:
+		print("Extended reasoning finished.")
+
+	mistakes = extact_mistakes(onto)
+	
+	return onto, list(mistakes.values())
+
 
 def plain_list(list_of_lists):
 	" -> generator"
@@ -273,9 +322,14 @@ def plain_list(list_of_lists):
 
 
 if __name__ == '__main__':
+	# -a
 	alg_filepath = r"c:\D\Нинь\учёба\10s\Quiz\Дистракторы\tr-gen\alg_out_2.json"
+	# -t
 	tr_filepath  = r"c:\D\Нинь\учёба\10s\Quiz\Дистракторы\tr-gen\tr_out_err.json"
+	# -r
 	rdf_filename = "algtr_simple.rdf"
+	# -o , -e
+	mistakes_out_filename = "algtr_mistakes.json"
 
 	with open(alg_filepath, encoding="utf8") as f:
 		alg = f.read()
@@ -283,25 +337,33 @@ if __name__ == '__main__':
 	with open(tr_filepath, encoding="utf8") as f:
 		tr = f.read()
 
-	# каркас онтологии, наполненный минимальными фактами об алгоритме и трассе
-	onto = make_up_ontology(alg, tr)
+	# # каркас онтологии, наполненный минимальными фактами об алгоритме и трассе
+	# onto = make_up_ontology(alg, tr)
 
-	onto.save(file=rdf_filename, format='rdfxml')
-	print("Saved RDF file: {} !".format(rdf_filename))
+	# onto.save(file=rdf_filename, format='rdfxml')
+	# print("Saved RDF file: {} !".format(rdf_filename))
 	
-	# обёртка для расширенного логического вывода:
-	 # при создании наполняет базовую онтологию вспомогательными сущностями
-	wr_onto = AugmentingOntology(onto)
+	# # обёртка для расширенного логического вывода:
+	#  # при создании наполняет базовую онтологию вспомогательными сущностями
+	# wr_onto = AugmentingOntology(onto)
 
-	# после наложения обёртки можно добавлять SWRL-правила
-	from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
-	load_swrl_rules(onto, swrl_rules_dict)
+	# # после наложения обёртки можно добавлять SWRL-правила
+	# from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
+	# load_swrl_rules(onto, swrl_rules_dict)
 	
 
-	if 1:
-		# расширенное обновление онтологии и сохранение с новыми фактами
-		wr_onto.sync(runs_limit=5)
+	# if 1:
+	# 	# расширенное обновление онтологии и сохранение с новыми фактами
+	# 	wr_onto.sync(runs_limit=5)
 
+	# 	print("Extended reasoning finished.")
+	
+	onto, mistakes = process_algtr(alg, tr, 0)
+	with open(mistakes_out_filename, "w", encoding="utf8") as f:
+		json.dump(mistakes, f, indent=2)
+		
+	print("Saved mistakes ({}) as json: {}".format(len(mistakes), mistakes_out_filename))
+	
 
 	ontology_file2 = rdf_filename.replace(".", "_ext.")
 	onto.save(file=ontology_file2, format='rdfxml')
