@@ -15,6 +15,14 @@ RULES_DICT = {
 	# act(?b),
 	# act(?c),
 	
+"parent_of_to_contains_act": """
+	parent_of(?a, ?b) -> contains_act(?a, ?b)
+ """ ,
+
+"contains_actTransitive": """
+	contains_act(?a, ?b), contains_act(?b, ?c) -> contains_act(?a, ?c)
+	""",
+
 
 "DepthOfProgramIs0": """
 	algorithm(?a), executes(?p, ?a) -> depth(?p, 0)

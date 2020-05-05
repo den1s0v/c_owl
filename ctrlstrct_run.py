@@ -226,8 +226,8 @@ def init_persistent_structure(onto):
 	
 		# новое свойство parent_of
 		class parent_of(act_begin >> act, InverseFunctionalProperty): pass
-		# новое свойство contains
-		class contains(act_begin >> act, ): pass
+		# новое свойство contains_act
+		class contains_act(act_begin >> act, ): pass
 	
 
 def load_swrl_rules(onto, rules_dict):
