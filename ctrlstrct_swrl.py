@@ -39,7 +39,7 @@ RULES_DICT = {
 	depth(?a, ?da), parent_of(?p, ?a)
 	 -> depth(?b, ?da), parent_of(?p, ?b), corresponding_end(?a, ?b)
 	""",
- # добавить проверку на Начало А - Конец Б (должен был быть Конец А)
+ # + добавить проверку на Начало А - Конец Б (должен был быть Конец А) - CorrespondingActsMismatch_Error
 "DepthSame_eb": """
 	act_end(?a), next(?a, ?b), act_begin(?b), 
 	depth(?a, ?da), parent_of(?p, ?a)
@@ -60,7 +60,21 @@ RULES_DICT = {
 
 
 
-"-ActStartsAfterEnd": """
+"CorrespondingActsMismatch_Error": """
+	corresponding_end(?a, ?b), 
+	executes(?a, ?s1),
+	executes(?b, ?s2),
+	DifferentFrom(?s1, ?s2),
+	
+	IRI(?a, ?a_iri),
+	IRI(?b, ?b_iri),
+	
+	stringConcat(?cmd, "trace_error{arg=", ?a_iri, "; arg=", ?b_iri, "; message=[Corresponding Acts Mismatch Error (broken trace flow)]; }")
+	 -> CREATE(INSTANCE, ?cmd)
+""",
+
+
+"-ActStartsAfterEnd_Error": """
 	Context(?c)
 	Block(?block)
 	Statement(?stmt1)
@@ -83,7 +97,7 @@ RULES_DICT = {
 		
 	""",
 
-"DuplicatesOfAct": """
+"DuplicatesOfAct_Mistake": """
 	sequence(?block), 
 	executes(?block_act_b, ?block), 
 	executes(?block_act_e, ?block), 
@@ -110,7 +124,7 @@ RULES_DICT = {
 	 -> CREATE(INSTANCE, ?cmd)
 """,
 
-"-MissingAct": """
+"-MissingAct_Mistake": """
 	
 """,
 
