@@ -1,7 +1,11 @@
 # import_algtr.py
 
 
-""" Импорт алгоритмов и трасс из JSON-формата (из файлов, сгенерированных json2alg2tr) """
+""" Импорт алгоритмов и трасс из JSON-формата (из файлов, сгенерированных json2alg2tr), 
+наполнение ими чистой онтологии,  
+добавление SWRL-правил, определённых в ctrlstrct_swrl.py (используя import),
+запуск рсширеного ризонинга с UpdOnto.
+"""
 
 
 import json
@@ -44,31 +48,18 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
 	with onto:
 		# наполняем онтологию с нуля сущностями с теми именами, который найдём в загруженных json-словарях
 		
-		# types.new_class(temp_name, (domain >> range_, ))  # , Property
+		init_persistent_structure(onto)
 		
-		# Статические определения
-		
-		# новое свойство id
-		if not onto["id"]:
-			id_prop = types.new_class("id", (Thing >> int, FunctionalProperty, ))
-		# ->
-		class act(Thing): pass  # Thing - временно?
-		# -->
-		class act_begin(act): pass  # Thing - временно?
-		# -->
-		class act_end(act): pass
-		# новое свойство executes
-		prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
-		# новое свойство next
-		prop_next = types.new_class("next", (Thing >> Thing, FunctionalProperty, ))
-		# новое свойство before
-		prop_before = types.new_class("before", (Thing >> Thing, ))
-		# признак first
-		class first_item(Thing, ): pass
-		# признак last
-		class last_item(Thing, ): pass
-		
-		
+		id_prop = onto["id"]
+		first_item = onto["first_item"]
+		last_item = onto["last_item"]
+		act = onto["act"]
+		act_begin = onto["act_begin"]
+		act_end = onto["act_end"]
+		prop_executes = onto["executes"]
+		prop_next = onto["next"]
+		# prop_executes = onto["executes"]
+
 		
 		# создадим классы алгоритма и объекты в них
 		for d in alg_objects:
@@ -196,12 +187,55 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
 				
 	return onto
 
+def init_persistent_structure(onto):
+		# types.new_class(temp_name, (domain >> range_, ))  # , Property
+		
+		# Статические определения
+		
+		# новое свойство id
+		if not onto["id"]:
+			id_prop = types.new_class("id", (Thing >> int, FunctionalProperty, ))
+		# ->
+		class act(Thing): pass  # Thing - временно?
+		# -->
+		class act_begin(act): pass  # Thing - временно?
+		# -->
+		class act_end(act): pass
+		
+		# признак first
+		class first_item(Thing, ): pass
+		# признак last
+		class last_item(Thing, ): pass
+
+		# новое свойство executes
+		prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
+		# новое свойство next
+		prop_next = types.new_class("next", (Thing >> Thing, FunctionalProperty, ))
+		# новое свойство before
+		prop_before = types.new_class("before", (Thing >> Thing, ))
+		
+		# новое свойство depth
+		prop_depth = types.new_class("depth", (Thing >> int, FunctionalProperty, ))
+		# # новое свойство same_level
+		# prop_same_level = types.new_class("same_level", (Thing >> Thing, SymmetricProperty))
+		# # новое свойство child_level
+		# prop_child_level = types.new_class("child_level", (Thing >> Thing, SymmetricProperty))
+		
+		# новое свойство corresponding_end
+		class corresponding_end(act_begin >> act_end, FunctionalProperty, InverseFunctionalProperty): pass
+	
+		# новое свойство parent_of
+		class parent_of(act_begin >> act, InverseFunctionalProperty): pass
+		# новое свойство contains
+		class contains(act_begin >> act, ): pass
+	
 
 def load_swrl_rules(onto, rules_dict):
 	
 	with onto:
 	
 		# -->
+		# Создать класс ошибки
 		class trace_error(Thing): pass
 		
 		if not onto["message"]:
