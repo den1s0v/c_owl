@@ -228,24 +228,41 @@ def create_instance(onto, str_formatted):
 	print("Instance of {} created : {}, fields: {}".format(class_name, obj.name, str(fields)))
 
 
-def augment_ontology(onto, apply_changes=True, autoremove=True):
+def augment_ontology(onto, apply_only=None, apply_changes=True, autoremove=True, verbose=1):
 	"""
-	Find all specials intended to make changes in the ontology.
-	When `apply_changes` == True (the default), apply the changes to the ontology.
-	When `autoremove` == True (the default), remove special
-	properties asserted/inferred after use. Leave them untouched otherwise (if possible).
-	returns report of special properties found.
+	Find all specials intended to make changes in the ontology and apply them.
+	
+	When `apply_only` is None (the default), find and apply all the specials available.
+	When `apply_only` is not None it must be an iterable of a (subset of) report returned before. If so, the changes applied will be limited to the provided, other changes wiil be discarded (removed but not applied).
+	Passing [] blocks applying any of specials present in the ontology (along with autoremove=True, all specials will be discarded). The returned report will be empty is this case.
+	
+	When `apply_changes` is True (the default), apply the changes to the ontology, leave the ontology untouched otherwise (a.k.a. "dry run").
+	
+	When `autoremove` is True (the default) and `apply_changes` is True, remove the special properties applied/found. Leave them untouched otherwise (if possible). Nothing is done if when `apply_changes` is False.
+	
+	Returns report of special properties found (regardling the related changes applied or not).
 	"""
+	
+	def judge_case(report_case):  # -> apply, remove  (booleans)
+		nonlocal report
+		report.append(report_case)
+		if apply_only is None:
+			return apply_changes, autoremove and apply_changes
+		else:
+			return apply_changes and report_case in apply_only, autoremove and apply_changes
+			
+		
+	
 	report = []
 
 	with onto:
 		# удаляем объекты, которые подцеплены к классу DESTROY_INSTANCE
 		for o in onto.DESTROY_INSTANCE.instances():
-			if apply_changes:
+			apply_, remove = judge_case( (onto.DESTROY_INSTANCE.name, o.name) )
+			if apply_:
 				destroy_entity(o)
-				print("DESTROY_INSTANCE: \t", o.name)
+				if verbose: print("DESTROY_INSTANCE: \t", o.name)
 				# информацию об указании удалить нельзя оставить, т.к. удаляется её носитель.
-			report += [(onto.DESTROY_INSTANCE.name, o.name)]
 
 		# создаём и разрываем указанные связи (LINK_ , UNLINK_)
 
@@ -253,29 +270,29 @@ def augment_ontology(onto, apply_changes=True, autoremove=True):
 			if p.name.startswith("LINK_"):
 				real_p = onto[ p.name.replace("LINK_", "") ]
 				for s,o in p.get_relations():
-					report += [(s.name, p.name, getattr(o,"name",o))]
-					if apply_changes:
+					apply_, remove = judge_case( (s.name, p.name, getattr(o,"name",o)) )
+					if apply_:
 						make_triple(s, real_p, o)
-						if autoremove:
-							remove_triple(s, p, o)
+					if remove:
+						remove_triple(s, p, o)
 
 			if p.name.startswith("UNLINK_"):
 				real_p = onto[ p.name.replace("UNLINK_", "") ]
 				for s,o in p.get_relations():
-					report += [(s.name, p.name, getattr(o,"name",o))]
-					if apply_changes:
+					apply_, remove = judge_case( (s.name, p.name, getattr(o,"name",o)) )
+					if apply_:
 						remove_triple(s, real_p, o)
-						if autoremove:
-							remove_triple(s, p, o)
+					if remove:
+						remove_triple(s, p, o)
 
 		# создаём новые объекты
 		for str_formatted in onto.INSTANCE.CREATE:
-			report += [(onto.INSTANCE.name, onto.CREATE.name, str_formatted)]
-			if apply_changes:
-				print("<INSTANCE.CREATE> : {}".format(str_formatted))
+			apply_, remove = judge_case( (onto.INSTANCE.name, onto.CREATE.name, str_formatted) )
+			if apply_:
+				if verbose: print("<INSTANCE.CREATE> : {}".format(str_formatted))
 				create_instance(onto, str_formatted)
-				if autoremove:
-					remove_triple(onto.INSTANCE, onto.CREATE, str_formatted)
+			if remove:
+				remove_triple(onto.INSTANCE, onto.CREATE, str_formatted)
 
 	return report
 
@@ -314,10 +331,12 @@ def sync_pellet_cycle(onto, runs_limit=15, verbose=1):  ### , dest_onto=None):
 
 			if verbose: print("sync_pellet_cycle: augmenting ontology ...")
 			specials_to_use = augment_ontology(onto, apply_changes=False)
-			specials_to_use = set(specials_to_use)
+			specials_to_use = set(specials_to_use) - all_specials
 
-			if specials_to_use.issubset(all_specials):   ### prev_specials
+			if not specials_to_use:
 				# вывод закончен, новых вещей не появится.
+				# очистим онтологию от неиспользованных спец. свойств
+				augment_ontology(onto, apply_only=[])
 				if verbose: 
 					print("sync_pellet_cycle: iteration",i,"is a final one. Finished successfully!")
 					print("Total distinct specials used: ",len(all_specials))
@@ -326,7 +345,7 @@ def sync_pellet_cycle(onto, runs_limit=15, verbose=1):  ### , dest_onto=None):
 			specials_to_use = None
 
 			if verbose: print("sync_pellet_cycle: augmenting ontology ...")
-			specials_used = augment_ontology(onto, apply_changes=True)
+			specials_used = augment_ontology(onto, apply_only=specials_to_use)
 			specials_used = set(specials_used)
 			if verbose: 
 				print("sync_pellet_cycle: specials_used:")
