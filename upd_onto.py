@@ -55,7 +55,9 @@ class AugmentingOntology(object):
 	def sync(self, **kwargs):
 		"Perform full sync of the ontology with Pellet reasoner & augmentation mechanism allowing powerful means to change the ontology via SWRL"
 		# sync_pellet_cycle(onto, runs_limit=15)
-		sync_pellet_cycle(self.onto, **kwargs)
+		success,n_runs = sync_pellet_cycle(self.onto, **kwargs)
+		
+		return success,n_runs
 
 # make wrapping methods
 # if False and AugmentingOntology:
@@ -302,19 +304,15 @@ def prepare_ontology_for_reasoning(onto):
 	with onto:
 		assert onto.IRI
 		for o in onto.individuals():
-#             print(o.name)
 			if not o.IRI:
 				o.IRI = o.name
 
 
-def sync_pellet_cycle(onto, runs_limit=15, verbose=1):  ### , dest_onto=None):
+def sync_pellet_cycle(onto, runs_limit=15, verbose=1):
 	"""
 	 Обёртка вокруг запуска Pellet
 	 Put the result to the same ontology `onto`.
 	"""
-
-#     if not dest_onto:
-#         dest_onto = onto
 
 	with onto:
 		all_specials = set()
@@ -330,27 +328,27 @@ def sync_pellet_cycle(onto, runs_limit=15, verbose=1):  ### , dest_onto=None):
 			sync_reasoner_pellet(infer_property_values=True, infer_data_property_values=True, debug=0)
 
 			if verbose: print("sync_pellet_cycle: augmenting ontology ...")
-			specials_to_use = augment_ontology(onto, apply_changes=False)
+			specials_to_use = augment_ontology(onto, apply_changes=False, verbose=verbose)
 			specials_to_use = set(specials_to_use) - all_specials
 
 			if not specials_to_use:
 				# вывод закончен, новых вещей не появится.
 				# очистим онтологию от неиспользованных спец. свойств
-				augment_ontology(onto, apply_only=[])
+				augment_ontology(onto, apply_only=[], verbose=verbose)
 				if verbose: 
 					print("sync_pellet_cycle: iteration",i,"is a final one. Finished successfully!")
 					print("Total distinct specials used: ",len(all_specials))
-				return True
+				return True,i
 				# break
 			specials_to_use = None
 
 			if verbose: print("sync_pellet_cycle: augmenting ontology ...")
-			specials_used = augment_ontology(onto, apply_only=specials_to_use)
+			specials_used = augment_ontology(onto, apply_only=specials_to_use, verbose=verbose)
 			specials_used = set(specials_used)
 			if verbose: 
 				print("sync_pellet_cycle: specials_used:")
 				print(specials_used)
-#             print(prev_specials)
+            # print(prev_specials)
 
 			# prev_specials = specials_used
 			all_specials.update(specials_used)
@@ -358,7 +356,7 @@ def sync_pellet_cycle(onto, runs_limit=15, verbose=1):  ### , dest_onto=None):
 			if verbose: print("sync_pellet_cycle: iteration",i,"completed.")
 			if runs_limit > 0 and i >= runs_limit:
 				if verbose: print("sync_pellet_cycle: max iteration count reached:",runs_limit,", stopping.")
-				return False
+				return False,i
 				# break
 
 

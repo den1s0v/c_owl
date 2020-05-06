@@ -68,6 +68,8 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
 				type_ 	= d.get("type")
 				name 	= d.get("name", "")
 				
+				assert type_, "Error in agrorithm object: "+str(d)
+				
 				id_ 		= int(id_)
 				clean_name 	= re.sub(r"\s+", "", name)
 				
@@ -301,10 +303,10 @@ def process_algtr(alg_json, trace_json, verbose=1, ) -> "onto, mistakes_list":
 		print("Extended reasoning started ...",)
 
 	# расширенное обновление онтологии и сохранение с новыми фактами
-	wr_onto.sync(runs_limit=5, verbose=verbose)
+	success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
 
 	if not verbose:
-		print("Extended reasoning finished.")
+		print("Extended reasoning finished.", "Success:", str(success) + ","," Pellet run times:", n_runs)
 
 	mistakes = extact_mistakes(onto)
 	
@@ -337,28 +339,9 @@ if __name__ == '__main__':
 	with open(tr_filepath, encoding="utf8") as f:
 		tr = f.read()
 
-	# # каркас онтологии, наполненный минимальными фактами об алгоритме и трассе
-	# onto = make_up_ontology(alg, tr)
-
-	# onto.save(file=rdf_filename, format='rdfxml')
-	# print("Saved RDF file: {} !".format(rdf_filename))
+	# Запуск !	
+	onto, mistakes = process_algtr(alg, tr, verbose=0)
 	
-	# # обёртка для расширенного логического вывода:
-	#  # при создании наполняет базовую онтологию вспомогательными сущностями
-	# wr_onto = AugmentingOntology(onto)
-
-	# # после наложения обёртки можно добавлять SWRL-правила
-	# from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
-	# load_swrl_rules(onto, swrl_rules_dict)
-	
-
-	# if 1:
-	# 	# расширенное обновление онтологии и сохранение с новыми фактами
-	# 	wr_onto.sync(runs_limit=5)
-
-	# 	print("Extended reasoning finished.")
-	
-	onto, mistakes = process_algtr(alg, tr, 0)
 	with open(mistakes_out_filename, "w", encoding="utf8") as f:
 		json.dump(mistakes, f, indent=2)
 		
