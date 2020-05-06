@@ -1,0 +1,28 @@
+{
+  "id": 2,
+  "type": "algorithm",
+  "name": "algorithm",
+  "functions": [],
+  "stmts": {
+    "id": 6,
+    "type": "sequence",
+    "name": "Global Code",
+    "body": [
+      {
+        "id": 3,
+        "type": "stmt",
+        "name": "do_one"
+      },
+      {
+        "id": 4,
+        "type": "stmt",
+        "name": "do_two"
+      },
+      {
+        "id": 5,
+        "type": "stmt",
+        "name": "do_three"
+      }
+    ]
+  }
+}

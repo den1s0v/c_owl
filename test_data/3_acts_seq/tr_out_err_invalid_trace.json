@@ -1,0 +1,12 @@
+[
+  {"id": 7, "action": "program", "executes": 2, "gen": "she", "phase": "started", "n": null},
+  {"id": 117, "action": "global_code", "executes": 6, "gen": "it", "phase": "started", "n": 1},
+  [
+    {"id": 8, "action": "do_one", "executes": 3, "gen": "it", "phase": "started", "_n": 1},
+    {"id": 9, "action": "do_two", "executes": 4, "gen": "it", "phase": "finished", "_n": 1},
+    {"id": 13009, "action": "do_two", "executes": 4, "gen": "it", "phase": "performed", "_n": 1},
+    {"id": 10, "action": "do_three", "executes": 5, "gen": "it", "phase": "performed", "_n": 1}
+  ],
+  {"id": 117, "action": "global_code", "executes": 6, "gen": "it", "phase": "finished", "n": 1},
+  {"id": 7, "action": "program", "executes": 2, "gen": "she", "phase": "finished", "n": null}
+]

@@ -1,0 +1,33 @@
+{
+	"- tests named with - at start are ignored!": {},
+	
+	"duplicates": {
+		"alg_input"  :"alg_out_2.json",
+		"trace_input":"tr_out_err.json",
+		"reference_output":  [{
+			"message": [
+			  "Duplicate Acts Of Stmt Error"
+			],
+			"arg": [
+			  "13009b_do_two"
+			]
+		}]
+	},
+	
+	"ends_different": {
+		"alg_input"  :"alg_out_2.json",
+		"trace_input":"tr_out_err_invalid_trace.json",
+		"reference_output":  [{
+			"message": [
+			  "Corresponding Acts Mismatch Error (broken trace flow)"
+			],
+			"arg": [
+			  "8b_do_one", "9e_do_two"
+			]
+		}]
+	},
+	
+	"-test2": {},
+	
+	"-test3": {}
+}
