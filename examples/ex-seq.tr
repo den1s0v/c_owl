@@ -1,5 +1,0 @@
-:begin seq_main
-    hello()
-    how_are_you()
-    bye()
-:end seq_main
