@@ -1,0 +1,11 @@
+{
+"algorithm": [
+
+	{"name":"my-do_while-1", "body": [
+			"действие№1",
+			"действие№2"
+		],
+        "do while":"my-cond-1"
+	}
+]
+}

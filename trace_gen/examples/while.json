@@ -1,0 +1,10 @@
+{
+"algorithm": [
+
+	{"while":"while-cond-1", "name":"my-while-1", "body": [
+			"действие№1",
+			"действие№2"
+		]
+	}
+]
+}

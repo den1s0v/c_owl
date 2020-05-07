@@ -1,0 +1,48 @@
+{
+"algorithm": [
+	{"func":"main", "is_entry":"false", "param_list":[], "body": [
+			"бежать",
+			"break"
+		]
+	},
+	{"alternative":"my-alt-1", "branches": [
+			{"if": "цвет==зелёный", "then": [
+				"бежать",
+				"стоп"
+			]},
+			{"else if": "цвет==желтый", "then": [
+				"лежать"
+			]},
+			{"else": [
+				"ждать"
+			]}
+		]
+	},
+	{"while":"while-cond-1", "name":"my-while-1", "body": [
+			{"do while":"dowhile-cond-2", "name":"my-dowhile-2", "body": [
+					"do_while_body_action_2"
+				]
+			},
+			{"for":"день", "from":"1 (ПН)", "to":"5 (ПТ)", "step":"+1",
+			"init_act": "день = 1 (ПН)",
+			"cond_act": "день не достиг 6 (СБ)",
+			"update_act": "прибавить 1 к день",  "name":"по_будням", "body": [
+                {"alternative":"работал_ли", "branches": [
+                        {"if": "работал", "then": [
+                            "молодец"
+                        ]}
+                    ]
+                }
+			]},
+            {"foreach":"элемента", "in": "списке", "name":"по_списку", "body": [
+            "foreach_body_action_4"]
+            },
+            {"sequence": [
+                "seq_action_1",
+                "seq_action_2"
+                ],
+                "name":"блок"
+            }
+		]
+	}
+]}
