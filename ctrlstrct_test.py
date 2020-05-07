@@ -21,7 +21,7 @@ TRACE_FILE_FIELD = "trace_input"
 REFERENCE_DATA_FIELD = "reference_output"
 
 
-def run_tests_in_directory(directory):
+def run_tests_in_directory(directory) -> bool:
 	
 	tests_fpath = os.path.join(directory, TESTS_FNM)
 
@@ -57,11 +57,12 @@ def run_tests_in_directory(directory):
 				# Запуск !	
 				_, mistakes = process_algtr(alg, tr, verbose=0)
 			except Exception as e:
-				run_report["failed"] += 1
-				msg = "Exception occured: "+str(e)
+				msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
+				msg = ("  ok" if False else "FAIL") + (" [%s]" % test_name) + "\t:" + msg
 				print(msg)
 				output_data[test_name] = msg
 				run_report["messages"].append(msg)
+				run_report["failed"] += 1
 				continue
 			
 			# записывать больше?
@@ -85,7 +86,9 @@ def run_tests_in_directory(directory):
 		with open(fpath, "w", encoding="utf8") as f:
 			f.write("\n".join(run_report["messages"]))
 			f.write("\n=============\n")
-			f.write("succeded: %d, failed: %d, total run: %d.\n(skipped: %d)\n" % (run_report["succeded"], run_report["failed"], run_report["succeded"]+run_report["failed"], run_report["skipped"]))
+			f.write("succeded: %d, failed: %d, total: %d.\n(skipped: %d)\n" % (run_report["succeded"], run_report["failed"], run_report["succeded"]+run_report["failed"], run_report["skipped"]))
+			
+	return run_report["failed"] == 0
 	
 
 def object_to_hashable(obj, discard_dict_keys=()):
@@ -154,9 +157,17 @@ def resolve_path(fname, directory='.'):
 
 
 if __name__ == '__main__':
+	
+	success_all = True
+	
 	for directory,subdirs,files in os.walk(TEST_DIR):
 		if TESTS_FNM in files:
 			print("Running tests in: ", directory)
-			run_tests_in_directory(directory)
+			success = run_tests_in_directory(directory)
+			success_all = success_all and success
+			print("Tests passed:", success, " in directory: ", directory)
 			
 		# break
+		
+	# indicate tests success with exit code
+	exit(0 if success_all else 1)
