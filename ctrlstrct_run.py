@@ -287,13 +287,18 @@ def extact_mistakes(onto) -> dict:
 	return mistakes
 
 
-def process_algtr(alg_json, trace_json, verbose=1, ) -> "onto, mistakes_list":
+def process_algtr(alg_json, trace_json, debug_rdf_fpath=None, verbose=1, ) -> "onto, mistakes_list":
 	# каркас онтологии, наполненный минимальными фактами об алгоритме и трассе
 	onto = make_up_ontology(alg_json, trace_json)
 
 	# обёртка для расширенного логического вывода:
 	 # при создании наполняет базовую онтологию вспомогательными сущностями
 	wr_onto = AugmentingOntology(onto)
+	
+	if debug_rdf_fpath:
+		onto.save(file=debug_rdf_fpath, format='rdfxml')
+		# print("Saved RDF file: {} !".format(ontology_file))
+		
 
 	# после наложения обёртки можно добавлять SWRL-правила
 	from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict

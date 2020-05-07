@@ -1,3 +1,5 @@
 *.pyc
 *.txt
 try.py
+test_data/*/*output*
+test_data/*/*.rdf

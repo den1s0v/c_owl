@@ -20,6 +20,8 @@ ALG_FILE_FIELD = "alg_input"
 TRACE_FILE_FIELD = "trace_input"
 REFERENCE_DATA_FIELD = "reference_output"
 
+SAVE_RDF = True
+
 
 def run_tests_in_directory(directory) -> bool:
 	
@@ -54,11 +56,21 @@ def run_tests_in_directory(directory) -> bool:
 	
 			
 			try:
+				if SAVE_RDF:
+					ontology_file = test_name + "_output.rdf"
+					ontology_fpath = os.path.join(directory, ontology_file)
+					# onto.save(file=fpath, format='rdfxml')
+					# print("Saved RDF file: {} !".format(ontology_file))
+				else:
+					ontology_fpath = None
+
 				# Запуск !	
-				_, mistakes = process_algtr(alg, tr, verbose=0)
+				onto, mistakes = process_algtr(alg, tr, verbose=0, debug_rdf_fpath=ontology_fpath)
+				
 			except Exception as e:
 				msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
-				msg = ("  ok" if False else "FAIL") + (" [%s]" % test_name) + "\t:" + msg
+				ok = False
+				msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % test_name) + ":\t" + msg
 				print(msg)
 				output_data[test_name] = msg
 				run_report["messages"].append(msg)
@@ -71,7 +83,7 @@ def run_tests_in_directory(directory) -> bool:
 			# сравнить результат и эталон
 			# ...
 			ok, msg = compare_mistakes(test_data[REFERENCE_DATA_FIELD], mistakes)
-			msg = ("  ok" if ok else "FAIL") + (" [%s]" % test_name) + "\t:" + msg
+			msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % test_name) + "\t:" + msg
 			print(msg)
 			# 	run_report = {"succeded": 0, "failed": 0, "messages":[]}
 			run_report["succeded" if ok else "failed"] += 1

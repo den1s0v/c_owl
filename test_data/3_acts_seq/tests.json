@@ -14,7 +14,7 @@
 		}]
 	},
 	
-	"ends_different": {
+	"-ends_different": {
 		"alg_input"  :"alg_out_2.json",
 		"trace_input":"tr_out_err_invalid_trace.json",
 		"reference_output":  [{
