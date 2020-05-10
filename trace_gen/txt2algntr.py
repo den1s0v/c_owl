@@ -706,17 +706,22 @@ def find_by_keyval_in(key, val, dict_or_list):
 
 def parse_text_file(txt_file_path, encoding="utf8"):
 
+    try:
+        with open(txt_file_path, encoding=encoding) as f:
+            text = f.read()
+    except OSError as e:
+        print(f"Error reading file {txt_file_path} :\n  " + str(e))
+        return []
+
+    text = text.replace("\t", " "*4)
+    lines = text.split("\n")
+    text = None
+    
+    
     print("="*40)
     print("Parsing algorithms and traces from".center(40))
     print(txt_file_path.center(40))
     print("="*40)
-    
-    with open(txt_file_path, encoding=encoding) as f:
-        text = f.read()
-    
-    text = text.replace("\t", " "*4)
-    lines = text.split("\n")
-
     
     # Алгоритмы ...
     
@@ -820,17 +825,71 @@ def parse_text_file(txt_file_path, encoding="utf8"):
             print(" ", e)
             
             
+    valid_alg_trs = [{
+        "trace_name"    : nm,
+        "algorithm_name": trdct["alg_name"],
+        "trace"         : trdct["trace_parser"].trace,
+        "algorithm"     : alg_data[trdct["alg_name"]]["alg_parser"].algorithm,
+        
+    } for nm,trdct in tr_data.items() if "trace_parser" in trdct]
+    
+    print("Total in file (%s):" % txt_file_path)
+    print("  Number of valid algorithms:", len( {nm for nm,adct in alg_data.items() if "erroneous" not in adct} ))
+    print("  Number of valid traces:", len(valid_alg_trs))
+    print()
+    
+    return valid_alg_trs
             
-    print("Done")
 
+def parse_text_files(file_paths, encoding="utf8"):
+    alg_trs = []
+    
+    for fpath in file_paths:
+        alg_trs += parse_text_file(fpath, encoding=encoding)
+    
+    print("Number of traces with algorithms collected from", len(file_paths), "text file(s):", len(alg_trs))
+    print()
+    
+    return alg_trs
+            
+def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=(".txt", ".tr"), skip_starting_with_hypen=True):
+    import os
+    result_list = []
+    file_list = os.listdir(directory)
+    
+    for fname in file_list:
+        if not fname.endswith(file_extensions):
+            continue
+            
+        if skip_starting_with_hypen and fname.startswith("-"):
+            continue
+            
+        fpath = os.path.join(directory, fname)
+        if not os.path.exists(fpath):
+            continue
+            
+        result_list.append(fpath)
+    
+    return result_list
 
 def main():
 
-	parse_text_file("../handcrafted_traces/err_branching.txt")
+	# parse_text_file("../handcrafted_traces/err_branching.txt")
 	# parse_text_file("../handcrafted_traces/err_loops.txt")
 	# parse_text_file("../handcrafted_traces/correct_branching.txt")
 	# parse_text_file("../handcrafted_traces/correct_loops.txt")
+    
+    # parse_text_files([
+    #     # "../handcrafted_traces/err_branching.txt",
+    #     # "../handcrafted_traces/err_loops.txt",
+    #     "../handcrafted_traces/correct_branching.txt",
+    #     # "../handcrafted_traces/correct_loops.txt",
+    #     "../handcrafted_traces/no_such_file.txt",
+    # ])
 
+
+    parse_text_files( search_text_trace_files() )
+    
 
 if __name__ == '__main__':
 	main()
