@@ -9,7 +9,7 @@ import json
 import os
 
 from ctrlstrct_run import process_algtr
-from trace_gen.txt2algntr import parse_text_files, search_text_trace_files
+from trace_gen.txt2algntr import parse_text_files, search_text_trace_files, find_by_key_in
 
 
 
@@ -180,7 +180,7 @@ def run_test_for_alg_trace(test_data: dict, directory=TEST_DIR):
 			ontology_fpath = None
 
 		# Запуск !	
-		onto, mistakes = process_algtr(alg, tr, verbose=0, debug_rdf_fpath=ontology_fpath)
+		onto, mistakes = process_algtr(alg, tr, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True)
 		
 	except Exception as e:
 		msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
@@ -195,18 +195,41 @@ def run_test_for_alg_trace(test_data: dict, directory=TEST_DIR):
 
 	# сравнить результат и эталон
 	# ...
-	ok, msg = validate_mistakes(tr, mistakes)
+	ok, msg = validate_mistakes(tr, mistakes, onto)
 	msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % test_name) + ":\t" + msg
 	log_print(msg)
 	
 	return ok
 
 
-def validate_mistakes(trace:dict, mistakes:list):
-	pass
+def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
+	"Сравнивает результат по первой ошибочной строке"
 	
-	return True, "validation is not implemented"
+	print("validate_mistakes : To debug.")
 	
+	def is_error_act(d:dict):
+		comment = d["comment"]
+		return ("error" in comment or "ошибка" in comment)
+	
+	error_flags = {d["text_line"]:is_error_act(d) for d in trace}
+	
+	arg_objs = find_by_key_in("arg", mistakes)
+
+	inferred_error_lines = [int(o.text_line) for o in arg_objs]
+	# inferred_error_lines.sort()
+	
+	# проверка
+	
+	for i,is_err in error_flags.items():
+		if is_err:
+			if i not in inferred_error_lines:
+				return False, f"Erroneous line {i} hasn't been recognized by the ontology."
+				break
+			elif i in inferred_error_lines:
+				return False, f"Correct line {i} has been recognized by the ontology as erroneous."
+				break
+				
+	return True, "Validation ok."
 
 
 # global log storage
@@ -225,8 +248,8 @@ def run_tests():
 	files = search_text_trace_files(directory="handcrafted_traces/")
 	
 	### Отладочная заглушка
-	# files = [f for f in files if "example" in f]
-	files = [f for f in files if "correct_branching" in f]
+	files = [f for f in files if "example" in f]
+	# files = [f for f in files if "correct_branching" in f]
 	
 	alg_trs = parse_text_files(files)
 	test_count = len(alg_trs)
