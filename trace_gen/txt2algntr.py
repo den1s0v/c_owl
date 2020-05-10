@@ -342,14 +342,14 @@ class TraceParser:
             
     def newID(self, what=None, owerwrite=False):
         self._maxID += 1
-        if what:
-            if what in self.name2id:
-                if owerwrite:
-                    print("Warning: multiple trace objects named as '%s' !"%what,
-                      "Old id/new id:", self.name2id[what],"/", self._maxID, "; Overriding with latter one.")
-                else:
-                    return self.name2id[what]
-            self.name2id[what] = self._maxID
+        # if what:
+        #     if what in self.name2id:
+        #         if owerwrite:
+        #             print("Warning: multiple trace objects named as '%s' !"%what,
+        #               "Old id/new id:", self.name2id[what],"/", self._maxID, "; Overriding with latter one.")
+        #         else:
+        #             return self.name2id[what]
+        #     self.name2id[what] = self._maxID
         return self._maxID
 
     def parse(self, line_list: "list(str)", alg_dict=None, name2id=None, start_line=0, end_line=None):
@@ -398,7 +398,8 @@ class TraceParser:
                 assert alg_obj_id, "TraceError: no corresporning '{}' found for '{}'".format("algorithm' or 'алгоритм", name)
                 result.append({
                       "id": self.newID(name),
-                      "action": name,
+                      # "action": name,
+                      "name": name,
                       "executes": alg_obj_id,
                       "phase": phase,
                       # "n": None,
@@ -440,7 +441,8 @@ class TraceParser:
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
-                      struct: name,
+                      # struct: name,
+                      "name": name,
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
@@ -477,7 +479,8 @@ class TraceParser:
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
-                      "expr": name,
+                      # "expr": name,
+                      "name": name,
                       "value": value,
                       "executes": alg_obj_id,
                       "phase": phase,
@@ -507,7 +510,7 @@ class TraceParser:
                         break
                 if else_branch_name is None:
                     # в трассе нет (ошибочная трасса!) - найдём первую попавшуюся ветку ИНАЧЕ в алгоритме (как часть развилки)
-                    found = tuple(find_by_keyval_in("type", "else", ap.algorithm))
+                    found = tuple(find_by_keyval_in("type", "else", self.alg_dict))
                     if found:
                         else_branch_name = found[0]["name"]
                     else:
@@ -519,7 +522,8 @@ class TraceParser:
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format("ветка иначе", ci)
                 result.append({
                       "id": self.newID(name),
-                      "branch": name,
+                      # "branch": name,
+                      "name": name,
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
@@ -549,7 +553,8 @@ class TraceParser:
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
-                      "branch": name,
+                      # "branch": name,
+                      "name": name,
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
@@ -583,7 +588,8 @@ class TraceParser:
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
-                      "loop_name": name,    # имя цикла !
+                      # "loop_name": name,    # имя цикла !
+                      "name": name,    # имя цикла !
                       "executes": alg_obj_id,
                       "phase": phase,
                       "iteration_n": ith,
@@ -613,7 +619,8 @@ class TraceParser:
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
-                      "action": name,
+                      # "action": name,
+                      "name": name,
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
@@ -639,7 +646,8 @@ class TraceParser:
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format("ветка иначе", ci)
                 result.append({
                       "id": self.newID(name),
-                      "action": name,
+                      # "action": name,
+                      "name": name,
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
@@ -833,6 +841,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         
     } for nm,trdct in tr_data.items() if "trace_parser" in trdct]
     
+    print()
     print("Total in file (%s):" % txt_file_path)
     print("  Number of valid algorithms:", len( {nm for nm,adct in alg_data.items() if "erroneous" not in adct} ))
     print("  Number of valid traces:", len(valid_alg_trs))

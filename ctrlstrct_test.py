@@ -9,11 +9,13 @@ import json
 import os
 
 from ctrlstrct_run import process_algtr
+from trace_gen.txt2algntr import parse_text_files, search_text_trace_files
+
 
 
 TEST_DIR = "./test_data"
 OUTPUT_FNM = "output.json"
-RUN_REPORT_FNM = "run_report.txt"
+REPORT_FNM = "run_report.txt"
 TESTS_FNM = "tests.json"
 
 ALG_FILE_FIELD = "alg_input"
@@ -94,7 +96,7 @@ def run_tests_in_directory(directory) -> bool:
 		with open(fpath, "w", encoding="utf8") as f:
 			json.dump(output_data, f, indent=2)
 	
-		fpath = os.path.join(directory, RUN_REPORT_FNM)
+		fpath = os.path.join(directory, REPORT_FNM)
 		with open(fpath, "w", encoding="utf8") as f:
 			f.write("\n".join(run_report["messages"]))
 			f.write("\n=============\n")
@@ -115,9 +117,6 @@ def object_to_hashable(obj, discard_dict_keys=()):
 			data.append(key)
 			data.append( object_to_hashable(obj[key], discard_dict_keys) )
 		return tuple(data)
-		
-	
-	
 	
 def compare_mistakes(expected, actual, ignored_fields=("name",)):
 	assert isinstance(expected, list), "mistakes list expected"
@@ -156,8 +155,6 @@ def compare_mistakes(expected, actual, ignored_fields=("name",)):
 	
 	return True, "ok"
 	
-	
-	
 def resolve_path(fname, directory='.'):
 	for case_path in [
 		os.path.join(directory, fname),
@@ -167,19 +164,120 @@ def resolve_path(fname, directory='.'):
 			return case_path
 	return None
 
+def run_test_for_alg_trace(test_data: dict, directory=TEST_DIR):
+	
+	alg = test_data["algorithm"]
+	tr  = test_data["trace"]
+	test_name  = test_data["trace_name"]
+	
+	try:
+		if SAVE_RDF:
+			ontology_file = test_name + "_output.rdf"
+			ontology_fpath = os.path.join(directory, ontology_file)
+			# onto.save(file=fpath, format='rdfxml')
+			# print("Saved RDF file: {} !".format(ontology_file))
+		else:
+			ontology_fpath = None
+
+		# Запуск !	
+		onto, mistakes = process_algtr(alg, tr, verbose=0, debug_rdf_fpath=ontology_fpath)
+		
+	except Exception as e:
+		msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
+		ok = False
+		msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % test_name) + ":\t" + msg
+		log_print(msg)
+		
+		# debug only:
+		# raise e
+		
+		return False
+
+	# сравнить результат и эталон
+	# ...
+	ok, msg = validate_mistakes(tr, mistakes)
+	msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % test_name) + ":\t" + msg
+	log_print(msg)
+	
+	return ok
+
+
+def validate_mistakes(trace:dict, mistakes:list):
+	pass
+	
+	return True, "validation is not implemented"
+	
+
+
+# global log storage
+LOG = []
+	
+def log_print(*args, sep=" ", end="\n"):
+	s = sep.join(map(str, args)) + end
+	print(s, end="")
+	LOG.append(s)
+	
+# def replace_print()	:
+# 	pass
+
+def run_tests():
+	
+	files = search_text_trace_files(directory="handcrafted_traces/")
+	
+	### Отладочная заглушка
+	# files = [f for f in files if "example" in f]
+	files = [f for f in files if "correct_branching" in f]
+	
+	alg_trs = parse_text_files(files)
+	test_count = len(alg_trs)
+	
+	success_all = True
+	failed = 0
+	
+	for i, test_data in enumerate(alg_trs):
+		try:
+			assert "trace_name"     in test_data, "trace_name"
+			assert "algorithm_name" in test_data, "algorithm_name"
+			assert "trace"          in test_data, "trace"         
+			assert "algorithm"      in test_data, "algorithm"     
+		except Exception as e:
+			log_print("Fix me: field is missing:", e)
+			continue
+		
+		# log_print("Running test %2d/%d for trace: " % (i+1, test_count), test_data["trace_name"])
+		log_print("%2d/%d  " % (i+1, test_count), end="")
+		success = run_test_for_alg_trace(test_data)
+		if not success:
+			failed += 1
+			success_all = False
+		# success_all = success_all and success
+			
+	log_print()
+	log_print("="*40)
+	log_print("Tests passed:", success)
+	log_print(f"tests failed: {failed} of {test_count}.")
+			
+	return failed == 0
+
 
 if __name__ == '__main__':
 	
 	success_all = True
 	
-	for directory,subdirs,files in os.walk(TEST_DIR):
-		if TESTS_FNM in files:
-			print("Running tests in: ", directory)
-			success = run_tests_in_directory(directory)
-			success_all = success_all and success
-			print("Tests passed:", success, " in directory: ", directory)
+	# for directory,subdirs,files in os.walk(TEST_DIR):
+	# 	if TESTS_FNM in files:
+	# 		print("Running tests in: ", directory)
+	# 		success = run_tests_in_directory(directory)
+	# 		success_all = success_all and success
+	# 		print("Tests passed:", success, " in directory: ", directory)
 			
-		# break
+	# 	# break
+	success_all = run_tests()
+	
+	# save LOG
+	fpath = os.path.join(TEST_DIR, REPORT_FNM)
+	with open(fpath, "w", encoding="utf8") as f:
+		f.write("\n".join(LOG))
 		
 	# indicate tests success with exit code
 	exit(0 if success_all else 1)

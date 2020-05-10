@@ -25,20 +25,30 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
 		objects.append(x)
 		return x
 
-	objects = []
-	alg = json.loads(alg_json_str, object_hook=catch_obj)
-	alg_objects = objects
+	if isinstance(alg_json_str, str) and isinstance(trace_json_str, str):
+		objects = []
+		alg = json.loads(alg_json_str, object_hook=catch_obj)
+		alg_objects = objects
 
-	objects = []
-	tr = json.loads(trace_json_str, object_hook=catch_obj)
-	tr_objects = objects
+		# objects = []
+		tr = json.loads(trace_json_str) # , object_hook=catch_obj)
+		# tr_objects = objects
+		
+		# делаем иерархический список плоским без потери порядка
+		tr = list(plain_list(tr))
 	
-	
-	# делаем иерархический список плоским без потери порядка
-	tr = list(plain_list(tr))
+	elif isinstance(alg_json_str, dict) and isinstance(trace_json_str, list):
+		alg = alg_json_str
+		tr = trace_json_str
+		
+		alg_objects = list(find_by_type(alg))
+		
+	else:
+		raise TypeError(f"alg & trace msut be either JSON strings, either dict and list, but got: {type(alg_json_str)}, {type(trace_json_str)}")
+		
 
-	id2obj = {}  # индекс всех объектов для быстрого поиска по id
-	for d in alg_objects + tr_objects:
+	id2obj = {}  # индекс всех объектов АЛГОРИТМА для быстрого поиска по id
+	for d in alg_objects:
 		if "id" in d:
 			id2obj[ d["id"] ] = d
 			
@@ -87,6 +97,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
 				# привязываем id
 				make_triple(obj, id_prop, id_)
 				# (имя не привязываем.)
+			# else: raise "no id!"
 				
 		# наладим связи между элементами алгоритма
 		def link_objects(iri_subj, prop_name, iri_obj):
@@ -163,7 +174,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
 				# phase: (started|finished|performed)
 				phase 		= d.get("phase")  # , "performed"
 				n 			= d.get("n", None) or d.get("n_", None)
-				name		= d.get("action", None)  # !  name <- action
+				name		= d.get("name", None)  or  d.get("action", None)  # !  name <- action
 				
 				id_ 		= int(id_)
 				clean_name 	= re.sub(r"\s+", "", name)
@@ -172,6 +183,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
 				number_mark = "" if not n else ("_n%d" % n)
 				
 				# находим связанный элемент алгоритма
+				assert executes in id2obj, (id2obj, d)
 				alg_elem = id2obj[executes]
 
 				if phase_mark in ("b", "p"):
@@ -326,8 +338,18 @@ def plain_list(list_of_lists):
 		else:
 			yield x
 
+def find_by_type(dict_or_list, types=(dict,)):
+    "plain list of dicts or objects of specified type"
+    if isinstance(dict_or_list, types):
+        yield dict_or_list
+    if isinstance(dict_or_list, dict):
+        for v in dict_or_list.values():
+            yield from find_by_type(v, types)
+    elif isinstance(dict_or_list, (list, tuple, set)):
+        for d in dict_or_list:
+            yield from find_by_type(d, types)
 
-
+            
 if __name__ == '__main__':
 	# -a
 	alg_filepath = r"c:\D\Нинь\учёба\10s\Quiz\Дистракторы\tr-gen\alg_out_2.json"
