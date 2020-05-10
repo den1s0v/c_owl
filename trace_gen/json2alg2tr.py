@@ -906,7 +906,7 @@ if TraceJsonVisitor:
 		self.add_act(CompoundActNode(act), enter=True)
 
 		if node.stmts:
-			self.accept_line_list(node.stmts)
+			self.visit_list(node.stmts)
 		self.leave_current_act()
 
 	TraceJsonVisitor.visit_ElseBranchJN = _
