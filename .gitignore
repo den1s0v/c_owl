@@ -1,5 +1,6 @@
 *.pyc
-*.txt
-try.py
+#*.txt
 test_data/*/*output*
 test_data/*/*.rdf
+test_data/*.rdf
+*report*
