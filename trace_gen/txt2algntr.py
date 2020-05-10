@@ -158,7 +158,7 @@ class AlgorithmParser:
                 alt_obj = result[-1]
                 alt_obj["branches"] += [ {
                         "id": self.newID(branch_name),
-                        "type": "else if",
+                        "type": "else-if",
                         "name": branch_name,
                         "cond":  self.parse_expr(cond_name),
                         "branch": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
