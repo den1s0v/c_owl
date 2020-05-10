@@ -417,7 +417,8 @@ class TraceParser:
             # начался цикл my-while-1 1-й раз
             # началась развилка my-alt-1 1-й раз
             # началась функция main 1-й раз
-            m = re.match(r"""(начал[оа]?с[ья]|закончил[оа]?с[ья])  # 1 phase 
+            # выполнилась функция main 1-й раз
+            m = re.match(r"""(начал[оа]?с[ья]|закончил[оа]?с[ья]|выполнил[оа]?с[ья])  # 1 phase 
                 \s+
                 (следование|развилка|цикл|функция)   # 2 struct 
                 \s+(\S+)                     # 3 name 
@@ -434,7 +435,7 @@ class TraceParser:
                          }[m.group(2)]
                 name = m.group(3)
                 ith = m.group(4)  if len(m.groups())>=4 else  None
-                phase = "started"  if "начал" in m.group(1) else  "finished"
+                phase = "started"  if "начал" in m.group(1) else  ("finished"  if "закончил" in m.group(1) else  "performed")
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
@@ -825,9 +826,9 @@ def parse_text_file(txt_file_path, encoding="utf8"):
 
 def main():
 
-	# parse_text_file("../handcrafted_traces/err_branching.txt")
+	parse_text_file("../handcrafted_traces/err_branching.txt")
 	# parse_text_file("../handcrafted_traces/err_loops.txt")
-	parse_text_file("../handcrafted_traces/correct_branching.txt")
+	# parse_text_file("../handcrafted_traces/correct_branching.txt")
 	# parse_text_file("../handcrafted_traces/correct_loops.txt")
 
 
