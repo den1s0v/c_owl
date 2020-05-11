@@ -1,0 +1,59 @@
+
+// алгоритм alg_inner_seq2 (следование со вложенным следованием)
+{
+    outer_first
+    {  # inner_seq
+		inner_first
+		inner_second
+	}
+	outer_second
+    outer_third
+}
+
+
+
+/* 
+alg_inner_seq2 all ok
+*/
+{
+началась программа
+outer_first выполнилось 1-й раз
+началось следование inner_seq 1-й раз
+    inner_first выполнилось 1-й раз 
+    inner_second выполнилось 1-й раз 
+закончилось следование inner_seq 1-й раз
+outer_second выполнилось 1-й раз
+outer_third выполнилось 1-й раз
+закончилась программа
+}
+
+/* 
+alg_inner_seq2 MisplacedBefore
+*/
+{
+началась программа
+outer_first выполнилось 1-й раз
+    inner_first выполнилось 1-й раз   // ошибка ! До содержащего следования
+началось следование inner_seq 1-й раз
+    inner_second выполнилось 1-й раз 
+закончилось следование inner_seq 1-й раз
+outer_second выполнилось 1-й раз
+outer_third выполнилось 1-й раз
+закончилась программа
+}
+
+/* 
+alg_inner_seq2 MisplacedAfter
+*/
+{
+началась программа
+outer_first выполнилось 1-й раз
+началось следование inner_seq 1-й раз
+    inner_first выполнилось 1-й раз
+закончилось следование inner_seq 1-й раз
+    inner_second выполнилось 1-й раз  // ошибка ! После содержащего следования
+outer_second выполнилось 1-й раз
+outer_third выполнилось 1-й раз
+закончилась программа
+}
+

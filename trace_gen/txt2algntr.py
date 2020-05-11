@@ -278,7 +278,7 @@ class AlgorithmParser:
             m = re.match(r"\{\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
             if m:
                 if self.verbose: print("named sequence")
-                name =   m.group(1),  # имя следования (пишется в комментарии)
+                name =   m.group(1)  # имя следования (пишется в комментарии)
                 result.append({
                     "id": self.newID(name),
                     "type": "sequence",

@@ -294,10 +294,10 @@ def run_tests():
 			
 	log_print()
 	log_print("="*40)
-	log_print("Tests passed:", success)
+	log_print("Tests passed:", success_all)
 	log_print(f"tests failed: {failed} of {test_count}.")
 			
-	return failed == 0
+	return success_all
 
 
 if __name__ == '__main__':
