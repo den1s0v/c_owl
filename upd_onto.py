@@ -179,6 +179,17 @@ def remove_triple(subj, prop, obj):
 		setattr(subj, prop.python_name, None)
 
 
+def get_relation_object(subj,prop):
+	"""
+	Another way to retrieve 3rd element of stored triple.
+	Usage:
+		obj = get_relation_object(subj, prop)
+	Works when the following fails (this appears generally with FunctionalProperty'es):
+		obj = subj.prop
+		objs = prop[subj]
+	"""
+	return dict(prop.get_relations()) [subj]
+
 
 # global / persistent
 _regexes = {}
