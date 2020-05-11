@@ -13,7 +13,7 @@
 
 
 /* 
-alg_inner_seq2 all ok
+SKIP_alg_inner_seq2 all ok
 */
 {
 началась программа
