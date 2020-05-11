@@ -261,13 +261,13 @@ def run_tests():
 	files = search_text_trace_files(directory="handcrafted_traces/")
 	
 	### Отладочная заглушка !
-	files = [f for f in files if "example" in f]
+	# files = [f for f in files if "example" in f]
 	# files = [f for f in files if "correct_branching" in f]
 	
 	alg_trs = parse_text_files(files)
 	
 	### Отладочная заглушка !
-	alg_trs = alg_trs[1:2]
+	# alg_trs = alg_trs[1:2]
 	
 	test_count = len(alg_trs)
 	

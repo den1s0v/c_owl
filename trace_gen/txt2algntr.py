@@ -872,10 +872,22 @@ def parse_text_files(file_paths, encoding="utf8"):
     
     return alg_trs
             
-def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=(".txt", ".tr"), skip_starting_with_hypen=True):
+def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=(".txt", ".tr"), skip_starting_with_hypen=True, filter_file="filter.inf"):
     import os
     result_list = []
-    file_list = os.listdir(directory)
+    search_in_dir = True
+    if filter_file and os.path.exists(os.path.join(directory, filter_file)):
+        try:
+            with open(os.path.join(directory, filter_file)) as f:
+                text = f.read()
+            file_list = [s.strip() for s in text.split("\n") if s.strip()]
+            text = None
+            search_in_dir = False
+        except OSError:
+            pass
+
+    if search_in_dir:
+        file_list = os.listdir(directory)
     
     for fname in file_list:
         if not fname.endswith(file_extensions):
@@ -886,6 +898,7 @@ def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=
             
         fpath = os.path.join(directory, fname)
         if not os.path.exists(fpath):
+            # print("path does not exist: ", fpath)
             continue
             
         result_list.append(fpath)

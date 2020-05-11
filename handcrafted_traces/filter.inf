@@ -1,0 +1,6 @@
+SKIP correct_branching.txt
+SKIP err_branching.txt
+SKIP correct_loops.txt
+SKIP err_loops.txt
+SKIP example.txt
+test_sequences.txt
