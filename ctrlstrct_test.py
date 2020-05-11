@@ -10,7 +10,7 @@ import os
 
 from ctrlstrct_run import process_algtr
 from trace_gen.txt2algntr import parse_text_files, search_text_trace_files, find_by_key_in
-
+from upd_onto import get_relation_object
 
 
 TEST_DIR = "./test_data"
@@ -24,13 +24,21 @@ REFERENCE_DATA_FIELD = "reference_output"
 
 SAVE_RDF = True
 
+# global log storage
+LOG = []
+	
+def log_print(*args, sep=" ", end="\n"):
+	s = sep.join(map(str, args)) + end
+	print(s, end="")
+	LOG.append(s)
+	
+# def replace_print()	:
+# 	pass
 
 def run_tests_in_directory(directory) -> bool:
 	
 	tests_fpath = os.path.join(directory, TESTS_FNM)
-
 	assert os.path.exists(tests_fpath), tests_fpath
-	
 	with open(tests_fpath, encoding="utf8") as f:
 		tests_data = json.load(f)
 		
@@ -203,9 +211,7 @@ def run_test_for_alg_trace(test_data: dict, directory=TEST_DIR):
 
 
 def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
-	"Сравнивает результат по первой ошибочной строке"
-	
-	print("validate_mistakes : To debug.")
+	"Находит расхождения в определении ошибочных строк трассы"
 	
 	def is_error_act(d:dict):
 		comment = d["comment"]
@@ -213,45 +219,56 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	
 	error_flags = {d["text_line"]:is_error_act(d) for d in trace}
 	
-	arg_objs = find_by_key_in("arg", mistakes)
-
-	inferred_error_lines = [int(o.text_line) for o in arg_objs]
-	# inferred_error_lines.sort()
+	arg_objs = []
 	
+	for prop_name in ("arg", ):  # добавить поля, если они появятся в спецификации ошибки
+		arg_dicts = (find_by_key_in(prop_name, mistakes))  # список словарей с ключами 'arg', по которым хранятся списки объектов онтологии
+		for dct in arg_dicts:
+			arg_objs += dct[prop_name]
+			
+	if arg_objs:
+		onto = arg_objs[0].namespace
+		prop_text_line = onto["text_line"]
+	
+	inferred_error_lines = []
+	for arg_obj in arg_objs:
+		text_line = get_relation_object(arg_obj, prop_text_line)
+		inferred_error_lines.append(text_line)
+		
 	# проверка
-	
+	differences = []
+	first_err_line = None  # из размеченных комментариями в трассе
 	for i,is_err in error_flags.items():
 		if is_err:
+			if first_err_line is None:
+				first_err_line = i
 			if i not in inferred_error_lines:
-				return False, f"Erroneous line {i} hasn't been recognized by the ontology."
-				break
-			elif i in inferred_error_lines:
-				return False, f"Correct line {i} has been recognized by the ontology as erroneous."
-				break
+				m = f"Erroneous line {i} hasn't been recognized by the ontology."
+				differences.append(m)
+			# break ?
+		elif i in inferred_error_lines and first_err_line is None:  # вслед за первой ошибочной может быть всё что угодно
+			m = f"Correct line {i} has been recognized by the ontology as erroneous."
+			differences.append(m)
+			# break
 				
+	if differences:
+		return False, "\n\t> ".join(["",*differences])
 	return True, "Validation ok."
 
-
-# global log storage
-LOG = []
-	
-def log_print(*args, sep=" ", end="\n"):
-	s = sep.join(map(str, args)) + end
-	print(s, end="")
-	LOG.append(s)
-	
-# def replace_print()	:
-# 	pass
 
 def run_tests():
 	
 	files = search_text_trace_files(directory="handcrafted_traces/")
 	
-	### Отладочная заглушка
+	### Отладочная заглушка !
 	files = [f for f in files if "example" in f]
 	# files = [f for f in files if "correct_branching" in f]
 	
 	alg_trs = parse_text_files(files)
+	
+	### Отладочная заглушка !
+	alg_trs = alg_trs[1:2]
+	
 	test_count = len(alg_trs)
 	
 	success_all = True
