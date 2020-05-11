@@ -25,7 +25,7 @@ RULES_DICT = {
 
 
 "DepthOfProgramIs0": """
-	algorithm(?a), executes(?p, ?a) -> depth(?p, 0)
+	algorithm(?a), entry_point(?a, ?e), executes(?p, ?e) -> depth(?p, 0)
 	""",
 
 "DepthIncr": """

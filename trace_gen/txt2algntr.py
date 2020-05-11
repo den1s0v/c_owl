@@ -23,6 +23,7 @@ class AlgorithmParser:
                     "name": "global_code",
                     "body": []
                 },
+              "entry_point": None,
         }
         
         if line_list:
@@ -40,6 +41,15 @@ class AlgorithmParser:
 
     def parse(self, line_list: "list(str)"):
         self.algorithm["global_code"]["body"] += self.parse_algorithm_ids(line_list)
+        # найдём точку входа
+        for func in self.algorithm["functions"]:
+            if func["is_entry"]:
+                self.algorithm["entry_point"] = func  # надеемся, что объект с id сформируется в ссылку на функцию ...
+                break
+        else:  # нет функции
+            self.algorithm["entry_point"] = self.algorithm["global_code"]  # надеемся с id
+                
+                
         
     def parse_expr(self, name:str) -> dict:
         "Нововведение: самостоятельный объект для выражений (пока - только условия)"
@@ -139,7 +149,7 @@ class AlgorithmParser:
                         "type": "if",
                         "name": branch_name,
                         "cond":  self.parse_expr(cond_name),
-                        "branch": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                        "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 })
                 ci = e + 1
@@ -161,7 +171,7 @@ class AlgorithmParser:
                         "type": "else-if",
                         "name": branch_name,
                         "cond":  self.parse_expr(cond_name),
-                        "branch": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                        "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -177,7 +187,7 @@ class AlgorithmParser:
                         "id": self.newID(branch_name),
                         "type": "else",
                         "name": branch_name,
-                        "branch": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                        "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -383,7 +393,7 @@ class TraceParser:
             line = line.strip()
             
             # ...  // comment
-            m = re.search(r"\{\s+(?://|#)\s*(.+)$", line, re.I)
+            m = re.search(r"(?://|#)\s*(.+)$", line, re.I)
             comment = m and m.group(1) or ""
         
             # началась программа
@@ -394,7 +404,8 @@ class TraceParser:
                 #   {"id": 32, "action": "программа", "executes": 25, "gen": "she", "phase": "started", "n": null},
                 name = "программа"
                 phase = "started"  if m.group(1) == "началась" else  "finished"
-                alg_obj_id = self.get_alg_node_id(("algorithm","алгоритм"))
+                # alg_obj_id = self.get_alg_node_id(("algorithm","алгоритм"))
+                alg_obj_id = self.alg_dict["entry_point"]["id"]
                 assert alg_obj_id, "TraceError: no corresporning '{}' found for '{}'".format("algorithm' or 'алгоритм", name)
                 result.append({
                       "id": self.newID(name),
@@ -403,7 +414,7 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       # "n": None,
-                      "text_line": ci,
+                      "text_line": ci + 1,
                       "comment": comment,
                 })
                 ci += 1
@@ -446,7 +457,7 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci,
+                      "text_line": ci + 1,
                       "comment": comment,
                 })
                 ci += 1
@@ -485,7 +496,7 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci,
+                      "text_line": ci + 1,
                       "comment": comment,
                 })
                 ci += 1
@@ -527,7 +538,7 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci,
+                      "text_line": ci + 1,
                       "comment": comment,
                 })
                 ci += 1
@@ -558,7 +569,7 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci,
+                      "text_line": ci + 1,
                       "comment": comment,
                 })
                 ci += 1
@@ -593,7 +604,7 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "iteration_n": ith,
-                      "text_line": ci,
+                      "text_line": ci + 1,
                       "comment": comment,
                 })
                 ci += 1
@@ -624,7 +635,7 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci,
+                      "text_line": ci + 1,
                       "comment": comment,
                 })
                 ci += 1
@@ -651,7 +662,7 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci,
+                      "text_line": ci + 1,
                       "comment": comment,
                 })
                 ci += 1
@@ -790,7 +801,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
                         # найдено
                         tr_data[name] = {
                             "alg_name": alg_name,
-                            "lines":(i+1, j)  # строки текста трассы (вкл-но)
+                            "lines":(i, j)  # строки текста трассы (вкл-но)
                         }
 
                         # print("line", i, name)
