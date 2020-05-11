@@ -77,6 +77,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
         act_end = onto["act_end"]
         prop_executes = onto["executes"]
         prop_next = onto["next"]
+        prop_text_line = onto["text_line"]
         # prop_executes = onto["executes"]
 
         
@@ -131,8 +132,17 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
                         subobject_iri_list = [subv["iri"] for subv in v if isinstance(subv, dict) and "id" in subv and "iri" in subv]
                         if not subobject_iri_list:
                             continue
-                        
+                            
                         iri = d["iri"]
+                        
+                        # всякий список действий должен быть оформлен как sequence с полем body - списком.
+                        if k == "body":
+	                        # делаем объект последовательностью (нужно для тел циклов, веток, функций)
+	                        onto[iri].is_a.append( onto.sequence )
+                        # else:  # это нормально для других списков
+                        #     print("Warning: key of sequence is '%s' (consider using 'body')" % k)
+                        
+                        
                         subelem__prop_name = k+"_item"
                         for i, subiri in enumerate(subobject_iri_list):
                             # главная связь
@@ -185,6 +195,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
                 phase       = d.get("phase")  # , "performed"
                 n           = d.get("n", None) or d.get("n_", None)
                 name        = d.get("name", None)  or  d.get("action", None)  # !  name <- action
+                text_line   = d.get("text_line", None)
                 
                 id_         = int(id_)
                 # clean_name    = re.sub(r"\s+", "", name)
@@ -197,18 +208,26 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
                 assert executes in id2obj, (id2obj, d)
                 alg_elem = id2obj[executes]
 
+
+                iri_template = "{}%s_{}{}".format(text_line or id_, clean_name, number_mark)
+                
                 if phase_mark in ("b", "p"):
                     # начало акта
-                    iri = "{}{}_{}{}".format(id_, "b", clean_name, number_mark)
+                    iri = iri_template % "b"
                     # print("iri: ", iri)
                     obj = make_act(iri, act_begin, alg_elem["iri"], False)
                     # НЕ привязываем id (т.к. может повторяться у начал и концов. TO FIX?)
                     # make_triple(obj, id_prop, id_)
+                    # привязываем нужные свойства
+                    make_triple(obj, prop_text_line, text_line)
                 
                 if phase_mark in ("e", "p"):
                     # конец акта
-                    iri = "{}{}_{}{}".format(id_, "e", clean_name, number_mark)
+                    iri = iri_template % "e"
                     obj = make_act(iri, act_end, alg_elem["iri"], i==len(tr))
+                    # привязываем нужные свойства
+                    make_triple(obj, prop_text_line, text_line)
+
                 
     return onto
 
@@ -223,9 +242,12 @@ def init_persistent_structure(onto):
         # ->
         class act(Thing): pass  # Thing - временно?
         # -->
-        class act_begin(act): pass  # Thing - временно?
+        class act_begin(act): pass
         # -->
         class act_end(act): pass
+        
+        # ->
+        class sequence(Thing): pass
         
         # признак first
         class first_item(Thing, ): pass
@@ -241,6 +263,8 @@ def init_persistent_structure(onto):
         
         # новое свойство depth
         prop_depth = types.new_class("depth", (Thing >> int, FunctionalProperty, ))
+        # новое свойство text_line
+        prop_text_line = types.new_class("text_line", (Thing >> int, FunctionalProperty, ))
         # # новое свойство same_level
         # prop_same_level = types.new_class("same_level", (Thing >> Thing, SymmetricProperty))
         # # новое свойство child_level
@@ -338,6 +362,10 @@ def process_algtr(alg_json, trace_json, debug_rdf_fpath=None, verbose=1, mistake
     if not verbose:
         print("Extended reasoning finished.", "Success:", str(success) + ","," Pellet run times:", n_runs)
 
+    if debug_rdf_fpath:
+        onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
+        # print("Saved RDF file: {} !".format(ontology_file))
+        
     mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
     
     return onto, list(mistakes.values())
