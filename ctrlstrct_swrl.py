@@ -71,6 +71,12 @@ RULES_DICT = {
 	""",
 
 
+                ###################
+                ###################
+################ Смысловые правила ################
+                ###################
+                ###################
+
 
 "CorrespondingActsMismatch_Error": """
 	corresponding_end(?a, ?b), 
@@ -136,8 +142,33 @@ RULES_DICT = {
 	 -> CREATE(INSTANCE, ?cmd)
 """,
 
-"-MissingAct_Mistake": """
+
+# Нужно вычислить настоящего, должного родительского объекта, затем всё просто.
+
+"GenericMisplaced_Mistake": """
+    act_begin(?act1),
+    executes(?act1, ?st), 
+    parent_of(?st2, ?st),
+
+    parent_of(?act2, ?act1),
+    executes(?act2, ?shouldbe_st2), 
 	
+    DifferentFrom(?shouldbe_st2, ?st2),
+    
+    IRI(?act1, ?act1_iri),
+    IRI(?st2, ?st2_iri),
+    IRI(?shouldbe_st2, ?shouldbe_st2_iri),
+    
+    stringConcat(?cmd, "trace_error{trace_error{arg=", ?act1_iri, "; trace_error{arg=", ?st2_iri, "; trace_error{arg=", ?shouldbe_st2_iri, "; message=[Act placed within inproper enclosing act]; }")
+     -> CREATE(INSTANCE, ?cmd)
+    
+    
+""",
+
+# Акт находится в пределах родительского акта, но не непосредственно под ним
+
+"-MissingAct_Mistake": """
+    
 """,
 
 
