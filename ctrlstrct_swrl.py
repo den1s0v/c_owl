@@ -1,8 +1,11 @@
 # ctrlstrct.swrl
 
+import re
+
 RULES_DICT = {
 
-# помечаем минусом в начале отключенные правила
+# помечаем минусом в начале имени отключенные правила.
+# из текста удаляются комментарии в стиле Си и Python.
 
 
                 ###################
@@ -14,6 +17,9 @@ RULES_DICT = {
 
 "hasNextAct_to_beforeAct": """
 	next(?a, ?b) -> before(?a, ?b)
+
+    # an comment !!!
+    // Another one.
  """ ,
 
 "BeforeActTransitive": """
@@ -175,4 +181,52 @@ RULES_DICT = {
 """,
 
 
+"-ActsPairMisorder_Mistake": """
+
+    # начало и конец акта блока
+    sequence(?block), 
+    executes(?block_act_b, ?block), 
+    executes(?block_act_e, ?block), 
+
+    act_begin(?act1),
+    act_begin(?act2),
+
+    # акты в пределах акта блока
+    before(?block_act_b, ?act1), 
+    before(?block_act_b, ?act2), 
+    before(?act1, ?block_act_e), 
+    before(?act2, ?block_act_e), 
+
+    # акты выполняют пару последовательных действий
+    body_item(?block, ?st1), 
+    body_item(?block, ?st2), 
+    next(?st1, ?st2)
+    executes(?act1, ?st1), 
+    executes(?act2, ?st2), 
+    
+    # но сами стоят в другом порядке.
+    before(?act2, ?act1), 
+    
+    IRI(?act2, ?act2_iri),
+    IRI(?act1, ?act1_iri),
+    
+    stringConcat(?cmd, "trace_error{arg=", ?act2_iri, "; arg=", ?act1_iri, "; message=[Act occurs before its consequent]; }")
+     -> CREATE(INSTANCE, ?cmd)
+""",
+
+
 }
+
+
+comment_re = re.compile(r"(?://|#)\s*(.+)$", re.I)
+
+for k in RULES_DICT:
+    txt = RULES_DICT[k]
+    lines = [
+                comment_re.sub("", line)
+                for line in 
+                txt.split("\n")
+            ]
+    RULES_DICT[k] = "\n".join(lines)
+    
+# print(RULES_DICT)
