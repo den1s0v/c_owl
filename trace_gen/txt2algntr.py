@@ -111,13 +111,19 @@ class AlgorithmParser:
             if m:
                 if self.verbose: print("function")
                 name = m.group(1)  # имя функции
+                body_name = name+"-body"
                 self.algorithm["functions"].append({
                       "id": self.newID(name),
                       "type": "func",
                       "name": name,  # имя функции
                       "is_entry": name == "main",
                       "param_list": [],
-                      "body": parse_algorithm(line_list[i+2:e])  # исключая скобки { } вокруг тела
+                      "body" : {   #  stmts -> global_code  !!! 
+                            "id": self.newID(body_name),
+                            "type": "sequence",
+                            "name": body_name,
+                            "body": parse_algorithm(line_list[i+2:e])  # исключая скобки { } вокруг тела
+                        },
                 })
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -450,6 +456,8 @@ class TraceParser:
                 phase = "started"  if "начал" in m.group(1) else  ("finished"  if "закончил" in m.group(1) else  "performed")
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                if struct == "func":
+                    alg_obj_id = next(find_by_keyval_in("name", name, self.alg_dict["functions"]))["body"]["id"]
                 result.append({
                       "id": self.newID(name),
                       # struct: name,

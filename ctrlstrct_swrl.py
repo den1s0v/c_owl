@@ -42,6 +42,12 @@ RULES_DICT = {
 	""",
 
 
+# entry_point       program executes        first act executes
+# 
+# global_code       global_code.body        global_code.body.first
+# 
+# func_a            func_a.body             func_a.body.first
+
 "DepthOfProgramIs0": """
 	algorithm(?a), entry_point(?a, ?e), executes(?p, ?e) -> depth(?p, 0)
 	""",
@@ -181,7 +187,7 @@ RULES_DICT = {
 """,
 
 
-"-ActsPairMisorder_Mistake": """
+"ActsPairMisorder_Mistake": """
 
     # начало и конец акта блока
     sequence(?block), 
@@ -200,7 +206,7 @@ RULES_DICT = {
     # акты выполняют пару последовательных действий
     body_item(?block, ?st1), 
     body_item(?block, ?st2), 
-    next(?st1, ?st2)
+    next(?st1, ?st2),
     executes(?act1, ?st1), 
     executes(?act2, ?st2), 
     

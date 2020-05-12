@@ -165,6 +165,11 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
 
         def make_act(iri, onto_class, alg_iri, is_last=False):
             nonlocal trace_acts_iri_list
+            n = 2; orig_iri = iri
+            while onto[iri]:  # пока есть объект с таким именем
+            	# модифицировать имя
+            	iri = orig_iri + ("_%d" % n); n += 1
+            
             trace_acts_iri_list.append(iri)                 
             # создаём объект
             obj = onto_class(iri)
@@ -346,15 +351,15 @@ def process_algtr(alg_json, trace_json, debug_rdf_fpath=None, verbose=1, mistake
      # при создании наполняет базовую онтологию вспомогательными сущностями
     wr_onto = AugmentingOntology(onto)
     
-    if debug_rdf_fpath:
-        onto.save(file=debug_rdf_fpath, format='rdfxml')
-        # print("Saved RDF file: {} !".format(ontology_file))
-        
 
     # после наложения обёртки можно добавлять SWRL-правила
     from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
     load_swrl_rules(onto, swrl_rules_dict)
     
+    if debug_rdf_fpath:
+        onto.save(file=debug_rdf_fpath, format='rdfxml')
+        # print("Saved RDF file: {} !".format(ontology_file))
+        
     if not verbose:
         print("Extended reasoning started ...",)
 
