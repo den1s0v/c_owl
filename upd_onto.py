@@ -188,7 +188,8 @@ def get_relation_object(subj,prop):
 		obj = subj.prop
 		objs = prop[subj]
 	"""
-	return dict(prop.get_relations()) [subj]
+	d = dict(prop.get_relations())
+	return d.get(subj, None)
 
 
 # global / persistent
