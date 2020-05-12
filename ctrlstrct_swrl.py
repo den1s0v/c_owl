@@ -216,7 +216,7 @@ RULES_DICT = {
     IRI(?act2, ?act2_iri),
     IRI(?act1, ?act1_iri),
     
-    stringConcat(?cmd, "trace_error{arg=", ?act2_iri, "; arg=", ?act1_iri, "; message=[Act occurs before its consequent]; }")
+    stringConcat(?cmd, "trace_error{arg=", ?act2_iri, "; arg=", ?act1_iri, "; message=[Act occurs before its precedent]; }")
      -> CREATE(INSTANCE, ?cmd)
 """,
 
