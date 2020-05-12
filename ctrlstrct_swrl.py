@@ -4,6 +4,14 @@ RULES_DICT = {
 
 # помечаем минусом в начале отключенные правила
 
+
+                ###################
+                ###################
+################ Служебные правила ################
+                ###################
+                ###################
+
+
 "hasNextAct_to_beforeAct": """
 	next(?a, ?b) -> before(?a, ?b)
  """ ,
@@ -15,8 +23,12 @@ RULES_DICT = {
 	# act(?b),
 	# act(?c),
 	
+"parent_of_to_contains_child": """
+	parent_of(?a, ?b) -> contains_child(?a, ?b)
+ """ ,
+
 "parent_of_to_contains_act": """
-	parent_of(?a, ?b) -> contains_act(?a, ?b)
+    parent_of(?a, ?b), act(?a), act(?b) -> contains_act(?a, ?b)
  """ ,
 
 "contains_actTransitive": """

@@ -111,11 +111,11 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
             # else: raise "no id!"
                 
         # наладим связи между элементами алгоритма
-        def link_objects(iri_subj, prop_name, iri_obj):
+        def link_objects(iri_subj, prop_name, iri_obj, prop_superclasses=()):
             prop = onto[prop_name]
             if not prop:
                 # новое свойство по заданному имени
-                prop = types.new_class(prop_name, (Thing >> Thing, ))
+                prop = types.new_class(prop_name, (Thing >> Thing, *prop_superclasses))
             # связываем объекты свойством
             make_triple(onto[iri_subj], prop, onto[iri_obj])
             
@@ -125,7 +125,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
                 for k in d:  # ищем объекты среди полей словаря
                     v = d[k]
                     if isinstance(v, dict) and "id" in v and "iri" in v:
-                        link_objects(d["iri"], k, v["iri"])
+                        link_objects(d["iri"], k, v["iri"], (onto.parent_of,) )
                     elif isinstance(v, list):
                         # print("check out list", k, "...")
                         # сделаем список, если в нём нормальные "наши" объекты
@@ -146,7 +146,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
                         subelem__prop_name = k+"_item"
                         for i, subiri in enumerate(subobject_iri_list):
                             # главная связь
-                            link_objects(iri, subelem__prop_name, subiri)
+                            link_objects(iri, subelem__prop_name, subiri, (onto.parent_of,) )
                             # последовательность
                             if i >= 1:
                                 prev_iri = subobject_iri_list[i-1]
@@ -274,9 +274,11 @@ def init_persistent_structure(onto):
         class corresponding_end(act_begin >> act_end, FunctionalProperty, InverseFunctionalProperty): pass
     
         # новое свойство parent_of
-        class parent_of(act_begin >> act, InverseFunctionalProperty): pass
-        # новое свойство contains_act
-        class contains_act(act_begin >> act, ): pass
+        # class parent_of(act_begin >> act, InverseFunctionalProperty): pass
+        class parent_of(Thing >> Thing, InverseFunctionalProperty): pass
+        # новое свойство contains_act < contains_child
+        class contains_child(Thing >> Thing, ): pass
+        class contains_act(act_begin >> act, contains_child): pass
     
 
 def load_swrl_rules(onto, rules_dict):
@@ -297,7 +299,7 @@ def load_swrl_rules(onto, rules_dict):
 
         for k in rules_dict:
             if k.startswith("-"):
-                print("skipping SWRL rule due to minus: \t", k)
+                # print("skipping SWRL rule due to minus: \t", k)
                 continue
             
             rule = rules_dict[k]
