@@ -224,12 +224,14 @@ RULES_DICT = {
 }
 
 
-comment_re = re.compile(r"(?://|#)\s*(.+)$", re.I)
+# strip all the comments out ...
+# ... replacing them by spaces in order to preserve char positions reported by lexing parser
+comment_re = re.compile(r"(?://|#).*$")
 
 for k in RULES_DICT:
     txt = RULES_DICT[k]
     lines = [
-                comment_re.sub("", line)
+                comment_re.sub(lambda m:" "*len(m.group(0)), line)
                 for line in 
                 txt.split("\n")
             ]
