@@ -213,12 +213,13 @@ def run_test_for_alg_trace(test_data: dict, directory=TEST_DIR):
 def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	"Находит расхождения в определении ошибочных строк трассы"
 	
+	print(f"mistakes: {mistakes}")
+	
 	def is_error_act(d:dict):
 		comment = d["comment"]
 		return ("error" in comment or "ошибка" in comment)
 	
 	error_flags = {d["text_line"]:is_error_act(d) for d in trace}
-	
 	arg_objs = []
 	
 	for prop_name in ("arg", ):  # добавить поля, если они появятся в спецификации ошибки

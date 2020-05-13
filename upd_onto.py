@@ -98,7 +98,7 @@ with onto1:
 
 # ...
 
-# run automatic augmentation which removing all the tool artifacts
+# run automatic augmentation which removing all the tool artifacts:
 augment_ontology(onto1)
 
 
@@ -108,8 +108,38 @@ augment_ontology(onto1)
 # injected property prefices
 _special_prefixes =  [
 	"LINK_", "UNLINK_",  # prefixes for properties replicated existiong properties
-	"CREATE", "IRI"  # full names of properties
+	"CREATE", "IRI", # "CountableProperty",  # full names of properties
+	"COUNT_",  # prefix for name of property that holds the count of links
 ]
+
+
+def make_triple(subj, prop, obj):
+	print(f"make_triple({subj}, {prop}, {obj})")
+	prop[subj].append(obj)
+	# "not asserted" workaround
+	if FunctionalProperty in prop.is_a:
+		setattr(subj, prop.python_name, obj)
+
+
+def remove_triple(subj, prop, obj):
+	if obj in prop[subj]:
+		prop[subj].remove(obj)
+	# "not removed" workaround
+	if FunctionalProperty in prop.is_a:
+		setattr(subj, prop.python_name, None)
+
+
+def get_relation_object(subj,prop):
+	"""
+	Another way to retrieve 3rd element of stored triple.
+	Usage:
+		obj = get_relation_object(subj, prop)
+	Works when the following fails (this appears generally with FunctionalProperty'es):
+		obj = subj.prop
+		objs = prop[subj]
+	"""
+	d = dict(prop.get_relations())
+	return d.get(subj, None)
 
 
 
@@ -118,6 +148,7 @@ def _patch_ontology(onto, ignore_properties=None, verbose=False):
 	Run once after an ontology init.
 
 	ignore_properties=None : TODO (skip some properties)
+	make extended properties selectively relying on SWRL rules set : TODO
 	"""
 
 	with onto:
@@ -140,7 +171,7 @@ def _patch_ontology(onto, ignore_properties=None, verbose=False):
 			temp_name = "LINK_"+name
 			if not onto[temp_name]:  # не было создано ранее
 				types.new_class(temp_name, (domain >> range_, ))  # , Property
-				if verbose: print(name, domain, ">>", range_)
+				if verbose: print(name, ":", domain, ">>", range_)
 
 			temp_name = "UNLINK_"+name
 			if not onto[temp_name]:  # не было создано ранее
@@ -164,32 +195,8 @@ def _patch_ontology(onto, ignore_properties=None, verbose=False):
 		if not onto["IRI"]:
 			class IRI(Thing >> str, FunctionalProperty): pass
 
+
 	return onto
-
-
-def make_triple(subj, prop, obj):
-	prop[subj].append(obj)
-
-
-def remove_triple(subj, prop, obj):
-	if obj in prop[subj]:
-		prop[subj].remove(obj)
-	# "not removed" workaround
-	if FunctionalProperty in prop.is_a:
-		setattr(subj, prop.python_name, None)
-
-
-def get_relation_object(subj,prop):
-	"""
-	Another way to retrieve 3rd element of stored triple.
-	Usage:
-		obj = get_relation_object(subj, prop)
-	Works when the following fails (this appears generally with FunctionalProperty'es):
-		obj = subj.prop
-		objs = prop[subj]
-	"""
-	d = dict(prop.get_relations())
-	return d.get(subj, None)
 
 
 # global / persistent
@@ -282,7 +289,7 @@ def augment_ontology(onto, apply_only=None, apply_changes=True, autoremove=True,
 
 		for p in onto.properties():
 			if p.name.startswith("LINK_"):
-				real_p = onto[ p.name.replace("LINK_", "") ]
+				real_p = onto[ p.name.replace("LINK_", "") ]  # does always exist
 				for s,o in p.get_relations():
 					apply_, remove = judge_case( (s.name, p.name, getattr(o,"name",o)) )
 					if apply_:
@@ -352,7 +359,7 @@ def sync_pellet_cycle(onto, runs_limit=15, verbose=1):
 					print("Total distinct specials used: ",len(all_specials))
 				return True,i
 				# break
-			specials_to_use = None
+			# specials_to_use = None  # uncomment to allow repeated commands to run
 
 			if verbose: print("sync_pellet_cycle: augmenting ontology ...")
 			specials_used = augment_ontology(onto, apply_only=specials_to_use, verbose=verbose)
