@@ -220,15 +220,81 @@ RULES_DICT = {
      -> CREATE(INSTANCE, ?cmd)
 """,
 
+# Подготовка к подсчёту числа связей
+"PrepareCountingSequenceActs": """
+
+    # начало и конец акта блока
+    sequence(?block), 
+    executes(?block_act_b, ?block), 
+    corresponding_end(?block_act_b, ?block_act_e), # построение актов следования завершено
+    body_item(?block, ?st),
+
+        # act_begin(?act1),
+        # # акт в пределах акта блока
+        # parent_of(?block_act_b, ?act1)
+
+    IRI(?block_act_b, ?block_act_b_iri),
+    IRI(?st, ?st_iri),
+    
+    stringConcat(?cmd, "Counter{arg=", ?block_act_b_iri, "; arg=", ?st_iri, "; COUNT_target=-1;}")
+     -> CREATE(INSTANCE, ?cmd)
+""",
+# Подсчёт числа связей
+"CountSequenceActs": """
+
+    # # начало и конец акта блока
+    # sequence(?block), 
+    # executes(?block_act_b, ?block), 
+    # corresponding_end(?block_act_b, ?block_act_e), # построение актов следования завершено
+    # body_item(?block, ?st),
+
+    # акт существует, получим счётчик
+    Counter(?counter),
+    arg(?counter, ?block_act_b),
+    arg(?counter, ?st),
+
+    executes(?act1, ?st),  # акт нужного действия
+    act_begin(?act1),
+    parent_of(?block_act_b, ?act1) # акт в пределах акта блока
+
+    # привязываем найденный акт, чтобы посчитать его
+     -> target(?counter, ?act1)
+""",
+
+# помечаем конец следования как ошибочный, если акт отсутствует
+# Надо указать на акт, следующий за пропущенным ...
+"MissingActInSequence_Mistake": """
+    Counter(?counter),
+    COUNT_target(?counter, ?n),
+    equal(?n, 0),  # lessThan(?n, 1) - может сработать на начальном -1
+    arg(?counter, ?block_act_b),
+    arg(?counter, ?st),
+
+    corresponding_end(?block_act_b, ?block_act_e), # конец следования
+    
+    IRI(?block_act_e, ?block_act_e_iri),
+    IRI(?st, ?st_iri),
+    
+    stringConcat(?cmd, "trace_error{arg=", ?block_act_e_iri, "; arg=", ?st_iri, "; message=[MissingActInSequence]; }")
+     -> CREATE(INSTANCE, ?cmd)
+""",
+
+"-Aaa_Mistake": """
+    
+""",
+
 
 }
-
 
 # strip all the comments out ...
 # ... replacing them by spaces in order to preserve char positions reported by lexing parser
 comment_re = re.compile(r"(?://|#).*$")
 
-for k in RULES_DICT:
+for k in tuple(RULES_DICT.keys()):
+    if k.startswith("-"):
+        print("skipping SWRL rule due to minus: \t", k)
+        del RULES_DICT[k]
+        continue
     txt = RULES_DICT[k]
     lines = [
                 comment_re.sub(lambda m:" "*len(m.group(0)), line)

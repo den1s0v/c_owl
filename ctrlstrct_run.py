@@ -299,14 +299,8 @@ def load_swrl_rules(onto, rules_dict):
         # объекты, спровоцировавшие ошибку
         for prop_name in ("arg", ):
             if not onto[prop_name]:
-                types.new_class(prop_name, (trace_error >> Thing,))
-
-
-        for k in rules_dict:
-            if k.startswith("-"):
-                # print("skipping SWRL rule due to minus: \t", k)
-                continue
-            
+                types.new_class(prop_name, (Thing >> Thing,))
+           
             rule = rules_dict[k]
             try:
                 Imp().set_as_rule(rule)
