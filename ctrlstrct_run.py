@@ -259,6 +259,10 @@ def init_persistent_structure(onto):
         # признак last
         class last_item(Thing, ): pass
 
+        # создаём новый class - для создания n-арной ассоциации для подсчёта числа связей
+        if not onto["Counter"]:
+        	class Counter(Thing): pass
+
         # новое свойство executes
         prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
         # новое свойство next
@@ -277,6 +281,9 @@ def init_persistent_structure(onto):
         
         # новое свойство corresponding_end
         class corresponding_end(act_begin >> act_end, FunctionalProperty, InverseFunctionalProperty): pass
+    
+        # новое свойство target - цель подсчёта числа связей
+        class target(Counter >> Thing, AsymmetricProperty): pass
     
         # новое свойство parent_of
         # class parent_of(act_begin >> act, InverseFunctionalProperty): pass
@@ -301,6 +308,7 @@ def load_swrl_rules(onto, rules_dict):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
            
+        for k in rules_dict:
             rule = rules_dict[k]
             try:
                 Imp().set_as_rule(rule)

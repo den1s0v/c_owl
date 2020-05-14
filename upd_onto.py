@@ -114,19 +114,20 @@ _special_prefixes =  [
 
 
 def make_triple(subj, prop, obj):
-	print(f"make_triple({subj}, {prop}, {obj})")
-	prop[subj].append(obj)
-	# "not asserted" workaround
 	if FunctionalProperty in prop.is_a:
+		# "not asserted" workaround
 		setattr(subj, prop.python_name, obj)
+	else:
+		prop[subj].append(obj)
 
 
 def remove_triple(subj, prop, obj):
-	if obj in prop[subj]:
-		prop[subj].remove(obj)
-	# "not removed" workaround
 	if FunctionalProperty in prop.is_a:
+		# "not removed" workaround
 		setattr(subj, prop.python_name, None)
+	else:
+		if obj in prop[subj]:
+			prop[subj].remove(obj)
 
 
 def get_relation_object(subj,prop):
@@ -177,6 +178,10 @@ def _patch_ontology(onto, ignore_properties=None, verbose=False):
 			if not onto[temp_name]:  # не было создано ранее
 				types.new_class(temp_name, (domain >> range_, ))
 
+			temp_name = "COUNT_"+name
+			if not onto[temp_name]:  # не было создано ранее
+				types.new_class(temp_name, (domain >> int , FunctionalProperty))
+
 
 		# создаём новый class
 		if not onto["DESTROY_INSTANCE"]:
@@ -194,7 +199,6 @@ def _patch_ontology(onto, ignore_properties=None, verbose=False):
 		# новое свойство (name в owlready2 для того, чтобы ссылаться на объекты строками)
 		if not onto["IRI"]:
 			class IRI(Thing >> str, FunctionalProperty): pass
-
 
 	return onto
 
@@ -271,7 +275,6 @@ def augment_ontology(onto, apply_only=None, apply_changes=True, autoremove=True,
 			return apply_changes, autoremove and apply_changes
 		else:
 			return apply_changes and report_case in apply_only, autoremove and apply_changes
-			
 		
 	
 	report = []
@@ -282,10 +285,10 @@ def augment_ontology(onto, apply_only=None, apply_changes=True, autoremove=True,
 			apply_, remove = judge_case( (onto.DESTROY_INSTANCE.name, o.name) )
 			if apply_:
 				destroy_entity(o)
-				if verbose: print("DESTROY_INSTANCE: \t", o.name)
+				if verbose: print("<DESTROY_INSTANCE> : ", o.name)
 				# информацию об указании удалить нельзя оставить, т.к. удаляется её носитель.
 
-		# создаём и разрываем указанные связи (LINK_ , UNLINK_)
+		# создаём и разрываем указанные связи (LINK_ , UNLINK_), считаем объекты (COUNT_)
 
 		for p in onto.properties():
 			if p.name.startswith("LINK_"):
@@ -305,6 +308,18 @@ def augment_ontology(onto, apply_only=None, apply_changes=True, autoremove=True,
 						remove_triple(s, real_p, o)
 					if remove:
 						remove_triple(s, p, o)
+
+			if p.name.startswith("COUNT_"):
+				real_p = onto[ p.name.replace("COUNT_", "") ]
+				for s,o in p.get_relations():
+					old_n = get_relation_object(s, real_p)
+					# подсчитаем число триплетов с s в левой части
+					new_n = [s1 for s1,o1 in real_p.get_relations()].count(s)
+					apply_, remove = judge_case( (s.name, p.name, old_n, new_n) )
+					if apply_:
+						make_triple(s, p, new_n)
+					# if remove:
+					# 	remove_triple(s, p, o)
 
 		# создаём новые объекты
 		for str_formatted in onto.INSTANCE.CREATE:
@@ -334,9 +349,8 @@ def sync_pellet_cycle(onto, runs_limit=15, verbose=1):
 	"""
 
 	with onto:
+		# Для предотвращения опосредованного закцикливания ведём полную историю спец. команд
 		all_specials = set()
-		# prev_specials = set()
-		# Для предотвращения опосредованного закцикливания следует вести полную историю спец. команд ...
 		i = 0
 		while True:
 			i+=1; 	
