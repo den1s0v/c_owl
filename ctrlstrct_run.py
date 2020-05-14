@@ -291,23 +291,30 @@ def init_persistent_structure(onto):
         # новое свойство contains_act < contains_child
         class contains_child(Thing >> Thing, ): pass
         class contains_act(act_begin >> act, contains_child): pass
-    
+        
+        # -->
+        # Создать класс ошибки
+        class trace_error(Thing): pass
+
+        if not onto["message"]:
+            message_prop = types.new_class("message", (trace_error >> str, FunctionalProperty, ))
+        # объект-агрумент, на который делается ссылка
+        for prop_name in ("arg", ):
+            if not onto[prop_name]:
+                types.new_class(prop_name, (Thing >> Thing,))
+           
+       # объекты, спровоцировавшие ошибку
+        if not onto["Erroneous"]:
+            types.new_class("Erroneous", (Thing,))
+        for prop_name in ("cause", ):
+            if not onto[prop_name]:
+                types.new_class(prop_name, (Thing >> onto["Erroneous"],))
+
 
 def load_swrl_rules(onto, rules_dict):
     
     with onto:
     
-        # -->
-        # Создать класс ошибки
-        class trace_error(Thing): pass
-        
-        if not onto["message"]:
-            message_prop = types.new_class("message", (trace_error >> str, FunctionalProperty, ))
-        # объекты, спровоцировавшие ошибку
-        for prop_name in ("arg", ):
-            if not onto[prop_name]:
-                types.new_class(prop_name, (Thing >> Thing,))
-           
         for k in rules_dict:
             rule = rules_dict[k]
             try:
@@ -321,8 +328,8 @@ def load_swrl_rules(onto, rules_dict):
         
 
 def extact_mistakes(onto, as_objects=False) -> dict:
-    properties_to_extract = ("name", onto.message, onto.arg, )
 
+    properties_to_extract = ("name", onto.message, onto.arg, onto.cause, )
     mistakes = {}
 
     for inst in onto.trace_error.instances():
@@ -330,14 +337,14 @@ def extact_mistakes(onto, as_objects=False) -> dict:
             values = []
             if isinstance(prop, str):
                 prop_name = prop
-                values.append(getattr(inst, prop))
+                values.append(getattr(inst, prop_name))
             else:
                 prop_name = prop.name
-                for o,s in prop.get_relations():
-                    if o == inst:
+                for s,o in prop.get_relations():
+                    if s == inst:
                         if not as_objects:
-                            s = s.name if hasattr(s, "name") else s
-                        values.append(s)
+                            o = o.name if hasattr(o, "name") else o
+                        values.append(o)
             d = mistakes.get(inst.name, {})
             d[prop_name] = values
             mistakes[inst.name] = d
@@ -369,7 +376,7 @@ def process_algtr(alg_json, trace_json, debug_rdf_fpath=None, verbose=1, mistake
     success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
 
     if not verbose:
-        print("Extended reasoning finished.", "Success:", str(success) + ","," Pellet run times:", n_runs)
+        print("Extended reasoning finished.", f"Success: {success}, Pellet run times: {n_runs}")
 
     if debug_rdf_fpath:
         onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
