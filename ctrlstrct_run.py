@@ -21,7 +21,225 @@ ONTOLOGY_maxID = 1
 
 def prepare_name(s):
     return slugify(s) or s
+    
+    		
+# наладим связи между элементами алгоритма
+def link_objects(onto, iri_subj : str, prop_name : str, iri_obj : str, prop_superclasses=(Thing >> Thing, )):
+	"""Make a relation between two individuals that must exist in the ontology. The property, however, is created if does not exist (the `prop_superclasses` are applied to the new property)."""
+    prop = onto[prop_name]
+    if not prop:
+    	with onto:
+	        # новое свойство по заданному имени
+	        prop = types.new_class(prop_name, (*prop_superclasses))
+    # связываем объекты свойством
+    make_triple(onto[iri_subj], prop, onto[iri_obj])
+    
 
+
+
+class TraceTester():
+	def __init__(self, trace_data):
+    """trace_data: dict like
+    {
+        "trace_name"    : str,
+        "algorithm_name": str,
+        "trace"         : list,
+        "algorithm"     : dict,
+        "header_boolean_chain" : list of bool - chain of conditions results
+    }
+    """
+		self.data = trace_data
+		
+		# индекс всех объектов АЛГОРИТМА для быстрого поиска по id
+		self.id2obj = self.data["algorithm"].get("id2obj", {})
+		self.act_iris = []
+			
+	def inject_to_ontology(self, onto):
+		
+		self.inject_algorithm_to_ontology(onto)
+		self.inject_trace_to_ontology(onto)
+		
+		
+	def inject_algorithm_to_ontology(self, onto):
+		"Prepares self.id2obj and writes algorithm to ontology if it isn't there."
+		
+		alg_objects = list(find_by_type(self.data["algorithm"]))
+		if not self.id2obj:
+			# fill it once
+			for d in alg_objects:
+			    if "id" in d:
+			        self.id2obj[ d["id"] ] = d
+	        # store to original algorithm dict
+	        self.data["algorithm"]["id2obj"] = self.id2obj
+        
+        if onto.algorithm_name and self.data["algorithm"]["algorithm_name"] in [s for _,s in onto.algorithm_name.get_relations()]:
+        	# do nothing as the algorithm is in the ontology
+        	return
+        
+        # make algorithm classes and individuals
+        for d in alg_objects:
+            if "id" in d:
+                id_     = d.get("id")
+                type_   = d.get("type")
+                name    = d.get("name", "")
+                
+                assert type_, "Error in agrorithm object: "+str(d)
+                
+                id_         = int(id_)
+                clean_name  = prepare_name(name)
+                
+                class_ = onto[type_]
+                if not class_:
+                    # make a new class in the ontology
+                    class_ = types.new_class(type_, (Thing, ))
+                    
+                # формируем имя экземпляра в онтологии
+                iri = "{}_{}".format(id_, clean_name)
+                
+                # uniqualize individual's name
+                n = 2; orig_iri = iri
+                while onto[iri]:  # пока есть объект с таким именем
+                	# модифицировать имя
+                	iri = orig_iri + ("_%d" % n); n += 1
+                	
+                # сохраняем назад в наш словарь (для привязки к актам трассы) 
+                d["iri"] = iri
+                # создаём объект
+                obj = class_(iri)
+                # привязываем id
+                make_triple(obj, onto.id, id_)
+                # (имя не привязываем.)
+                
+                # make special link identifying algorithm
+                if type_ == "algorithm":
+                	link_objects(onto, iri, "algorithm_name", self.data["algorithm"]["algorithm_name"], (Thing >> str, onto.parent_of,) )
+            # else: raise "no id!"
+                
+        for d in alg_objects:
+            if "id" in d:
+                for k in d:  # ищем объекты среди полей словаря
+                    v = d[k]
+                    if isinstance(v, dict) and "id" in v and "iri" in v:
+                        link_objects(onto, d["iri"], k, v["iri"], (Thing >> Thing, onto.parent_of,) )
+                    elif isinstance(v, (list, set)):
+                    	# make an ordered sequence for list, unorederd for set
+                        # print("check out list", k, "...")
+                        # сделаем список, если в нём нормальные "наши" объекты
+                        subobject_iri_list = [subv["iri"] for subv in v  if isinstance(subv, dict) and "id" in subv and "iri" in subv]
+                        if not subobject_iri_list:
+                            continue
+                            
+                        iri = d["iri"]
+                        
+                        # всякий список действий должен быть оформлен как sequence с полем body - списком.
+                        if k == "body" and isinstance(v, list):
+	                        # делаем объект последовательностью (нужно для тел циклов, веток, функций)
+	                        onto[iri].is_a.append( onto.sequence )
+                        # else:  # это нормально для других списков
+                        #     print("Warning: key of sequence is '%s' (consider using 'body')" % k)
+                        
+                        
+                        subelem__prop_name = k+"_item"
+                        for i, subiri in enumerate(subobject_iri_list):
+                            # главная связь
+                            link_objects(onto, iri, subelem__prop_name, subiri, (Thing >> Thing, onto.parent_of,) )
+                            if isinstance(v, list):  # for list only
+	                            # последовательность
+	                            if i >= 1:
+	                                prev_iri = subobject_iri_list[i-1]
+	                                link_objects(onto, prev_iri, "next", subiri)
+	                            # первый / последний
+	                            if i == 0:
+	                                # mark as first elem of the list
+	                                onto[subiri].is_a.append(onto.first_item)
+	                            if i == len(subobject_iri_list)-1:
+	                                # mark as last act of the list
+	                                onto[subiri].is_a.append(onto.last_item)
+
+		
+	def inject_trace_to_ontology(self, onto):
+		"Writes trace to ontology."
+		
+        # make trace acts as individuals
+
+        def make_act(iri, onto_class, alg_iri, is_last=False):
+            nonlocal trace_acts_iri_list
+            
+            # uniqualize individual's name
+            n = 2; orig_iri = iri
+            while onto[iri]:  # пока есть объект с таким именем
+            	# модифицировать имя
+            	iri = orig_iri + ("_%d" % n); n += 1
+            
+            trace_acts_iri_list.append(iri)                 
+            # создаём объект
+            obj = onto_class(iri)
+            # привязываем связанный элемент алгоритма
+            make_triple(obj, onto.executes, onto[alg_elem["iri"]])
+            
+            # формируем последовательный список
+            if len(trace_acts_iri_list) > 1:
+                # привязываем next
+                prev_iri = trace_acts_iri_list[-2]
+                make_triple(onto[prev_iri], onto.next, obj)
+            elif len(trace_acts_iri_list) == 1:
+                # mark as first act of the list
+                obj.is_a.append(onto.first_item)
+            if is_last:
+                # mark as last act of the list
+                obj.is_a.append(onto.last_item)
+            return obj
+
+        i = 0
+        trace_acts_iri_list = []
+        for d in tr:
+            i += 1
+            if "id" in d:
+                id_         = d.get("id")
+                executes    = d.get("executes")
+                # phase: (started|finished|performed)
+                phase       = d.get("phase")  # , "performed"
+                n           = d.get("n", None) or d.get("n_", None)
+                name        = d.get("name", None)  or  d.get("action", None)  # !  name <- action
+                text_line   = d.get("text_line", None)
+                
+                id_         = int(id_)
+                clean_name  = prepare_name(name)
+                phase_mark  = {"started":"b", "finished":"e", "performed":"p",}[phase]
+                n           = n and int(n)  # convert if not None (n cannot be 0)
+                number_mark = "" if not n else ("_n%d" % n)
+                
+                # find related algorithm element
+                assert executes in self.id2obj, (self.id2obj, d)
+                alg_elem = self.id2obj[executes]
+
+
+                iri_template = "{}%s_{}{}".format(text_line or id_, clean_name, number_mark)
+                
+                if phase_mark in ("b", "p"):
+                    # начало акта
+                    iri = iri_template % "b"
+                    # d["iris"] = d.get("iris", ()) + (iri, )  # save iri back to dict
+                    self.act_iris.append(iri)
+                    obj = make_act(iri, onto.act_begin, alg_elem["iri"], False)
+                    # НЕ привязываем id (т.к. может повторяться у начал и концов. TO FIX?)
+                    # привязываем нужные свойства
+                    make_triple(obj, prop_text_line, text_line)
+                
+                if phase_mark in ("e", "p"):
+                    # конец акта
+                    iri = iri_template % "e"
+                    # d["iris"] = d.get("iris", ()) + (iri, )  # save iri back to dict
+                    self.act_iris.append(iri)
+                    obj = make_act(iri, onto.act_end, alg_elem["iri"], i==len(tr))
+                    # привязываем нужные свойства
+                    make_triple(obj, onto.text_line, text_line)
+		
+		
+	def test_with_ontology_results(self, onto):
+		pass
+	
+	
 
 def make_up_ontology(alg_json_str, trace_json_str, iri=None):
     """ -> Owlready2 ontology object """
@@ -355,6 +573,56 @@ def extact_mistakes(onto, as_objects=False) -> dict:
 def process_algtr(alg_json, trace_json, debug_rdf_fpath=None, verbose=1, mistakes_as_objects=False) -> "onto, mistakes_list":
     # каркас онтологии, наполненный минимальными фактами об алгоритме и трассе
     onto = make_up_ontology(alg_json, trace_json)
+
+    # обёртка для расширенного логического вывода:
+     # при создании наполняет базовую онтологию вспомогательными сущностями
+    wr_onto = AugmentingOntology(onto)
+    
+
+    # после наложения обёртки можно добавлять SWRL-правила
+    from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
+    load_swrl_rules(onto, swrl_rules_dict)
+    
+    if debug_rdf_fpath:
+        onto.save(file=debug_rdf_fpath, format='rdfxml')
+        # print("Saved RDF file: {} !".format(ontology_file))
+        
+    if not verbose:
+        print("Extended reasoning started ...",)
+
+    # расширенное обновление онтологии и сохранение с новыми фактами
+    success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
+
+    if not verbose:
+        print("Extended reasoning finished.", f"Success: {success}, Pellet run times: {n_runs}")
+
+    if debug_rdf_fpath:
+        onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
+        # print("Saved RDF file: {} !".format(ontology_file))
+        
+    mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
+    
+    return onto, list(mistakes.values())
+
+
+def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, mistakes_as_objects=False) -> "onto, mistakes_list":
+	"""Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found."""
+    
+    global ONTOLOGY_maxID
+	
+    # создание онтологии
+    my_iri = iri or ('http://vstu.ru/poas/ctrl_structs_2020-05_v%d' % ONTOLOGY_maxID)
+    ONTOLOGY_maxID += 1
+    onto = get_ontology(my_iri)
+
+    with onto:
+	    # каркас онтологии
+        init_persistent_structure(onto)
+        
+    # наполняем онтологию с нуля сущностями с теми именами, которые найдём в загруженных json-словарях
+    for tr_data in trace_data_list:
+        tt = TraceTester(tr_data)
+        tt.inject_to_ontology(onto)
 
     # обёртка для расширенного логического вывода:
      # при создании наполняет базовую онтологию вспомогательными сущностями
