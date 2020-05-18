@@ -206,7 +206,7 @@ class TraceTextVisitor(TextVisitor):
 			for ch in states_str:
 				yield bool(int(ch))
 			while 1:
-				yield 0
+				yield False
 		self.condition_value_generator = _gen(condition_values)
 		self.last_cond_tuple = (-1, False)
 	def register_act(self, stmt_id='any'):

@@ -331,6 +331,7 @@ class TraceParser:
         self.name2id_no_whitespace = None
         
         self.trace = []
+        self.boolean_chain = []
         
         if line_list and self.alg_dict:
             self.parse(line_list, self.alg_dict, self.name2id, start_line, end_line)
@@ -483,7 +484,7 @@ class TraceParser:
                 выполнил[оа]?с[ья]
                 (?:\s+(\d+)[-_]?й?\s+раз)?   # 3 ith  (optional)
                 \s+
-                -
+                - >?    # - or ->
                 \s+
                 (\S+)   # 4 value
                 """, line, re.I | re.VERBOSE)
@@ -496,6 +497,17 @@ class TraceParser:
                 phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                
+                # convert value to true / false if matches so
+                value = {
+                    "истина":True,
+                    "true"  :True,
+                    "ложь" :False,
+                    "false":False,
+                    }.get(value.lower(), value)
+                if isinstance(value, bool):
+                    self.boolean_chain.append(value)
+                
                 result.append({
                       "id": self.newID(name),
                       # "expr": name,
@@ -732,6 +744,16 @@ def find_by_keyval_in(key, val, dict_or_list):
 
 
 def parse_text_file(txt_file_path, encoding="utf8"):
+    """Returns list of dicts like
+    {
+        "trace_name"    : str,
+        "algorithm_name": str,
+        "trace"         : list,
+        "algorithm"     : dict,
+        "header_boolean_chain" : list of bool, 
+    }
+    collected from specified file_path.
+    """
 
     try:
         with open(txt_file_path, encoding=encoding) as f:
@@ -791,14 +813,24 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         if word_in("началась программа", lines[i]):
             # найти имя трассы
             name = None
+            boolean_chain = None
             for j in range(i-1, i-5, -1):  # проверяем 4 строки вверх
                 m = alg_names_rgx.search(lines[j])
                 if m:
                     alg_name = m.group(0)
-                    # отбрасываем комментарий
+                    # отбрасываем комментарий / strip comment mark out
                     name = re.sub(r"^\s*(?:/\*|//|#)\s*", "", lines[j])
-    
+                    
+                    # найти цепочку из 0 и 1, стоящую за именем алгоритма (если есть)
+                    boolean_chain = None # слово за именем алгоритма
+                    words = name.split()
+                    alg_name_i = words.index(alg_name)
+                    if alg_name_i < len(words) - 1:
+                        boolean_chain = words[alg_name_i + 1]
+                        boolean_chain = re.sub(r"[^01]", "", boolean_chain)
+                        boolean_chain = list(map({"0":False, "1":True}.get, boolean_chain))  # convert to boolean list
                     break
+    
             if not name:
                 print("Ignored (no related algorithm found by name): line", i, lines[i])
                 continue
@@ -809,6 +841,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
                         # найдено
                         tr_data[name] = {
                             "alg_name": alg_name,
+                            "boolean_chain": boolean_chain,  # последовательность из 0 и 1 - значения условий в порядке появления в трассе
                             "lines":(i, j)  # строки текста трассы (вкл-но)
                         }
 
@@ -844,6 +877,9 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         try:
             b,e = tr_dict["lines"]
             tr_dict["trace_parser"] = TraceParser(lines, alg_data[alg_name]["alg_parser"], start_line=b)
+            
+            # store boolean chain
+            
             print("Success")
             
         except Exception as e:
@@ -857,6 +893,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         "algorithm_name": trdct["alg_name"],
         "trace"         : trdct["trace_parser"].trace,
         "algorithm"     : alg_data[trdct["alg_name"]]["alg_parser"].algorithm,
+        "header_boolean_chain" : trdct["boolean_chain"], 
         
     } for nm,trdct in tr_data.items() if "trace_parser" in trdct]
     
@@ -870,6 +907,9 @@ def parse_text_file(txt_file_path, encoding="utf8"):
             
 
 def parse_text_files(file_paths, encoding="utf8"):
+    """Returns concatenation of lists of traces collected from specified file paths.
+    """
+    
     alg_trs = []
     
     for fpath in file_paths:
