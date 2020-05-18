@@ -8,7 +8,7 @@
 import json
 import os
 
-from ctrlstrct_run import process_algtr
+from ctrlstrct_run import process_algtr, process_algtraces
 from trace_gen.txt2algntr import parse_text_files, search_text_trace_files, find_by_key_in
 from upd_onto import get_relation_object
 
@@ -257,7 +257,7 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	return True, "Validation ok."
 
 
-def run_tests():
+def run_tests(directory="test_data/"):
 	
 	files = search_text_trace_files(directory="handcrafted_traces/")
 	
@@ -268,30 +268,47 @@ def run_tests():
 	alg_trs = parse_text_files(files)
 	
 	### Отладочная заглушка !
-	# alg_trs = alg_trs[1:2]
+	alg_trs = alg_trs[:1]
 	
 	test_count = len(alg_trs)
 	
 	success_all = True
 	failed = 0
 	
-	for i, test_data in enumerate(alg_trs):
-		try:
-			assert "trace_name"     in test_data, "trace_name"
-			assert "algorithm_name" in test_data, "algorithm_name"
-			assert "trace"          in test_data, "trace"         
-			assert "algorithm"      in test_data, "algorithm"     
-		except Exception as e:
-			log_print("Fix me: field is missing:", e)
-			continue
-		
-		# log_print("Running test %2d/%d for trace: " % (i+1, test_count), test_data["trace_name"])
-		log_print("%2d/%d  " % (i+1, test_count), end="")
-		success = run_test_for_alg_trace(test_data)
-		if not success:
-			failed += 1
-			success_all = False
-		# success_all = success_all and success
+	try:
+		if True:
+			if SAVE_RDF:
+				ontology_file = "test_all" + "_output.rdf"
+				ontology_fpath = os.path.join(directory, ontology_file)
+				
+			else:
+				ontology_fpath = None
+			process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True)
+		else:
+			for i, test_data in enumerate(alg_trs):
+				try:
+					assert "trace_name"     in test_data, "trace_name"
+					assert "algorithm_name" in test_data, "algorithm_name"
+					assert "trace"          in test_data, "trace"         
+					assert "algorithm"      in test_data, "algorithm"     
+				except Exception as e:
+					log_print("Fix me: field is missing:", e)
+					continue
+				
+				# log_print("Running test %2d/%d for trace: " % (i+1, test_count), test_data["trace_name"])
+				log_print("%2d/%d  " % (i+1, test_count), end="")
+				success = run_test_for_alg_trace(test_data)
+				if not success:
+					failed += 1
+					success_all = False
+				# success_all = success_all and success
+	except Exception as e:
+		msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
+		ok = False
+		success_all = False
+		msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % "test_all") + ":\t" + msg
+		log_print(msg)
+		raise e
 			
 	log_print()
 	log_print("="*40)
