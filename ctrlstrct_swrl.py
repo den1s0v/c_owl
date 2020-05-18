@@ -29,9 +29,10 @@ RULES_DICT = {
 	# act(?b),
 	# act(?c),
 	
-"parent_of_to_contains_child": """
-	parent_of(?a, ?b) -> contains_child(?a, ?b)
- """ ,
+# ???
+# "parent_of_to_contains_child": """
+# 	parent_of(?a, ?b) -> contains_child(?a, ?b)
+#  """ ,
 
 "parent_of_to_contains_act": """
     parent_of(?a, ?b), act(?a), act(?b) -> contains_act(?a, ?b)
@@ -141,10 +142,13 @@ RULES_DICT = {
 	
 	before(?act1, ?act2), 
 	
-	before(?block_act_b, ?act1), 
-	before(?block_act_b, ?act2), 
-	before(?act1, ?block_act_e), 
-	before(?act2, ?block_act_e), 
+	# before(?block_act_b, ?act1), 
+	# before(?block_act_b, ?act2), 
+	# before(?act1, ?block_act_e), 
+	# before(?act2, ?block_act_e), 
+    parent_of(?block_act_b, ?act1), 
+    parent_of(?block_act_b, ?act2), 
+    
 
 	DifferentFrom(?act1, ?act2),
 	
@@ -192,16 +196,18 @@ RULES_DICT = {
     # начало и конец акта блока
     sequence(?block), 
     executes(?block_act_b, ?block), 
-    executes(?block_act_e, ?block), 
+    corresponding_end(?block_act_b, ?block_act_e), 
 
     act_begin(?act1),
     act_begin(?act2),
 
     # акты в пределах акта блока
-    before(?block_act_b, ?act1), 
-    before(?block_act_b, ?act2), 
-    before(?act1, ?block_act_e), 
-    before(?act2, ?block_act_e), 
+    # before(?block_act_b, ?act1), 
+    # before(?block_act_b, ?act2), 
+    # before(?act1, ?block_act_e), 
+    # before(?act2, ?block_act_e), 
+    parent_of(?block_act_b, ?act1), 
+    parent_of(?block_act_b, ?act2), 
 
     # акты выполняют пару последовательных действий
     body_item(?block, ?st1), 
@@ -292,7 +298,7 @@ comment_re = re.compile(r"(?://|#).*$")
 
 for k in tuple(RULES_DICT.keys()):
     if k.startswith("-"):
-        print("skipping SWRL rule due to minus: \t", k)
+        # print("skipping SWRL rule due to minus: \t", k)
         del RULES_DICT[k]
         continue
     txt = RULES_DICT[k]

@@ -315,8 +315,9 @@ def augment_ontology(onto, apply_only=None, apply_changes=True, autoremove=True,
 					old_n = get_relation_object(s, real_p)
 					# подсчитаем число триплетов с s в левой части
 					new_n = [s1 for s1,o1 in real_p.get_relations()].count(s)
-					apply_, remove = judge_case( (s.name, p.name, old_n, new_n) )
-					if apply_:
+					# this modification cannot cause infinite loop, so do not log it
+					# apply_, remove = judge_case( (s.name, p.name, old_n, new_n) )
+					if apply_changes:  # if apply_:
 						make_triple(s, p, new_n)
 					# if remove:
 					# 	remove_triple(s, p, o)
