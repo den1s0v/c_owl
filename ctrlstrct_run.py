@@ -15,6 +15,7 @@ import re
 
 from upd_onto import *
 from transliterate import slugify
+from trace_gen.txt2algntr import find_by_key_in, find_by_keyval_in
 
 
 ONTOLOGY_maxID = 1
@@ -40,23 +41,240 @@ def link_objects(onto, iri_subj : str, prop_name : str, iri_obj : str, prop_supe
 class TraceTester():
     def __init__(self, trace_data):
         """trace_data: dict like
-        {
+         {
             "trace_name"    : str,
             "algorithm_name": str,
             "trace"         : list,
             "algorithm"     : dict,
             "header_boolean_chain" : list of bool - chain of conditions results
-        }
+         }
         """
         self.data = trace_data
         
         # индекс всех объектов АЛГОРИТМА для быстрого поиска по id
         self.id2obj = self.data["algorithm"].get("id2obj", {})
         self.act_iris = []
+        
+        self._maxID = 1
+        
+    def newID(self, what=None):
+        self._maxID += 1
+        return self._maxID            
+        
+    def make_correct_trace(self):
+        if "correct_trace" in self.data or "header_boolean_chain" not in self.data:
+            print("make_correct_trace: aborting.")
+            return
             
+        self.data["correct_trace"] = []
+        
+        def _gen(states_str):
+            for ch in states_str:
+                yield bool(int(ch))
+            while 1:
+                yield False
+                
+        self.condition_value_generator = _gen(self.data["header_boolean_chain"])
+        self.last_cond_tuple = (-1, False)
+        self._maxID = max(self._maxID, max(self.id2obj.keys()) + 10)
+        
+        def next_cond_value(self):
+            i,_ = self.last_cond_tuple
+            v = next(self.condition_value_generator)
+            v = bool(v)
+            self.last_cond_tuple = (i+1, v)
+            return v
+            
+        
+        def make_correct_trace_for_alg_node(node):
+            # copy reference
+            result = self.data["correct_trace"]
+            
+            if node["type"] in {"func"}:
+                
+                phase = "started"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["body"]["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                
+                for body_node in node["body"]["body"]:
+                    make_correct_trace_for_alg_node(body_node)
+                
+                phase = "finished"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["body"]["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                
+            if node["type"] in {"sequence", "else"}:
+                
+                phase = "started"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                
+                for body_node in node["body"]:
+                    make_correct_trace_for_alg_node(body_node)
+                
+                phase = "finished"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                
+            if node["type"] in {"alternative"}:
+                
+                phase = "started"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                
+                for branch in node["branches"]:
+                    branch.accept(self)
+                    make_correct_trace_for_alg_node(branch)
+                    if self.last_cond_tuple[1] == True:
+                        break
+                
+                phase = "finished"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                
+            if node["type"] in {"if", "else-if"}:
+                make_correct_trace_for_alg_node(node["cond"])
+                _,cond_v = self.last_cond_tuple
+                if cond_v:
+                    phase = "started"
+                    ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                    result.append({
+                          "id": self.newID(),
+                          "name": node["name"],
+                          "executes": node["id"],
+                          "phase": phase,
+                          "n": ith,
+                          # "text_line": None,
+                          # "comment": None,
+                    })
+                    
+                    for body_node in node["body"]:
+                        make_correct_trace_for_alg_node(body_node)
+                    
+                    phase = "finished"
+                    ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                    result.append({
+                          "id": self.newID(),
+                          "name": node["name"],
+                          "executes": node["id"],
+                          "phase": phase,
+                          "n": ith,
+                          # "text_line": None,
+                          # "comment": None,
+                    })
+                
+                
+            if node["type"] in {"expr"}:
+                value = self.next_cond_value()
+                phase = "performed"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "value": value,
+                      "executes": node["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                    
+            if node["type"] in {"stmt"}:
+                phase = "performed"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                    
+        
+        alg_node = self.data["algorithm"]["entry_point"]
+        
+        name = "программа"
+        phase = "started"
+        self.data["correct_trace"].append({
+              "id": self.newID(),
+              "name": name,
+              "executes": alg_node["id"],
+              "phase": phase,
+              "n": None,
+              # "text_line": None,
+              # "comment": None,
+        })
+        make_correct_trace_for_alg_node(alg_node)
+        phase = "finished"
+        self.data["correct_trace"].append({
+              "id": self.newID(),
+              "name": name,
+              "executes": alg_node["id"],
+              "phase": phase,
+              "n": None,
+              # "text_line": None,
+              # "comment": None,
+        })
+        
+        # print(self.data["correct_trace"])
+        # exit()
+        
+
+        
     def inject_to_ontology(self, onto):
         
         self.inject_algorithm_to_ontology(onto)
+        self.make_correct_trace()
         self.inject_trace_to_ontology(onto)
         
         
