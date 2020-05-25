@@ -668,16 +668,20 @@ def plain_list(list_of_lists):
         else:
             yield x
 
-def find_by_type(dict_or_list, types=(dict,)):
+def find_by_type(dict_or_list, types=(dict,), _not_entry=None):
     "plain list of dicts or objects of specified type"
+    _not_entry = _not_entry or set()
     if isinstance(dict_or_list, types):
         yield dict_or_list
+        _not_entry.add(id(dict_or_list))
     if isinstance(dict_or_list, dict):
         for v in dict_or_list.values():
-            yield from find_by_type(v, types)
+            if id(v) not in _not_entry:
+                yield from find_by_type(v, types, _not_entry)
     elif isinstance(dict_or_list, (list, tuple, set)):
-        for d in dict_or_list:
-            yield from find_by_type(d, types)
+        for v in dict_or_list:
+            if id(v) not in _not_entry:
+                yield from find_by_type(v, types, _not_entry)
 
             
 if __name__ == '__main__':
