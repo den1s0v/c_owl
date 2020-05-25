@@ -266,17 +266,137 @@ class TraceTester():
               # "comment": None,
         })
         
+        # print(self.data["trace"])
         # print(self.data["correct_trace"])
         # exit()
         
+    def merge_acts(self, student_act, correct_act):
+        """reassign all the properties from correct act to student_act and destroy the correct_act, so the student_act becomes the correct_act"""
+        assert student_act.namespace is correct_act.namespace
+        
+        onto = correct_act.namespace
+        
+        # set base class `correct_act`
+        student_act.is_a.append(onto.correct_act)
+        
+        correct_next = onto.correct_next
+        
+        prev_correct_act = get_relation_subject(correct_next, correct_act)
+        if prev_correct_act:
+            remove_triple(prev_correct_act, correct_next, correct_act)
+            make_triple(prev_correct_act, correct_next, student_act)
+        
+        next_correct_act = get_relation_object(correct_act, correct_next)
+        if next_correct_act:
+            remove_triple(correct_act, correct_next, next_correct_act)
+            make_triple(student_act, correct_next, next_correct_act)
+            
+        destroy_entity(correct_act)
+        
+        
+    def merge_traces(self, onto, student_iris, correct_iris):
+        student_objects = [onto[iri] for iri in student_iris]
+        correct_objects = [onto[iri] for iri in correct_iris]
+        
+        # 1. merge acts that match at begin of the sequences
+        # 2. merge acts that match at end of the sequences
+        # 3. try to divide the unmatched middle with unambiguously matching acts
+        
+        first_mismatch_i = -1
+        last_mismatch_i  = -1
+        
+        for i in range(min(len(student_objects), len(correct_objects))):
+            st_o, cr_o = student_objects[i], correct_objects[i]
+            if st_o and cr_o and st_o.executes == cr_o.executes:
+                # match exist
+                self.merge_acts(st_o, cr_o)
+                student_objects[i] = None
+                correct_objects[i] = None
+            else:
+                first_mismatch_i = i
+                break
+                
+        if first_mismatch_i < 0:
+            # all matched
+            return
+        for i in range(1, min(len(student_objects), len(correct_objects))):
+            # take ith element from end
+            st_o, cr_o = student_objects[-i], correct_objects[-i]
+            
+            if st_o and cr_o and st_o.executes == cr_o.executes:
+                # match exist
+                self.merge_acts(st_o, cr_o)
+                student_objects[-i] = None
+                correct_objects[-i] = None
+            else:
+                last_mismatch_i = -i
+                break
+            
+        # 3. try to split the not matched middle by unambiguously matching acts
+        # 3.1 check if the split is not possible
+        
+        # crop remaining lists
+        last_mismatch_i += 1
+        if last_mismatch_i > -1: last_mismatch_i = None
+        student_objects = student_objects[first_mismatch_i:last_mismatch_i]
+        correct_objects = correct_objects[first_mismatch_i:last_mismatch_i]
+        
+        if not student_objects or not correct_objects:
+            # one of the sets was exhausted
+            return
+        
+        # find matching by separate 'executed' ids
+        student_alg_ids = [act.executes.id if act else None for act in student_objects]
+        correct_alg_ids = [act.executes.id if act else None for act in correct_objects]
+        
+        shared_ids = set(student_alg_ids) & set(correct_alg_ids) - {None}
+                
+        if not shared_ids:
+            # nothing shared remaining: all different
+            return
+            
+        # 3.2 check if we can merge consequent executions of some statement
+        merge_indices = []
+        
+        for shared_id in shared_ids:
+            if student_alg_ids.count(shared_id) == correct_alg_ids.count(shared_id):
+                # consider the matching acts equal
+                student_indices = [i for i, x in enumerate(student_alg_ids) if x == shared_id]
+                correct_indices = [i for i, x in enumerate(correct_alg_ids) if x == shared_id]
+                
+                # and merge them
+                for st_i, cr_i in zip(student_indices, correct_indices):
+                    self.merge_acts(student_objects[st_i], correct_objects[cr_i])
+                    student_objects[st_i] = None
+                    correct_objects[cr_i] = None
+                    merge_indices.append( (st_i, cr_i) )
 
+        # 3.3 split resulting lists by the merge_indices and try apply the same transformations
+        prev_indices = (0, 0)
+        for indices in merge_indices:
+            (st_p, cr_p), (st_i, cr_i), prev_indices = prev_indices, indices, indices
+            self.merge_traces(
+                onto,
+                student_objects[st_p:st_i],
+                correct_objects[cr_p:cr_i],
+                )
+        
+
+                
+        # print(student_alg_ids)
+        # print(correct_alg_ids)
+        
+        # pass
+        # exit()
         
     def inject_to_ontology(self, onto):
         
         self.inject_algorithm_to_ontology(onto)
         
+        self.make_correct_trace()
         self.inject_trace_to_ontology(onto, self.data["trace"], ("student_act",), "next")
         self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
+        self.merge_traces(onto, self.data["student_act_iri_list"], self.data["correct_act_iri_list"])
         
     def inject_algorithm_to_ontology(self, onto):
         "Prepares self.id2obj and writes algorithm to ontology if it isn't there."
