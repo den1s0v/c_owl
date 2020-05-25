@@ -78,7 +78,7 @@ class TraceTester():
         self.last_cond_tuple = (-1, False)
         self._maxID = max(self._maxID, max(self.id2obj.keys()) + 10)
         
-        def next_cond_value(self):
+        def next_cond_value():
             i,_ = self.last_cond_tuple
             v = next(self.condition_value_generator)
             v = bool(v)
@@ -163,7 +163,6 @@ class TraceTester():
                 })
                 
                 for branch in node["branches"]:
-                    branch.accept(self)
                     make_correct_trace_for_alg_node(branch)
                     if self.last_cond_tuple[1] == True:
                         break
@@ -213,7 +212,7 @@ class TraceTester():
                 
                 
             if node["type"] in {"expr"}:
-                value = self.next_cond_value()
+                value = next_cond_value()
                 phase = "performed"
                 ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
                 result.append({
