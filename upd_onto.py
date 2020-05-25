@@ -142,6 +142,16 @@ def get_relation_object(subj,prop):
 	d = dict(prop.get_relations())
 	return d.get(subj, None)
 
+def get_relation_subject(prop, obj):
+	"""
+	Another way to retrieve 1st element of stored triple.
+	Usage:
+		obj = get_relation_object(subj, prop)
+	(This may be good for InverseFunctionalProperty'es)
+	"""
+	d = dict((b,a) for a,b in prop.get_relations())
+	return d.get(obj, None)
+
 
 
 def _patch_ontology(onto, ignore_properties=None, verbose=False):
