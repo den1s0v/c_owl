@@ -381,8 +381,6 @@ class TraceParser:
         
     def parse_trace_by_alg(self, line_list: "list(str)", start_line=0, end_line=None) -> list:
         """Формирует плоский список объектов трассы в формате trace.json для ctrlstrct_run.py
-            Функции автоматически добавляются в self.algorithm["functions"].
-            Глобальный код возввращается списком statement'ов верхнего уровня.
         """
         
         # parse_trace = self.parse_trace_by_alg  # синоним для простоты написания
@@ -412,8 +410,9 @@ class TraceParser:
                 name = "программа"
                 phase = "started"  if m.group(1) == "началась" else  "finished"
                 # alg_obj_id = self.get_alg_node_id(("algorithm","алгоритм"))
+                # assert alg_obj_id, "TraceError: no corresporning '{}' found for '{}'".format("algorithm' or 'алгоритм", name)
                 alg_obj_id = self.alg_dict["entry_point"]["id"]
-                assert alg_obj_id, "TraceError: no corresporning '{}' found for '{}'".format("algorithm' or 'алгоритм", name)
+                assert alg_obj_id, f"TraceError: no entry_point found for '{name}'."
                 result.append({
                       "id": self.newID(name),
                       # "action": name,
