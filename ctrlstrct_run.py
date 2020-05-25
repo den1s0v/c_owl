@@ -274,9 +274,9 @@ class TraceTester():
     def inject_to_ontology(self, onto):
         
         self.inject_algorithm_to_ontology(onto)
-        self.make_correct_trace()
-        self.inject_trace_to_ontology(onto)
         
+        self.inject_trace_to_ontology(onto, self.data["trace"], ("student_act",), "next")
+        self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
         
     def inject_algorithm_to_ontology(self, onto):
         "Prepares self.id2obj and writes algorithm to ontology if it isn't there."
@@ -380,13 +380,16 @@ class TraceTester():
                                         onto[subiri].is_a.append(onto.last_item)
 
         
-    def inject_trace_to_ontology(self, onto):
-        "Writes trace to ontology."
+    def inject_trace_to_ontology(self, onto, trace, act_classnames=("act",), next_propertyname=None):
+        "Writes specified trace to ontology."
+        
+        additional_classes = [onto[nm] for nm in act_classnames]
+        assert all(additional_classes), (additional_classes, act_classnames)
         
         # make trace acts as individuals
 
-        def make_act(iri, onto_class, alg_iri, is_last=False):
-            nonlocal trace_acts_iri_list
+        def make_act(iri, onto_class, alg_iri, prop_class=onto.next, is_last=False):
+            # nonlocal trace_acts_iri_list
             
             # uniqualize individual's name
             n = 2; orig_iri = iri
@@ -401,10 +404,10 @@ class TraceTester():
             make_triple(obj, onto.executes, onto[alg_elem["iri"]])
             
             # формируем последовательный список
-            if len(trace_acts_iri_list) > 1:
-                # привязываем next
+            if prop_class and len(trace_acts_iri_list) > 1:
+                # привязываем next, если указано
                 prev_iri = trace_acts_iri_list[-2]
-                make_triple(onto[prev_iri], onto.next, obj)
+                make_triple(onto[prev_iri], prop_class, obj)
             elif len(trace_acts_iri_list) == 1:
                 # mark as first act of the list
                 obj.is_a.append(onto.first_item)
@@ -416,7 +419,7 @@ class TraceTester():
         with onto:
             i = 0
             trace_acts_iri_list = []
-            for d in self.data["trace"]:
+            for d in trace:
                 i += 1
                 if "id" in d:
                     id_         = d.get("id")
@@ -445,7 +448,11 @@ class TraceTester():
                         iri = iri_template % "b"
                         # d["iris"] = d.get("iris", ()) + (iri, )  # save iri back to dict
                         self.act_iris.append(iri)
-                        obj = make_act(iri, onto.act_begin, alg_elem["iri"], False)
+                        obj = make_act(iri, onto.act_begin, alg_elem["iri"], 
+                            prop_class=onto[next_propertyname], 
+                            is_last=False)
+                        for class_ in additional_classes:
+                            obj.is_a.append(class_)
                         # НЕ привязываем id (т.к. может повторяться у начал и концов. TO FIX?)
                         # привязываем нужные свойства
                         make_triple(obj, onto.text_line, text_line)
@@ -455,9 +462,16 @@ class TraceTester():
                         iri = iri_template % "e"
                         # d["iris"] = d.get("iris", ()) + (iri, )  # save iri back to dict
                         self.act_iris.append(iri)
-                        obj = make_act(iri, onto.act_end, alg_elem["iri"], i==len(self.data["trace"]))
+                        obj = make_act(iri, onto.act_end, alg_elem["iri"], 
+                            prop_class=onto[next_propertyname], 
+                            is_last=(i==len(self.data["trace"])))
+                        for class_ in additional_classes:
+                            obj.is_a.append(class_)
                         # привязываем нужные свойства
                         make_triple(obj, onto.text_line, text_line)
+                        
+            iri_list_key = act_classnames[0] + "_iri_list"
+            self.data[iri_list_key] = trace_acts_iri_list
         
         
     def test_with_ontology_results(self, onto):
@@ -681,6 +695,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
 def init_persistent_structure(onto):
         # types.new_class(temp_name, (domain >> range_, ))  # , Property
         
+    with onto:    
         # Статические определения
         
         # новое свойство id
@@ -692,6 +707,10 @@ def init_persistent_structure(onto):
         class act_begin(act): pass
         # -->
         class act_end(act): pass
+        # -->
+        class student_act(act): pass
+        # -->
+        class correct_act(act): pass
         
         # ->
         class sequence(Thing): pass
@@ -709,6 +728,8 @@ def init_persistent_structure(onto):
         prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
         # новое свойство next
         prop_next = types.new_class("next", (Thing >> Thing, FunctionalProperty, ))
+        # новое свойство correct_next
+        correct_next = types.new_class("correct_next", (Thing >> Thing, FunctionalProperty, ))
         # новое свойство before
         prop_before = types.new_class("before", (Thing >> Thing, ))
         
