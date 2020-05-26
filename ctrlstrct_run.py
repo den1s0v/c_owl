@@ -85,7 +85,7 @@ class TraceTester():
             self.last_cond_tuple = (i+1, v)
             return v
             
-        
+        # long "multi-entry" function
         def make_correct_trace_for_alg_node(node):
             # copy reference
             result = self.data["correct_trace"]
@@ -121,32 +121,36 @@ class TraceTester():
                 
             if node["type"] in {"sequence", "else"}:
                 
-                phase = "started"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
-                result.append({
-                      "id": self.newID(),
-                      "name": node["name"],
-                      "executes": node["id"],
-                      "phase": phase,
-                      "n": ith,
-                      # "text_line": None,
-                      # "comment": None,
-                })
+                # do not wrap 'global_code'
+                if node["name"] != 'global_code':
+                    phase = "started"
+                    ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                    result.append({
+                          "id": self.newID(),
+                          "name": node["name"],
+                          "executes": node["id"],
+                          "phase": phase,
+                          "n": ith,
+                          # "text_line": None,
+                          # "comment": None,
+                    })
                 
                 for body_node in node["body"]:
                     make_correct_trace_for_alg_node(body_node)
                 
-                phase = "finished"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
-                result.append({
-                      "id": self.newID(),
-                      "name": node["name"],
-                      "executes": node["id"],
-                      "phase": phase,
-                      "n": ith,
-                      # "text_line": None,
-                      # "comment": None,
-                })
+                # do not wrap 'global_code'
+                if node["name"] != 'global_code':
+                    phase = "finished"
+                    ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                    result.append({
+                          "id": self.newID(),
+                          "name": node["name"],
+                          "executes": node["id"],
+                          "phase": phase,
+                          "n": ith,
+                          # "text_line": None,
+                          # "comment": None,
+                    })
                 
             if node["type"] in {"alternative"}:
                 
@@ -266,6 +270,7 @@ class TraceTester():
         })
         
         # print(self.data["trace"])
+        # print()
         # print(self.data["correct_trace"])
         # exit()
         
@@ -600,6 +605,8 @@ class TraceTester():
 
 def make_up_ontology(alg_json_str, trace_json_str, iri=None):
     """ -> Owlready2 ontology object """
+    
+    raise "function make_up_ontology() deprecated!"
     
     global ONTOLOGY_maxID
 
@@ -1043,6 +1050,10 @@ def find_by_type(dict_or_list, types=(dict,), _not_entry=None):
 
             
 if __name__ == '__main__':
+    
+    print("Please run *_test.py script instead!")
+    exit()
+    
     # -a
     alg_filepath = r"c:\D\Нинь\учёба\10s\Quiz\Дистракторы\tr-gen\alg_out_2.json"
     # -t
