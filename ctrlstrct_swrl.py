@@ -22,9 +22,16 @@ RULES_DICT = {
     // Another one.
  """ ,
 
+"correct_hasNextAct_to_correct_beforeAct": """
+    correct_next(?a, ?b) -> correct_before(?a, ?b)
+ """ ,
+
 "BeforeActTransitive": """
 	before(?a, ?b), before(?b, ?c) -> before(?a, ?c)
 	""",
+"correct_BeforeActTransitive": """
+    correct_before(?a, ?b), correct_before(?b, ?c) -> correct_before(?a, ?c)
+    """,
 	# act(?a),
 	# act(?b),
 	# act(?c),

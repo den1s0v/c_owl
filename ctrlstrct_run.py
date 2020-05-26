@@ -580,6 +580,8 @@ class TraceTester():
                         # НЕ привязываем id (т.к. может повторяться у начал и концов. TO FIX?)
                         # привязываем нужные свойства
                         make_triple(obj, onto.text_line, text_line)
+                        if "value" in d:
+                            make_triple(obj, onto.expr_value, d["value"])
                     
                     if phase_mark in ("e", "p"):
                         # конец акта
@@ -660,6 +662,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
         prop_executes = onto["executes"]
         prop_next = onto["next"]
         prop_text_line = onto["text_line"]
+        prop_value = onto["value"]
         # prop_executes = onto["executes"]
 
         
@@ -807,6 +810,9 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
                     # make_triple(obj, id_prop, id_)
                     # привязываем нужные свойства
                     make_triple(obj, prop_text_line, text_line)
+                    if "value" in d:
+                        make_triple(obj, prop_value, d["value"])
+                        
                 
                 if phase_mark in ("e", "p"):
                     # конец акта
@@ -852,15 +858,21 @@ def init_persistent_structure(onto):
 
         # новое свойство executes
         prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
+        # новое свойство expr_value
+        prop_expr_value = types.new_class("expr_value", (DataProperty, FunctionalProperty, ))
         # новое свойство next
         prop_next = types.new_class("next", (Thing >> Thing, FunctionalProperty, ))
         # новое свойство correct_next
         correct_next = types.new_class("correct_next", (Thing >> Thing, FunctionalProperty, ))
         # новое свойство before
         prop_before = types.new_class("before", (Thing >> Thing, ))
+        # новое свойство correct_before
+        prop_correct_before = types.new_class("correct_before", (Thing >> Thing, ))
         
         # новое свойство depth
         prop_depth = types.new_class("depth", (Thing >> int, FunctionalProperty, ))
+        # новое свойство correct_depth
+        prop_correct_depth = types.new_class("correct_depth", (Thing >> int, FunctionalProperty, ))
         # новое свойство text_line
         prop_text_line = types.new_class("text_line", (Thing >> int, FunctionalProperty, ))
         # # новое свойство same_level
