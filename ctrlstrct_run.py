@@ -375,6 +375,13 @@ class TraceTester():
                     correct_objects[cr_i] = None
                     merge_indices.append( (st_i, cr_i) )
 
+        # sort merge_indices and drop pairs breaking strict order
+        merge_indices.sort()
+        correct_indices = [i for _, i in merge_indices]
+        indices_to_drop = what_to_drop_to_reach_ordering(correct_indices)
+        for i in sorted(correct_indices, reverse=True):
+            del merge_indices[i]
+
         # 3.3 split resulting lists by the merge_indices and try apply the same transformations
         prev_indices = (0, 0)
         for indices in merge_indices:
@@ -1059,6 +1066,27 @@ def find_by_type(dict_or_list, types=(dict,), _not_entry=None):
         for v in dict_or_list:
             if id(v) not in _not_entry:
                 yield from find_by_type(v, types, _not_entry)
+
+
+def what_to_drop_to_reach_ordering(arr: list) -> list:
+    conflicting_pairs = []
+    for i in range(len(arr)):
+        for j in range(i + 1, len(arr)):
+            if arr[i] > arr[j]:
+                conflicting_pairs.append( (i, j) )
+    
+    indices_to_drop = []
+    
+    while conflicting_pairs:
+        conflicting_flat = [x for t in conflicting_pairs for x in t]
+        indices_rated = sorted(set(conflicting_flat), key=lambda i: -conflicting_flat.count(i))
+        top_index = indices_rated[0]
+        indices_to_drop.append(top_index)
+        for t in conflicting_pairs[:]:
+            if top_index in t:
+                conflicting_pairs.remove(t)
+        
+    return indices_to_drop
 
             
 if __name__ == '__main__':
