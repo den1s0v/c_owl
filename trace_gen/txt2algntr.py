@@ -354,7 +354,21 @@ class TraceParser:
                     self.name2id_no_whitespace = { n.replace(' ',''):v for n,v in self.name2id.items() }
                 # поищем без пробелов
                 r = self.name2id_no_whitespace.get(name, None)
-                
+    
+        if r is not None:            
+            # check if the node is expr
+            criterion = lambda d: (type(d) is dict and "id" in d and d["id"] == r and d["type"] == "expr")
+            expr = list(find_by_predicate(self.alg_dict, criterion, find_one=True))
+            if expr:
+                expr = expr[0]
+                # find the (expr as "cond")`s parent statement and return it
+                criterion = lambda d: (type(d) is dict and "cond" in d and d["cond"] == expr)
+                p = list(find_by_predicate(self.alg_dict, criterion, find_one=True))
+                if p:
+                    # print(name, p)
+                    r = p[0]["id"]
+                else:
+                    print(f"cannot find parent statement for '{name}'!")
         return r
             
     def newID(self, what=None, owerwrite=False):
@@ -902,6 +916,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
             print("Error !")
             print("Error parsing trace:", tr_name, ":")
             print(" ", e)
+            # raise e
             
             
     valid_alg_trs = [{
