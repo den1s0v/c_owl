@@ -66,13 +66,13 @@ RULES_DICT = {
 	 -> depth(?b, ?db), parent_of(?a, ?b)
 	""",
 
-"DepthSame_be": """
+"DepthSame_b-e": """
 	act_begin(?a), next(?a, ?b), act_end(?b), 
 	depth(?a, ?da), parent_of(?p, ?a)
 	 -> depth(?b, ?da), parent_of(?p, ?b), corresponding_end(?a, ?b)
 	""",
  # + добавить проверку на Начало А - Конец Б (должен был быть Конец А) - CorrespondingActsMismatch_Error
-"DepthSame_eb": """
+"DepthSame_e-b": """
 	act_end(?a), next(?a, ?b), act_begin(?b), 
 	depth(?a, ?da), parent_of(?p, ?a)
 	 -> depth(?b, ?da), parent_of(?p, ?b)
@@ -107,7 +107,7 @@ RULES_DICT = {
 	IRI(?a, ?a_iri),
 	IRI(?b, ?b_iri),
 	
-	stringConcat(?cmd, "trace_error{arg=", ?a_iri, "; arg=", ?b_iri, "; message=[Corresponding Acts Mismatch Error (broken trace flow)]; }")
+	stringConcat(?cmd, "trace_error{arg=", ?a_iri, "; cause=", ?b_iri, "; message=[CorrespondingActsMismatchError (broken trace flow)]; }")
 	 -> CREATE(INSTANCE, ?cmd)
 """,
 
@@ -161,7 +161,7 @@ RULES_DICT = {
 	
 	IRI(?act2, ?act2_iri),
 	
-	stringConcat(?cmd, "trace_error{arg=", ?act2_iri, "; message=[Duplicate Acts Of Stmt Error]; }")
+	stringConcat(?cmd, "trace_error{cause=", ?act2_iri, "; message=[DuplicateActs Of Stmt Error]; }")
 	 -> CREATE(INSTANCE, ?cmd)
 """,
 
@@ -179,13 +179,13 @@ RULES_DICT = {
     DifferentFrom(?shouldbe_st2, ?st2),
     
     IRI(?act1, ?act1_iri),
+    IRI(?act2, ?act2_iri),
+    IRI(?st, ?st_iri),
     IRI(?st2, ?st2_iri),
     IRI(?shouldbe_st2, ?shouldbe_st2_iri),
     
-    stringConcat(?cmd, "trace_error{trace_error{arg=", ?act1_iri, "; trace_error{arg=", ?st2_iri, "; trace_error{arg=", ?shouldbe_st2_iri, "; message=[Act placed within inproper enclosing act]; }")
+    stringConcat(?cmd, "trace_error{cause=", ?act1_iri, "; arg=", ?act2_iri, "; arg=", ?st2_iri, "; arg=", ?st_iri, "; arg=", ?shouldbe_st2_iri, "; message=[WrongContext: Act placed within inproper enclosing act]; }")
      -> CREATE(INSTANCE, ?cmd)
-    
-    
 """,
 
 # Акт находится в пределах родительского акта, но не непосредственно под ним
@@ -229,7 +229,7 @@ RULES_DICT = {
     IRI(?act2, ?act2_iri),
     IRI(?act1, ?act1_iri),
     
-    stringConcat(?cmd, "trace_error{arg=", ?act2_iri, "; arg=", ?act1_iri, "; message=[Act occurs before its precedent]; }")
+    stringConcat(?cmd, "trace_error{cause=", ?act2_iri, "; arg=", ?act1_iri, "; message=[TooEarly: Act should not occure before the act preceding it]; }")
      -> CREATE(INSTANCE, ?cmd)
 """,
 
@@ -278,17 +278,18 @@ RULES_DICT = {
 # Надо указать на акт, следующий за пропущенным ...
 "MissingActInSequence_Mistake": """
     Counter(?counter),
-    COUNT_target(?counter, ?n),
-    equal(?n, 0),  # lessThan(?n, 1) - может сработать на начальном -1
+    COUNT_target(?counter, 0),
     arg(?counter, ?block_act_b),
+    act_begin(?block_act_b),
     arg(?counter, ?st),
+    stmt(?st),
 
     corresponding_end(?block_act_b, ?block_act_e), # конец следования
     
     IRI(?block_act_e, ?block_act_e_iri),
     IRI(?st, ?st_iri),
     
-    stringConcat(?cmd, "trace_error{arg=", ?block_act_e_iri, "; arg=", ?st_iri, "; message=[MissingActInSequence]; }")
+    stringConcat(?cmd, "trace_error{cause=", ?block_act_e_iri, "; arg=", ?st_iri, "; message=[MissingActInSequence]; }")
      -> CREATE(INSTANCE, ?cmd)
 """,
 

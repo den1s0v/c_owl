@@ -900,7 +900,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
                 print(" ", e)            
         
         if "alg_parser" not in alg_data[alg_name]:
-            print("Skipping trace:", tr_name, ", because no corresporning algorithm parsed:", alg_name)
+            print("Skipping trace:", tr_name, ", because no corresponding algorithm parsed:", alg_name)
             continue
             
         print("Parsing trace:", tr_name, "...", end='\t')
