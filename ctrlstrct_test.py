@@ -272,6 +272,10 @@ def run_tests(directory="test_data/"):
 	
 	test_count = len(alg_trs)
 	
+	if test_count == 0:
+		print("Nothing to test: no valid traces found.")
+		return True
+	
 	success_all = True
 	failed = 0
 	
