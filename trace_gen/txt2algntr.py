@@ -717,6 +717,23 @@ def extract_alg_name(line) -> str:
 
 # extract_alg_name("line 15 // алгоритм 07_while (while в стиле foreach, с 2 действиями)")
 
+def find_by_predicate(dict_or_list, pred=lambda x:(type(x) is dict), find_one=False, _not_entry=None):
+    "plain list of dicts or objects of specified type"
+    _not_entry = _not_entry or set()
+    _not_entry.add(id(dict_or_list))
+    if pred(dict_or_list):
+        yield dict_or_list
+        if find_one:
+            return
+    if isinstance(dict_or_list, dict):
+        for v in dict_or_list.values():
+            if id(v) not in _not_entry:
+                yield from find_by_predicate(v, pred, _not_entry)
+    elif isinstance(dict_or_list, (list, tuple, set)):
+        for v in dict_or_list:
+            if id(v) not in _not_entry:
+                yield from find_by_predicate(v, pred, _not_entry)
+
 def find_by_key_in(key, dict_or_list):
     if isinstance(dict_or_list, dict):
         for k, v in dict_or_list.items():
