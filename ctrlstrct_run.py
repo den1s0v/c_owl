@@ -379,7 +379,7 @@ class TraceTester():
         merge_indices.sort()
         correct_indices = [i for _, i in merge_indices]
         indices_to_drop = what_to_drop_to_reach_ordering(correct_indices)
-        for i in sorted(correct_indices, reverse=True):
+        for i in sorted(indices_to_drop, reverse=True):
             del merge_indices[i]
 
         # 3.3 split resulting lists by the merge_indices and try apply the same transformations
