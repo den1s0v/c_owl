@@ -109,7 +109,7 @@ augment_ontology(onto1)
 _special_prefixes =  [
 	"LINK_", "UNLINK_",  # prefixes for properties replicated existiong properties
 	"CREATE", "IRI", # "CountableProperty",  # full names of properties
-	"COUNT_",  # prefix for name of property that holds the count of links
+	"COUNT_", "N_"  # prefix for name of property that holds the count of links
 ]
 
 
@@ -164,33 +164,38 @@ def _patch_ontology(onto, ignore_properties=None, verbose=False):
 
 	with onto:
 		# создаём новые property
-		for p in onto.properties():
-			name = p.name
-			if any(name.startswith(px) for px in _special_prefixes):
-				continue
+		for pass_i in range(1):   # ensure to create "COUNT_" first
+			for p in onto.properties():
+				name = p.name
+				if any(name.startswith(px) for px in _special_prefixes):
+					print("skipped", name)
+					continue
 
-			# domain = p.domain[0]  if isinstance(p.domain, list) else p.domain
-			# range_ = p.range[0]  if isinstance(p.range, list) else p.range
-			domain = p.domain
-			range_ = p.range
-			if isinstance(domain, list):
-				domain = domain[0]  if len(domain)>0 else Thing
-			if isinstance(range_, list):
-				range_ = range_[0]  if len(range_)>0 else (str  if DataProperty in p.is_a else  Thing)
+				# domain = p.domain[0]  if isinstance(p.domain, list) else p.domain
+				# range_ = p.range[0]  if isinstance(p.range, list) else p.range
+				domain = p.domain
+				range_ = p.range
+				if isinstance(domain, list):
+					domain = domain[0]  if len(domain)>0 else Thing
+				if isinstance(range_, list):
+					range_ = range_[0]  if len(range_)>0 else (str  if DataProperty in p.is_a else  Thing)
 
 
-			temp_name = "LINK_"+name
-			if not onto[temp_name]:  # не было создано ранее
-				types.new_class(temp_name, (domain >> range_, ))  # , Property
-				if verbose: print(name, ":", domain, ">>", range_)
+				temp_name = "LINK_"+name
+				if pass_i == 0 and not onto[temp_name]:  # не было создано ранее
+					types.new_class(temp_name, (domain >> range_, ))  # , Property
+					if verbose: print(name, ":", domain, ">>", range_)
 
-			temp_name = "UNLINK_"+name
-			if not onto[temp_name]:  # не было создано ранее
-				types.new_class(temp_name, (domain >> range_, ))
+				temp_name = "UNLINK_"+name
+				if pass_i == 0 and not onto[temp_name]:  # не было создано ранее
+					types.new_class(temp_name, (domain >> range_, ))
 
-			temp_name = "COUNT_"+name
-			if not onto[temp_name]:  # не было создано ранее
-				types.new_class(temp_name, (domain >> int , FunctionalProperty))
+				temp_name = "COUNT_"+name
+				if pass_i == 0 and not onto[temp_name]:  # не было создано ранее
+					types.new_class(temp_name, (domain >> bool , FunctionalProperty))
+				temp_name = "N_"+name
+				if pass_i == 0 and not onto[temp_name]:  # не было создано ранее
+					types.new_class(temp_name, (domain >> int , FunctionalProperty))
 
 
 		# создаём новый class
@@ -321,14 +326,18 @@ def augment_ontology(onto, apply_only=None, apply_changes=True, autoremove=True,
 
 			if p.name.startswith("COUNT_"):
 				real_p = onto[ p.name.replace("COUNT_", "") ]
+				n_p = onto[ p.name.replace("COUNT_", "N_") ]
 				for s,o in p.get_relations():
 					old_n = get_relation_object(s, real_p)
 					# подсчитаем число триплетов с s в левой части
 					new_n = [s1 for s1,o1 in real_p.get_relations()].count(s)
 					# this modification cannot cause infinite loop, so do not log it
-					# apply_, remove = judge_case( (s.name, p.name, old_n, new_n) )
+					judge_case( (s.name, p.name, old_n, new_n) )  # just report activity
 					if apply_changes:  # if apply_:
-						make_triple(s, p, new_n)
+						if o:  # true -> do count
+							make_triple(s, n_p, float(new_n))
+						else:  # false -> remove the special property
+							remove_triple(s, n_p, old_n)
 					# if remove:
 					# 	remove_triple(s, p, o)
 
