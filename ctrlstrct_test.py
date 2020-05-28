@@ -218,7 +218,7 @@ def run_test_for_alg_trace(test_data: dict, directory=TEST_DIR):
 def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	"Находит расхождения в определении ошибочных строк трассы"
 	
-	print(f"mistakes: {mistakes}")
+	# print(f"mistakes: {mistakes}")
 	
 	# extract erroneous acts provided by trace
 	def error_description(comment_str) -> list:
