@@ -7,6 +7,7 @@
 
 import json
 import os
+import re
 
 from ctrlstrct_run import process_algtr, process_algtraces
 from trace_gen.txt2algntr import parse_text_files, search_text_trace_files, find_by_key_in
@@ -36,6 +37,8 @@ def log_print(*args, sep=" ", end="\n"):
 # 	pass
 
 def run_tests_in_directory(directory) -> bool:
+	
+	raise "Deprecated"
 	
 	tests_fpath = os.path.join(directory, TESTS_FNM)
 	assert os.path.exists(tests_fpath), tests_fpath
@@ -174,6 +177,8 @@ def resolve_path(fname, directory='.'):
 
 def run_test_for_alg_trace(test_data: dict, directory=TEST_DIR):
 	
+	raise "Deprecated"
+	
 	alg = test_data["algorithm"]
 	tr  = test_data["trace"]
 	test_name  = test_data["trace_name"]
@@ -215,42 +220,85 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	
 	print(f"mistakes: {mistakes}")
 	
-	def is_error_act(d:dict):
-		comment = d["comment"]
-		return ("error" in comment or "ошибка" in comment)
+	# extract erroneous acts provided by trace
+	def error_description(comment_str) -> list:
+		if "error" in comment_str or "ошибка" in comment_str:
+			# ex. "error: AllFalseNoElse (Нет ветки ИНАЧЕ)"
+			m = re.search(r"(?:ошибка|error)\s*:?\s*([^()]*)\s*(?:\(.+\).*)?$", comment_str, re.I)
+			if m:
+				err_names = m.group(1).strip()
+				return re.split(r"\s,?\s+", err_names)
+		return None
 	
-	error_flags = {d["text_line"]:is_error_act(d) for d in trace}
-	arg_objs = []
+	text_lines = [d["text_line"] for d in trace]
+	error_descrs = {d["text_line"]: error_description(d["comment"]) for d in trace}
 	
-	for prop_name in ("arg", ):  # добавить поля, если они появятся в спецификации ошибки
-		arg_dicts = (find_by_key_in(prop_name, mistakes))  # список словарей с ключами 'arg', по которым хранятся списки объектов онтологии
-		for dct in arg_dicts:
-			arg_objs += dct[prop_name]
-			
-	if arg_objs:
-		onto = arg_objs[0].namespace
-		prop_text_line = onto["text_line"]
+	# extract erroneous acts and messages from error instances (inferred)
+	err_objs = []
+	err_obj_id2msgs = {}
 	
-	inferred_error_lines = []
-	for arg_obj in arg_objs:
-		text_line = get_relation_object(arg_obj, prop_text_line)
-		inferred_error_lines.append(text_line)
+	# retrieve property object(s)
+	prop_text_line = onto["text_line"]
+	# prop_message = onto["message"]
+
+	for prop_name in ("cause", ):  # добавить поля, если они появятся в спецификации ошибки
+		tr_obj_dicts = list(find_by_key_in(prop_name, mistakes))  # список ошибок с ключами 'cause', по которым хранятся списки объектов онтологии
 		
-	# проверка
+		for dct in tr_obj_dicts:
+			for err_obj in dct[prop_name]:
+				if (err_obj.text_line) in text_lines:  # ignore unrelated errors (possibly related to another trace)
+					err_objs.append(err_obj)
+					err_obj_id2msgs[id(err_obj)] = dct["message"]
+			
+	
+	# get text lines of the inferred erroneous acts
+	inferred_error_lines = [
+		get_relation_object(err_obj, prop_text_line)
+		for err_obj in err_objs
+	]
+		
+	# do check
 	differences = []
-	first_err_line = None  # из размеченных комментариями в трассе
-	for i,is_err in error_flags.items():
-		if is_err:
-			if first_err_line is None:
-				first_err_line = i
-			if i not in inferred_error_lines:
-				m = f"Erroneous line {i} hasn't been recognized by the ontology."
-				differences.append(m)
-			# break ?
-		elif i in inferred_error_lines and first_err_line is None:  # вслед за первой ошибочной может быть всё что угодно
-			m = f"Correct line {i} has been recognized by the ontology as erroneous."
+	
+	def _compare_mistakes(expected: list, inferred: list, line_i) -> str or None:
+		if not expected and not inferred:
+			return None
+		
+		if expected and not inferred:
+			return f"Erroneous line {line_i} hasn't been recognized by the ontology. Expected mistakes: {', '.join(expected)}"
+			
+		if not expected and inferred:
+			return f"Correct line {line_i} has been recognized by the ontology as erroneous. Inferred mistakes: {', '.join(inferred)}"
+			
+		(not_recognised, extra) = ([], inferred[:])
+		for err_word in expected:
+			for inferred_descr in extra[:]:
+				if err_word and err_word.lower() in inferred_descr.lower():
+					extra.remove(inferred_descr)
+					break
+			else:
+				not_recognised.append(err_word)
+		
+		if not not_recognised and not extra:
+			return None
+		
+		m = f"Erroneous line {line_i} has been recognized by the ontology partially only. Expected but not recognised - ({len(not_recognised)}) {', '.join(not_recognised)}. Inferred but not expected - ({len(extra)}) {', '.join(extra)}."
+		return m
+			
+				
+	# first_err_line = None  # из размеченных комментариями в трассе
+	for line_i, err_descr in error_descrs.items():
+		
+		# gather all inferred mistakes
+		inferred_messages = []
+		if line_i in inferred_error_lines:
+			for inferred_line_i, err_obj in zip(inferred_error_lines, err_objs):
+				if line_i == inferred_line_i:
+					inferred_messages.extend(err_obj_id2msgs[id(err_obj)])
+		
+		m = _compare_mistakes(err_descr, inferred_messages, line_i)
+		if m:
 			differences.append(m)
-			# break
 				
 	if differences:
 		return False, "\n\t> ".join(["",*differences])
@@ -268,7 +316,7 @@ def run_tests(directory="test_data/"):
 	alg_trs = parse_text_files(files)
 	
 	### Отладочная заглушка !
-	alg_trs = alg_trs[:1]
+	# alg_trs = alg_trs[:1]
 	
 	test_count = len(alg_trs)
 	
@@ -278,6 +326,7 @@ def run_tests(directory="test_data/"):
 	
 	success_all = True
 	failed = 0
+	mistakes = []
 	
 	try:
 		if True:
@@ -287,25 +336,25 @@ def run_tests(directory="test_data/"):
 				
 			else:
 				ontology_fpath = None
-			process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True)
-		else:
-			for i, test_data in enumerate(alg_trs):
-				try:
-					assert "trace_name"     in test_data, "trace_name"
-					assert "algorithm_name" in test_data, "algorithm_name"
-					assert "trace"          in test_data, "trace"         
-					assert "algorithm"      in test_data, "algorithm"     
-				except Exception as e:
-					log_print("Fix me: field is missing:", e)
-					continue
+			onto, mistakes = process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True)
+		# else:
+		# 	for i, test_data in enumerate(alg_trs):
+		# 		try:
+		# 			assert "trace_name"     in test_data, "trace_name"
+		# 			assert "algorithm_name" in test_data, "algorithm_name"
+		# 			assert "trace"          in test_data, "trace"         
+		# 			assert "algorithm"      in test_data, "algorithm"     
+		# 		except Exception as e:
+		# 			log_print("Fix me: field is missing:", e)
+		# 			continue
 				
-				# log_print("Running test %2d/%d for trace: " % (i+1, test_count), test_data["trace_name"])
-				log_print("%2d/%d  " % (i+1, test_count), end="")
-				success = run_test_for_alg_trace(test_data)
-				if not success:
-					failed += 1
-					success_all = False
-				# success_all = success_all and success
+		# 		# log_print("Running test %2d/%d for trace: " % (i+1, test_count), test_data["trace_name"])
+		# 		log_print("%2d/%d  " % (i+1, test_count), end="")
+		# 		success = run_test_for_alg_trace(test_data)
+		# 		if not success:
+		# 			failed += 1
+		# 			success_all = False
+		# 		# success_all = success_all and success
 	except Exception as e:
 		msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
 		ok = False
@@ -313,6 +362,15 @@ def run_tests(directory="test_data/"):
 		msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % "test_all") + ":\t" + msg
 		log_print(msg)
 		raise e
+		
+	# test the results
+	for tr_dict in alg_trs:
+		ok, msg = validate_mistakes(tr_dict["trace"], mistakes, onto)
+		if not ok:
+			failed += 1
+			success_all = False
+		msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % tr_dict["trace_name"]) + ":\t" + msg
+		log_print(msg)
 			
 	log_print()
 	log_print("="*40)

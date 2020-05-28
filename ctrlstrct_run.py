@@ -935,13 +935,23 @@ def load_swrl_rules(onto, rules_dict):
         
 
 def extact_mistakes(onto, as_objects=False) -> dict:
-
+    """Searches for instances of trace_error class and constructs a dict of the following form:
+        "<error_instance1_name>": {
+            "<property1_name>": ["list", "of", "property", "values", ...],
+            "<property2_name>": [onto.iri_1, "reference", "can present", "too", ...],
+            ...
+        },
+                "<error_instance1_name>": {},
+                ... 
+    
+     """
     properties_to_extract = ("name", onto.message, onto.arg, onto.cause, )
     mistakes = {}
 
     for inst in onto.trace_error.instances():
         for prop in properties_to_extract:
             values = []
+            # fill values ...
             if isinstance(prop, str):
                 prop_name = prop
                 values.append(getattr(inst, prop_name))
@@ -952,6 +962,7 @@ def extact_mistakes(onto, as_objects=False) -> dict:
                         if not as_objects:
                             o = o.name if hasattr(o, "name") else o
                         values.append(o)
+                        
             d = mistakes.get(inst.name, {})
             d[prop_name] = values
             mistakes[inst.name] = d

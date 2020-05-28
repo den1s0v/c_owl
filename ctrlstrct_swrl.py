@@ -111,7 +111,7 @@ RULES_DICT = {
 	 -> CREATE(INSTANCE, ?cmd)
 """,
 
-
+# ! OFF
 "-ActStartsAfterEnd_Error": """
 	Context(?c)
 	Block(?block)
@@ -219,7 +219,7 @@ RULES_DICT = {
     # акты выполняют пару последовательных действий
     body_item(?block, ?st1), 
     body_item(?block, ?st2), 
-    next(?st1, ?st2),
+    next(?st1, ?st2),         # st1 --> st2
     executes(?act1, ?st1), 
     executes(?act2, ?st2), 
     
@@ -229,12 +229,12 @@ RULES_DICT = {
     IRI(?act2, ?act2_iri),
     IRI(?act1, ?act1_iri),
     
-    stringConcat(?cmd, "trace_error{cause=", ?act2_iri, "; arg=", ?act1_iri, "; message=[TooEarly: Act should not occure before the act preceding it]; }")
+    stringConcat(?cmd, "trace_error{cause=", ?act2_iri, "; arg=", ?act1_iri, "; message=[TooEarly: Act should not occure before the act it must follow]; }")
      -> CREATE(INSTANCE, ?cmd)
 """,
 
 # Подготовка к подсчёту числа связей
-"PrepareCountingSequenceActs": """
+"-PrepareCountingSequenceActs": """
 
     # начало и конец акта блока
     sequence(?block), 
@@ -253,7 +253,7 @@ RULES_DICT = {
      -> CREATE(INSTANCE, ?cmd)
 """,
 # Подсчёт числа связей
-"CountSequenceActs": """
+"-CountSequenceActs": """
 
     # # начало и конец акта блока
     # sequence(?block), 
@@ -276,7 +276,7 @@ RULES_DICT = {
 
 # помечаем конец следования как ошибочный, если акт отсутствует
 # Надо указать на акт, следующий за пропущенным ...
-"MissingActInSequence_Mistake": """
+"-MissingActInSequence_Mistake": """
     Counter(?counter),
     COUNT_target(?counter, 0),
     arg(?counter, ?block_act_b),
