@@ -882,6 +882,8 @@ def init_persistent_structure(onto):
         prop_correct_depth = types.new_class("correct_depth", (Thing >> int, FunctionalProperty, ))
         # новое свойство text_line
         prop_text_line = types.new_class("text_line", (Thing >> int, FunctionalProperty, ))
+        prop_has_student_act = types.new_class("has_student_act", (Thing >> act, ))
+        prop_has_correct_act = types.new_class("has_correct_act", (Thing >> act, ))
         # # новое свойство same_level
         # prop_same_level = types.new_class("same_level", (Thing >> Thing, SymmetricProperty))
         # # новое свойство child_level

@@ -65,18 +65,34 @@ RULES_DICT = {
 	depth(?a, ?da), add(?db, ?da, 1)
 	 -> depth(?b, ?db), parent_of(?a, ?b)
 	""",
+"DepthIncr_correct": """
+    act_begin(?a), correct_next(?a, ?b), act_begin(?b), 
+    depth(?a, ?da), add(?db, ?da, 1)
+     -> depth(?b, ?db), parent_of(?a, ?b)
+    """,
 
 "DepthSame_b-e": """
 	act_begin(?a), next(?a, ?b), act_end(?b), 
 	depth(?a, ?da), parent_of(?p, ?a)
 	 -> depth(?b, ?da), parent_of(?p, ?b), corresponding_end(?a, ?b)
 	""",
- # + добавить проверку на Начало А - Конец Б (должен был быть Конец А) - CorrespondingActsMismatch_Error
+"DepthSame_b-e_correct": """
+    act_begin(?a), correct_next(?a, ?b), act_end(?b), 
+    depth(?a, ?da), parent_of(?p, ?a)
+     -> depth(?b, ?da), parent_of(?p, ?b), corresponding_end(?a, ?b)
+    """,
+    
+ # проверка на Начало А - Конец Б (должен был быть Конец А) - CorrespondingActsMismatch_Error
 "DepthSame_e-b": """
 	act_end(?a), next(?a, ?b), act_begin(?b), 
 	depth(?a, ?da), parent_of(?p, ?a)
 	 -> depth(?b, ?da), parent_of(?p, ?b)
 	""",
+"DepthSame_e-b_correct": """
+    act_end(?a), correct_next(?a, ?b), act_begin(?b), 
+    depth(?a, ?da), parent_of(?p, ?a)
+     -> depth(?b, ?da), parent_of(?p, ?b)
+    """,
 
 "DepthDecr": """
 	act_end(?a), next(?a, ?b), act_end(?b), 
@@ -84,6 +100,12 @@ RULES_DICT = {
 	parent_of(?p, ?a)
 	 -> depth(?b, ?db), corresponding_end(?p, ?b)
 	""",
+"DepthDecr_correct": """
+    act_end(?a), correct_next(?a, ?b), act_end(?b), 
+    depth(?a, ?da), subtract(?db, ?da, 1), 
+    parent_of(?p, ?a)
+     -> depth(?b, ?db), corresponding_end(?p, ?b)
+    """,
 
 "SameParentOfCorrACts": """
 	corresponding_end(?a, ?b), parent_of(?p, ?a)
@@ -188,6 +210,13 @@ RULES_DICT = {
      -> CREATE(INSTANCE, ?cmd)
 """,
 
+    # act1 = 85b_otvet_negativnyj_n1
+    # act2 = 83b_po_otvetu_n1
+    # shouldbe_st2 = 4_po_otvetu
+    # st2 = 9_elseif-otvet_negativnyj
+    # st = 10_otvet_negativnyj
+    
+
 # Акт находится в пределах родительского акта, но не непосредственно под ним
 # ...
 
@@ -233,6 +262,88 @@ RULES_DICT = {
      -> CREATE(INSTANCE, ?cmd)
 """,
 
+"Init_Count_std_and_corr_acts": """
+    # executes(?std_act, ?st),
+    # student_act(?std_act),
+    # act_begin(?std_act),
+    # executes(?corr_act, ?st),
+    correct_act(?corr_act),
+    act_begin(?corr_act),
+    # DifferentFrom(?std_act, ?corr_act)
+     -> COUNT_has_student_act(?corr_act, true), COUNT_has_correct_act(?corr_act, true)
+     # -> LINK_COUNT_has_student_act(?corr_act, true), LINK_COUNT_has_correct_act(?corr_act, true)
+
+""",
+"Count_std_acts": """
+    executes(?std_act, ?st),
+    student_act(?std_act),
+    act_begin(?std_act),
+    
+    executes(?corr_act2, ?st),
+    correct_act(?corr_act2),
+    act_begin(?corr_act2),
+    
+    parent_of(?par_act, ?std_act),  # в пределах одного объемлющего акта
+    parent_of(?par_act, ?corr_act2),
+    
+    # DifferentFrom(?std_act, ?corr_act2)
+     -> has_student_act(?corr_act2, ?std_act)
+""",
+"Count_corr_acts": """
+    executes(?corr_act1, ?st),
+    correct_act(?corr_act1),
+    act_begin(?corr_act1),
+    executes(?corr_act2, ?st),
+    correct_act(?corr_act2),
+    act_begin(?corr_act2),
+    parent_of(?par_act, ?corr_act1),  # в пределах одного объемлющего акта
+    parent_of(?par_act, ?corr_act2),
+     -> has_correct_act(?corr_act1, ?corr_act2)
+""",
+
+# Подготовка к сопоставлению корректных актов студенческим
+"-AlignSequenceActs_student-correct": """
+
+    # sequence(?block), 
+    # parent_of(?block, ?st),
+    
+    executes(?std_act, ?st),
+    student_act(?std_act),
+    executes(?corr_act, ?st),
+    student_act(?corr_act),
+    
+    # DifferentFrom(?std_act, ?corr_act),
+    
+    COUNT_has_student_act()
+    
+    IRI(?act2, ?act2_iri),
+    IRI(?act1, ?act1_iri),
+    
+    stringConcat(?cmd, "trace_error{cause=", ?act2_iri, "; arg=", ?act1_iri, "; message=[TooEarly: Act should not occure before the act it must follow]; }")
+     -> CREATE(INSTANCE, ?cmd)
+""",
+
+
+# Подготовка к подсчёту числа связей
+"-PrepareCountingSequence_student-correct": """
+
+    # # начало и конец акта блока
+    # sequence(?block), 
+    # executes(?block_act_b, ?block), 
+    # corresponding_end(?block_act_b, ?block_act_e), # построение актов следования завершено
+    # body_item(?block, ?st),
+
+    #     # act_begin(?act1),
+    #     # # акт в пределах акта блока
+    #     # parent_of(?block_act_b, ?act1)
+
+    # IRI(?block_act_b, ?block_act_b_iri),
+    # IRI(?st, ?st_iri),
+    
+    # stringConcat(?cmd, "Counter{arg=", ?block_act_b_iri, "; arg=", ?st_iri, "; COUNT_target=true;}")
+    #  -> CREATE(INSTANCE, ?cmd)
+""",
+
 # Подготовка к подсчёту числа связей
 "-PrepareCountingSequenceActs": """
 
@@ -249,9 +360,10 @@ RULES_DICT = {
     IRI(?block_act_b, ?block_act_b_iri),
     IRI(?st, ?st_iri),
     
-    stringConcat(?cmd, "Counter{arg=", ?block_act_b_iri, "; arg=", ?st_iri, "; COUNT_target=-1;}")
+    stringConcat(?cmd, "Counter{arg=", ?block_act_b_iri, "; arg=", ?st_iri, "; COUNT_target=true;}")
      -> CREATE(INSTANCE, ?cmd)
 """,
+
 # Подсчёт числа связей
 "-CountSequenceActs": """
 
@@ -276,25 +388,40 @@ RULES_DICT = {
 
 # помечаем конец следования как ошибочный, если акт отсутствует
 # Надо указать на акт, следующий за пропущенным ...
-"-MissingActInSequence_Mistake": """
-    Counter(?counter),
-    COUNT_target(?counter, 0),
-    arg(?counter, ?block_act_b),
-    act_begin(?block_act_b),
-    arg(?counter, ?st),
-    stmt(?st),
-
-    corresponding_end(?block_act_b, ?block_act_e), # конец следования
+"MissingActInSequence_Mistake": """
+    correct_act(?corr_act2),
+    # act_begin(?corr_act2),
     
-    IRI(?block_act_e, ?block_act_e_iri),
-    IRI(?st, ?st_iri),
+    N_has_student_act(?corr_act2, ?std_n),
+    N_has_correct_act(?corr_act2, ?corr_n),
     
-    stringConcat(?cmd, "trace_error{cause=", ?block_act_e_iri, "; arg=", ?st_iri, "; message=[MissingActInSequence]; }")
+    lessThan(?std_n, ?corr_n),  # не хватает актов в трассе студента
+    
+    # stringConcat(?cmd, "std_n=", ?std_n, "; corr_n=", ?corr_n)
+    # -> expr_value(?corr_act2, ?cmd)
+    # -> expr_value(?corr_act2, ?std_n)
+    
+    # correct_next(?corr_act2, ?next_corr_act), # следующий за пропущенным
+    # correct_act(?next_corr_act),
+    # student_act(?next_corr_act),
+    
+    IRI(?corr_act2, ?corr_act_iri),
+    # IRI(?next_corr_act, ?next_corr_act_iri),
+    
+    stringConcat(?cmd, "trace_error{cause=", ?corr_act_iri, "; arg=", ?corr_act_iri, "; message=[MissingActAnywhere, not only In Sequence]; }")
      -> CREATE(INSTANCE, ?cmd)
 """,
 
-"-Aaa_Mistake": """
-    
+"-Test_lessThan": """
+    lessThan(0, 1)
+     -> expr_value(INSTANCE, "debug: lessThan works!")  # OK!
+ """,
+
+"-Test_int_prop2": """
+    Counter(?counter),
+    COUNT_target(?counter, 0)
+
+     ->  arg(?counter, ?counter)  # DEBUG
 """,
 
 
