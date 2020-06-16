@@ -35,7 +35,13 @@ def link_objects(onto, iri_subj : str, prop_name : str, iri_obj : str, prop_supe
     # связываем объекты свойством
     make_triple(onto[iri_subj], prop, onto[iri_obj])
     
-
+def uniqualize_iri(onto, iri):
+    """uniqualize individual's name"""
+    n = 2; orig_iri = iri
+    while onto[iri]:  # пока есть объект с таким именем
+        # модифицировать имя
+        iri = orig_iri + ("_%d" % n); n += 1
+    return iri
 
 
 class TraceTester():
@@ -77,6 +83,7 @@ class TraceTester():
         self.condition_value_generator = _gen(self.data["header_boolean_chain"])
         self.last_cond_tuple = (-1, False)
         self._maxID = max(self._maxID, max(self.id2obj.keys()) + 10)
+        self.expr_id2values = {}
         
         def next_cond_value():
             i,_ = self.last_cond_tuple
@@ -219,6 +226,7 @@ class TraceTester():
                 value = next_cond_value()
                 phase = "performed"
                 ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                self.expr_id2values[node["id"]] = self.expr_id2values.get(node["id"], []) + [value]
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
@@ -253,7 +261,7 @@ class TraceTester():
               "name": name,
               "executes": alg_node["id"],
               "phase": phase,
-              "n": None,
+              "n": 1,
               # "text_line": None,
               # "comment": None,
         })
@@ -264,7 +272,7 @@ class TraceTester():
               "name": name,
               "executes": alg_node["id"],
               "phase": phase,
-              "n": None,
+              "n": 1,
               # "text_line": None,
               # "comment": None,
         })
@@ -405,9 +413,10 @@ class TraceTester():
         self.inject_algorithm_to_ontology(onto)
         
         self.make_correct_trace()
+        self.prepare_act_candidates(onto, extra_act_entries=0)
         self.inject_trace_to_ontology(onto, self.data["trace"], ("student_act",), "next")
-        self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
-        self.merge_traces(onto, self.data["student_act_iri_list"], self.data["correct_act_iri_list"])
+        # self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
+        # self.merge_traces(onto, self.data["student_act_iri_list"], self.data["correct_act_iri_list"])
         
     def inject_algorithm_to_ontology(self, onto):
         "Prepares self.id2obj and writes algorithm to ontology if it isn't there."
@@ -445,11 +454,7 @@ class TraceTester():
                     # формируем имя экземпляра в онтологии
                     iri = "{}_{}".format(id_, clean_name)
                     
-                    # uniqualize individual's name
-                    n = 2; orig_iri = iri
-                    while onto[iri]:  # пока есть объект с таким именем
-                        # модифицировать имя
-                        iri = orig_iri + ("_%d" % n); n += 1
+                    iri = uniqualize_iri(onto, iri)
                         
                     # сохраняем назад в наш словарь (для привязки к актам трассы) 
                     d["iri"] = iri
@@ -511,6 +516,87 @@ class TraceTester():
                                         onto[subiri].is_a.append(onto.last_item)
 
         
+    def prepare_act_candidates(self, onto, extra_act_entries=2):
+        """Create all possible acts for each statement. 
+        Maximum executon number will be exceeded by `extra_act_entries`.
+        Resulting set of acts of size N will be repeated N times, each act to be possibly placed at each index of the trace, covering the set of all possible traces."""
+        
+        assert extra_act_entries >= 0, extra_act_entries
+        
+        alg_id2max_exec_n = {}  # executed stmt id to max exec_time in correct trace
+        
+        for act in self.data["correct_trace"]:
+            executed_id = act["executes"]
+            exec_n = act["n"]
+            alg_id2max_exec_n[executed_id] = exec_n  # assume "n"s appear consequently in the trace
+            
+        # update the dict by adding extra_act_entries value for each stmt
+        for st_id in self.id2obj.keys():
+            alg_id2max_exec_n[st_id] = extra_act_entries + alg_id2max_exec_n.get(st_id, 0)
+            
+        entry_stmt_id = self.data["correct_trace"][0]["executes"]
+            
+        # make top-level act representing the trace
+        iri = f'trace_{self.data["trace_name"]}_{"".join(map(str, self.data["header_boolean_chain"]))}'
+        iri = uniqualize_iri(onto, iri)
+        iri = prepare_name(iri)
+        trace_obj = onto.trace(iri)
+        trace_obj.is_a.append(onto.correct_act)
+        make_triple(trace_obj, onto.executes, onto[self.data["algorithm"]["iri"]])
+        make_triple(trace_obj, onto.index, 0)
+        make_triple(trace_obj, onto.exec_time, 1)
+        make_triple(trace_obj, onto.before, trace_obj)  # init existance flag
+        
+        
+        N = sum(alg_id2max_exec_n.values()) * 2  # as each stmt has begin & end!
+        print(F"N of layers and N acts on layer: {N}")
+        for st_id, max_n in alg_id2max_exec_n.items():
+            
+            alg_elem = self.id2obj[st_id]
+            if alg_elem["type"] in {"algorithm"}:
+                continue
+                
+            # prepare data
+            name = alg_elem.get("name", "unkn")
+            clean_name  = prepare_name(name)
+            
+            for index in range(1, N + 1):
+                for exec_n in range(1, max_n + 1):
+                    # skip impossible combinations of exec_time & index
+                    if exec_n > index:
+                        continue
+                    
+                    # make instances: act_begin, act_end
+                    number_mark = "" if max_n <=1 else ("_n%02d" % exec_n)
+                    iri_template = f"%s_{clean_name}_i{index:02}{number_mark}"
+                    
+                    for mark, class_ in [("b", onto.act_begin), ("e", onto.act_end)]:
+                        iri = iri_template % mark
+                        iri = uniqualize_iri(onto, iri)
+                        
+                        obj = class_(iri)
+                        # obj.is_a.append(class_X)
+                        make_triple(obj, onto.executes, onto[alg_elem["iri"]])
+                        make_triple(obj, onto.index, index)
+                        make_triple(obj, onto.exec_time, exec_n)
+                        
+                        # attach expr value: for act Begin only!
+                        if mark == "b" and alg_elem["type"] in {"expr"}:
+                            values = self.expr_id2values[node["id"]]
+                            if len(values) <= exec_n:
+                                value = values[exec_n + 1]
+                            else:
+                                value = False
+                            make_triple(obj, onto.expr_value, value)
+                            
+                        if mark == "b" and st_id == entry_stmt_id and index == exec_n == 1:
+                            obj.is_a.append(onto.correct_act)
+                            obj.is_a.append(onto.current_act)
+                            make_triple(trace_obj, onto.next, obj)
+                            
+                            
+                    
+                    
     def inject_trace_to_ontology(self, onto, trace, act_classnames=("act",), next_propertyname=None):
         "Writes specified trace to ontology."
         
@@ -522,11 +608,7 @@ class TraceTester():
         def make_act(iri, onto_class, alg_iri, prop_class=onto.next, is_last=False):
             # nonlocal trace_acts_iri_list
             
-            # uniqualize individual's name
-            n = 2; orig_iri = iri
-            while onto[iri]:  # пока есть объект с таким именем
-                # модифицировать имя
-                iri = orig_iri + ("_%d" % n); n += 1
+            iri = uniqualize_iri(onto, iri)
             
             trace_acts_iri_list.append(iri)                 
             # создаём объект
@@ -546,9 +628,19 @@ class TraceTester():
                 # mark as last act of the list
                 obj.is_a.append(onto.last_item)
             return obj
+            
+        def find_act(class_, executes: int, index: int, exec_time: int):
+            for obj in class_.instances():
+                # print(F"{obj}: ")
+                if (obj.executes.id == executes and
+                       obj.index == index and
+                   obj.exec_time == exec_time):
+                    return obj
+            print(f"act not found: ex={executes}, i={index}, n={exec_time}")
 
         with onto:
             i = 0
+            act_index = 0
             trace_acts_iri_list = []
             for d in trace:
                 i += 1
@@ -576,35 +668,39 @@ class TraceTester():
                     
                     if phase_mark in ("b", "p"):
                         # начало акта
-                        iri = iri_template % "b"
-                        # d["iris"] = d.get("iris", ()) + (iri, )  # save iri back to dict
-                        self.act_iris.append(iri)
-                        obj = make_act(iri, onto.act_begin, alg_elem["iri"], 
-                            prop_class=onto[next_propertyname], 
-                            is_last=False)
-                        for class_ in additional_classes:
-                            obj.is_a.append(class_)
-                        # НЕ привязываем id (т.к. может повторяться у начал и концов. TO FIX?)
-                        # привязываем нужные свойства
-                        make_triple(obj, onto.text_line, text_line)
-                        if "value" in d:
-                            make_triple(obj, onto.expr_value, d["value"])
+                        act_index += 1
+                        # iri = iri_template % "b"
+                        # self.act_iris.append(iri)
+                        # obj = make_act(iri, onto.act_begin, alg_elem["iri"], 
+                        #     prop_class=onto[next_propertyname], 
+                        #     is_last=False)
+                        obj = find_act(onto.act_begin, executes, act_index, n or 1) 
+                        if obj:
+                            for class_ in additional_classes:
+                                obj.is_a.append(class_)
+                            # привязываем нужные свойства
+                            make_triple(obj, onto.text_line, text_line)
+                        # # НЕ привязываем id (т.к. может повторяться у начал и концов. TO FIX?)
+                            # if "value" in d:
+                        #     make_triple(obj, onto.expr_value, d["value"])
                     
                     if phase_mark in ("e", "p"):
                         # конец акта
-                        iri = iri_template % "e"
-                        # d["iris"] = d.get("iris", ()) + (iri, )  # save iri back to dict
-                        self.act_iris.append(iri)
-                        obj = make_act(iri, onto.act_end, alg_elem["iri"], 
-                            prop_class=onto[next_propertyname], 
-                            is_last=(i==len(self.data["trace"])))
-                        for class_ in additional_classes:
-                            obj.is_a.append(class_)
-                        # привязываем нужные свойства
-                        make_triple(obj, onto.text_line, text_line)
+                        act_index += 1
+                        # iri = iri_template % "e"
+                        # self.act_iris.append(iri)
+                        # obj = make_act(iri, onto.act_end, alg_elem["iri"], 
+                        #     prop_class=onto[next_propertyname], 
+                        #     is_last=(i==len(self.data["trace"])))
+                        obj = find_act(onto.act_end, executes, act_index, n or 1) 
+                        if obj:
+                            for class_ in additional_classes:
+                                obj.is_a.append(class_)
+                            # привязываем нужные свойства
+                            make_triple(obj, onto.text_line, text_line)
                         
-            iri_list_key = act_classnames[0] + "_iri_list"
-            self.data[iri_list_key] = trace_acts_iri_list
+            # iri_list_key = act_classnames[0] + "_iri_list"
+            # self.data[iri_list_key] = trace_acts_iri_list
         
         
     def test_with_ontology_results(self, onto):
@@ -831,6 +927,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
                 
     return onto
 
+
 def init_persistent_structure(onto):
         # types.new_class(temp_name, (domain >> range_, ))  # , Property
         
@@ -844,12 +941,16 @@ def init_persistent_structure(onto):
         class act(Thing): pass  # Thing - временно?
         # -->
         class act_begin(act): pass
+        # --->
+        class trace(act_begin): pass
         # -->
         class act_end(act): pass
         # -->
         class student_act(act): pass
         # -->
         class correct_act(act): pass
+        # -->
+        class current_act(act): pass
         
         # ->
         class sequence(Thing): pass
@@ -859,41 +960,45 @@ def init_persistent_structure(onto):
         # признак last
         class last_item(Thing, ): pass
 
-        # создаём новый class - для создания n-арной ассоциации для подсчёта числа связей
-        if not onto["Counter"]:
-            class Counter(Thing): pass
+        # # создаём новый class - для создания n-арной ассоциации для подсчёта числа связей
+        # if not onto["Counter"]:
+        #     class Counter(Thing): pass
 
         # новое свойство executes
         prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
         # новое свойство expr_value
         prop_expr_value = types.new_class("expr_value", (DataProperty, FunctionalProperty, ))
         # новое свойство next
-        prop_next = types.new_class("next", (Thing >> Thing, FunctionalProperty, ))
-        # новое свойство correct_next
-        correct_next = types.new_class("correct_next", (Thing >> Thing, FunctionalProperty, ))
+        prop_next = types.new_class("next", (Thing >> Thing, ))
+        # новое свойство next_sibling
+        next_sibling = types.new_class("next_sibling", (Thing >> Thing, ))
         # новое свойство before
-        prop_before = types.new_class("before", (Thing >> Thing, ))
-        # новое свойство correct_before
-        prop_correct_before = types.new_class("correct_before", (Thing >> Thing, ))
+        prop_before = types.new_class("before", (Thing >> Thing, TransitiveProperty))
+        # # новое свойство correct_before
+        # prop_correct_before = types.new_class("correct_before", (Thing >> Thing, ))
         
-        # новое свойство depth
-        prop_depth = types.new_class("depth", (Thing >> int, FunctionalProperty, ))
-        # новое свойство correct_depth
-        prop_correct_depth = types.new_class("correct_depth", (Thing >> int, FunctionalProperty, ))
+        # новое свойство index
+        prop_index = types.new_class("index", (Thing >> int, FunctionalProperty, ))
+        # новое свойство exec_time
+        prop_exec_time = types.new_class("exec_time", (Thing >> int, FunctionalProperty, ))
+        # # новое свойство depth
+        # prop_depth = types.new_class("depth", (Thing >> int, FunctionalProperty, ))
+        # # новое свойство correct_depth
+        # prop_correct_depth = types.new_class("correct_depth", (Thing >> int, FunctionalProperty, ))
         # новое свойство text_line
         prop_text_line = types.new_class("text_line", (Thing >> int, FunctionalProperty, ))
-        prop_has_student_act = types.new_class("has_student_act", (Thing >> act, ))
-        prop_has_correct_act = types.new_class("has_correct_act", (Thing >> act, ))
+        # prop_has_student_act = types.new_class("has_student_act", (Thing >> act, ))
+        # prop_has_correct_act = types.new_class("has_correct_act", (Thing >> act, ))
         # # новое свойство same_level
         # prop_same_level = types.new_class("same_level", (Thing >> Thing, SymmetricProperty))
         # # новое свойство child_level
         # prop_child_level = types.new_class("child_level", (Thing >> Thing, SymmetricProperty))
         
         # новое свойство corresponding_end
-        class corresponding_end(act_begin >> act_end, FunctionalProperty, InverseFunctionalProperty): pass
+        class corresponding_end(act_begin >> act_end, ): pass
     
-        # новое свойство target - цель подсчёта числа связей
-        class target(Counter >> Thing, AsymmetricProperty): pass
+        # # новое свойство target - цель подсчёта числа связей
+        # class target(Counter >> Thing, AsymmetricProperty): pass
     
         # новое свойство parent_of
         # class parent_of(act_begin >> act, InverseFunctionalProperty): pass
@@ -915,10 +1020,36 @@ def init_persistent_structure(onto):
            
        # объекты, спровоцировавшие ошибку
         if not onto["Erroneous"]:
-            types.new_class("Erroneous", (Thing,))
-        for prop_name in ("cause", ):
+            Erroneous = types.new_class("Erroneous", (Thing,))
+            
+            # make Erroneous subclasses
+            for class_name in [
+                "CorrespondingEndMismatched",
+                "CorrespondingEndPerformedDifferentTime",
+                "AfterTraceEnd",
+                "DuplicateActInSequence",
+                "WrongExecTime",
+            ]:
+                types.new_class(class_name, (Erroneous,))
+            
+        for prop_name in ("cause", "should_be"):
             if not onto[prop_name]:
-                types.new_class(prop_name, (Thing >> onto["Erroneous"],))
+                types.new_class(prop_name, (onto["Erroneous"] >> Thing,))
+
+        # make correct_act subclasses
+        for class_name in [
+            "FunctionBegin",
+            "SequenceBegin",
+            "SequenceNext",
+            "SequenceEnd",
+            "StmtEnd",
+            "DebugObj",
+        ]:
+            types.new_class(class_name, (correct_act,))
+            
+        # for prop_name in ("reason", ):  # for correct acts !
+        #     if not onto[prop_name]:
+        #         types.new_class(prop_name, (correct_act >> Thing,))
 
 
 def load_swrl_rules(onto, rules_dict):
@@ -1028,29 +1159,41 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, mistakes
 
     # обёртка для расширенного логического вывода:
      # при создании наполняет базовую онтологию вспомогательными сущностями
-    wr_onto = AugmentingOntology(onto)
+    # wr_onto = AugmentingOntology(onto)
     
 
     # после наложения обёртки можно добавлять SWRL-правила
-    from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
-    load_swrl_rules(onto, swrl_rules_dict)
+    if True:
+        from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
+        load_swrl_rules(onto, swrl_rules_dict)
     
     if debug_rdf_fpath:
         onto.save(file=debug_rdf_fpath, format='rdfxml')
-        # print("Saved RDF file: {} !".format(ontology_file))
+        print("Saved RDF file: {} !".format(debug_rdf_fpath))
         
-    if not verbose:
-        print("Extended reasoning started ...",)
+        sync_stardog(debug_rdf_fpath)
+        
+    exit()
+        
+    # if not verbose:
+    #     print("Extended reasoning started ...",)
 
-    # расширенное обновление онтологии и сохранение с новыми фактами
-    success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
+    # # расширенное обновление онтологии и сохранение с новыми фактами
+    # success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
+    
+    with onto:
+        # запуск Pellet
+        sync_reasoner_pellet(infer_property_values=True, infer_data_property_values=True, debug=0)
 
-    if not verbose:
-        print("Extended reasoning finished.", f"Success: {success}, Pellet run times: {n_runs}")
+
+    # if not verbose:
+    #     print("Extended reasoning finished.", f"Success: {success}, Pellet run times: {n_runs}")
 
     if debug_rdf_fpath:
         onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
-        # print("Saved RDF file: {} !".format(ontology_file))
+        print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
+        
+    exit()
         
     mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
     
@@ -1100,6 +1243,74 @@ def what_to_drop_to_reach_ordering(arr: list) -> list:
                 conflicting_pairs.remove(t)
         
     return indices_to_drop
+
+
+from pprint import pprint
+
+def sync_stardog(ontology_path, save_as_path=None):
+  import stardog
+
+  conn_details = {
+    'endpoint': 'http://localhost:5820',
+    'username': 'admin',
+    'password': 'admin'
+  }
+  
+  dbname = "ctrlstrct_db"
+  
+  ontology_file = stardog.content.File(ontology_path)
+  graphname = "urn:graph_data"
+  
+  schema_file = stardog.content.File("stgd_schema.ttl")
+  schema_graphname = "urn:graph_schema"
+  
+  save_as = save_as_path or (ontology_path + "_ext")
+
+  try:
+    with stardog.Admin(**conn_details) as admin:
+      print("creating database ...")
+      # print(*(d.name for d in admin.databases()))
+      if dbname not in (d.name for d in admin.databases()):
+        db = admin.new_database(dbname)
+      else:
+        db = admin.database(dbname)
+
+      with stardog.Connection(dbname, **conn_details) as conn:
+        conn.begin()  # reasoning=True)
+        conn.clear()
+        print("uploading database ...")
+        conn.add(ontology_file)  ###, graph_uri=graphname)
+        print("uploading schema ...")
+        conn.add(schema_file)  ###, graph_uri=schema_graphname)
+        conn.commit()
+        
+        if False:  # !!!
+            # BASE <http://vstu.ru/poas/ctrl_structs_2020-05_v1#>;
+              
+            # OK!
+            # results = conn.select('''SELECT * WHERE {?a  rdf:type <http://vstu.ru/poas/ctrl_structs_2020-05_v1#current_act> }''', reasoning=True)
+            results = conn.select('''PREFIX onto: <http://vstu.ru/poas/ctrl_structs_2020-05_v1#>
+              
+              SELECT * WHERE {?a a onto:current_act }''', reasoning=True)
+            pprint(results)
+
+            print("downloading database ...")
+            contents = conn.export()
+
+            # запись в файл
+            ext = '.ttl'
+            if not save_as.endswith(ext):
+                save_as += ext
+            print("writing to file: " + save_as[-50:])
+            with open(save_as, 'wb') as f:
+                f.write(contents)
+        print("saved.")
+  finally:
+      pass
+      # db.drop()
+      # print("dropped the db.")
+
+
 
             
 if __name__ == '__main__':

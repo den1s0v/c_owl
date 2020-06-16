@@ -1,0 +1,86 @@
+
+@prefix : <http://vstu.ru/poas/ctrl_structs_2020-05_v1#> .
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix swrlb: <http://www.w3.org/2003/11/swrlb#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+
+# IF {
+  #    ?offering gr:hasPriceSpecification ?ps .
+  #    ?ps gr:hasCurrencyValue ?price .
+  #    FILTER (?price >= 200.00).
+  # }
+  # THEN {
+  #    ?offering a :ExpensiveProduct .
+# }
+
+# IF {
+  #    ?t a :Triangle ;
+  #       :base ?b ;
+  #       :height ?h
+  #    BIND (?b * ?h / 2 AS ?area)
+  # }
+  # THEN {
+  #     ?t :area ?area
+# }
+
+# IF {
+#   ?a a :current_act;
+#        :index ?ia .
+#        BIND (?ia + 1 AS ?nia).
+#   ?b a / rdfs:subClassOf :act;
+#        :index ?ib .
+#   FILTER (?nia = ?ib) .
+#  } THEN {
+#    ?a :next ?b
+#  }
+ 
+#  IF {
+#   ?a a / rdfs:subClassOf :act .
+#    ?a :next ?b .
+#  } THEN {
+#    ?a :before ?b
+#  }
+
+
+# 1804 total. -r
+# 1624 total - no -r   -  1620 total.
+
+
+# "assign_next_sibling_0-1-b": """
+#   trace(?a),
+#   act_begin(?b), exec_time(?b, ?_ib),
+#   equal(?_ib, 1),
+#   # DifferentFrom(?a, ?b),
+#    -> next_sibling(?a, ?b)
+#  """,
+
+# IF {
+#   ?a a :trace .
+#   ?b a :act_begin .
+#   ?b :exec_time ?_ib .
+#   FILTER (?_ib = 1).
+#  } THEN {
+#    ?a :next_sibling ?b
+#  }
+
+# "assign_next_sibling_0-1-e": """
+#   trace(?a),
+#   act_end(?b), exec_time(?b, ?_ib),
+#   equal(?_ib, 1), 
+#   # DifferentFrom(?a, ?b),
+#    -> next_sibling(?a, ?b)
+#  """,
+
+# IF {
+#   ?a a :trace .
+#   ?b a :act_end .
+#   ?b :exec_time ?_ib .
+#   FILTER (?_ib = 1).
+#  } THEN {
+#    ?a :next_sibling ?b
+#  }

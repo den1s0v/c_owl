@@ -5,33 +5,70 @@ import re
 RULES_DICT = {
 
 # помечаем минусом в начале имени отключенные правила.
-# из текста удаляются комментарии в стиле Си и Python.
+# из текста удаляются комментарии в стиле Си (//) и Python (#).
 
 
-                ###################
-                ###################
+				###################
+				###################
 ################ Служебные правила ################
-                ###################
-                ###################
+				###################
+				###################
 
 
-"hasNextAct_to_beforeAct": """
-	next(?a, ?b) -> before(?a, ?b)
+"next_to__current_act": """
+	current_act(?a), index(?a, ?ia), add(?ib, ?ia, 1),
+	act(?b), index(?b, ?_ib),
+	equal(?_ib, ?ib), 
+	 -> next(?a, ?b), before(?a, ?b)
+ """,
 
-    # an comment !!!
-    // Another one.
- """ ,
+"- hasNextAct_to_beforeAct": """
+	next(?a, ?b) -> before(?a, ?b)  # 'before' connects correct acts and acts next to current, only.
 
-"correct_hasNextAct_to_correct_beforeAct": """
-    correct_next(?a, ?b) -> correct_before(?a, ?b)
- """ ,
+	# a comment in rule !!!
+	// Another one.
+ """,
 
-"BeforeActTransitive": """
-	before(?a, ?b), before(?b, ?c) -> before(?a, ?c)
+"assign_next_sibling_0-1-b": """
+	trace(?a),
+	act_begin(?b), exec_time(?b, ?_ib),
+	equal(?_ib, 1),
+	# DifferentFrom(?a, ?b),  # stardog fails the rule here!
+	 -> next_sibling(?a, ?b)
+ """,
+"assign_next_sibling_0-1-e": """
+	trace(?a),
+	act_end(?b), exec_time(?b, ?_ib),
+	equal(?_ib, 1), 
+	# DifferentFrom(?a, ?b),
+	 -> next_sibling(?a, ?b)
+ """,
+"assign_next_sibling-b": """
+	act_begin(?a), exec_time(?a, ?ia), add(?_ib, ?ia, 1),
+	act_begin(?b), exec_time(?b, ?ib),  # unification of a bound var does rebind in stardog ??!
+	equal(?_ib, ?ib), 
+	# DifferentFrom(?a, ?b),
+	executes(?a, ?st),
+	executes(?b, ?st),
+	 -> next_sibling(?a, ?b)
+ """,
+"assign_next_sibling-e": """
+	act_end(?a), exec_time(?a, ?ia), add(?_ib, ?ia, 1),
+	act_end(?b), exec_time(?b, ?ib),
+	equal(?_ib, ?ib), 
+	# DifferentFrom(?a, ?b),
+	executes(?a, ?st),
+	executes(?b, ?st),
+	 -> next_sibling(?a, ?b)
+ """,
+
+
+"- BeforeActTransitive": """
+	before(?a, ?b), before(?b, ?c), -> before(?a, ?c)
 	""",
-"correct_BeforeActTransitive": """
-    correct_before(?a, ?b), correct_before(?b, ?c) -> correct_before(?a, ?c)
-    """,
+# "- - correct_BeforeActTransitive": """
+# 	correct_before(?a, ?b), correct_before(?b, ?c) -> correct_before(?a, ?c)
+# 	""",
 	# act(?a),
 	# act(?b),
 	# act(?c),
@@ -41,11 +78,11 @@ RULES_DICT = {
 # 	parent_of(?a, ?b) -> contains_child(?a, ?b)
 #  """ ,
 
-"parent_of_to_contains_act": """
-    parent_of(?a, ?b), act(?a), act(?b) -> contains_act(?a, ?b)
+"- parent_of_to_contains_act": """
+	parent_of(?a, ?b), act(?a), act(?b) -> contains_act(?a, ?b)
  """ ,
 
-"contains_actTransitive": """
+"- contains_actTransitive": """
 	contains_act(?a, ?b), contains_act(?b, ?c) -> contains_act(?a, ?c)
 	""",
 
@@ -56,68 +93,178 @@ RULES_DICT = {
 # 
 # func_a            func_a.body             func_a.body.first
 
-"DepthOfProgramIs0": """
-	algorithm(?a), entry_point(?a, ?e), executes(?p, ?e) -> depth(?p, 0)
+"- DepthOfProgramIs0": """
+	algorithm(?a), entry_point(?a, ?e), 
+	executes(?p, ?e), correct_act(p),
+	 -> depth(?p, 0)
 	""",
 
 "DepthIncr": """
 	act_begin(?a), next(?a, ?b), act_begin(?b), 
+	# depth(?a, ?da), add(?db, ?da, 1)
+	 -> parent_of(?a, ?b)  # depth(?b, ?db),
+	""",
+"- DepthIncr_correct": """
+	act_begin(?a), correct_next(?a, ?b), act_begin(?b), 
 	depth(?a, ?da), add(?db, ?da, 1)
 	 -> depth(?b, ?db), parent_of(?a, ?b)
 	""",
-"DepthIncr_correct": """
-    act_begin(?a), correct_next(?a, ?b), act_begin(?b), 
-    depth(?a, ?da), add(?db, ?da, 1)
-     -> depth(?b, ?db), parent_of(?a, ?b)
-    """,
 
 "DepthSame_b-e": """
 	act_begin(?a), next(?a, ?b), act_end(?b), 
+	parent_of(?p, ?a),  # depth(?a, ?da), 
+	 -> parent_of(?p, ?b), corresponding_end(?a, ?b)
+	 # depth(?b, ?da)
+	""",
+"- DepthSame_b-e_correct": """
+	act_begin(?a), correct_next(?a, ?b), act_end(?b), 
 	depth(?a, ?da), parent_of(?p, ?a)
 	 -> depth(?b, ?da), parent_of(?p, ?b), corresponding_end(?a, ?b)
 	""",
-"DepthSame_b-e_correct": """
-    act_begin(?a), correct_next(?a, ?b), act_end(?b), 
-    depth(?a, ?da), parent_of(?p, ?a)
-     -> depth(?b, ?da), parent_of(?p, ?b), corresponding_end(?a, ?b)
-    """,
-    
+	
  # проверка на Начало А - Конец Б (должен был быть Конец А) - CorrespondingActsMismatch_Error
 "DepthSame_e-b": """
 	act_end(?a), next(?a, ?b), act_begin(?b), 
-	depth(?a, ?da), parent_of(?p, ?a)
-	 -> depth(?b, ?da), parent_of(?p, ?b)
+	parent_of(?p, ?a)  # depth(?a, ?da),
+	 -> parent_of(?p, ?b)  # depth(?b, ?da), 
 	""",
-"DepthSame_e-b_correct": """
-    act_end(?a), correct_next(?a, ?b), act_begin(?b), 
-    depth(?a, ?da), parent_of(?p, ?a)
-     -> depth(?b, ?da), parent_of(?p, ?b)
-    """,
+"- DepthSame_e-b_correct": """
+	act_end(?a), correct_next(?a, ?b), act_begin(?b), 
+	parent_of(?p, ?a)  # depth(?a, ?da),
+	 -> depth(?b, ?da), parent_of(?p, ?b)
+	 -> parent_of(?p, ?b)  # depth(?b, ?da), 
+	""",
 
 "DepthDecr": """
 	act_end(?a), next(?a, ?b), act_end(?b), 
+	# depth(?a, ?da), subtract(?db, ?da, 1), 
+	parent_of(?p, ?a)
+	 -> corresponding_end(?p, ?b)  # depth(?b, ?db),
+	""",
+"- DepthDecr_correct": """
+	act_end(?a), correct_next(?a, ?b), act_end(?b), 
 	depth(?a, ?da), subtract(?db, ?da, 1), 
 	parent_of(?p, ?a)
 	 -> depth(?b, ?db), corresponding_end(?p, ?b)
 	""",
-"DepthDecr_correct": """
-    act_end(?a), correct_next(?a, ?b), act_end(?b), 
-    depth(?a, ?da), subtract(?db, ?da, 1), 
-    parent_of(?p, ?a)
-     -> depth(?b, ?db), corresponding_end(?p, ?b)
-    """,
 
-"SameParentOfCorrACts": """
+"SameParentOfCorrActs": """
 	corresponding_end(?a, ?b), parent_of(?p, ?a)
 	 -> parent_of(?p, ?b)
 	""",
 
 
-                ###################
-                ###################
+				######################
+				######################
+################ Производящие правила ################
+				######################
+				######################
+"DBG_connect_FunctionBegin": """
+	current_act(?a),
+	act_begin(?a),
+	func(?func_), 
+	executes(?a, ?func_),
+	body(?func_, ?st),
+	
+	next(?a, ?b),
+	act_begin(?b),
+	executes(?b, ?st),
+	
+	 -> DebugObj(?a)
+
+""",
+
+"connect_FunctionBegin": """
+	current_act(?a),
+	act_begin(?a),
+	func(?func_), 
+	executes(?a, ?func_),
+	body(?func_, ?st),
+	
+	next(?a, ?b),
+	act_begin(?b),
+	executes(?b, ?st),
+	
+	# check that previous execution of st was in correct trace
+	next_sibling(?pr, ?b), trace(?tr), before(?tr, ?pr),
+	 -> correct_act(?b), current_act(?b), FunctionBegin(?b)
+""",
+
+"connect_SequenceBegin": """
+	current_act(?a),
+	act_begin(?a),
+	sequence(?block), 
+	executes(?a, ?block),
+	body_item(?block, ?st),
+	first_item(?st),
+	
+	next(?a, ?b),
+	act_begin(?b),
+	executes(?b, ?st),
+	
+	next_sibling(?pr, ?b), trace(?tr), before(?tr, ?pr),
+	 -> correct_act(?b), current_act(?b), SequenceBegin(?b)
+""",
+
+"connect_SequenceNext": """
+	current_act(?a),
+	act_end(?a),
+	parent_of(?p, ?a),
+	sequence(?block), 
+	executes(?p, ?block),
+	body_item(?block, ?st),
+	executes(?a, ?st),
+	
+	next(?a, ?b),
+	next(?st, ?st2),
+	
+	act_begin(?b),
+	executes(?b, ?st2),
+	
+	next_sibling(?pr, ?b), trace(?tr), before(?tr, ?pr),
+	 -> correct_act(?b), current_act(?b), SequenceNext(?b)
+""",
+
+"connect_StmtEnd": """
+	current_act(?a),
+	act_begin(?a),
+	stmt(?st), 
+	executes(?a, ?st),
+	
+	act_end(?b),
+	next(?a, ?b),
+	executes(?b, ?st),
+	
+	exec_time(?a, ?t), exec_time(?b, ?t),
+	 -> current_act(?b), StmtEnd(?b)
+""",
+
+"- ??! connect_SequenceEnd": """
+	current_act(?a),
+	act_end(?a),
+	executes(?a, ?st),
+	last_item(?st),
+	
+	next(?a, ?b),
+	act_end(?b),
+	
+	parent_of(?p, ?a),
+	executes(?p, ?block),
+	sequence(?block), 
+	executes(?b, ?block),
+	body_item(?block, ?st),
+	
+	next_sibling(?pr, ?b), trace(?tr), before(?tr, ?pr),
+	 -> correct_act(?b), current_act(?b), SequenceEnd(?b)
+""",
+
+
+
+				###################
+				###################
 ################ Смысловые правила ################
-                ###################
-                ###################
+				###################
+				###################
 
 
 "CorrespondingActsMismatch_Error": """
@@ -125,16 +272,31 @@ RULES_DICT = {
 	executes(?a, ?s1),
 	executes(?b, ?s2),
 	DifferentFrom(?s1, ?s2),
-	
-	IRI(?a, ?a_iri),
-	IRI(?b, ?b_iri),
-	
-	stringConcat(?cmd, "trace_error{arg=", ?a_iri, "; cause=", ?b_iri, "; message=[CorrespondingActsMismatchError (broken trace flow)]; }")
-	 -> CREATE(INSTANCE, ?cmd)
+	 -> CorrespondingEndMismatched(?b), cause(?b, ?a)
 """,
 
+"CorrespondingActsHaveDifferentExecTime_Error": """
+	corresponding_end(?a, ?b), 
+	executes(?a, ?s1),
+	executes(?b, ?s2),
+	SameAs(?s1, ?s2),
+	exec_time(?a, ?n1),
+	exec_time(?b, ?n2),
+	notEqual(?n1, ?n2),
+	 -> CorrespondingEndPerformedDifferentTime(?b), cause(?b, ?a)
+""",
+"- EndAfterTraceEnd_Error": """
+	act_end(?a),
+	parent_of(?p, ?a), index(?p, 0),  # top-level act representing trace only has index of 0.
+	next(?a, ?b), ## act(?b), 
+	 -> AfterTraceEnd(?b), cause(?b, ?a)
+	""",
+
+
+
+
 # ! OFF
-"-ActStartsAfterEnd_Error": """
+"- - ActStartsAfterEnd_Error": """
 	Context(?c)
 	Block(?block)
 	Statement(?stmt1)
@@ -159,269 +321,144 @@ RULES_DICT = {
 
 "DuplicatesOfAct_Mistake": """
 	sequence(?block), 
+	act_begin(?block_act_b),
 	executes(?block_act_b, ?block), 
-	executes(?block_act_e, ?block), 
-
-	act_begin(?act1),
-	act_begin(?act2),
 
 	body_item(?block, ?st), 
-	executes(?act1, ?st), 
-	executes(?act2, ?st), 
+	executes(?a, ?st), 
+	executes(?b, ?st), 
 	
-	before(?act1, ?act2), 
-	
-	# before(?block_act_b, ?act1), 
-	# before(?block_act_b, ?act2), 
-	# before(?act1, ?block_act_e), 
-	# before(?act2, ?block_act_e), 
-    parent_of(?block_act_b, ?act1), 
-    parent_of(?block_act_b, ?act2), 
-    
+	parent_of(?block_act_b, ?a),
+	parent_of(?block_act_b, ?b),
+	act_begin(?a),
+	act_begin(?b),
+	DifferentFrom(?a, ?b),
 
-	DifferentFrom(?act1, ?act2),
+	before(?a, ?b), 
+	 -> DuplicateActInSequence(?b), cause(?b, ?a)
+""",
+
+
+"- GenericMisplaced_Mistake": """
+	act_begin(?act1),
+	executes(?act1, ?st), 
+	parent_of(?st2, ?st),
+
+	parent_of(?act2, ?act1),
+	executes(?act2, ?shouldbe_st2), 
 	
+	DifferentFrom(?shouldbe_st2, ?st2),
+	
+	IRI(?act1, ?act1_iri),
 	IRI(?act2, ?act2_iri),
+	IRI(?st, ?st_iri),
+	IRI(?st2, ?st2_iri),
+	IRI(?shouldbe_st2, ?shouldbe_st2_iri),
 	
-	stringConcat(?cmd, "trace_error{cause=", ?act2_iri, "; message=[DuplicateActs Of Stmt Error]; }")
+	stringConcat(?cmd, "trace_error{cause=", ?act1_iri, "; arg=", ?act2_iri, "; arg=", ?st2_iri, "; arg=", ?st_iri, "; arg=", ?shouldbe_st2_iri, "; message=[WrongContext: Act placed within inproper enclosing act]; }")
 	 -> CREATE(INSTANCE, ?cmd)
 """,
 
-
-# Нужно вычислить настоящий, должный родительский объект, затем всё просто.
-
-"GenericMisplaced_Mistake": """
-    act_begin(?act1),
-    executes(?act1, ?st), 
-    parent_of(?st2, ?st),
-
-    parent_of(?act2, ?act1),
-    executes(?act2, ?shouldbe_st2), 
+	# act1 = 85b_otvet_negativnyj_n1
+	# act2 = 83b_po_otvetu_n1
+	# shouldbe_st2 = 4_po_otvetu
+	# st2 = 9_elseif-otvet_negativnyj
+	# st = 10_otvet_negativnyj
 	
-    DifferentFrom(?shouldbe_st2, ?st2),
-    
-    IRI(?act1, ?act1_iri),
-    IRI(?act2, ?act2_iri),
-    IRI(?st, ?st_iri),
-    IRI(?st2, ?st2_iri),
-    IRI(?shouldbe_st2, ?shouldbe_st2_iri),
-    
-    stringConcat(?cmd, "trace_error{cause=", ?act1_iri, "; arg=", ?act2_iri, "; arg=", ?st2_iri, "; arg=", ?st_iri, "; arg=", ?shouldbe_st2_iri, "; message=[WrongContext: Act placed within inproper enclosing act]; }")
-     -> CREATE(INSTANCE, ?cmd)
-""",
-
-    # act1 = 85b_otvet_negativnyj_n1
-    # act2 = 83b_po_otvetu_n1
-    # shouldbe_st2 = 4_po_otvetu
-    # st2 = 9_elseif-otvet_negativnyj
-    # st = 10_otvet_negativnyj
-    
 
 # Акт находится в пределах родительского акта, но не непосредственно под ним
 # ...
 
 
-# Здесь, думаю, надо добавить в upd_onto счётчик связей
-"-MissingAct_Mistake": """
-    
+"- -MissingAct_Mistake": """
+	
 """,
 
 
-"ActsPairMisorder_Mistake": """
+"- ActsPairMisorder_Mistake": """
 
-    # начало и конец акта блока
-    sequence(?block), 
-    executes(?block_act_b, ?block), 
-    corresponding_end(?block_act_b, ?block_act_e), 
+	# начало и конец акта блока
+	sequence(?block), 
+	executes(?block_act_b, ?block), 
+	corresponding_end(?block_act_b, ?block_act_e), 
 
-    act_begin(?act1),
-    act_begin(?act2),
+	act_begin(?act1),
+	act_begin(?act2),
 
-    # акты в пределах акта блока
-    # before(?block_act_b, ?act1), 
-    # before(?block_act_b, ?act2), 
-    # before(?act1, ?block_act_e), 
-    # before(?act2, ?block_act_e), 
-    parent_of(?block_act_b, ?act1), 
-    parent_of(?block_act_b, ?act2), 
+	# акты в пределах акта блока
+	# before(?block_act_b, ?act1), 
+	# before(?block_act_b, ?act2), 
+	# before(?act1, ?block_act_e), 
+	# before(?act2, ?block_act_e), 
+	parent_of(?block_act_b, ?act1), 
+	parent_of(?block_act_b, ?act2), 
 
-    # акты выполняют пару последовательных действий
-    body_item(?block, ?st1), 
-    body_item(?block, ?st2), 
-    next(?st1, ?st2),         # st1 --> st2
-    executes(?act1, ?st1), 
-    executes(?act2, ?st2), 
-    
-    # но сами стоят в другом порядке.
-    before(?act2, ?act1), 
-    
-    IRI(?act2, ?act2_iri),
-    IRI(?act1, ?act1_iri),
-    
-    stringConcat(?cmd, "trace_error{cause=", ?act2_iri, "; arg=", ?act1_iri, "; message=[TooEarly: Act should not occure before the act it must follow]; }")
-     -> CREATE(INSTANCE, ?cmd)
+	# акты выполняют пару последовательных действий
+	body_item(?block, ?st1), 
+	body_item(?block, ?st2), 
+	next(?st1, ?st2),         # st1 --> st2
+	executes(?act1, ?st1), 
+	executes(?act2, ?st2), 
+	
+	# но сами стоят в другом порядке.
+	before(?act2, ?act1), 
+	
+	IRI(?act2, ?act2_iri),
+	IRI(?act1, ?act1_iri),
+	
+	stringConcat(?cmd, "trace_error{cause=", ?act2_iri, "; arg=", ?act1_iri, "; message=[TooEarly: Act should not occure before the act it must follow]; }")
+	 -> CREATE(INSTANCE, ?cmd)
 """,
 
-"Init_Count_std_and_corr_acts": """
-    # executes(?std_act, ?st),
-    # student_act(?std_act),
-    # act_begin(?std_act),
-    # executes(?corr_act, ?st),
-    correct_act(?corr_act),
-    act_begin(?corr_act),
-    # DifferentFrom(?std_act, ?corr_act)
-     -> COUNT_has_student_act(?corr_act, true), COUNT_has_correct_act(?corr_act, true)
-     # -> LINK_COUNT_has_student_act(?corr_act, true), LINK_COUNT_has_correct_act(?corr_act, true)
+"- Init_Count_std_and_corr_acts": """
+	# executes(?std_act, ?st),
+	# student_act(?std_act),
+	# act_begin(?std_act),
+	# executes(?corr_act, ?st),
+	correct_act(?corr_act),
+	act_begin(?corr_act),
+	# DifferentFrom(?std_act, ?corr_act)
+	 -> COUNT_has_student_act(?corr_act, true), COUNT_has_correct_act(?corr_act, true)
+	 # -> LINK_COUNT_has_student_act(?corr_act, true), LINK_COUNT_has_correct_act(?corr_act, true)
 
 """,
-"Count_std_acts": """
-    executes(?std_act, ?st),
-    student_act(?std_act),
-    act_begin(?std_act),
-    
-    executes(?corr_act2, ?st),
-    correct_act(?corr_act2),
-    act_begin(?corr_act2),
-    
-    parent_of(?par_act, ?std_act),  # в пределах одного объемлющего акта
-    parent_of(?par_act, ?corr_act2),
-    
-    # DifferentFrom(?std_act, ?corr_act2)
-     -> has_student_act(?corr_act2, ?std_act)
+"- Count_std_acts": """
+	executes(?std_act, ?st),
+	student_act(?std_act),
+	act_begin(?std_act),
+	
+	executes(?corr_act2, ?st),
+	correct_act(?corr_act2),
+	act_begin(?corr_act2),
+	
+	parent_of(?par_act, ?std_act),  # в пределах одного объемлющего акта
+	parent_of(?par_act, ?corr_act2),
+	
+	# DifferentFrom(?std_act, ?corr_act2)
+	 -> has_student_act(?corr_act2, ?std_act)
 """,
-"Count_corr_acts": """
-    executes(?corr_act1, ?st),
-    correct_act(?corr_act1),
-    act_begin(?corr_act1),
-    executes(?corr_act2, ?st),
-    correct_act(?corr_act2),
-    act_begin(?corr_act2),
-    parent_of(?par_act, ?corr_act1),  # в пределах одного объемлющего акта
-    parent_of(?par_act, ?corr_act2),
-     -> has_correct_act(?corr_act1, ?corr_act2)
-""",
-
-# Подготовка к сопоставлению корректных актов студенческим
-"-AlignSequenceActs_student-correct": """
-
-    # sequence(?block), 
-    # parent_of(?block, ?st),
-    
-    executes(?std_act, ?st),
-    student_act(?std_act),
-    executes(?corr_act, ?st),
-    student_act(?corr_act),
-    
-    # DifferentFrom(?std_act, ?corr_act),
-    
-    COUNT_has_student_act()
-    
-    IRI(?act2, ?act2_iri),
-    IRI(?act1, ?act1_iri),
-    
-    stringConcat(?cmd, "trace_error{cause=", ?act2_iri, "; arg=", ?act1_iri, "; message=[TooEarly: Act should not occure before the act it must follow]; }")
-     -> CREATE(INSTANCE, ?cmd)
-""",
-
-
-# Подготовка к подсчёту числа связей
-"-PrepareCountingSequence_student-correct": """
-
-    # # начало и конец акта блока
-    # sequence(?block), 
-    # executes(?block_act_b, ?block), 
-    # corresponding_end(?block_act_b, ?block_act_e), # построение актов следования завершено
-    # body_item(?block, ?st),
-
-    #     # act_begin(?act1),
-    #     # # акт в пределах акта блока
-    #     # parent_of(?block_act_b, ?act1)
-
-    # IRI(?block_act_b, ?block_act_b_iri),
-    # IRI(?st, ?st_iri),
-    
-    # stringConcat(?cmd, "Counter{arg=", ?block_act_b_iri, "; arg=", ?st_iri, "; COUNT_target=true;}")
-    #  -> CREATE(INSTANCE, ?cmd)
-""",
-
-# Подготовка к подсчёту числа связей
-"-PrepareCountingSequenceActs": """
-
-    # начало и конец акта блока
-    sequence(?block), 
-    executes(?block_act_b, ?block), 
-    corresponding_end(?block_act_b, ?block_act_e), # построение актов следования завершено
-    body_item(?block, ?st),
-
-        # act_begin(?act1),
-        # # акт в пределах акта блока
-        # parent_of(?block_act_b, ?act1)
-
-    IRI(?block_act_b, ?block_act_b_iri),
-    IRI(?st, ?st_iri),
-    
-    stringConcat(?cmd, "Counter{arg=", ?block_act_b_iri, "; arg=", ?st_iri, "; COUNT_target=true;}")
-     -> CREATE(INSTANCE, ?cmd)
-""",
-
-# Подсчёт числа связей
-"-CountSequenceActs": """
-
-    # # начало и конец акта блока
-    # sequence(?block), 
-    # executes(?block_act_b, ?block), 
-    # corresponding_end(?block_act_b, ?block_act_e), # построение актов следования завершено
-    # body_item(?block, ?st),
-
-    # акт существует, получим счётчик
-    Counter(?counter),
-    arg(?counter, ?block_act_b),
-    arg(?counter, ?st),
-
-    executes(?act1, ?st),  # акт нужного действия
-    act_begin(?act1),
-    parent_of(?block_act_b, ?act1) # акт в пределах акта блока
-
-    # привязываем найденный акт, чтобы посчитать его
-     -> target(?counter, ?act1)
-""",
-
-# помечаем конец следования как ошибочный, если акт отсутствует
-# Надо указать на акт, следующий за пропущенным ...
-"MissingActInSequence_Mistake": """
-    correct_act(?corr_act2),
-    # act_begin(?corr_act2),
-    
-    N_has_student_act(?corr_act2, ?std_n),
-    N_has_correct_act(?corr_act2, ?corr_n),
-    
-    lessThan(?std_n, ?corr_n),  # не хватает актов в трассе студента
-    
-    # stringConcat(?cmd, "std_n=", ?std_n, "; corr_n=", ?corr_n)
-    # -> expr_value(?corr_act2, ?cmd)
-    # -> expr_value(?corr_act2, ?std_n)
-    
-    # correct_next(?corr_act2, ?next_corr_act), # следующий за пропущенным
-    # correct_act(?next_corr_act),
-    # student_act(?next_corr_act),
-    
-    IRI(?corr_act2, ?corr_act_iri),
-    # IRI(?next_corr_act, ?next_corr_act_iri),
-    
-    stringConcat(?cmd, "trace_error{cause=", ?corr_act_iri, "; arg=", ?corr_act_iri, "; message=[MissingActAnywhere, not only In Sequence]; }")
-     -> CREATE(INSTANCE, ?cmd)
+"- Count_corr_acts": """
+	executes(?corr_act1, ?st),
+	correct_act(?corr_act1),
+	act_begin(?corr_act1),
+	executes(?corr_act2, ?st),
+	correct_act(?corr_act2),
+	act_begin(?corr_act2),
+	parent_of(?par_act, ?corr_act1),  # в пределах одного объемлющего акта
+	parent_of(?par_act, ?corr_act2),
+	 -> has_correct_act(?corr_act1, ?corr_act2)
 """,
 
 "-Test_lessThan": """
-    lessThan(0, 1)
-     -> expr_value(INSTANCE, "debug: lessThan works!")  # OK!
+	lessThan(0, 1)
+	 -> expr_value(INSTANCE, "debug: lessThan works!")  # OK!
  """,
 
 "-Test_int_prop2": """
-    Counter(?counter),
-    COUNT_target(?counter, 0)
+	Counter(?counter),
+	COUNT_target(?counter, 0)
 
-     ->  arg(?counter, ?counter)  # DEBUG
+	 ->  arg(?counter, ?counter)  # DEBUG
 """,
 
 
@@ -432,16 +469,16 @@ RULES_DICT = {
 comment_re = re.compile(r"(?://|#).*$")
 
 for k in tuple(RULES_DICT.keys()):
-    if k.startswith("-"):
-        # print("skipping SWRL rule due to minus: \t", k)
-        del RULES_DICT[k]
-        continue
-    txt = RULES_DICT[k]
-    lines = [
-                comment_re.sub(lambda m:" "*len(m.group(0)), line)
-                for line in 
-                txt.split("\n")
-            ]
-    RULES_DICT[k] = "\n".join(lines)
-    
+	if k.startswith("-"):
+		# print("skipping SWRL rule due to minus: \t", k)
+		del RULES_DICT[k]
+		continue
+	txt = RULES_DICT[k]
+	lines = [
+				comment_re.sub(lambda m:" "*len(m.group(0)), line)
+				for line in 
+				txt.split("\n")
+			]
+	RULES_DICT[k] = "\n".join(lines)
+	
 # print(RULES_DICT)
