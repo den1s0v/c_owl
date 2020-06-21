@@ -413,7 +413,7 @@ class TraceTester():
         self.inject_algorithm_to_ontology(onto)
         
         self.make_correct_trace()
-        self.prepare_act_candidates(onto, extra_act_entries=0)
+        self.prepare_act_candidates(onto, extra_act_entries=1)
         self.inject_trace_to_ontology(onto, self.data["trace"], ("student_act",), "next")
         # self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
         # self.merge_traces(onto, self.data["student_act_iri_list"], self.data["correct_act_iri_list"])
@@ -543,8 +543,8 @@ class TraceTester():
         trace_obj = onto.trace(iri)
         trace_obj.is_a.append(onto.correct_act)
         make_triple(trace_obj, onto.executes, onto[self.data["algorithm"]["iri"]])
-        make_triple(trace_obj, onto.index, 0)
-        make_triple(trace_obj, onto.exec_time, 1)
+        make_triple(trace_obj, onto.index, 0)      # set to 0 so next is 1
+        make_triple(trace_obj, onto.exec_time, 0)  # set to 0 so next is 1
         make_triple(trace_obj, onto.in_trace, trace_obj)  # each act belongs to trace
         
         

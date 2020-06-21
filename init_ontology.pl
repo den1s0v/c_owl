@@ -26,9 +26,20 @@ swrl_rule() :-
 	index(A, ^^(IA, _)) , 
 	index(B, ^^(IB, _)) , 
 	IB =:= IA + 1 ,
+
+	next_sibling(Pr, B), correct_act(Pr),
+	% exec_time(Pr, ^^(NPr,_)),
+	% exec_time(B, ^^(NB,_)), 
+	% NPr < NB ,  % должен стоять иметь следующий номер!
+	index(Pr, ^^(IPr,_)), 
+	IPr =< IA ,  % пред. брат B должен стоять НЕ позже предыдущего акта A!
+	
 	rdf_assert(A, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#next', B) ,
-	% print(B) , nl,
-	% print(IB) , nl,
+	% print("A:") , print(A) , nl,
+	% print("P:") , print(Pr) , nl,
+	% print("B:") , print(B) , nl,
+	% % print(B) , nl,
+	% % format(' n~d --next-> n~d', [NPr, NB]) , nl,
 	% nl,
 	fail.
 	
@@ -96,6 +107,8 @@ swrl_rule_once() :-
 	in_trace(A, T) , in_trace(B, T) , 
 	exec_time(A, ^^(IA, _)) , 
 	exec_time(B, ^^(IB, _)) , 
+	executes(A, St),
+	executes(B, St),
 	IB =:= IA + 1 ,
 	rdf_assert(A, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#next_sibling', B) ,
 	% print(B) , nl,
@@ -113,6 +126,8 @@ swrl_rule_once() :-
 	in_trace(A, T) , in_trace(B, T) , 
 	exec_time(A, ^^(IA, _)) , 
 	exec_time(B, ^^(IB, _)) , 
+	executes(A, St),
+	executes(B, St),
 	IB =:= IA + 1 ,
 	rdf_assert(A, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#next_sibling', B) ,
 	% print(B) , nl,
@@ -225,14 +240,14 @@ swrl_rule() :-
 	act_begin(B) ,
 	executes(B, St) ,
 	
-	next_sibling(Pr, B), correct_act(Pr),
-	index(Pr, ^^(IPr,_)), index(B, ^^(IB,_)), IPr < IB ,  % должен стоять ПОСЛЕ!
+	% next_sibling(Pr, B), correct_act(Pr),
+	% index(Pr, ^^(IPr,_)), index(B, ^^(IB,_)), IPr < IB ,  % должен стоять ПОСЛЕ!
 	
 	not(correct_act(B)) ,
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#correct_act') ,
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#current_act') ,
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#FunctionBegin') ,
-	print("FunctionBegin: ") , print(B) , nl,
+	print("FunctionBegin: "),nl, print(A),nl, print(B),nl,nl,
 	fail.
 
 
@@ -264,8 +279,8 @@ swrl_rule() :-
 	act_begin(B) ,
 	executes(B, St) ,
 	
-	next_sibling(Pr, B), correct_act(Pr), 
-	index(Pr, ^^(IPr,_)), index(B, ^^(IB,_)), IPr < IB ,  % должен стоять ПОСЛЕ!
+	% next_sibling(Pr, B), correct_act(Pr), 
+	% index(Pr, ^^(IPr,_)), index(B, ^^(IB,_)), IPr < IB ,  % должен стоять ПОСЛЕ!
 	
 	not(correct_act(B)) ,
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#correct_act') ,
@@ -317,8 +332,13 @@ run_swrl(Prev3plesCount, Depth) :-
 		;
 		% !, 
 		statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
-		format("Reasoning finished in ~d iterations, ~d triples in graph total.\nTime elapised: ~d ms.", [Depth, Count, TimeSinceLastCall]), nl
+		format("Reasoning finished in ~d iterations, ~d triples in graph total.\nTime it took: ~d ms.", [Depth, Count, TimeSinceLastCall]), nl
 	).
+
+
+report_TimeSinceStart :-
+		statistics(walltime, [TimeSinceStart | [_TimeSinceLastCall]]),
+		format("Time Since Start: ~d ms.", [TimeSinceStart]), nl.
 
 
 /*
