@@ -1,3 +1,4 @@
+# encoding: utf-8
 # ctrlstrct_test.py
 
 """
@@ -27,6 +28,7 @@ SAVE_RDF = True
 
 # global log storage
 LOG = []
+	
 	
 def log_print(*args, sep=" ", end="\n"):
 	s = sep.join(map(str, args)) + end

@@ -545,7 +545,7 @@ class TraceTester():
         make_triple(trace_obj, onto.executes, onto[self.data["algorithm"]["iri"]])
         make_triple(trace_obj, onto.index, 0)
         make_triple(trace_obj, onto.exec_time, 1)
-        make_triple(trace_obj, onto.before, trace_obj)  # init existance flag
+        make_triple(trace_obj, onto.in_trace, trace_obj)  # each act belongs to trace
         
         
         N = sum(alg_id2max_exec_n.values()) * 2  # as each stmt has begin & end!
@@ -579,6 +579,7 @@ class TraceTester():
                         make_triple(obj, onto.executes, onto[alg_elem["iri"]])
                         make_triple(obj, onto.index, index)
                         make_triple(obj, onto.exec_time, exec_n)
+                        make_triple(obj, onto.in_trace, trace_obj)
                         
                         # attach expr value: for act Begin only!
                         if mark == "b" and alg_elem["type"] in {"expr"}:
@@ -973,9 +974,9 @@ def init_persistent_structure(onto):
         # новое свойство next_sibling
         next_sibling = types.new_class("next_sibling", (Thing >> Thing, ))
         # новое свойство before
-        prop_before = types.new_class("before", (Thing >> Thing, TransitiveProperty))
-        # # новое свойство correct_before
-        # prop_correct_before = types.new_class("correct_before", (Thing >> Thing, ))
+        # prop_before = types.new_class("before", (Thing >> Thing, TransitiveProperty))
+        # новое свойство in_trace
+        prop_in_trace = types.new_class("in_trace", (act >> trace, ))
         
         # новое свойство index
         prop_index = types.new_class("index", (Thing >> int, FunctionalProperty, ))
@@ -1045,6 +1046,7 @@ def init_persistent_structure(onto):
             "StmtEnd",
             "DebugObj",
         ]:
+            # types.new_class(class_name, (Thing,))
             types.new_class(class_name, (correct_act,))
             
         # for prop_name in ("reason", ):  # for correct acts !
@@ -1170,6 +1172,8 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, mistakes
     if debug_rdf_fpath:
         onto.save(file=debug_rdf_fpath, format='rdfxml')
         print("Saved RDF file: {} !".format(debug_rdf_fpath))
+
+        exit()
         
         sync_stardog(debug_rdf_fpath)
         
@@ -1246,23 +1250,27 @@ def what_to_drop_to_reach_ordering(arr: list) -> list:
 
 
 from pprint import pprint
+from stardog_credentails import *
+
 
 def sync_stardog(ontology_path, save_as_path=None):
-  import stardog
-
-  conn_details = {
-    'endpoint': 'http://localhost:5820',
-    'username': 'admin',
-    'password': 'admin'
-  }
+  # DEBUG
+  # return
   
-  dbname = "ctrlstrct_db"
+  import stardog
+  
+  # conn_details = {
+  #   'endpoint': 'http://localhost:5820',
+  #   'username': 'admin',
+  #   'password': 'admin'
+  # }
+  # dbname = "ctrlstrct_db"
+  # # graphname = "urn:graph_data"
+  # # schema_graphname = "urn:graph_schema"
   
   ontology_file = stardog.content.File(ontology_path)
-  graphname = "urn:graph_data"
   
   schema_file = stardog.content.File("stgd_schema.ttl")
-  schema_graphname = "urn:graph_schema"
   
   save_as = save_as_path or (ontology_path + "_ext")
 

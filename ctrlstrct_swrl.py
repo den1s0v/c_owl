@@ -14,12 +14,12 @@ RULES_DICT = {
 				###################
 				###################
 
-
+# (s1)
 "next_to__current_act": """
 	current_act(?a), index(?a, ?ia), add(?ib, ?ia, 1),
 	act(?b), index(?b, ?_ib),
 	equal(?_ib, ?ib), 
-	 -> next(?a, ?b), before(?a, ?b)
+	 -> next(?a, ?b)
  """,
 
 "- hasNextAct_to_beforeAct": """
@@ -29,6 +29,7 @@ RULES_DICT = {
 	// Another one.
  """,
 
+# (s2)
 "assign_next_sibling_0-1-b": """
 	trace(?a),
 	act_begin(?b), exec_time(?b, ?_ib),
@@ -36,6 +37,7 @@ RULES_DICT = {
 	# DifferentFrom(?a, ?b),  # stardog fails the rule here!
 	 -> next_sibling(?a, ?b)
  """,
+# (s3)
 "assign_next_sibling_0-1-e": """
 	trace(?a),
 	act_end(?b), exec_time(?b, ?_ib),
@@ -43,6 +45,7 @@ RULES_DICT = {
 	# DifferentFrom(?a, ?b),
 	 -> next_sibling(?a, ?b)
  """,
+# (s4)
 "assign_next_sibling-b": """
 	act_begin(?a), exec_time(?a, ?ia), add(?_ib, ?ia, 1),
 	act_begin(?b), exec_time(?b, ?ib),  # unification of a bound var does rebind in stardog ??!
@@ -52,6 +55,7 @@ RULES_DICT = {
 	executes(?b, ?st),
 	 -> next_sibling(?a, ?b)
  """,
+# (s5)
 "assign_next_sibling-e": """
 	act_end(?a), exec_time(?a, ?ia), add(?_ib, ?ia, 1),
 	act_end(?b), exec_time(?b, ?ib),
@@ -93,61 +97,66 @@ RULES_DICT = {
 # 
 # func_a            func_a.body             func_a.body.first
 
-"- DepthOfProgramIs0": """
-	algorithm(?a), entry_point(?a, ?e), 
-	executes(?p, ?e), correct_act(p),
-	 -> depth(?p, 0)
-	""",
+# "- DepthOfProgramIs0": """
+# 	algorithm(?a), entry_point(?a, ?e), 
+# 	executes(?p, ?e), correct_act(p),
+# 	 -> depth(?p, 0)
+# 	""",
 
+# (s6)
 "DepthIncr": """
 	act_begin(?a), next(?a, ?b), act_begin(?b), 
 	# depth(?a, ?da), add(?db, ?da, 1)
 	 -> parent_of(?a, ?b)  # depth(?b, ?db),
 	""",
-"- DepthIncr_correct": """
-	act_begin(?a), correct_next(?a, ?b), act_begin(?b), 
-	depth(?a, ?da), add(?db, ?da, 1)
-	 -> depth(?b, ?db), parent_of(?a, ?b)
-	""",
+# "- DepthIncr_correct": """
+# 	act_begin(?a), correct_next(?a, ?b), act_begin(?b), 
+# 	depth(?a, ?da), add(?db, ?da, 1)
+# 	 -> depth(?b, ?db), parent_of(?a, ?b)
+# 	""",
 
+# (s7)
 "DepthSame_b-e": """
 	act_begin(?a), next(?a, ?b), act_end(?b), 
 	parent_of(?p, ?a),  # depth(?a, ?da), 
 	 -> parent_of(?p, ?b), corresponding_end(?a, ?b)
 	 # depth(?b, ?da)
 	""",
-"- DepthSame_b-e_correct": """
-	act_begin(?a), correct_next(?a, ?b), act_end(?b), 
-	depth(?a, ?da), parent_of(?p, ?a)
-	 -> depth(?b, ?da), parent_of(?p, ?b), corresponding_end(?a, ?b)
-	""",
+# "- DepthSame_b-e_correct": """
+# 	act_begin(?a), correct_next(?a, ?b), act_end(?b), 
+# 	depth(?a, ?da), parent_of(?p, ?a)
+# 	 -> depth(?b, ?da), parent_of(?p, ?b), corresponding_end(?a, ?b)
+# 	""",
 	
+# (s8)
  # проверка на Начало А - Конец Б (должен был быть Конец А) - CorrespondingActsMismatch_Error
 "DepthSame_e-b": """
 	act_end(?a), next(?a, ?b), act_begin(?b), 
 	parent_of(?p, ?a)  # depth(?a, ?da),
 	 -> parent_of(?p, ?b)  # depth(?b, ?da), 
 	""",
-"- DepthSame_e-b_correct": """
-	act_end(?a), correct_next(?a, ?b), act_begin(?b), 
-	parent_of(?p, ?a)  # depth(?a, ?da),
-	 -> depth(?b, ?da), parent_of(?p, ?b)
-	 -> parent_of(?p, ?b)  # depth(?b, ?da), 
-	""",
+# "- DepthSame_e-b_correct": """
+# 	act_end(?a), correct_next(?a, ?b), act_begin(?b), 
+# 	parent_of(?p, ?a)  # depth(?a, ?da),
+# 	 -> depth(?b, ?da), parent_of(?p, ?b)
+# 	 -> parent_of(?p, ?b)  # depth(?b, ?da), 
+# 	""",
 
+# (s9)
 "DepthDecr": """
 	act_end(?a), next(?a, ?b), act_end(?b), 
 	# depth(?a, ?da), subtract(?db, ?da, 1), 
 	parent_of(?p, ?a)
 	 -> corresponding_end(?p, ?b)  # depth(?b, ?db),
 	""",
-"- DepthDecr_correct": """
-	act_end(?a), correct_next(?a, ?b), act_end(?b), 
-	depth(?a, ?da), subtract(?db, ?da, 1), 
-	parent_of(?p, ?a)
-	 -> depth(?b, ?db), corresponding_end(?p, ?b)
-	""",
+# "- DepthDecr_correct": """
+# 	act_end(?a), correct_next(?a, ?b), act_end(?b), 
+# 	depth(?a, ?da), subtract(?db, ?da, 1), 
+# 	parent_of(?p, ?a)
+# 	 -> depth(?b, ?db), corresponding_end(?p, ?b)
+# 	""",
 
+# (s10)
 "SameParentOfCorrActs": """
 	corresponding_end(?a, ?b), parent_of(?p, ?a)
 	 -> parent_of(?p, ?b)
@@ -159,7 +168,7 @@ RULES_DICT = {
 ################ Производящие правила ################
 				######################
 				######################
-"DBG_connect_FunctionBegin": """
+"-# DBG_connect_FunctionBegin": """
 	current_act(?a),
 	act_begin(?a),
 	func(?func_), 
@@ -170,10 +179,10 @@ RULES_DICT = {
 	act_begin(?b),
 	executes(?b, ?st),
 	
-	 -> DebugObj(?a)
-
+	 -> DebugObj(?a), DebugObj(?b)
 """,
 
+# OK (g1) !
 "connect_FunctionBegin": """
 	current_act(?a),
 	act_begin(?a),
@@ -184,13 +193,15 @@ RULES_DICT = {
 	next(?a, ?b),
 	act_begin(?b),
 	executes(?b, ?st),
+	# SameAs(?st, ?_st), # stardog fails with error here
 	
-	# check that previous execution of st was in correct trace
-	next_sibling(?pr, ?b), trace(?tr), before(?tr, ?pr),
+	# check that previous execution of st was in correct sub-trace
+	next_sibling(?pr, ?b), correct_act(?pr),
 	 -> correct_act(?b), current_act(?b), FunctionBegin(?b)
 """,
 
-"connect_SequenceBegin": """
+# (g2) - Infers nothing in Stardog
+"--- connect_SequenceBegin": """
 	current_act(?a),
 	act_begin(?a),
 	sequence(?block), 
@@ -202,11 +213,11 @@ RULES_DICT = {
 	act_begin(?b),
 	executes(?b, ?st),
 	
-	next_sibling(?pr, ?b), trace(?tr), before(?tr, ?pr),
+	next_sibling(?pr, ?b), correct_act(?pr),
 	 -> correct_act(?b), current_act(?b), SequenceBegin(?b)
 """,
 
-"connect_SequenceNext": """
+"--- connect_SequenceNext": """
 	current_act(?a),
 	act_end(?a),
 	parent_of(?p, ?a),
@@ -221,11 +232,11 @@ RULES_DICT = {
 	act_begin(?b),
 	executes(?b, ?st2),
 	
-	next_sibling(?pr, ?b), trace(?tr), before(?tr, ?pr),
+	next_sibling(?pr, ?b), correct_act(?pr),
 	 -> correct_act(?b), current_act(?b), SequenceNext(?b)
 """,
 
-"connect_StmtEnd": """
+"--- connect_StmtEnd": """
 	current_act(?a),
 	act_begin(?a),
 	stmt(?st), 
@@ -235,7 +246,8 @@ RULES_DICT = {
 	next(?a, ?b),
 	executes(?b, ?st),
 	
-	exec_time(?a, ?t), exec_time(?b, ?t),
+	exec_time(?a, ?t), exec_time(?b, ?_t),
+	equal(?t, ?_t),
 	 -> current_act(?b), StmtEnd(?b)
 """,
 
@@ -254,7 +266,7 @@ RULES_DICT = {
 	executes(?b, ?block),
 	body_item(?block, ?st),
 	
-	next_sibling(?pr, ?b), trace(?tr), before(?tr, ?pr),
+	next_sibling(?pr, ?b), correct_act(?pr),
 	 -> correct_act(?b), current_act(?b), SequenceEnd(?b)
 """,
 
@@ -267,7 +279,7 @@ RULES_DICT = {
 				###################
 
 
-"CorrespondingActsMismatch_Error": """
+"--- CorrespondingActsMismatch_Error": """
 	corresponding_end(?a, ?b), 
 	executes(?a, ?s1),
 	executes(?b, ?s2),
@@ -275,7 +287,7 @@ RULES_DICT = {
 	 -> CorrespondingEndMismatched(?b), cause(?b, ?a)
 """,
 
-"CorrespondingActsHaveDifferentExecTime_Error": """
+"--- CorrespondingActsHaveDifferentExecTime_Error": """
 	corresponding_end(?a, ?b), 
 	executes(?a, ?s1),
 	executes(?b, ?s2),
@@ -319,7 +331,7 @@ RULES_DICT = {
 		
 	""",
 
-"DuplicatesOfAct_Mistake": """
+"---------- DuplicatesOfAct_Mistake": """
 	sequence(?block), 
 	act_begin(?block_act_b),
 	executes(?block_act_b, ?block), 
