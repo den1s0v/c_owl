@@ -1,0 +1,15 @@
+:r a :Rectangle ;
+   :width 5 ;
+   :height 8 .
+
+:Rectangle rdfs:subClassOf :Shape .
+
+IF {
+	?r a :Rectangle ;
+	   :width ?w ;
+	   :height ?h
+    BIND (?w * ?h AS ?area)
+}
+THEN {
+    ?r :area ?area
+}
