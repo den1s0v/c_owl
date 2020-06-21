@@ -25,7 +25,7 @@ RULES_DICT = {
 "- hasNextAct_to_beforeAct": """
 	next(?a, ?b) -> before(?a, ?b)  # 'before' connects correct acts and acts next to current, only.
 
-	# a comment in rule !!!
+	# a comment in rule!
 	// Another one.
  """,
 
