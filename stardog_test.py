@@ -1,9 +1,9 @@
 # stardog_test
 
 import time
-_start_time = time.time()
+# _start_time = time.time()
+# print("Running...")
 
-print("Running...")
 # print("Started at", _start_time, "and running...")
 
 # def secondsToStr(t):
@@ -24,7 +24,7 @@ from pprint import pprint
 
 from stardog_credentails import *
 
-def main():
+def run_query():
 
     # conn_details = {
     # 'endpoint': 'http://localhost:5820',
@@ -81,13 +81,22 @@ def main():
         pprint(r['results']['bindings'])
         print(len(r['results']['bindings']), "total.")
 
-if __name__ == '__main__':
+def main() -> float:
+    _start_time = time.time()
+    print("Running SPARQL query...")
+    
     try:
-        main()
+        run_query()
         # pass
     except Exception as e:
         print(e)
         pass
   
-    print("[%.2f sec elapsed]" % (time.time() - _start_time), end=" ")
+    seconds = time.time() - _start_time
+    print("[%.2f sec elapsed]" % seconds, end=" ")
+    return seconds
+
+    
+if __name__ == '__main__':
+    main()
 
