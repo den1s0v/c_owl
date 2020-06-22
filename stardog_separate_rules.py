@@ -54,7 +54,7 @@ def main():
     # extra_act_entries=0, rules_filter=None, reasoning=None, on_done=None
     
     ### Debug!
-    # rules_turned_on = rules_turned_on[:1]
+    # rules_turned_on = rules_turned_on[:2]
     
     log2file("\n===============\nStarting...\n\n")
     

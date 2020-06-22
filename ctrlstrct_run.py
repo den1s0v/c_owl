@@ -1184,7 +1184,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         print("Saved RDF file: {} !".format(debug_rdf_fpath))
 
     if reasoning == "stardog":
-        seconds = sync_stardog(debug_rdf_fpath)
+        seconds = sync_stardog(debug_rdf_fpath, ontology_prefix=my_iri + "#")
         
     # exit()
         
@@ -1213,11 +1213,11 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         
     return onto, []  ### Debug exit
     
-    exit()
+    # exit()
         
-    mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
+    # mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
     
-    return onto, list(mistakes.values())
+    # return onto, list(mistakes.values())
 
 
 def plain_list(list_of_lists):
@@ -1269,7 +1269,7 @@ from pprint import pprint
 from stardog_credentails import *
 
 
-def sync_stardog(ontology_path, save_as_path=None):
+def sync_stardog(ontology_path, save_as_path=None, ontology_prefix=None):
   # DEBUG
   # return
   
@@ -1334,7 +1334,7 @@ def sync_stardog(ontology_path, save_as_path=None):
         # run query defined in another file ...
         from stardog_test import main as run_stardog_query
         
-        seconds = run_stardog_query()
+        seconds = run_stardog_query(ontology_prefix)
         return seconds
   
   except Exception as e:

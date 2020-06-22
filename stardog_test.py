@@ -24,8 +24,10 @@ from pprint import pprint
 
 from stardog_credentails import *
 
-def run_query():
-
+def run_query(ontology_prefix=None):
+    
+    ontology_prefix = ontology_prefix or "http://vstu.ru/poas/ctrl_structs_2020-05_v1#"
+    
     # conn_details = {
     # 'endpoint': 'http://localhost:5820',
     # 'username': 'admin',
@@ -54,7 +56,7 @@ def run_query():
               # ?s a / rdfs:subClassOf onto:act .  # prop chain!
               # ?o a onto:act .  # indirect cast does not work without reasoning!
 
-        query = """PREFIX onto: <http://vstu.ru/poas/ctrl_structs_2020-05_v1#>
+        query = """PREFIX onto: <%s>
         PREFIX owl: <http://www.w3.org/2002/07/owl#>
           
           SELECT DISTINCT * WHERE {  
@@ -72,7 +74,7 @@ def run_query():
               # ?s onto:before ?o .
               # ?o rdfs:subClassOf onto:Erroneous 
               # ?o rdfs:subClassOf onto:correct_act 
-          }"""
+          }""" % ontology_prefix
         
         # r = conn.select(query, reasoning=True)
         # r = conn.select(query, reasoning=False)
@@ -81,12 +83,12 @@ def run_query():
         pprint(r['results']['bindings'])
         print(len(r['results']['bindings']), "total.")
 
-def main() -> float:
+def main(ontology_prefix=None) -> float:
     _start_time = time.time()
     print("Running SPARQL query...")
     
     try:
-        run_query()
+        run_query(ontology_prefix)
         # pass
     except Exception as e:
         print(e)
