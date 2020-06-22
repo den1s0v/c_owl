@@ -408,12 +408,12 @@ class TraceTester():
         # pass
         # exit()
         
-    def inject_to_ontology(self, onto):
+    def inject_to_ontology(self, onto, extra_act_entries=0):
         
         self.inject_algorithm_to_ontology(onto)
         
         self.make_correct_trace()
-        self.prepare_act_candidates(onto, extra_act_entries=1)
+        self.prepare_act_candidates(onto, extra_act_entries=extra_act_entries)
         self.inject_trace_to_ontology(onto, self.data["trace"], ("student_act",), "next")
         # self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
         # self.merge_traces(onto, self.data["student_act_iri_list"], self.data["correct_act_iri_list"])
@@ -1054,10 +1054,14 @@ def init_persistent_structure(onto):
         #         types.new_class(prop_name, (correct_act >> Thing,))
 
 
-def load_swrl_rules(onto, rules_dict):
+def load_swrl_rules(onto, rules_dict, rules_filter=None):
+    """ rules_filter: None or callable hat receives name of rule and returns boolean """
     
     with onto:
         for k in rules_dict:
+            if rules_filter and not rules_filter(k):
+                continue
+                
             rule = rules_dict[k]
             try:
                 Imp(k).set_as_rule(rule)
@@ -1106,6 +1110,8 @@ def extact_mistakes(onto, as_objects=False) -> dict:
 
 
 def process_algtr(alg_json, trace_json, debug_rdf_fpath=None, verbose=1, mistakes_as_objects=False) -> "onto, mistakes_list":
+    raise "Deprecated: process_algtr()"
+  
     # каркас онтологии, наполненный минимальными фактами об алгоритме и трассе
     onto = make_up_ontology(alg_json, trace_json)
 
@@ -1140,8 +1146,12 @@ def process_algtr(alg_json, trace_json, debug_rdf_fpath=None, verbose=1, mistake
     return onto, list(mistakes.values())
 
 
-def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, mistakes_as_objects=False) -> "onto, mistakes_list":
-    """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found."""
+def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, 
+                      mistakes_as_objects=False, extra_act_entries=0, 
+                      rules_filter=None, reasoning=None, on_done=None) -> "onto, mistakes_list":
+    """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found.
+      reasoning: None or "stardog" or "pellet"
+    """
     
     global ONTOLOGY_maxID
     
@@ -1157,7 +1167,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, mistakes
     # наполняем онтологию с нуля сущностями с теми именами, которые найдём в загруженных json-словарях
     for tr_data in trace_data_list:
         tt = TraceTester(tr_data)
-        tt.inject_to_ontology(onto)
+        tt.inject_to_ontology(onto, extra_act_entries=extra_act_entries)
 
     # обёртка для расширенного логического вывода:
      # при создании наполняет базовую онтологию вспомогательными сущностями
@@ -1167,36 +1177,42 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, mistakes
     # после наложения обёртки можно добавлять SWRL-правила
     if True:
         from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
-        load_swrl_rules(onto, swrl_rules_dict)
+        load_swrl_rules(onto, swrl_rules_dict, rules_filter=rules_filter)
     
     if debug_rdf_fpath:
         onto.save(file=debug_rdf_fpath, format='rdfxml')
         print("Saved RDF file: {} !".format(debug_rdf_fpath))
 
-        exit()
+    if reasoning == "stardog":
+        seconds = sync_stardog(debug_rdf_fpath)
         
-        sync_stardog(debug_rdf_fpath)
+    # exit()
         
-    exit()
-        
-    # if not verbose:
-    #     print("Extended reasoning started ...",)
+    if reasoning == "pellet":
+        # if not verbose:
+        #     print("Extended reasoning started ...",)
 
-    # # расширенное обновление онтологии и сохранение с новыми фактами
-    # success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
+        # # расширенное обновление онтологии и сохранение с новыми фактами
+        # success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
+        
+        with onto:
+            # запуск Pellet
+            sync_reasoner_pellet(infer_property_values=True, infer_data_property_values=True, debug=0)
+        
+        seconds = -2
+
+        # if not verbose:
+        #     print("Extended reasoning finished.", f"Success: {success}, Pellet run times: {n_runs}")
+
+        if debug_rdf_fpath:
+            onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
+            print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
+            
+    if on_done:
+        on_done(seconds)
+        
+    return onto, []  ### Debug exit
     
-    with onto:
-        # запуск Pellet
-        sync_reasoner_pellet(infer_property_values=True, infer_data_property_values=True, debug=0)
-
-
-    # if not verbose:
-    #     print("Extended reasoning finished.", f"Success: {success}, Pellet run times: {n_runs}")
-
-    if debug_rdf_fpath:
-        onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
-        print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
-        
     exit()
         
     mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
@@ -1312,12 +1328,25 @@ def sync_stardog(ontology_path, save_as_path=None):
             print("writing to file: " + save_as[-50:])
             with open(save_as, 'wb') as f:
                 f.write(contents)
+                
         print("saved.")
+        
+        # run query defined in another file ...
+        from stardog_test import main as run_stardog_query
+        
+        seconds = run_stardog_query()
+        return seconds
+  
+  except Exception as e:
+      print(e)
+      return -1
+  
   finally:
       pass
       # db.drop()
       # print("dropped the db.")
-
+      # return -1
+      
 
 
             

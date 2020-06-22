@@ -188,7 +188,7 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	return True, "Validation ok."
 
 
-def run_tests(directory="test_data/"):
+def run_tests(directory="test_data/", process_kwargs={}):
 	
 	files = search_text_trace_files(directory="handcrafted_traces/")
 	
@@ -219,7 +219,7 @@ def run_tests(directory="test_data/"):
 				
 			else:
 				ontology_fpath = None
-			onto, mistakes = process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True)
+			onto, mistakes = process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True, **process_kwargs)
 		# else:
 		# 	for i, test_data in enumerate(alg_trs):
 		# 		try:

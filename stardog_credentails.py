@@ -1,8 +1,8 @@
 conn_details = {
-    'endpoint': 'http://ec2-52-208-254-30.eu-west-1.compute.amazonaws.com:5820',
+    # 'endpoint': 'http://ec2-52-208-254-30.eu-west-1.compute.amazonaws.com:5820',
     # 'endpoint': 'http://52.208.254.30:5820',
     
-    # 'endpoint': 'http://vds84.server-1.biz:5820',
+    'endpoint': 'http://vds84.server-1.biz:5820',
     # 'endpoint': 'http://localhost:5820',
     'username': 'admin',
     'password': 'admin'
