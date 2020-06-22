@@ -113,7 +113,7 @@ RULES_DICT = {
 	""",
 
 # (s10)
-"SameParentOfCorrActs_rule_10": """
+"SameParentOfCorrActs_rule_s10": """
 	corresponding_end(?a, ?b), parent_of(?p, ?a)
 	 -> parent_of(?p, ?b)
 	""",

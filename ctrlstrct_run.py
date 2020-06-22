@@ -1060,6 +1060,7 @@ def load_swrl_rules(onto, rules_dict, rules_filter=None):
     with onto:
         for k in rules_dict:
             if rules_filter and not rules_filter(k):
+                print("Ignoring SWRL rule:", k)
                 continue
                 
             rule = rules_dict[k]
@@ -1148,7 +1149,7 @@ def process_algtr(alg_json, trace_json, debug_rdf_fpath=None, verbose=1, mistake
 
 def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, 
                       mistakes_as_objects=False, extra_act_entries=0, 
-                      rules_filter=None, reasoning=None, on_done=None) -> "onto, mistakes_list":
+                      rules_filter=None, reasoning="stardog", on_done=None) -> "onto, mistakes_list":
     """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found.
       reasoning: None or "stardog" or "pellet"
     """
@@ -1304,8 +1305,8 @@ def sync_stardog(ontology_path, save_as_path=None, ontology_prefix=None):
         conn.clear()
         print("uploading database ...")
         conn.add(ontology_file)  ###, graph_uri=graphname)
-        print("uploading schema ...")
-        conn.add(schema_file)  ###, graph_uri=schema_graphname)
+        # print("uploading schema ...")
+        # conn.add(schema_file)  ###, graph_uri=schema_graphname)
         conn.commit()
         
         if False:  # !!!
