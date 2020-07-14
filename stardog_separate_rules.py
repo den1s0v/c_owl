@@ -1,3 +1,5 @@
+from time import sleep
+
 from ctrlstrct_test import run_tests
 
 def main():
@@ -15,29 +17,35 @@ def main():
 
 
     rules_turned_on = [
-        [],  # no one
+        # [],  # no one
         
-        # 'next_sibling' init only
-        ["_s2", ],
-        ["_s2", "_s3",  ],
-        ["_s2", "_s3", "_s4", ],
-        ["_s2", "_s3", "_s4", "_s5", ],
+        # # 'next_sibling' init only
+        # ["_s2", ],
+        # ["_s2", "_s3",  ],
+        # ["_s2", "_s3", "_s4", ],
+        # ["_s2", "_s3", "_s4", "_s5", ],
         
-        # 'next' relation on top of given
-        ["_s1", ],
+        # # 'next' relation on top of given
+        # ["_s1", ],
         
-        # acts' nesting relations on top of 'next' relation
-        ["_s1", "_s6", ],
-        ["_s1", "_s6", "_s7", ],
-        ["_s1", "_s6", "_s7", "_s8", ],
-        ["_s1", "_s6", "_s7", "_s8", "_s9", ],
-        ["_s1", "_s6", "_s7", "_s8", "_s9", "_s10", ],
+        # # acts' nesting relations on top of 'next' relation
+        # ["_s1", "_s6", ],
+        # ["_s1", "_s6", "_s7", ],
+        # ["_s1", "_s6", "_s7", "_s8", ],
+        # ["_s1", "_s6", "_s7", "_s8", "_s9", ],
+        # ["_s1", "_s6", "_s7", "_s8", "_s9", "_s10", ],
         
         
-        # generetive exclusively
-        ["_g1", ],
-        ["_g2", ],
-        ["_g1", "_g2", ],
+        # # generetive exclusively
+        # ["_g1", ],
+        # ["_g2", ],
+        # ["_g1", "_g2", ],
+        
+        
+        # with  all helpers
+        # ["_s1", "_s2", "_s3", "_s4", "_s5", "_s6", "_s7", "_s8", "_s9", "_s10",  "_g1", ],
+        # ["_s1", "_s2", "_s3", "_s4", "_s5", "_s6", "_s7", "_s8", "_s9", "_s10",  "_g2", ],
+        ["_s1", "_s2", "_s3", "_s4", "_s5", "_s6", "_s7", "_s8", "_s9", "_s10",  "_g1", "_g2", ],
         
         
     ]
@@ -65,6 +73,7 @@ def main():
             
         def on_done(seconds):
             log2file("%s:\n  %f seconds" % (str(rule_set), seconds))
+            sleep(5)
             
         run_tests(process_kwargs=dict(rules_filter=rules_filter, on_done=on_done, **persistent_kwargs))
     
