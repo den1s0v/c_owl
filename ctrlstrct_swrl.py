@@ -289,7 +289,7 @@ RULES_DICT = {
 
 
 "CorrespondingActsMismatch_Error": """
-	corresponding_end(?a, ?b), 
+	student_corresponding_end(?a, ?b), 
 	executes(?a, ?s1),
 	executes(?b, ?s2),
 	DifferentFrom(?s1, ?s2),
@@ -297,7 +297,7 @@ RULES_DICT = {
 """,
 
 "CorrespondingActsHaveDifferentExecTime_Error": """
-	corresponding_end(?a, ?b), 
+	student_corresponding_end(?a, ?b), 
 	executes(?a, ?st),
 	executes(?b, ?st),
 		# executes(?a, ?s1),
@@ -310,14 +310,22 @@ RULES_DICT = {
 """,
 
 
-"GenericWrong_Error": """
+"GenericWrongAct_Error": """
 	next(?a, ?b),
 	student_next(?a, ?c),
 	DifferentFrom(?b, ?c),
 	 -> should_be(?c, ?b), 
 	 cause(?c, ?a), 
 	 ### Erroneous(?c), ###
-	 
+""",
+
+"GenericWrongParent_Error": """
+	parent_of(?p, ?a),
+	student_parent_of(?c, ?a),
+	DifferentFrom(?p, ?c),
+	 -> context_should_be(?a, ?p), 
+	 # cause(?a, ?c), 
+	 WrongContext(?a)
 """,
 
 

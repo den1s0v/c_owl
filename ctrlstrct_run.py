@@ -1077,10 +1077,11 @@ def init_persistent_structure(onto):
                 "AfterTraceEnd",
                 "DuplicateActInSequence",
                 "WrongExecTime",
+                "WrongContext",
             ]:
                 types.new_class(class_name, (Erroneous,))
             
-        for prop_name in ("cause", "should_be"):
+        for prop_name in ("cause", "should_be", "context_should_be"):
             if not onto[prop_name]:
                 types.new_class(prop_name, (onto["Erroneous"] >> Thing,))
 
