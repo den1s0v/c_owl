@@ -3,13 +3,19 @@
 
 import re
 
+_maxAlgID = 1
+_maxTrID = 1
 
 class AlgorithmParser:
     def __init__(self, line_list=None, start_id=1, verbose=0):
         assert type(start_id) is int
-        self._maxID = start_id - 1
+        self._maxID = max(start_id - 1, _maxAlgID)
         self.verbose = verbose
-        
+        self.clear()
+        if line_list:
+            self.parse(line_list)
+
+    def clear(self):
         self.name2id = {}
         
         self.algorithm = {
@@ -25,13 +31,12 @@ class AlgorithmParser:
                 },
               "entry_point": None,
         }
-        
-        if line_list:
-            self.parse(line_list)
+
             
             
     def newID(self, what=None):
         self._maxID += 1
+        global _maxAlgID; _maxAlgID = self._maxID
         if what:
             if what in self.name2id:
                 print("Warning: multiple objects named as '%s' !"%what,
@@ -309,14 +314,13 @@ class AlgorithmParser:
 
         return result
 
-
 # ap = AlgorithmParser(test_lines)
 # ap.algorithm
 
 class TraceParser:
     def __init__(self, line_list=None, alg_parser_obj=None, start_id=1, start_line=0, end_line=None, verbose=0):
         assert type(start_id) is int
-        self._maxID = start_id - 1
+        self._maxID = max(start_id - 1, _maxTrID)
         self.verbose = verbose
 
         if alg_parser_obj:
@@ -373,6 +377,7 @@ class TraceParser:
             
     def newID(self, what=None, owerwrite=False):
         self._maxID += 1
+        global _maxTrID; _maxTrID = self._maxID
         # if what:
         #     if what in self.name2id:
         #         if owerwrite:
