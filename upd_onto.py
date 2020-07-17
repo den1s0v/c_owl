@@ -114,6 +114,7 @@ _special_prefixes =  [
 
 
 def make_triple(subj, prop, obj):
+	# print(subj, prop, obj)
 	if FunctionalProperty in prop.is_a:
 		# "not asserted" workaround
 		setattr(subj, prop.python_name, obj)
