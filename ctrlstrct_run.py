@@ -994,7 +994,6 @@ def init_persistent_structure(onto):
         # make aclgorithm elements classes
         for class_name in [
             "func",
-            "body",
         ]:
             types.new_class(class_name, (Thing,))
 
@@ -1063,7 +1062,7 @@ def init_persistent_structure(onto):
         if not onto["message"]:
             message_prop = types.new_class("message", (trace_error >> str, FunctionalProperty, ))
         # объект-агрумент, на который делается ссылка
-        for prop_name in ("arg", ):
+        for prop_name in ("arg", "body"):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
            
