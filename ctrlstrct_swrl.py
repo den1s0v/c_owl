@@ -14,13 +14,13 @@ RULES_DICT = {
 				###################
 				###################
 
-# (s1)
-"next_to__current_act_rule_s1": """
-	current_act(?a), index(?a, ?ia), add(?ib, ?ia, 1),
-	act(?b), index(?b, ?_ib),
-	equal(?_ib, ?ib), 
-	 -> next(?a, ?b)
- """,
+# # (s1)
+# "---- next_to__current_act_rule_s1": """
+# 	correct_act(?a), index(?a, ?ia), add(?ib, ?ia, 1),
+# 	act(?b), index(?b, ?_ib),
+# 	equal(?_ib, ?ib), 
+# 	 -> next(?a, ?b)
+#  """,
 
 "- hasNextAct_to_beforeAct": """
 	next(?a, ?b) -> before(?a, ?b)  # 'before' connects correct acts and acts next to current, only.
@@ -30,7 +30,7 @@ RULES_DICT = {
  """,
 
 # (s2)
-"assign_next_sibling_0-1-b_rule_s2": """
+"---- assign_next_sibling_0-1-b_rule_s2": """
 	trace(?a),
 	act_begin(?b), exec_time(?b, ?_ib),
 	equal(?_ib, 1),
@@ -38,7 +38,7 @@ RULES_DICT = {
 	 -> next_sibling(?a, ?b)
  """,
 # (s3)
-"assign_next_sibling_0-1-e_rule_s3": """
+"---- assign_next_sibling_0-1-e_rule_s3": """
 	trace(?a),
 	act_end(?b), exec_time(?b, ?_ib),
 	equal(?_ib, 1), 
@@ -46,7 +46,7 @@ RULES_DICT = {
 	 -> next_sibling(?a, ?b)
  """,
 # (s4)
-"assign_next_sibling-b_rule_s4": """
+"---- assign_next_sibling-b_rule_s4": """
 	act_begin(?a), exec_time(?a, ?ia), add(?_ib, ?ia, 1),
 	act_begin(?b), exec_time(?b, ?ib),  # unification of a bound var does rebind in stardog ??!
 	equal(?_ib, ?ib), 
@@ -56,7 +56,7 @@ RULES_DICT = {
 	 -> next_sibling(?a, ?b)
  """,
 # (s5)
-"assign_next_sibling-e_rule_s5": """
+"---- assign_next_sibling-e_rule_s5": """
 	act_end(?a), exec_time(?a, ?ia), add(?_ib, ?ia, 1),
 	act_end(?b), exec_time(?b, ?ib),
 	equal(?_ib, ?ib), 
@@ -89,12 +89,21 @@ RULES_DICT = {
 	act_begin(?a), next(?a, ?b), act_begin(?b), 
 	 -> parent_of(?a, ?b)
 	""",
+"student_DepthIncr_rule_s6": """
+	act_begin(?a), student_next(?a, ?b), act_begin(?b), 
+	 -> student_parent_of(?a, ?b)
+	""",
 
 # (s7)
 "DepthSame_b-e_rule_s7": """
 	act_begin(?a), next(?a, ?b), act_end(?b), 
 	parent_of(?p, ?a),
 	 -> parent_of(?p, ?b), corresponding_end(?a, ?b)
+	""",
+"student_DepthSame_b-e_rule_s7": """
+	act_begin(?a), student_next(?a, ?b), act_end(?b), 
+	student_parent_of(?p, ?a),
+	 -> student_parent_of(?p, ?b), student_corresponding_end(?a, ?b)
 	""",
 	
 # (s8)
@@ -104,6 +113,11 @@ RULES_DICT = {
 	parent_of(?p, ?a)  # depth(?a, ?da),
 	 -> parent_of(?p, ?b)  # depth(?b, ?da), 
 	""",
+"student_DepthSame_e-b_rule_s8": """
+	act_end(?a), student_next(?a, ?b), act_begin(?b), 
+	student_parent_of(?p, ?a)
+	 -> student_parent_of(?p, ?b)
+	""",
 
 # (s9)
 "DepthDecr_rule_s9": """
@@ -111,11 +125,20 @@ RULES_DICT = {
 	parent_of(?p, ?a)
 	 -> corresponding_end(?p, ?b)
 	""",
+"student_DepthDecr_rule_s9": """
+	act_end(?a), student_next(?a, ?b), act_end(?b), 
+	student_parent_of(?p, ?a)
+	 -> student_corresponding_end(?p, ?b)
+	""",
 
 # (s10)
 "SameParentOfCorrActs_rule_s10": """
 	corresponding_end(?a, ?b), parent_of(?p, ?a)
 	 -> parent_of(?p, ?b)
+	""",
+"student_SameParentOfCorrActs_rule_s10": """
+	corresponding_end(?a, ?b), student_parent_of(?p, ?a)
+	 -> student_parent_of(?p, ?b)
 	""",
 
 
@@ -124,8 +147,40 @@ RULES_DICT = {
 ################ Производящие правила ################
 				######################
 				######################
+
+# Точка входа в трассу - функция  [works with Pellet]
+"start__to__FunctionBegin__rule_g3": """
+	trace(?a),
+	executes(?a, ?alg),
+	entry_point(?alg, ?func_),
+	func(?func_), 
+
+	act_begin(?b),
+		# next_sibling(?pr, ?b), correct_act(?pr),
+	next_sibling(?a, ?b),  # ?pr === ?a
+	executes(?b, ?func_),
+
+	 -> correct_act(?b), next(?a, ?b), FunctionBegin(?b)
+""",
+
+# Точка входа в трассу - глобальный код  [works with Pellet]
+"start__to__GlobalCode__rule_g4": """
+	trace(?a),
+	executes(?a, ?alg),
+	entry_point(?alg, ?gc),
+	sequence(?gc), 
+
+	act_begin(?b),
+		# next_sibling(?pr, ?b), correct_act(?pr),
+	next_sibling(?a, ?b),  # ?pr === ?a
+	executes(?b, ?gc),
+
+	 -> correct_act(?b), next(?a, ?b), GlobalCodeBegin(?b)
+""",
+
+
 "-# DBG_connect_FunctionBegin": """
-	current_act(?a),
+	correct_act(?a),
 	act_begin(?a),
 	func(?func_), 
 	executes(?a, ?func_),
@@ -138,43 +193,43 @@ RULES_DICT = {
 	 -> DebugObj(?a), DebugObj(?b)
 """,
 
-# OK (g1) !
-"connect_FunctionBegin_rule_g1": """
-	current_act(?a),
+# OK !
+# Начало тела функции  [works with Pellet]
+"connect_FunctionBodyBegin_rule_g5": """
+	correct_act(?a),
 	act_begin(?a),
 	func(?func_), 
 	executes(?a, ?func_),
 	body(?func_, ?st),
 	
-	next(?a, ?b),
 	act_begin(?b),
+	next_sibling(?pr, ?b), correct_act(?pr),  # check that previous execution of st was in correct sub-trace
 	executes(?b, ?st),
 	# SameAs(?st, ?_st), # stardog fails with error here
 	
-	# check that previous execution of st was in correct sub-trace
-	next_sibling(?pr, ?b), correct_act(?pr),
-	 -> correct_act(?b), current_act(?b), FunctionBegin(?b)
+	 -> correct_act(?b), next(?a, ?b), FunctionBodyBegin(?b)
 """,
 
-# (g2) - Infers nothing in Stardog
+# Первый акт следования [works with Pellet]
+# Пустые следования (без действий) не поддерживаются!
 "connect_SequenceBegin_rule_g2": """
-	current_act(?a),
+	correct_act(?a),
 	act_begin(?a),
 	sequence(?block), 
 	executes(?a, ?block),
 	body_item(?block, ?st),
 	first_item(?st),
 	
-	next(?a, ?b),
 	act_begin(?b),
+	next_sibling(?pr, ?b), correct_act(?pr),
 	executes(?b, ?st),
 	
-	next_sibling(?pr, ?b), correct_act(?pr),
-	 -> correct_act(?b), current_act(?b), SequenceBegin(?b)
+	 -> correct_act(?b), next(?a, ?b), SequenceBegin(?b)
 """,
 
-"--- connect_SequenceNext": """ 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
-	current_act(?a),
+# Следующий акт следования [works with Pellet]
+"connect_SequenceNext": """
+	correct_act(?a),
 	act_end(?a),
 	parent_of(?p, ?a),
 	sequence(?block), 
@@ -182,50 +237,48 @@ RULES_DICT = {
 	body_item(?block, ?st),
 	executes(?a, ?st),
 	
-	next(?a, ?b),
 	next(?st, ?st2),
 	
 	act_begin(?b),
+	next_sibling(?pr, ?b), correct_act(?pr),
 	executes(?b, ?st2),
 	
-	next_sibling(?pr, ?b), correct_act(?pr),
-	 -> correct_act(?b), current_act(?b), SequenceNext(?b)
+	 -> correct_act(?b), next(?a, ?b), SequenceNext(?b)
 """,
 
-"--- connect_StmtEnd": """
-	current_act(?a),
+# Начало и конец простого акта [works with Pellet]
+"connect_StmtEnd": """
+	correct_act(?a),
 	act_begin(?a),
 	stmt(?st), 
 	executes(?a, ?st),
 	
 	act_end(?b),
-	next(?a, ?b),
+	next_sibling(?pr, ?b), correct_act(?pr),
 	executes(?b, ?st),
 	
 	exec_time(?a, ?t), exec_time(?b, ?_t),
 	equal(?t, ?_t),
-	 -> current_act(?b), StmtEnd(?b)
+	 -> correct_act(?b), next(?a, ?b), StmtEnd(?b)
 """,
 
-"- ??! connect_SequenceEnd": """
-	current_act(?a),
+"connect_SequenceEnd": """
+	correct_act(?a),
 	act_end(?a),
 	executes(?a, ?st),
 	last_item(?st),
 	
-	next(?a, ?b),
 	act_end(?b),
-	
 	parent_of(?p, ?a),
 	executes(?p, ?block),
-	sequence(?block), 
+#	sequence(?block),    # ???
 	executes(?b, ?block),
 	body_item(?block, ?st),
-	
 	next_sibling(?pr, ?b), correct_act(?pr),
-	 -> correct_act(?b), current_act(?b), SequenceEnd(?b)
+	 -> correct_act(?b), next(?a, ?b), SequenceEnd(?b)
 """,
 
+	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
 
 
 				###################
@@ -235,7 +288,7 @@ RULES_DICT = {
 				###################
 
 
-"--- CorrespondingActsMismatch_Error": """
+"CorrespondingActsMismatch_Error": """
 	corresponding_end(?a, ?b), 
 	executes(?a, ?s1),
 	executes(?b, ?s2),
@@ -243,16 +296,31 @@ RULES_DICT = {
 	 -> CorrespondingEndMismatched(?b), cause(?b, ?a)
 """,
 
-"--- CorrespondingActsHaveDifferentExecTime_Error": """
+"CorrespondingActsHaveDifferentExecTime_Error": """
 	corresponding_end(?a, ?b), 
-	executes(?a, ?s1),
-	executes(?b, ?s2),
-	SameAs(?s1, ?s2),
+	executes(?a, ?st),
+	executes(?b, ?st),
+		# executes(?a, ?s1),
+		# executes(?b, ?s2),
+		# SameAs(?s1, ?s2),
 	exec_time(?a, ?n1),
 	exec_time(?b, ?n2),
 	notEqual(?n1, ?n2),
 	 -> CorrespondingEndPerformedDifferentTime(?b), cause(?b, ?a)
 """,
+
+
+"GenericWrong_Error": """
+	next(?a, ?b),
+	student_next(?a, ?c),
+	DifferentFrom(?b, ?c),
+	 -> should_be(?c, ?b), 
+	 cause(?c, ?a), 
+	 ### Erroneous(?c), ###
+	 
+""",
+
+
 "- EndAfterTraceEnd_Error": """
 	act_end(?a),
 	parent_of(?p, ?a), index(?p, 0),  # top-level act representing trace only has index of 0.
@@ -378,44 +446,6 @@ RULES_DICT = {
 	 -> CREATE(INSTANCE, ?cmd)
 """,
 
-"- Init_Count_std_and_corr_acts": """
-	# executes(?std_act, ?st),
-	# student_act(?std_act),
-	# act_begin(?std_act),
-	# executes(?corr_act, ?st),
-	correct_act(?corr_act),
-	act_begin(?corr_act),
-	# DifferentFrom(?std_act, ?corr_act)
-	 -> COUNT_has_student_act(?corr_act, true), COUNT_has_correct_act(?corr_act, true)
-	 # -> LINK_COUNT_has_student_act(?corr_act, true), LINK_COUNT_has_correct_act(?corr_act, true)
-
-""",
-"- Count_std_acts": """
-	executes(?std_act, ?st),
-	student_act(?std_act),
-	act_begin(?std_act),
-	
-	executes(?corr_act2, ?st),
-	correct_act(?corr_act2),
-	act_begin(?corr_act2),
-	
-	parent_of(?par_act, ?std_act),  # в пределах одного объемлющего акта
-	parent_of(?par_act, ?corr_act2),
-	
-	# DifferentFrom(?std_act, ?corr_act2)
-	 -> has_student_act(?corr_act2, ?std_act)
-""",
-"- Count_corr_acts": """
-	executes(?corr_act1, ?st),
-	correct_act(?corr_act1),
-	act_begin(?corr_act1),
-	executes(?corr_act2, ?st),
-	correct_act(?corr_act2),
-	act_begin(?corr_act2),
-	parent_of(?par_act, ?corr_act1),  # в пределах одного объемлющего акта
-	parent_of(?par_act, ?corr_act2),
-	 -> has_correct_act(?corr_act1, ?corr_act2)
-""",
 
 "-Test_lessThan": """
 	lessThan(0, 1)
@@ -448,5 +478,14 @@ for k in tuple(RULES_DICT.keys()):
 				txt.split("\n")
 			]
 	RULES_DICT[k] = "\n".join(lines)
+
+if 0:  # check correctness of modified rules text
+	with open("swrl_dbg.txt", "w") as f:
+	# 	# f.write(repr(RULES_DICT))
+		for k, v in RULES_DICT.items():
+			print(f'"{k}": ', end="", file=f)
+			print(v, file=f)
+
+		# print(RULES_DICT)
 	
 # print(RULES_DICT)

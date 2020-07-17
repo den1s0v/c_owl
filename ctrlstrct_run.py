@@ -414,7 +414,7 @@ class TraceTester():
         
         self.make_correct_trace()
         self.prepare_act_candidates(onto, extra_act_entries=extra_act_entries)
-        self.inject_trace_to_ontology(onto, self.data["trace"], ("student_act",), "next")
+        self.inject_trace_to_ontology(onto, self.data["trace"], (), "student_next")
         # self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
         # self.merge_traces(onto, self.data["student_act_iri_list"], self.data["correct_act_iri_list"])
         
@@ -519,12 +519,12 @@ class TraceTester():
     def prepare_act_candidates(self, onto, extra_act_entries=2):
         """Create all possible acts for each statement. 
         Maximum executon number will be exceeded by `extra_act_entries`.
-        Resulting set of acts of size N will be repeated N times, each act to be possibly placed at each index of the trace, covering the set of all possible traces."""
+        /* Resulting set of acts of size N will be repeated N times, each act to be possibly placed at each index of the trace, covering the set of all possible traces. */ """
         
         assert extra_act_entries >= 0, extra_act_entries
         
         alg_id2max_exec_n = {}  # executed stmt id to max exec_time in correct trace
-        
+
         for act in self.data["correct_trace"]:
             executed_id = act["executes"]
             exec_n = act["n"]
@@ -543,13 +543,13 @@ class TraceTester():
         trace_obj = onto.trace(iri)
         trace_obj.is_a.append(onto.correct_act)
         make_triple(trace_obj, onto.executes, onto[self.data["algorithm"]["iri"]])
-        make_triple(trace_obj, onto.index, 0)      # set to 0 so next is 1
+        # make_triple(trace_obj, onto.index, 0)      # set to 0 so next is 1
         make_triple(trace_obj, onto.exec_time, 0)  # set to 0 so next is 1
         make_triple(trace_obj, onto.in_trace, trace_obj)  # each act belongs to trace
         
         
-        N = sum(alg_id2max_exec_n.values()) * 2  # as each stmt has begin & end!
-        print(F"N of layers and N acts on layer: {N}")
+        # N = sum(alg_id2max_exec_n.values()) * 2  # as each stmt has begin & end!
+        # print(F"N of layers and N acts on layer: {N}")
         for st_id, max_n in alg_id2max_exec_n.items():
             
             alg_elem = self.id2obj[st_id]
@@ -560,15 +560,14 @@ class TraceTester():
             name = alg_elem.get("name", "unkn")
             clean_name  = prepare_name(name)
             
-            for index in range(1, N + 1):
-                for exec_n in range(1, max_n + 1):
-                    # skip impossible combinations of exec_time & index
-                    if exec_n > index:
-                        continue
+            mark2act_obj = {}  # executed stmt id to list of act iri's can be consequently used in trace
+            
+            # for index in range(1, N + 1):
+            for exec_n in range(1, max_n + 1):
                     
                     # make instances: act_begin, act_end
                     number_mark = "" if max_n <=1 else ("_n%02d" % exec_n)
-                    iri_template = f"%s_{clean_name}_i{index:02}{number_mark}"
+                    iri_template = f"%s_{clean_name}{number_mark}"  # _i{index:02}
                     
                     for mark, class_ in [("b", onto.act_begin), ("e", onto.act_end)]:
                         iri = iri_template % mark
@@ -577,9 +576,19 @@ class TraceTester():
                         obj = class_(iri)
                         # obj.is_a.append(class_X)
                         make_triple(obj, onto.executes, onto[alg_elem["iri"]])
-                        make_triple(obj, onto.index, index)
+                        ### make_triple(obj, onto.index, index)
                         make_triple(obj, onto.exec_time, exec_n)
                         make_triple(obj, onto.in_trace, trace_obj)
+                        
+                        # connect "next_sibling"
+                        if exec_n == 1:
+                          make_triple(trace_obj, onto.next_sibling, obj)
+                        else:
+                          make_triple(trace_obj, onto.next_sibling, mark2act_obj[mark])
+
+                        # keep current value for next iteration
+                        mark2act_obj[mark] = obj
+
                         
                         # attach expr value: for act Begin only!
                         if mark == "b" and alg_elem["type"] in {"expr"}:
@@ -589,11 +598,12 @@ class TraceTester():
                             else:
                                 value = False
                             make_triple(obj, onto.expr_value, value)
-                            
-                        if mark == "b" and st_id == entry_stmt_id and index == exec_n == 1:
-                            obj.is_a.append(onto.correct_act)
-                            obj.is_a.append(onto.current_act)
-                            make_triple(trace_obj, onto.next, obj)
+                        
+                        # # connect trace begin and 1st act with "next"
+                        # if mark == "b" and st_id == entry_stmt_id and index == exec_n == 1:
+                        #     obj.is_a.append(onto.correct_act)
+                        #     # obj.is_a.append(onto.current_act)
+                        #     make_triple(trace_obj, onto.next, obj)
                             
                             
                     
@@ -602,47 +612,61 @@ class TraceTester():
         "Writes specified trace to ontology."
         
         additional_classes = [onto[nm] for nm in act_classnames]
-        assert all(additional_classes), (additional_classes, act_classnames)
+        assert all(additional_classes), (additional_classes, act_classnames, onto)
         
         # make trace acts as individuals
 
         def make_act(iri, onto_class, alg_iri, prop_class=onto.next, is_last=False):
-            # nonlocal trace_acts_iri_list
+
+            raise "Deprecated !"
             
+            # nonlocal trace_acts_list
             iri = uniqualize_iri(onto, iri)
             
-            trace_acts_iri_list.append(iri)                 
+            trace_acts_list.append(iri)                 
             # создаём объект
             obj = onto_class(iri)
             # привязываем связанный элемент алгоритма
             make_triple(obj, onto.executes, onto[alg_elem["iri"]])
             
             # формируем последовательный список
-            if prop_class and len(trace_acts_iri_list) > 1:
+            if prop_class and len(trace_acts_list) > 1:
                 # привязываем next, если указано
-                prev_iri = trace_acts_iri_list[-2]
+                prev_iri = trace_acts_list[-2]
                 make_triple(onto[prev_iri], prop_class, obj)
-            elif len(trace_acts_iri_list) == 1:
+            elif len(trace_acts_list) == 1:
                 # mark as first act of the list
                 obj.is_a.append(onto.first_item)
             if is_last:
                 # mark as last act of the list
                 obj.is_a.append(onto.last_item)
             return obj
+
+        def connect_next_act(obj):
+            trace_acts_list.append(obj)                 
+            # формируем последовательный список
+            if prop_class and len(trace_acts_list) > 1:
+                # привязываем next, если указано
+                prev_obj = trace_acts_list[-2]
+                obj = trace_acts_list[-1]
+                # print(">>", prev_obj, obj)
+                make_triple(prev_obj, prop_class, obj)
+
             
-        def find_act(class_, executes: int, index: int, exec_time: int):
+        def find_act(class_, executes: int, exec_time: int):
             for obj in class_.instances():
                 # print(F"{obj}: ")
                 if (obj.executes.id == executes and
-                       obj.index == index and
                    obj.exec_time == exec_time):
                     return obj
-            print(f"act not found: ex={executes}, i={index}, n={exec_time}")
+            print(f"act not found: ex={executes}, n={exec_time}")
+
+        prop_class = onto[next_propertyname]
 
         with onto:
             i = 0
-            act_index = 0
-            trace_acts_iri_list = []
+            # act_index = 0
+            trace_acts_list = []
             for d in trace:
                 i += 1
                 if "id" in d:
@@ -669,39 +693,41 @@ class TraceTester():
                     
                     if phase_mark in ("b", "p"):
                         # начало акта
-                        act_index += 1
+                        # act_index += 1
                         # iri = iri_template % "b"
                         # self.act_iris.append(iri)
                         # obj = make_act(iri, onto.act_begin, alg_elem["iri"], 
                         #     prop_class=onto[next_propertyname], 
                         #     is_last=False)
-                        obj = find_act(onto.act_begin, executes, act_index, n or 1) 
+                        obj = find_act(onto.act_begin, executes, n or 1) 
                         if obj:
                             for class_ in additional_classes:
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
+                            connect_next_act(obj)
                         # # НЕ привязываем id (т.к. может повторяться у начал и концов. TO FIX?)
                             # if "value" in d:
                         #     make_triple(obj, onto.expr_value, d["value"])
                     
                     if phase_mark in ("e", "p"):
                         # конец акта
-                        act_index += 1
+                        # act_index += 1
                         # iri = iri_template % "e"
                         # self.act_iris.append(iri)
                         # obj = make_act(iri, onto.act_end, alg_elem["iri"], 
                         #     prop_class=onto[next_propertyname], 
                         #     is_last=(i==len(self.data["trace"])))
-                        obj = find_act(onto.act_end, executes, act_index, n or 1) 
+                        obj = find_act(onto.act_end, executes, n or 1) 
                         if obj:
                             for class_ in additional_classes:
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
+                            connect_next_act(obj)
                         
             # iri_list_key = act_classnames[0] + "_iri_list"
-            # self.data[iri_list_key] = trace_acts_iri_list
+            # self.data[iri_list_key] = trace_acts_list
         
         
     def test_with_ontology_results(self, onto):
@@ -853,24 +879,24 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
         # создадим классы трассы и объекты в них
 
         def make_act(iri, onto_class, alg_iri, is_last=False):
-            nonlocal trace_acts_iri_list
+            nonlocal trace_acts_list
             n = 2; orig_iri = iri
             while onto[iri]:  # пока есть объект с таким именем
                 # модифицировать имя
                 iri = orig_iri + ("_%d" % n); n += 1
             
-            trace_acts_iri_list.append(iri)                 
+            trace_acts_list.append(iri)                 
             # создаём объект
             obj = onto_class(iri)
             # привязываем связанный элемент алгоритма
             make_triple(obj, prop_executes, onto[alg_elem["iri"]])
             
             # формируем последовательный список
-            if len(trace_acts_iri_list) > 1:
+            if len(trace_acts_list) > 1:
                 # привязываем next
-                prev_iri = trace_acts_iri_list[-2]
+                prev_iri = trace_acts_list[-2]
                 make_triple(onto[prev_iri], prop_next, obj)
-            elif len(trace_acts_iri_list) == 1:
+            elif len(trace_acts_list) == 1:
                 # mark as first act of the list
                 obj.is_a.append(first_item)
             if is_last:
@@ -879,7 +905,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
             return obj
 
         i = 0
-        trace_acts_iri_list = []
+        trace_acts_list = []
         for d in tr:
             i += 1
             if "id" in d:
@@ -946,12 +972,12 @@ def init_persistent_structure(onto):
         class trace(act_begin): pass
         # -->
         class act_end(act): pass
-        # -->
-        class student_act(act): pass
+        # # -->
+        # class student_act(act): pass
         # -->
         class correct_act(act): pass
-        # -->
-        class current_act(act): pass
+        # # -->
+        # class current_act(act): pass
         
         # ->
         class sequence(Thing): pass
@@ -965,29 +991,48 @@ def init_persistent_structure(onto):
         # if not onto["Counter"]:
         #     class Counter(Thing): pass
 
+        # make aclgorithm elements classes
+        for class_name in [
+            "func",
+            "body",
+        ]:
+            types.new_class(class_name, (Thing,))
+
         # новое свойство executes
         prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
+
         # новое свойство expr_value
         prop_expr_value = types.new_class("expr_value", (DataProperty, FunctionalProperty, ))
+
         # новое свойство next
-        prop_next = types.new_class("next", (Thing >> Thing, ))
-        # новое свойство next_sibling
+        types.new_class("next", (Thing >> Thing, ))
+        types.new_class("student_next", (Thing >> Thing, ))
+
+        # новое свойство student_next
+        prop_student_next = types.new_class("student_next", (act >> act, ))
+
+        # новое свойство next_sibling -- связывает акты, соседние по номеру раза выполнения (причём, начальные и конечные акты - раздельно)
         next_sibling = types.new_class("next_sibling", (Thing >> Thing, ))
+
         # новое свойство before
         # prop_before = types.new_class("before", (Thing >> Thing, TransitiveProperty))
+
         # новое свойство in_trace
         prop_in_trace = types.new_class("in_trace", (act >> trace, ))
         
-        # новое свойство index
-        prop_index = types.new_class("index", (Thing >> int, FunctionalProperty, ))
+        # # новое свойство index
+        # prop_index = types.new_class("index", (Thing >> int, FunctionalProperty, ))
+
         # новое свойство exec_time
         prop_exec_time = types.new_class("exec_time", (Thing >> int, FunctionalProperty, ))
         # # новое свойство depth
         # prop_depth = types.new_class("depth", (Thing >> int, FunctionalProperty, ))
         # # новое свойство correct_depth
         # prop_correct_depth = types.new_class("correct_depth", (Thing >> int, FunctionalProperty, ))
+
         # новое свойство text_line
         prop_text_line = types.new_class("text_line", (Thing >> int, FunctionalProperty, ))
+
         # prop_has_student_act = types.new_class("has_student_act", (Thing >> act, ))
         # prop_has_correct_act = types.new_class("has_correct_act", (Thing >> act, ))
         # # новое свойство same_level
@@ -997,6 +1042,7 @@ def init_persistent_structure(onto):
         
         # новое свойство corresponding_end
         class corresponding_end(act_begin >> act_end, ): pass
+        class student_corresponding_end(act_begin >> act_end, ): pass
     
         # # новое свойство target - цель подсчёта числа связей
         # class target(Counter >> Thing, AsymmetricProperty): pass
@@ -1004,9 +1050,11 @@ def init_persistent_structure(onto):
         # новое свойство parent_of
         # class parent_of(act_begin >> act, InverseFunctionalProperty): pass
         class parent_of(Thing >> Thing, InverseFunctionalProperty): pass
-        # новое свойство contains_act < contains_child
-        class contains_child(Thing >> Thing, ): pass
-        class contains_act(act_begin >> act, contains_child): pass
+        class student_parent_of(Thing >> Thing, InverseFunctionalProperty): pass
+
+        # # новое свойство contains_act < contains_child
+        # class contains_child(Thing >> Thing, ): pass
+        # class contains_act(act_begin >> act, contains_child): pass
         
         # -->
         # Создать класс ошибки
@@ -1040,6 +1088,8 @@ def init_persistent_structure(onto):
         # make correct_act subclasses
         for class_name in [
             "FunctionBegin",
+            "FunctionBodyBegin",
+            "GlobalCodeBegin",
             "SequenceBegin",
             "SequenceNext",
             "SequenceEnd",
