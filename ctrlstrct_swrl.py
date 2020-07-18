@@ -470,6 +470,41 @@ RULES_DICT = {
 
 }
 
+_more_rules = {}
+for i in range(1, 6+1):
+
+	pattern1 = ''.join([f"student_next(?c{j}, ?c{j+1}), " for j in range(1,i)])
+	pattern2 = f"student_next(?c{i}, ?b),"
+	action = ', '.join([f"ExtraAct(?c{j})" for j in range(1,i+1)])
+	_more_rules.update({
+		f"ExtraAct_{i}_Error": f"""
+			next(?a, ?b),
+			student_next(?a, ?c1),
+			DifferentFrom(?b, ?c1),
+			{pattern1}
+			{pattern2}
+			 -> {action} ## ExtraAct(?c1)
+		""",
+
+		})
+
+	pattern1 = ''.join([f"next(?c{j}, ?c{j+1}), " for j in range(1,i)])
+	pattern2 = f"next(?c{i}, ?b),"
+	action = ', '.join([f"MissingAct(?c{j})" for j in range(1,i+1)])
+	_more_rules.update({
+		f"MissingAct_{i}_Error": f"""
+			student_next(?a, ?b),
+			next(?a, ?c1),
+			DifferentFrom(?b, ?c1),
+			{pattern1}
+			{pattern2}
+			 -> {action} ## MissingAct(?c1)
+		""",
+
+		})
+
+RULES_DICT.update(_more_rules)
+
 # strip all the comments out ...
 # ... replacing them by spaces in order to preserve char positions reported by lexing parser
 comment_re = re.compile(r"(?://|#).*$")

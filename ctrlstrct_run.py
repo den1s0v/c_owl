@@ -1078,6 +1078,8 @@ def init_persistent_structure(onto):
                 "DuplicateActInSequence",
                 "WrongExecTime",
                 "WrongContext",
+                "ExtraAct",
+                "MissingAct",
             ]:
                 types.new_class(class_name, (Erroneous,))
             
