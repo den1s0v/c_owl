@@ -603,7 +603,7 @@ class TraceTester():
                         # if mark == "b" and st_id == entry_stmt_id and index == exec_n == 1:
                         #     obj.is_a.append(onto.correct_act)
                         #     # obj.is_a.append(onto.current_act)
-                        #     make_triple(trace_obj, onto.next, obj)
+                        #     make_triple(trace_obj, onto.next_act, obj)
                             
                             
                     
@@ -616,7 +616,7 @@ class TraceTester():
         
         # make trace acts as individuals
 
-        def make_act(iri, onto_class, alg_iri, prop_class=onto.next, is_last=False):
+        def make_act(iri, onto_class, alg_iri, prop_class=onto.next_act, is_last=False):
 
             raise "Deprecated !"
             
@@ -790,7 +790,7 @@ def make_up_ontology(alg_json_str, trace_json_str, iri=None):
         act_begin = onto["act_begin"]
         act_end = onto["act_end"]
         prop_executes = onto["executes"]
-        prop_next = onto["next"]
+        prop_next = onto["next_act"]
         prop_text_line = onto["text_line"]
         prop_value = onto["value"]
         # prop_executes = onto["executes"]
@@ -1005,6 +1005,7 @@ def init_persistent_structure(onto):
 
         # новое свойство next
         types.new_class("next", (Thing >> Thing, ))
+        types.new_class("next_act", (correct_act >> correct_act, ))
         types.new_class("student_next", (Thing >> Thing, ))
 
         # новое свойство student_next
@@ -1090,6 +1091,7 @@ def init_persistent_structure(onto):
         # make correct_act subclasses
         for class_name in [
             "FunctionBegin",
+            "FunctionEnd",
             "FunctionBodyBegin",
             "GlobalCodeBegin",
             "SequenceBegin",
@@ -1360,15 +1362,17 @@ def sync_stardog(ontology_path, save_as_path=None, ontology_prefix=None):
         # print("uploading schema ...")
         # conn.add(schema_file)  ###, graph_uri=schema_graphname)
         conn.commit()
+        # print("upload OK")
         
-        if False:  # !!!
+        if 0:  # !!!
             # BASE <http://vstu.ru/poas/ctrl_structs_2020-05_v1#>;
               
+            print("running query ...")
             # OK!
             # results = conn.select('''SELECT * WHERE {?a  rdf:type <http://vstu.ru/poas/ctrl_structs_2020-05_v1#current_act> }''', reasoning=True)
             results = conn.select('''PREFIX onto: <http://vstu.ru/poas/ctrl_structs_2020-05_v1#>
               
-              SELECT * WHERE {?a a onto:current_act }''', reasoning=True)
+              SELECT * WHERE {?a a onto:correct_act }''', reasoning=True)
             pprint(results)
 
             print("downloading database ...")

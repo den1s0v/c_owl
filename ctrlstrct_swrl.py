@@ -19,11 +19,11 @@ RULES_DICT = {
 # 	correct_act(?a), index(?a, ?ia), add(?ib, ?ia, 1),
 # 	act(?b), index(?b, ?_ib),
 # 	equal(?_ib, ?ib), 
-# 	 -> next(?a, ?b)
+# 	 -> next_act(?a, ?b)
 #  """,
 
 "- hasNextAct_to_beforeAct": """
-	next(?a, ?b) -> before(?a, ?b)  # 'before' connects correct acts and acts next to current, only.
+	next_act(?a, ?b) -> before(?a, ?b)  # 'before' connects correct acts and acts next_act to current, only.
 
 	# a comment in rule!
 	// Another one.
@@ -77,6 +77,8 @@ RULES_DICT = {
 #  """ ,
 
 
+
+
 # entry_point       program executes        first act executes
 # 
 # global_code       global_code.body        global_code.body.first
@@ -86,7 +88,7 @@ RULES_DICT = {
 
 # (s6)
 "DepthIncr_rule_s6": """
-	act_begin(?a), next(?a, ?b), act_begin(?b), 
+	act_begin(?a), next_act(?a, ?b), act_begin(?b), 
 	 -> parent_of(?a, ?b)
 	""",
 "student_DepthIncr_rule_s6": """
@@ -96,7 +98,7 @@ RULES_DICT = {
 
 # (s7)
 "DepthSame_b-e_rule_s7": """
-	act_begin(?a), next(?a, ?b), act_end(?b), 
+	act_begin(?a), next_act(?a, ?b), act_end(?b), 
 	parent_of(?p, ?a),
 	 -> parent_of(?p, ?b), corresponding_end(?a, ?b)
 	""",
@@ -109,7 +111,7 @@ RULES_DICT = {
 # (s8)
  # проверка на Начало А - Конец Б (должен был быть Конец А) - CorrespondingActsMismatch_Error
 "DepthSame_e-b_rule_s8": """
-	act_end(?a), next(?a, ?b), act_begin(?b), 
+	act_end(?a), next_act(?a, ?b), act_begin(?b), 
 	parent_of(?p, ?a)  # depth(?a, ?da),
 	 -> parent_of(?p, ?b)  # depth(?b, ?da), 
 	""",
@@ -121,7 +123,7 @@ RULES_DICT = {
 
 # (s9)
 "DepthDecr_rule_s9": """
-	act_end(?a), next(?a, ?b), act_end(?b), 
+	act_end(?a), next_act(?a, ?b), act_end(?b), 
 	parent_of(?p, ?a)
 	 -> corresponding_end(?p, ?b)
 	""",
@@ -148,7 +150,7 @@ RULES_DICT = {
 				######################
 				######################
 
-# Точка входа в трассу - функция  [works with Pellet]
+# Точка входа в трассу - функция  [works with Pellet] [works with Stardog]
 "start__to__FunctionBegin__rule_g3": """
 	trace(?a),
 	executes(?a, ?alg),
@@ -160,7 +162,9 @@ RULES_DICT = {
 	next_sibling(?a, ?b),  # ?pr === ?a
 	executes(?b, ?func_),
 
-	 -> correct_act(?b), next(?a, ?b), FunctionBegin(?b)
+	 -> correct_act(?b), 
+	 next_act(?a, ?b), 
+	 FunctionBegin(?b)
 """,
 
 # Точка входа в трассу - глобальный код  [works with Pellet]
@@ -175,26 +179,13 @@ RULES_DICT = {
 	next_sibling(?a, ?b),  # ?pr === ?a
 	executes(?b, ?gc),
 
-	 -> correct_act(?b), next(?a, ?b), GlobalCodeBegin(?b)
+	 -> correct_act(?b), 
+	 next_act(?a, ?b), GlobalCodeBegin(?b)
 """,
 
-
-"-# DBG_connect_FunctionBegin": """
-	correct_act(?a),
-	act_begin(?a),
-	func(?func_), 
-	executes(?a, ?func_),
-	body(?func_, ?st),
-	
-	next(?a, ?b),
-	act_begin(?b),
-	executes(?b, ?st),
-	
-	 -> DebugObj(?a), DebugObj(?b)
-""",
 
 # OK !
-# Начало тела функции  [works with Pellet]
+# Начало тела функции  [works with Pellet] [works with Stardog]
 "connect_FunctionBodyBegin_rule_g5": """
 	correct_act(?a),
 	act_begin(?a),
@@ -207,10 +198,26 @@ RULES_DICT = {
 	executes(?b, ?st),
 	# SameAs(?st, ?_st), # stardog fails with error here
 	
-	 -> correct_act(?b), next(?a, ?b), FunctionBodyBegin(?b)
+	 -> correct_act(?b), 
+	 next_act(?a, ?b), 
+	 FunctionBodyBegin(?b)
+""",
+# Конец тела функции
+"connect_MainBodyEnd_rule_g5-2": """
+	correct_act(?a),
+	act_end(?a),
+	func(?func_), 
+	body(?func_, ?st),
+	executes(?a, ?st),
+	
+	act_end(?b),
+	executes(?b, ?func_),
+	next_sibling(?pr, ?b), correct_act(?pr),  # check that previous execution of st was in correct sub-trace
+	
+	 -> next_act(?a, ?b), FunctionEnd(?b)  # correct_act(?b),
 """,
 
-# Первый акт следования [works with Pellet]
+# Первый акт следования [works with Pellet] [FAILS with Stardog...]
 # Пустые следования (без действий) не поддерживаются!
 "connect_SequenceBegin_rule_g2": """
 	correct_act(?a),
@@ -224,7 +231,7 @@ RULES_DICT = {
 	next_sibling(?pr, ?b), correct_act(?pr),
 	executes(?b, ?st),
 	
-	 -> correct_act(?b), next(?a, ?b), SequenceBegin(?b)
+	 -> correct_act(?b), next_act(?a, ?b), SequenceBegin(?b)
 """,
 
 # Следующий акт следования [works with Pellet]
@@ -243,7 +250,9 @@ RULES_DICT = {
 	next_sibling(?pr, ?b), correct_act(?pr),
 	executes(?b, ?st2),
 	
-	 -> correct_act(?b), next(?a, ?b), SequenceNext(?b)
+	 -> correct_act(?b), 
+	  next_act(?a, ?b), 
+	  SequenceNext(?b)
 """,
 
 # Начало и конец простого акта [works with Pellet]
@@ -259,7 +268,7 @@ RULES_DICT = {
 	
 	exec_time(?a, ?t), exec_time(?b, ?_t),
 	equal(?t, ?_t),
-	 -> correct_act(?b), next(?a, ?b), StmtEnd(?b)
+	 -> correct_act(?b), next_act(?a, ?b), StmtEnd(?b)
 """,
 
 "connect_SequenceEnd": """
@@ -275,7 +284,7 @@ RULES_DICT = {
 	executes(?b, ?block),
 	body_item(?block, ?st),
 	next_sibling(?pr, ?b), correct_act(?pr),
-	 -> correct_act(?b), next(?a, ?b), SequenceEnd(?b)
+	 -> correct_act(?b), next_act(?a, ?b), SequenceEnd(?b)
 """,
 
 	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
@@ -311,7 +320,7 @@ RULES_DICT = {
 
 
 "GenericWrongAct_Error": """
-	next(?a, ?b),
+	next_act(?a, ?b),
 	student_next(?a, ?c),
 	DifferentFrom(?b, ?c),
 	 -> should_be(?c, ?b), 
@@ -332,7 +341,7 @@ RULES_DICT = {
 "- EndAfterTraceEnd_Error": """
 	act_end(?a),
 	parent_of(?p, ?a), index(?p, 0),  # top-level act representing trace only has index of 0.
-	next(?a, ?b), ## act(?b), 
+	next_act(?a, ?b), ## act(?b), 
 	 -> AfterTraceEnd(?b), cause(?b, ?a)
 	""",
 
@@ -440,7 +449,7 @@ RULES_DICT = {
 	# акты выполняют пару последовательных действий
 	body_item(?block, ?st1), 
 	body_item(?block, ?st2), 
-	next(?st1, ?st2),         # st1 --> st2
+	next(?st1, ?st2),         # st1 -> st2
 	executes(?act1, ?st1), 
 	executes(?act2, ?st2), 
 	
@@ -478,7 +487,7 @@ for i in range(1, 6+1):
 	action = ', '.join([f"ExtraAct(?c{j})" for j in range(1,i+1)])
 	_more_rules.update({
 		f"ExtraAct_{i}_Error": f"""
-			next(?a, ?b),
+			next_act(?a, ?b),
 			student_next(?a, ?c1),
 			DifferentFrom(?b, ?c1),
 			{pattern1}
@@ -488,13 +497,13 @@ for i in range(1, 6+1):
 
 		})
 
-	pattern1 = ''.join([f"next(?c{j}, ?c{j+1}), " for j in range(1,i)])
-	pattern2 = f"next(?c{i}, ?b),"
+	pattern1 = ''.join([f"next_act(?c{j}, ?c{j+1}), " for j in range(1,i)])
+	pattern2 = f"next_act(?c{i}, ?b),"
 	action = ', '.join([f"MissingAct(?c{j})" for j in range(1,i+1)])
 	_more_rules.update({
 		f"MissingAct_{i}_Error": f"""
 			student_next(?a, ?b),
-			next(?a, ?c1),
+			next_act(?a, ?c1),
 			DifferentFrom(?b, ?c1),
 			{pattern1}
 			{pattern2}
@@ -522,7 +531,7 @@ for k in tuple(RULES_DICT.keys()):
 			]
 	RULES_DICT[k] = "\n".join(lines)
 
-if 0:  # check correctness of modified rules text
+if 1:  # check correctness of modified rules text
 	with open("swrl_dbg.txt", "w") as f:
 	# 	# f.write(repr(RULES_DICT))
 		for k, v in RULES_DICT.items():
