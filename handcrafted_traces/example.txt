@@ -105,7 +105,7 @@
 
 
 /* 
-SKIP____alg03_seq3 MisplacedBefore (с.2) Акт до main
+alg03_seq3 MisplacedBefore (с.2) Акт до main
 (Длинные комментарии также можно использовать) */
 {
 началась программа
@@ -170,7 +170,7 @@ SKIP____alg03_seq3 MissingAct-3 (с.5) Пропущен акт в следова
 
 
 /* 
-alg03_seq3 WrongContext (с.7)
+SKIP____alg03_seq3 WrongContext (с.7)
 */
 {
 началась программа
@@ -195,7 +195,7 @@ alg03_seq3 WrongContext (с.7)
 }
 
 /* 
-alg03_seq3_2  Трасса1
+SKIP____alg03_seq3_2  Трасса1
 */
 {
 началась программа
