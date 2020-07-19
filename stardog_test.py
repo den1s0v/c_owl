@@ -25,6 +25,7 @@ from pprint import pprint
 from stardog_credentails import *
 
 def run_query(ontology_prefix=None):
+    print("Running SPARQL query...")
     
     ontology_prefix = ontology_prefix or "http://vstu.ru/poas/ctrl_structs_2020-05_v1#"
     
@@ -62,7 +63,7 @@ def run_query(ontology_prefix=None):
           SELECT DISTINCT * WHERE {  
               # ?s a onto:DebugObj .
               # ?o a onto:DebugObj .
-              ?s a onto:current_act .
+              ?s a onto:correct_act .
               # ?s a onto:act . 
               # ?s a onto:trace . 
               # ?s ?p ?o .
@@ -83,12 +84,32 @@ def run_query(ontology_prefix=None):
         pprint(r['results']['bindings'])
         print(len(r['results']['bindings']), "total.")
 
+def request_graph(ontology_prefix=None):
+    print("Running CONSTRUCT query...")
+    
+    ontology_prefix = ontology_prefix or "http://vstu.ru/poas/ctrl_structs_2020-05_v1#"
+    
+    with stardog.Connection(dbname, **conn_details) as conn:
+
+        query = """PREFIX onto: <%s>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+          
+          construct {?s ?p ?o} where {?s ?p ?o}
+          """ % ontology_prefix
+        
+        r = conn.graph(query, reasoning=bool(1))
+        
+        # pprint(r)
+        # print(len(r['results']['bindings']), "total.")
+        with open("stdg_db_dump.ttl", "wb") as f:
+            f.write(r)
+
 def main(ontology_prefix=None) -> float:
     _start_time = time.time()
-    print("Running SPARQL query...")
     
     try:
-        run_query(ontology_prefix)
+        # run_query(ontology_prefix)
+        request_graph(ontology_prefix)
         # pass
     except Exception as e:
         print(e)
