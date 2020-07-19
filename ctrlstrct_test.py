@@ -275,7 +275,12 @@ if __name__ == '__main__':
 	# 		print("Tests passed:", success, " in directory: ", directory)
 			
 	# 	# break
-	success_all = run_tests(process_kwargs=dict(reasoning=None, extra_act_entries=1))
+	success_all = run_tests(process_kwargs=dict(
+		reasoning=None, 
+		# reasoning="stardog", 
+		extra_act_entries=0
+		)
+	)
 	
 	# save LOG
 	fpath = os.path.join(TEST_DIR, REPORT_FNM)
