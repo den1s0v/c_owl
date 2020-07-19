@@ -584,7 +584,7 @@ class TraceTester():
                         if exec_n == 1:
                           make_triple(trace_obj, onto.next_sibling, obj)
                         else:
-                          make_triple(trace_obj, onto.next_sibling, mark2act_obj[mark])
+                          make_triple(mark2act_obj[mark], onto.next_sibling, obj)
 
                         # keep current value for next iteration
                         mark2act_obj[mark] = obj
