@@ -536,13 +536,21 @@ class TraceTester():
             
         entry_stmt_id = self.data["correct_trace"][0]["executes"]
             
+        max_act_ID = 1
+        def set_id(act_obj):
+            nonlocal max_act_ID
+            max_act_ID += 1
+            make_triple(act_obj, onto.id, max_act_ID)
+
+
         # make top-level act representing the trace
-        iri = f'trace_{self.data["trace_name"]}_{"".join(map(str, self.data["header_boolean_chain"]))}'
+        iri = f'trace_{self.data["trace_name"]}_{"".join(map(str, map(int, self.data["header_boolean_chain"])))}'
         iri = uniqualize_iri(onto, iri)
         iri = prepare_name(iri)
         trace_obj = onto.trace(iri)
         trace_obj.is_a.append(onto.correct_act)
         make_triple(trace_obj, onto.executes, onto[self.data["algorithm"]["iri"]])
+        set_id(trace_obj)
         # make_triple(trace_obj, onto.index, 0)      # set to 0 so next is 1
         make_triple(trace_obj, onto.exec_time, 0)  # set to 0 so next is 1
         make_triple(trace_obj, onto.in_trace, trace_obj)  # each act belongs to trace
@@ -576,6 +584,7 @@ class TraceTester():
                         obj = class_(iri)
                         # obj.is_a.append(class_X)
                         make_triple(obj, onto.executes, onto[alg_elem["iri"]])
+                        set_id(obj)
                         ### make_triple(obj, onto.index, index)
                         make_triple(obj, onto.exec_time, exec_n)
                         make_triple(obj, onto.in_trace, trace_obj)
@@ -689,7 +698,7 @@ class TraceTester():
                     alg_elem = self.id2obj[executes]
 
 
-                    iri_template = "{}%s_{}{}".format(text_line or id_, clean_name, number_mark)
+                    # iri_template = "{}%s_{}{}".format(text_line or id_, clean_name, number_mark)
                     
                     if phase_mark in ("b", "p"):
                         # начало акта
