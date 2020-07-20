@@ -86,13 +86,20 @@ RULES_DICT = {
 # func_a            func_a.body             func_a.body.first
 
 
+"Incr_index": """
+	next_act(?a, ?b), index(?a, ?ia), add(?ib, ?ia, 1)
+	 -> index(?b, ?ib)""",
+"-hardcoded- student_Incr_index": """
+	student_next(?a, ?b), student_index(?a, ?ia), add(?ib, ?ia, 1)
+	 -> student_index(?b, ?ib)""",
+
 # (s6)
 "DepthIncr_rule_s6": """
-	act_begin(?a), next_act(?a, ?b), act_begin(?b), 
+	act_begin(?a), next_act(?a, ?b), act_begin(?b)
 	 -> parent_of(?a, ?b)
 	""",
 "student_DepthIncr_rule_s6": """
-	act_begin(?a), student_next(?a, ?b), act_begin(?b), 
+	act_begin(?a), student_next(?a, ?b), act_begin(?b)
 	 -> student_parent_of(?a, ?b)
 	""",
 
@@ -151,7 +158,7 @@ RULES_DICT = {
 				######################
 
 # Точка входа в трассу - функция  [works with Pellet] [works with Stardog]
-"start__to__FunctionBegin__rule_g3": """
+"start__to__MainFunctionBegin__rule_g3": """
 	trace(?a),
 	executes(?a, ?alg),
 	entry_point(?alg, ?func_),
@@ -195,6 +202,8 @@ RULES_DICT = {
 	
 	act_begin(?b),
 	next_sibling(?pr, ?b), correct_act(?pr),  # check that previous execution of st was in correct sub-trace
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+
 	executes(?b, ?st),
 	# SameAs(?st, ?_st), # stardog fails with error here
 	
@@ -203,7 +212,7 @@ RULES_DICT = {
 	 FunctionBodyBegin(?b)
 """,
 # Конец тела функции
-"connect_MainBodyEnd_rule_g5-2": """
+"connect_FuncBodyEnd_rule_g5-2": """
 	correct_act(?a),
 	act_end(?a),
 	func(?func_), 
@@ -213,6 +222,7 @@ RULES_DICT = {
 	act_end(?b),
 	executes(?b, ?func_),
 	next_sibling(?pr, ?b), correct_act(?pr),  # check that previous execution of st was in correct sub-trace
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	
 	 -> next_act(?a, ?b), FunctionEnd(?b)  # correct_act(?b),
 """,
@@ -229,6 +239,7 @@ RULES_DICT = {
 	
 	act_begin(?b),
 	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	executes(?b, ?st),
 	
 	 -> correct_act(?b), next_act(?a, ?b), SequenceBegin(?b)
@@ -248,6 +259,7 @@ RULES_DICT = {
 	
 	act_begin(?b),
 	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	executes(?b, ?st2),
 	
 	 -> correct_act(?b), 
@@ -264,6 +276,7 @@ RULES_DICT = {
 	
 	act_end(?b),
 	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	executes(?b, ?st),
 	
 	exec_time(?a, ?t), exec_time(?b, ?_t),
@@ -284,6 +297,7 @@ RULES_DICT = {
 	executes(?b, ?block),
 	body_item(?block, ?st),
 	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	 -> correct_act(?b), next_act(?a, ?b), SequenceEnd(?b)
 """,
 
@@ -546,4 +560,4 @@ if 1:  # check correctness of modified rules text
 
 		# print(RULES_DICT)
 	
-# print(RULES_DICT)
+# debug! # RULES_DICT = {}

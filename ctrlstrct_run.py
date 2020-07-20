@@ -551,7 +551,8 @@ class TraceTester():
         trace_obj.is_a.append(onto.correct_act)
         make_triple(trace_obj, onto.executes, onto[self.data["algorithm"]["iri"]])
         set_id(trace_obj)
-        # make_triple(trace_obj, onto.index, 0)      # set to 0 so next is 1
+        make_triple(trace_obj, onto.index, 0)
+        make_triple(trace_obj, onto.student_index, 0)
         make_triple(trace_obj, onto.exec_time, 0)  # set to 0 so next is 1
         make_triple(trace_obj, onto.in_trace, trace_obj)  # each act belongs to trace
         
@@ -660,6 +661,11 @@ class TraceTester():
                 obj = trace_acts_list[-1]
                 # print(">>", prev_obj, obj)
                 make_triple(prev_obj, prop_class, obj)
+            if trace_acts_list:
+              num = len(trace_acts_list)
+              make_triple(obj, onto.student_index, num)
+
+
 
             
         def find_act(class_, executes: int, exec_time: int):
@@ -1014,7 +1020,7 @@ def init_persistent_structure(onto):
 
         # новое свойство next
         types.new_class("next", (Thing >> Thing, ))
-        types.new_class("next_act", (correct_act >> correct_act, ))
+        types.new_class("next_act", (correct_act >> correct_act, FunctionalProperty, InverseFunctionalProperty))
         types.new_class("student_next", (Thing >> Thing, ))
 
         # новое свойство student_next
@@ -1029,8 +1035,9 @@ def init_persistent_structure(onto):
         # новое свойство in_trace
         prop_in_trace = types.new_class("in_trace", (act >> trace, ))
         
-        # # новое свойство index
-        # prop_index = types.new_class("index", (Thing >> int, FunctionalProperty, ))
+        # свойство index
+        types.new_class("index", (Thing >> int, FunctionalProperty, ))
+        types.new_class("student_index", (Thing >> int, FunctionalProperty, ))
 
         # новое свойство exec_time
         prop_exec_time = types.new_class("exec_time", (Thing >> int, FunctionalProperty, ))
