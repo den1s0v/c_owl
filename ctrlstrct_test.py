@@ -214,7 +214,7 @@ def run_tests(directory="test_data/", process_kwargs={}):
 	try:
 		if True:
 			if SAVE_RDF:
-				ontology_file = "test_WO-idx" + "_output.rdf"
+				ontology_file = "test_make_trace" + "_output.rdf"
 				ontology_fpath = os.path.join(directory, ontology_file)
 				
 			else:
@@ -276,8 +276,9 @@ if __name__ == '__main__':
 			
 	# 	# break
 	success_all = run_tests(process_kwargs=dict(
-		reasoning=None, 
+		# reasoning=None, 
 		# reasoning="stardog", 
+		reasoning="pellet", 
 		extra_act_entries=0
 		)
 	)
