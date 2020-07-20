@@ -156,7 +156,7 @@ RULES_DICT = {
 	executes(?a, ?alg),
 	entry_point(?alg, ?func_),
 	func(?func_), 
-
+	DifferentFrom(?a, ?b),  # здесь не нужно, но правило не ломается!
 	act_begin(?b),
 		# next_sibling(?pr, ?b), correct_act(?pr),
 	next_sibling(?a, ?b),  # ?pr === ?a
@@ -319,19 +319,25 @@ RULES_DICT = {
 """,
 
 
-"-ErrOff- GenericWrongAct_Error": """
+"GenericWrongAct_Error": """
 	next_act(?a, ?b),
 	student_next(?a, ?c),
-	DifferentFrom(?b, ?c),
+	# DifferentFrom(?b, ?c),
+		id(?b, ?ib),
+		id(?c, ?ic),
+		notEqual(?ib, ?ic),
 	 -> should_be(?c, ?b), 
 	 cause(?c, ?a), 
-	 ### Erroneous(?c), ###
+	 Erroneous(?c)
 """,
 
-"-ErrOff- GenericWrongParent_Error": """
+"GenericWrongParent_Error": """
 	parent_of(?p, ?a),
 	student_parent_of(?c, ?a),
-	DifferentFrom(?p, ?c),
+	# DifferentFrom(?p, ?c),
+		id(?p, ?ip),
+		id(?c, ?ic),
+		notEqual(?ip, ?ic),
 	 -> context_should_be(?a, ?p), 
 	 # cause(?a, ?c), 
 	 WrongContext(?a)
