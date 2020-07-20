@@ -156,7 +156,7 @@ RULES_DICT = {
 	executes(?a, ?alg),
 	entry_point(?alg, ?func_),
 	func(?func_), 
-	DifferentFrom(?a, ?b),  # здесь не нужно, но правило не ломается!
+	# DifferentFrom(?a, ?b),  # здесь не нужно, но правило от этого ломается (хотя и не ломает остальной вывод)!
 	act_begin(?b),
 		# next_sibling(?pr, ?b), correct_act(?pr),
 	next_sibling(?a, ?b),  # ?pr === ?a
@@ -492,10 +492,10 @@ for i in range(1, 6+1):
 	pattern2 = f"student_next(?c{i}, ?b),"
 	action = ', '.join([f"ExtraAct(?c{j})" for j in range(1,i+1)])
 	_more_rules.update({
-		f"-ErrOff- ExtraAct_{i}_Error": f"""
+		f"ExtraAct_{i}_Error": f"""
 			next_act(?a, ?b),
 			student_next(?a, ?c1),
-			DifferentFrom(?b, ?c1),
+			# DifferentFrom(?b, ?c1),
 			{pattern1}
 			{pattern2}
 			 -> {action} ## ExtraAct(?c1)
@@ -507,10 +507,10 @@ for i in range(1, 6+1):
 	pattern2 = f"next_act(?c{i}, ?b),"
 	action = ', '.join([f"MissingAct(?c{j})" for j in range(1,i+1)])
 	_more_rules.update({
-		f"-ErrOff- MissingAct_{i}_Error": f"""
+		f"MissingAct_{i}_Error": f"""
 			student_next(?a, ?b),
 			next_act(?a, ?c1),
-			DifferentFrom(?b, ?c1),
+			# DifferentFrom(?b, ?c1),
 			{pattern1}
 			{pattern2}
 			 -> {action} ## MissingAct(?c1)
