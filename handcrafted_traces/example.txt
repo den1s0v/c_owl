@@ -105,7 +105,7 @@
 
 
 /* 
-alg03_seq3 Empty_trace
+SKIP____alg03_seq3 Empty_trace
 */
 {
 началась программа
@@ -115,7 +115,7 @@ alg03_seq3 Empty_trace
 }
 
 /* 
-SKIP____alg03_seq3 MisplacedBefore (с.2) Акт до main
+alg03_seq3 MisplacedBefore (с.2) Акт до main
 (Длинные комментарии также можно использовать) */
 {
 началась программа
