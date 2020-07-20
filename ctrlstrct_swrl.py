@@ -297,7 +297,7 @@ RULES_DICT = {
 				###################
 
 
-"CorrespondingActsMismatch_Error": """
+"-ErrOff- CorrespondingActsMismatch_Error": """
 	student_corresponding_end(?a, ?b), 
 	executes(?a, ?s1),
 	executes(?b, ?s2),
@@ -305,7 +305,7 @@ RULES_DICT = {
 	 -> CorrespondingEndMismatched(?b), cause(?b, ?a)
 """,
 
-"CorrespondingActsHaveDifferentExecTime_Error": """
+"-ErrOff- CorrespondingActsHaveDifferentExecTime_Error": """
 	student_corresponding_end(?a, ?b), 
 	executes(?a, ?st),
 	executes(?b, ?st),
@@ -319,7 +319,7 @@ RULES_DICT = {
 """,
 
 
-"GenericWrongAct_Error": """
+"-ErrOff- GenericWrongAct_Error": """
 	next_act(?a, ?b),
 	student_next(?a, ?c),
 	DifferentFrom(?b, ?c),
@@ -328,7 +328,7 @@ RULES_DICT = {
 	 ### Erroneous(?c), ###
 """,
 
-"GenericWrongParent_Error": """
+"-ErrOff- GenericWrongParent_Error": """
 	parent_of(?p, ?a),
 	student_parent_of(?c, ?a),
 	DifferentFrom(?p, ?c),
@@ -486,7 +486,7 @@ for i in range(1, 6+1):
 	pattern2 = f"student_next(?c{i}, ?b),"
 	action = ', '.join([f"ExtraAct(?c{j})" for j in range(1,i+1)])
 	_more_rules.update({
-		f"ExtraAct_{i}_Error": f"""
+		f"-ErrOff- ExtraAct_{i}_Error": f"""
 			next_act(?a, ?b),
 			student_next(?a, ?c1),
 			DifferentFrom(?b, ?c1),
@@ -501,7 +501,7 @@ for i in range(1, 6+1):
 	pattern2 = f"next_act(?c{i}, ?b),"
 	action = ', '.join([f"MissingAct(?c{j})" for j in range(1,i+1)])
 	_more_rules.update({
-		f"MissingAct_{i}_Error": f"""
+		f"-ErrOff- MissingAct_{i}_Error": f"""
 			student_next(?a, ?b),
 			next_act(?a, ?c1),
 			DifferentFrom(?b, ?c1),
