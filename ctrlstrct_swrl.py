@@ -496,6 +496,26 @@ RULES_DICT = {
 	 ->  arg(?counter, ?counter)  # DEBUG
 """,
 
+# Дубликат акта в следовании [works with Pellet]
+# Базируется на ExtraAct
+"DuplicateOfAct-b_Error": """
+	ExtraAct(?c1), 
+	act_begin(?c1),
+	student_parent_of(?p, ?c1),
+	executes(?p, ?block),
+	sequence(?block),
+	executes(?c1, ?st),
+
+	executes(?c, ?st),
+	parent_of(?p, ?c),
+	act_begin(?c),
+
+		id(?p, ?ip),
+		id(?c, ?ic),
+		notEqual(?ip, ?ic),
+	 -> cause(?c1, ?c), 
+	 DuplicateOfAct(?c1)
+"""
 
 }
 
