@@ -604,7 +604,7 @@ class TraceTester():
                         
                         # attach expr value: for act Begin only!
                         if mark == "b" and alg_elem["type"] in {"expr"}:
-                            values = self.expr_id2values[st_id]
+                            values = self.expr_id2values[st_id] if st_id in self.expr_id2values else []
                             # if len(values) <= exec_n:
                             if exec_n <= len(values):
                                 value = values[exec_n - 1]
