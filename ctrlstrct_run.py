@@ -1014,9 +1014,14 @@ def init_persistent_structure(onto):
 
         # make aclgorithm elements classes
         for class_name in [
-            "func",
+            "func", "alternative", "alt_branch", 
         ]:
             types.new_class(class_name, (Thing,))
+
+        for class_name in [
+            "if", "else-if", "else", 
+        ]:
+            types.new_class(class_name, (onto.alt_branch,))
 
         # новое свойство executes
         prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
@@ -1107,7 +1112,7 @@ def init_persistent_structure(onto):
             ]:
                 types.new_class(class_name, (Erroneous,))
             
-        for prop_name in ("cause", "should_be", "context_should_be"):
+        for prop_name in ("cause", "cause2", "should_be", "context_should_be"):
             if not onto[prop_name]:
                 types.new_class(prop_name, (onto["Erroneous"] >> Thing,))
 
@@ -1121,7 +1126,13 @@ def init_persistent_structure(onto):
             "SequenceNext",
             "SequenceEnd",
             "StmtEnd",
-            "DebugObj",
+            "ExprEnd",
+            # "DebugObj",
+            "AltBegin",  # 1st condition
+            "NextAltCondition",
+            "BranchBegin",
+            "AltBranchBegin",
+            "AltEndAfterBranch",
         ]:
             # types.new_class(class_name, (Thing,))
             types.new_class(class_name, (correct_act,))

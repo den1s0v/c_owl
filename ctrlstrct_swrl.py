@@ -275,8 +275,8 @@ RULES_DICT = {
 	executes(?a, ?st),
 	
 	act_end(?b),
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	# next_sibling(?pr, ?b), correct_act(?pr),
+	# 	index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	executes(?b, ?st),
 	
 	exec_time(?a, ?t), exec_time(?b, ?_t),
@@ -284,6 +284,22 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), StmtEnd(?b)
 """,
 
+# Начало и конец акта выражения [works with Pellet]
+"connect_ExprEnd": """
+	correct_act(?a),
+	act_begin(?a),
+	expr(?st), 
+	executes(?a, ?st),
+	
+	act_end(?b),
+	executes(?b, ?st),
+	
+	exec_time(?a, ?t), exec_time(?b, ?_t),
+	equal(?t, ?_t),
+	 -> correct_act(?b), next_act(?a, ?b), ExprEnd(?b)
+""",
+
+#  [works with Pellet]
 "connect_SequenceEnd": """
 	correct_act(?a),
 	act_end(?a),
@@ -300,6 +316,95 @@ RULES_DICT = {
 		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	 -> correct_act(?b), next_act(?a, ?b), SequenceEnd(?b)
 """,
+
+
+# ===== Alt ===== #
+
+
+# Проверка первого условия развилки (if) [works with Pellet]
+"connect_AltBegin": """
+	correct_act(?a),
+	act_begin(?a),
+	alternative(?alt), 
+	executes(?a, ?alt),
+
+	branches_item(?alt, ?br),
+	first_item(?br),	# one of that lines is enough
+	# if(?br),			# one of that lines is enough
+	cond(?br, ?cnd),
+	
+	act_begin(?b),
+	executes(?b, ?cnd),  # expr
+	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+
+	# exec_time(?a, ?t), exec_time(?b, ?_t),
+	# equal(?t, ?_t),
+	 -> correct_act(?b), next_act(?a, ?b), AltBegin(?b)
+""",
+
+# Начало ветки истинного условия развилки [works with Pellet]
+"connect_AltBranchBegin_CondTrue": """
+	correct_act(?a),
+	act_end(?a),
+	expr(?cnd), 
+	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, true),  # condition passed
+
+	cond(?br, ?cnd),
+	alt_branch(?br),  # belonds to an alternative
+	
+	act_begin(?b),
+	executes(?b, ?br),
+	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+
+	 -> correct_act(?b), next_act(?a, ?b), AltBranchBegin(?b)
+""",
+
+# Проверка следующего условия развилки (else-if) [works with Pellet]
+"connect_NextAltCondition": """
+	correct_act(?a),
+	act_end(?a),
+	expr(?cnd), 
+	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, false),  # condition failed
+
+	cond(?br, ?cnd),
+	alt_branch(?br),  # belonds to an alternative
+
+	next(?br, ?br2),
+	cond(?br2, ?cnd2),
+	
+	act_begin(?b),
+	executes(?b, ?cnd2),  # expr
+	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+
+	# exec_time(?a, ?t), exec_time(?b, ?_t),
+	# equal(?t, ?_t),
+	 -> correct_act(?b), next_act(?a, ?b), NextAltCondition(?b)
+""",
+
+# Окончание развилки по завершению ветки [works with Pellet]
+"connect_AltEndAfterBranch": """
+	correct_act(?a),
+	act_end(?a),
+	executes(?a, ?br),
+	branches_item(?alt, ?br),
+	alternative(?alt), 
+
+	act_end(?b),
+	executes(?b, ?alt),  # ends whole alternative
+	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	 -> correct_act(?b), next_act(?a, ?b), AltEndAfterBranch(?b)
+""",
+
 
 	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
 
@@ -504,6 +609,7 @@ RULES_DICT = {
 	student_parent_of(?p, ?c1),
 	executes(?p, ?block),
 	sequence(?block),
+		body_item(?block, ?st),  # just to ensure the sequence is real (and thus has "body_item"s)
 	executes(?c1, ?st),
 
 	executes(?c, ?st),
