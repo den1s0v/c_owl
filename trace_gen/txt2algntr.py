@@ -340,7 +340,8 @@ class TraceParser:
         if line_list and self.alg_dict:
             self.parse(line_list, self.alg_dict, self.name2id, start_line, end_line)
             
-    def get_alg_node_id(self, name):
+    def get_alg_node_id(self, name, node_type=None):
+        """ `node_type` is useful to force "expr" type of returned node """
         if isinstance(name, (list, set, tuple)):
             r = None
             for n in name:
@@ -359,12 +360,23 @@ class TraceParser:
                 # поищем без пробелов
                 r = self.name2id_no_whitespace.get(name, None)
     
-        if r is not None:            
+        if node_type:  # and node_type == "expr":
+            name = name.replace('(','').replace(')','')
+
+            criterion = lambda d: (type(d) is dict and "id" in d and  d["type"] == node_type and  d["name"].replace(' ','').replace('(','').replace(')','') == name)
+            nodes = list(find_by_predicate(self.alg_dict, criterion, find_one=True))
+            if nodes:
+                expr = nodes[0]
+                return expr["id"]
+
+        elif r is not None:            
             # check if the node is expr
             criterion = lambda d: (type(d) is dict and "id" in d and d["id"] == r and d["type"] == "expr")
             expr = list(find_by_predicate(self.alg_dict, criterion, find_one=True))
             if expr:
                 expr = expr[0]
+
+
                 # find the (expr as "cond")`s parent statement and return it
                 criterion = lambda d: (type(d) is dict and "cond" in d and d["cond"] == expr)
                 p = list(find_by_predicate(self.alg_dict, criterion, find_one=True))
@@ -514,7 +526,8 @@ class TraceParser:
                 ith = m.group(3)  if len(m.groups())>=3 else  None
                 phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
                 alg_obj_id = self.get_alg_node_id(name)
-                assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                cond_obj_id = self.get_alg_node_id(name, node_type="expr")
+                assert alg_obj_id and cond_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 
                 # convert value to true / false if matches so
                 value = {
@@ -531,7 +544,7 @@ class TraceParser:
                       # "expr": name,
                       "name": name,
                       "value": value,
-                      "executes": alg_obj_id,
+                      "executes": cond_obj_id,  # not alg_obj_id !
                       "phase": phase,
                       "n": ith,
                       "text_line": ci + 1,
