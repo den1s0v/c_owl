@@ -602,11 +602,13 @@ class TraceTester():
                         
                         # attach expr value: for act Begin only!
                         if mark == "b" and alg_elem["type"] in {"expr"}:
-                            values = self.expr_id2values[node["id"]]
-                            if len(values) <= exec_n:
-                                value = values[exec_n + 1]
+                            values = self.expr_id2values[st_id]
+                            # if len(values) <= exec_n:
+                            if exec_n <= len(values):
+                                value = values[exec_n - 1]
                             else:
                                 value = False
+                            # print(obj, onto.expr_value, value)
                             make_triple(obj, onto.expr_value, value)
                         
                         # # connect trace begin and 1st act with "next"
