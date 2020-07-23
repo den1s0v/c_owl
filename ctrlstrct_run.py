@@ -56,6 +56,8 @@ class TraceTester():
          }
         """
         self.data = trace_data
+
+        # pprint(trace_data["trace"])
         
         # индекс всех объектов АЛГОРИТМА для быстрого поиска по id
         self.id2obj = self.data["algorithm"].get("id2obj", {})
@@ -723,6 +725,8 @@ class TraceTester():
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
                             connect_next_act(obj)
+                        else:
+                          print("  act name:", name)
                         # # НЕ привязываем id (т.к. может повторяться у начал и концов. TO FIX?)
                             # if "value" in d:
                         #     make_triple(obj, onto.expr_value, d["value"])
