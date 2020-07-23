@@ -385,9 +385,56 @@ RULES_DICT = {
 	next_sibling(?pr, ?b), correct_act(?pr),
 		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 
-	# exec_time(?a, ?t), exec_time(?b, ?_t),
-	# equal(?t, ?_t),
 	 -> correct_act(?b), next_act(?a, ?b), NextAltCondition(?b)
+""",
+
+# Переход к ветке ИНАЧЕ (else)  [works with Pellet]
+"connect_AltElseBranch": """
+	correct_act(?a),
+	act_end(?a),
+	expr(?cnd), 
+	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, false),  # condition failed
+
+	cond(?br, ?cnd),
+	alt_branch(?br),  # belonds to an alternative
+	next(?br, ?br2),
+	else(?br2),
+	
+	act_begin(?b),
+	executes(?b, ?br2),  # expr
+
+	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+
+	 -> correct_act(?b), next_act(?a, ?b), AltElseBranchBegin(?b)
+""",
+
+# Переход к ветке ИНАЧЕ (else) [works with Pellet]
+"connect_AltEndAllFalse": """
+	correct_act(?a),
+	act_end(?a),
+	expr(?cnd), 
+	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, false),  # condition failed
+
+	cond(?br, ?cnd),
+	alt_branch(?br),  # belonds to an alternative
+	branches_item(?alt, ?br),
+	last_item(?br),   # the branch is last in alternative
+	alternative(?alt),
+	
+	act_end(?b),
+	executes(?b, ?alt),  # expr
+
+	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+
+	 -> correct_act(?b), next_act(?a, ?b), AltEndAllFalse(?b)
 """,
 
 # Окончание развилки по завершению ветки [works with Pellet]
@@ -404,6 +451,8 @@ RULES_DICT = {
 		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	 -> correct_act(?b), next_act(?a, ?b), AltEndAfterBranch(?b)
 """,
+
+# (6 generating rules to construct alternatives)
 
 
 	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.

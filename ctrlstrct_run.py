@@ -1130,9 +1130,10 @@ def init_persistent_structure(onto):
             # "DebugObj",
             "AltBegin",  # 1st condition
             "NextAltCondition",
-            "BranchBegin",
             "AltBranchBegin",
+            "AltElseBranchBegin",
             "AltEndAfterBranch",
+            "AltEndAllFalse",
         ]:
             # types.new_class(class_name, (Thing,))
             types.new_class(class_name, (correct_act,))
