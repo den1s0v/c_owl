@@ -692,9 +692,11 @@ for i in range(1, 6+1):
 
 		})
 
-	pattern1 = ''.join([f"next_act(?c{j}, ?c{j+1}), " for j in range(1,i)])
+	pattern1 = ''.join([f"next_act(?c{j}, ?c{j+1}), "
+						for j in range(1,i)])
 	pattern2 = f"next_act(?c{i}, ?b),"
-	action = ', '.join([f"MissingAct(?c{j})" for j in range(1,i+1)])
+	action = ',  '.join([f"MissingAct(?c{j}), should_be_before(?c{j}, ?b)"
+						for j in range(1,i+1)])
 	_more_rules.update({
 		f"MissingAct_{i}_Error": f"""
 			student_next(?a, ?b),

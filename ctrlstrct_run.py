@@ -1021,7 +1021,7 @@ def init_persistent_structure(onto):
         # if not onto["Counter"]:
         #     class Counter(Thing): pass
 
-        # make aclgorithm elements classes
+        # make algorithm elements classes
         for class_name in [
             "func", "alternative", "alt_branch", 
         ]:
@@ -1121,7 +1121,7 @@ def init_persistent_structure(onto):
             ]:
                 types.new_class(class_name, (Erroneous,))
             
-        for prop_name in ("cause", "cause2", "should_be", "context_should_be"):
+        for prop_name in ("cause", "cause2", "should_be", "should_be_before", "context_should_be"):
             if not onto[prop_name]:
                 types.new_class(prop_name, (onto["Erroneous"] >> Thing,))
 
