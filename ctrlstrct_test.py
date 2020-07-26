@@ -279,7 +279,7 @@ if __name__ == '__main__':
 		# reasoning=None, 
 		# reasoning="stardog", 
 		reasoning="pellet", 
-		extra_act_entries=1
+		extra_act_entries=0
 		)
 	)
 	

@@ -286,6 +286,7 @@ class TraceTester():
         
     def merge_acts(self, student_act, correct_act):
         """reassign all the properties from correct act to student_act and destroy the correct_act, so the student_act becomes the correct_act"""
+        raise "Deprecated!"
         assert student_act.namespace is correct_act.namespace
         
         onto = correct_act.namespace
@@ -307,8 +308,8 @@ class TraceTester():
             
         destroy_entity(correct_act)
         
-        
     def merge_traces(self, onto, student_iris, correct_iris):
+        raise "Deprecated!"
         student_objects = [onto[iri] for iri in student_iris]
         correct_objects = [onto[iri] for iri in correct_iris]
         
@@ -536,6 +537,14 @@ class TraceTester():
         for st_id in self.id2obj.keys():
             alg_id2max_exec_n[st_id] = extra_act_entries + alg_id2max_exec_n.get(st_id, 0)
             
+        # ensure that student's acts also exist
+        for act in self.data["trace"]:
+            executed_id = act["executes"]
+            exec_n = act.get("n", "1")
+            alg_id2max_exec_n[executed_id] = max(
+                            int(exec_n),  # assume "n"s appear consequently in the trace
+                            int(alg_id2max_exec_n[executed_id]))
+
         entry_stmt_id = self.data["correct_trace"][0]["executes"]
             
         max_act_ID = 1
