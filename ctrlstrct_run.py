@@ -1317,13 +1317,12 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     if on_done:
         on_done(seconds)
         
-    return onto, []  ### Debug exit
-    
+    # return onto, []  ### Debug exit
     # exit()
         
-    # mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
+    mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
     
-    # return onto, list(mistakes.values())
+    return onto, list(mistakes.values())
 
 
 def plain_list(list_of_lists):
