@@ -1182,18 +1182,22 @@ def load_swrl_rules(onto, rules_dict, rules_filter=None):
 def extact_mistakes(onto, as_objects=False) -> dict:
     """Searches for instances of trace_error class and constructs a dict of the following form:
         "<error_instance1_name>": {
+            "classes": ["list", "of", "class", "names", ...],
             "<property1_name>": ["list", "of", "property", "values", ...],
             "<property2_name>": [onto.iri_1, "reference", "can present", "too", ...],
             ...
         },
-                "<error_instance1_name>": {},
-                ... 
+        "<error_instance2_name>": {},
+        ... 
     
      """
-    properties_to_extract = ("name", onto.message, onto.arg, onto.cause, )
+    error_classes = onto.Erroneous.descendants()  # a set of the descendant Classes (including self)
+
+    properties_to_extract = ("name", onto.cause, onto.should_be, onto.should_be_before, onto.context_should_be, onto.text_line, )
     mistakes = {}
 
-    for inst in onto.trace_error.instances():
+    # The .instances() class method can be used to iterate through all Instances of a Class (including its subclasses). It returns a generator.
+    for inst in onto.Erroneous.instances():
         for prop in properties_to_extract:
             values = []
             # fill values ...
@@ -1211,6 +1215,11 @@ def extact_mistakes(onto, as_objects=False) -> dict:
             d = mistakes.get(inst.name, {})
             d[prop_name] = values
             mistakes[inst.name] = d
+        classes = {class_ for class_ in inst.is_a if class_ in error_classes}
+        base_classes = set([sup for cl in classes for sup in cl.is_a])
+        # print(classes, "-" ,base_classes)
+        classes -= base_classes  # remove less precise bases
+        mistakes[inst.name]["classes"] = [class_.name for class_ in classes]
     
     return mistakes
 
