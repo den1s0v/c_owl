@@ -455,6 +455,9 @@ RULES_DICT = {
 # (6 generating rules to construct alternatives)
 
 
+# !!!!!!!!!!!!!!!!
+
+
 	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
 
 
@@ -562,7 +565,7 @@ RULES_DICT = {
 	DifferentFrom(?a, ?b),
 
 	before(?a, ?b), 
-	 -> DuplicateActInSequence(?b), cause(?b, ?a)
+	 -> DuplicateActInSequence >>> DuplicateOfAct? (?b), cause(?b, ?a)
 """,
 
 
@@ -704,7 +707,8 @@ for i in range(1, 6+1):
 			# DifferentFrom(?b, ?c1),
 			{pattern1}
 			{pattern2}
-			 -> {action} ## MissingAct(?c1)
+			 -> {action}, ## MissingAct(?c1)]
+			 TooEarly(?b)
 		""",
 
 		})
