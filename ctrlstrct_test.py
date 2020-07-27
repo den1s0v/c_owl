@@ -106,15 +106,17 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	# extract erroneous acts provided by trace
 	def error_description(comment_str) -> list:
 		if "error" in comment_str or "ошибка" in comment_str:
-			# ex. "error: AllFalseNoElse (Нет ветки ИНАЧЕ)"
+			# For input str "error: AllFalseNoElse, TooEarly (Нет ветки ИНАЧЕ)"
+			# the result will be ['AllFalseNoElse', 'TooEarly']
 			m = re.search(r"(?:ошибка|error)\s*:?\s*([^()]*)\s*(?:\(.+\).*)?$", comment_str, re.I)
 			if m:
 				err_names = m.group(1).strip()
-				return re.split(r"\s,?\s+", err_names)
+				return re.split(r"\s*,?\s+", err_names)
 		return None
 	
 	text_lines = [d["text_line"] for d in trace]
 	error_descrs = {d["text_line"]: error_description(d["comment"]) for d in trace}
+
 	
 	# extract erroneous acts and messages from error instances (inferred)
 	err_objs = []
@@ -122,24 +124,18 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	
 	# retrieve property object(s)
 	prop_text_line = onto["text_line"]
-	# prop_message = onto["message"]
 
-	for prop_name in ("cause", ):  # добавить поля, если они появятся в спецификации ошибки
-		tr_obj_dicts = list(find_by_key_in(prop_name, mistakes))  # список ошибок с ключами 'cause', по которым хранятся списки объектов онтологии
-		
-		for dct in tr_obj_dicts:
-			for err_obj in dct[prop_name]:
-				if (err_obj.text_line) in text_lines:  # ignore unrelated errors (possibly related to another trace)
-					err_objs.append(err_obj)
-					err_obj_id2msgs[id(err_obj)] = dct["message"]
-			
-	
 	# get text lines of the inferred erroneous acts
-	inferred_error_lines = [
-		get_relation_object(err_obj, prop_text_line)
-		for err_obj in err_objs
-	]
-		
+	inferred_error_lines = [dct["text_line"] for dct in mistakes]
+	inferred_error_lines = [arr[0] if arr else None for arr in inferred_error_lines]
+
+	for dct, line in zip(mistakes, inferred_error_lines):
+		if line in text_lines:  # ignore unrelated errors (possibly related to another trace)
+			err_objs.append(dct)
+			err_obj_id2msgs[id(dct)] = dct["classes"]
+			
+	inferred_error_lines = [dct["text_line"][0] for dct in err_objs]  # reassign from filtered array
+	
 	# do check
 	differences = []
 	
@@ -153,10 +149,11 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 		if not expected and inferred:
 			return f"Correct line {line_i} has been recognized by the ontology as erroneous. Inferred mistakes: {', '.join(inferred)}"
 			
-		(not_recognised, extra) = ([], inferred[:])
+		(recognised, not_recognised, extra) = ([], [], inferred[:])
 		for err_word in expected:
 			for inferred_descr in extra[:]:
 				if err_word and err_word.lower() in inferred_descr.lower():
+					recognised.append(inferred_descr)
 					extra.remove(inferred_descr)
 					break
 			else:
@@ -165,21 +162,26 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 		if not not_recognised and not extra:
 			return None
 		
-		m = f"Erroneous line {line_i} has been recognized by the ontology partially only. Expected but not recognised - ({len(not_recognised)}) {', '.join(not_recognised)}. Inferred but not expected - ({len(extra)}) {', '.join(extra)}."
+		m = f"Erroneous line {line_i} has been recognized by the ontology partially only ({', '.join(recognised) or 'None in common'}). Expected but not recognised - {len(not_recognised)} ({', '.join(not_recognised) or None}). Inferred but not expected - {len(extra)} ({', '.join(extra) or None})."
 		return m
 			
 				
 	# first_err_line = None  # из размеченных комментариями в трассе
-	for line_i, err_descr in error_descrs.items():
-		
+	for line_i in text_lines:
+		descr_messages = []
+		for descr_line_i, err_descr in error_descrs.items():
+			if err_descr and descr_line_i == line_i:
+				descr_messages = err_descr
+				break
+
 		# gather all inferred mistakes
-		inferred_messages = []
+		inferred_messages = set()
 		if line_i in inferred_error_lines:
 			for inferred_line_i, err_obj in zip(inferred_error_lines, err_objs):
 				if line_i == inferred_line_i:
-					inferred_messages.extend(err_obj_id2msgs[id(err_obj)])
+					inferred_messages |= set(err_obj_id2msgs[id(err_obj)])
 		
-		m = _compare_mistakes(err_descr, inferred_messages, line_i)
+		m = _compare_mistakes(descr_messages, list(inferred_messages), line_i)
 		if m:
 			differences.append(m)
 				
