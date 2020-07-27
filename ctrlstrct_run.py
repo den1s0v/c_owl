@@ -1112,14 +1112,21 @@ def init_persistent_structure(onto):
                 "CorrespondingEndMismatched",
                 "CorrespondingEndPerformedDifferentTime",
                 "AfterTraceEnd",
-                "DuplicateActInSequence",
+                # "DuplicateActInSequence",
                 "WrongExecTime",
                 "WrongContext",
                 "ExtraAct",
+                ("DuplicateOfAct", ["ExtraAct"]),
                 "MissingAct",
-                "DuplicateOfAct",
+                "TooEarly",
             ]:
-                types.new_class(class_name, (Erroneous,))
+                if isinstance(class_name, str):
+                    types.new_class(class_name, (Erroneous,))
+                elif isinstance(class_name, tuple):
+                    class_name, base_names = class_name
+                    bases = tuple(onto[base_name] for base_name in base_names)
+                    # print(bases)
+                    types.new_class(class_name, bases)
             
         for prop_name in ("cause", "cause2", "should_be", "should_be_before", "context_should_be"):
             if not onto[prop_name]:
