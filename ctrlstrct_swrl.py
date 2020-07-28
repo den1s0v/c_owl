@@ -671,9 +671,9 @@ RULES_DICT = {
 	parent_of(?p, ?c),
 	act_begin(?c),
 
-		id(?p, ?ip),
+		id(?c1, ?ic1),
 		id(?c, ?ic),
-		notEqual(?ip, ?ic),
+		notEqual(?ic1, ?ic),
 	 -> cause(?c1, ?c), 
 	 DuplicateOfAct(?c1)
 """,
@@ -692,9 +692,9 @@ RULES_DICT = {
 	parent_of(?p, ?c),
 	act_end(?c),
 
-		id(?p, ?ip),
+		id(?c1, ?ic1),
 		id(?c, ?ic),
-		notEqual(?ip, ?ic),
+		notEqual(?ic1, ?ic),
 	 -> cause(?c1, ?c), 
 	 DuplicateOfAct(?c1)
 """,
