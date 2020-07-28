@@ -1124,7 +1124,7 @@ def init_persistent_structure(onto):
                 "TooEarly", # right after missing acts
                 ("DisplacedAct", ["TooEarly","ExtraAct","MissingAct"]),
                 # Alternatives mistakes ...
-                ("NoFirstCondition", ["DisplacedAct"]),
+                "NoFirstCondition",
                 ("BranchOfFalseCondition", ["ExtraAct"]),
                 ("ConditionAfterBranch", ["ExtraAct"]),
                 ("AnotherExtraBranch", ["ExtraAct"]),
