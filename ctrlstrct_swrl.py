@@ -412,7 +412,7 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), AltElseBranchBegin(?b)
 """,
 
-# Переход к ветке ИНАЧЕ (else) [works with Pellet]
+# Конец развилки, т.к. все условия ложны [works with Pellet]
 "connect_AltEndAllFalse": """
 	correct_act(?a),
 	act_end(?a),
@@ -738,6 +738,38 @@ RULES_DICT = {
 	act_begin(?b),
 	executes(?b, ?br),
 	 -> BranchOfFalseCondition(?b)
+""",
+
+# Условие после ветки  [works with Pellet]
+"ConditionAfterBranch-alt_Error": """
+	act_end(?a),
+	executes(?a, ?br),
+	branches_item(?alt, ?br),
+	alternative(?alt), 
+
+	student_next(?a, ?b),
+	ExtraAct(?b), 	  # как страховка, сработает и без этого
+	# act_begin(?b),
+	executes(?b, ?cnd),
+	expr(?cnd), 	# a condition
+	
+	 -> ConditionAfterBranch(?b)
+""",
+
+# Вторая ветка в альтернативе [works with Pellet]
+"AnotherExtraBranch-alt_Error": """
+	act_end(?a),
+	executes(?a, ?br),
+	branches_item(?alt, ?br),
+	alternative(?alt), 
+
+	student_next(?a, ?b),
+	ExtraAct(?b), 	  # как страховка, сработает и без этого
+	# act_begin(?b),
+	executes(?b, ?br2),
+	branches_item(?alt2, ?br2),
+	
+	 -> AnotherExtraBranch(?b)
 """,
 
 
