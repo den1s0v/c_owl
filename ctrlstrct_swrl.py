@@ -824,6 +824,22 @@ RULES_DICT = {
 	 -> NoNextCondition(?b)
 """,
 
+"AllFalseNoEnd-alt_Error": """
+	act_end(?a),
+	expr(?cnd), 
+	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, false),  # condition failed
+	cond(?br, ?cnd),  # corresponding branch
+	last_item(?br),   # no more conditions expected
+
+	student_next(?a, ?b),
+	Erroneous(?b),
+	
+	 -> AllFalseNoEnd(?b)
+""",
+
 
 }
 

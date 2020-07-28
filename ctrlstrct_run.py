@@ -58,6 +58,7 @@ class TraceTester():
         self.data = trace_data
 
         # pprint(trace_data["trace"])
+        # pprint(trace_data["algorithm"])
         
         # индекс всех объектов АЛГОРИТМА для быстрого поиска по id
         self.id2obj = self.data["algorithm"].get("id2obj", {})
@@ -1117,7 +1118,7 @@ def init_persistent_structure(onto):
                 "WrongExecTime",
                 "WrongContext",
                 "ExtraAct",
-                ("DuplicateOfAct", ["ExtraAct"]),
+                ("DuplicateOfAct", ["ExtraAct"]), # act was moved somewhere
                 "MissingAct",
                 "TooEarly", # right after missing acts
                 ("DisplacedAct", ["TooEarly","ExtraAct","MissingAct"]),
@@ -1129,6 +1130,7 @@ def init_persistent_structure(onto):
                 ("NoBranchWhenConditionIsTrue", ["MissingAct"]),
                 "AllFalseNoElse",
                 "NoNextCondition",
+                "AllFalseNoEnd",
             ]:
                 if isinstance(class_name, str):
                     types.new_class(class_name, (Erroneous,))

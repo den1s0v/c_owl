@@ -93,7 +93,7 @@ class AlgorithmParser:
                     continue
                 current_level = line_indents[i]
                 current_level_stmt_line_idx.append(i)
-            if line_indents[i] < current_level:  # элемент волее верхнего уровня
+            if line_indents[i] < current_level:  # элемент более верхнего уровня
                 break
 
         current_level_stmt_line_idx.append(len(line_list))  # конец последнего
