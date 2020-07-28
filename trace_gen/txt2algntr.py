@@ -425,6 +425,8 @@ class TraceParser:
         
             if ci >= end_line or not line:
                 break
+
+            ci += 1  # increment before any usage to match 1-based enumeration
         
             line = line.strip()
             
@@ -433,7 +435,6 @@ class TraceParser:
             comment = m and m.group(1) or ""
 
             if m and m.start() == 0:
-                ci += 1
                 continue
         
             # началась программа
@@ -455,10 +456,9 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       # "n": None,
-                      "text_line": ci + 1,
+                      "text_line": ci,
                       "comment": comment,
                 })
-                ci += 1
                 
                 if phase == "finished":
                     break  # трасса построена до конца!
@@ -500,10 +500,9 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci + 1,
+                      "text_line": ci,
                       "comment": comment,
                 })
-                ci += 1
                 continue  # with next act
         
             # условие развилки (цвет==зелёный) выполнилось 1-й раз - истина
@@ -551,10 +550,9 @@ class TraceParser:
                       "executes": cond_obj_id,  # not alg_obj_id !
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci + 1,
+                      "text_line": ci,
                       "comment": comment,
                 })
-                ci += 1
                 continue  # with next act
             
             # ветка иначе началась 1-й раз
@@ -593,10 +591,9 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci + 1,
+                      "text_line": ci,
                       "comment": comment,
                 })
-                ci += 1
                 continue  # with next act
 
             # ветка условия развилки (цвет==зелёный) началась 1-й раз
@@ -624,10 +621,9 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci + 1,
+                      "text_line": ci,
                       "comment": comment,
                 })
-                ci += 1
                 continue  # with next act
                 
             # началась итерация 1 цикла my-while-1
@@ -659,10 +655,9 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "iteration_n": ith,
-                      "text_line": ci + 1,
+                      "text_line": ci,
                       "comment": comment,
                 })
-                ci += 1
                 continue  # with next act
             
             # выполнилась инициализация (день = 1) 1-й раз
@@ -690,10 +685,9 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci + 1,
+                      "text_line": ci,
                       "comment": comment,
                 })
-                ci += 1
                 continue  # with next act
             
                 
@@ -710,7 +704,7 @@ class TraceParser:
                 # phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
                 phase = "started"  if "начал" in m.group(2) else  ("finished"  if "закончил" in m.group(2) else  "performed")
                 alg_obj_id = self.get_alg_node_id(name)
-                assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format("ветка иначе", ci)
+                assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
                       # "action": name,
@@ -718,16 +712,14 @@ class TraceParser:
                       "executes": alg_obj_id,
                       "phase": phase,
                       "n": ith,
-                      "text_line": ci + 1,
+                      "text_line": ci,
                       "comment": comment,
                 })
-                ci += 1
                 continue  # with next act
 
             
             # print("Warning: unknown trace line structure at line %d: "%ci, line)
             raise ValueError("TraceError: unknown trace line structure at line %d: %s"%(ci, line))
-            ci += 1
 
         return result
        
