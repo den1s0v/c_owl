@@ -98,7 +98,7 @@ class AlgorithmParser:
 
         current_level_stmt_line_idx.append(len(line_list))  # конец последнего
 
-    #     print(current_level_stmt_line_idx)
+        # print(current_level_stmt_line_idx)
 
         ci = 0  # current line index
 
@@ -109,7 +109,8 @@ class AlgorithmParser:
                 continue
 
             ci = i
-    #         print(ci, e)
+            # print(ci, e)
+            # print(*line_list[ci:e+1])
 
             # функция main
             m = re.match(r"функция\s+(\S+)", line_list[ci].strip(), re.I)
