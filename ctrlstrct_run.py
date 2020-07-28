@@ -1113,7 +1113,8 @@ def init_persistent_structure(onto):
                 # Sequence mistakes ...
                 "CorrespondingEndMismatched",
                 "CorrespondingEndPerformedDifferentTime",
-                "AfterTraceEnd",
+                "WrongExecTime",
+                # "AfterTraceEnd",
                 # "DuplicateActInSequence",
                 "WrongExecTime",
                 "WrongContext",

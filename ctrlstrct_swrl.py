@@ -515,6 +515,17 @@ RULES_DICT = {
 	 WrongContext(?a)
 """,
 
+"GenericWrongExecTime_Error": """
+	Erroneous(?c),
+	should_be(?c, ?b),
+	executes(?c, ?st),
+	executes(?b, ?st),
+	exec_time(?c, ?n1),
+	exec_time(?b, ?n2),
+	notEqual(?n1, ?n2),
+	 -> WrongExecTime(?c)
+""",
+
 
 "- EndAfterTraceEnd_Error": """
 	act_end(?a),
