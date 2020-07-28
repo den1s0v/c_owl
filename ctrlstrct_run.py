@@ -1126,6 +1126,7 @@ def init_persistent_structure(onto):
                 ("BranchOfFalseCondition", ["ExtraAct"]),
                 ("ConditionAfterBranch", ["ExtraAct"]),
                 ("AnotherExtraBranch", ["ExtraAct"]),
+                ("NoBranchWhenConditionIsTrue", ["MissingAct"]),
             ]:
                 if isinstance(class_name, str):
                     types.new_class(class_name, (Erroneous,))

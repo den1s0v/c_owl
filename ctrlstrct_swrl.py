@@ -772,6 +772,24 @@ RULES_DICT = {
 	 -> AnotherExtraBranch(?b)
 """,
 
+# После истинного условия нет его ветки [works with Pellet]
+"NoBranchWhenConditionIsTrue-alt_Error": """
+	act_end(?a),
+	expr(?cnd), 
+	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, true),  # condition passed
+
+	cond(?br, ?cnd),  # corresponding branch
+	alt_branch(?br),  # belonds to an alternative
+
+	student_next(?a, ?b),
+	Erroneous(?b), 	  # как страховка, сработает и без этого
+	
+	 -> NoBranchWhenConditionIsTrue(?b)
+""",
+
 
 }
 
