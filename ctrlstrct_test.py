@@ -52,6 +52,7 @@ def object_to_hashable(obj, discard_dict_keys=()):
 		return tuple(data)
 	
 def compare_mistakes(expected, actual, ignored_fields=("name",)):
+	"""Precise but configurable list of dicts comparison"""
 	assert isinstance(expected, list), "mistakes list expected"
 	assert isinstance(actual, list), "mistakes list expected"
 	

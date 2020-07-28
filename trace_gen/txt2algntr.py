@@ -418,7 +418,7 @@ class TraceParser:
 
         result = []
         
-        ci = start_line
+        ci = start_line  # index of line
         end_line = end_line or len(line_list)
         
         for line in line_list[ci:]:
@@ -431,6 +431,10 @@ class TraceParser:
             # ...  // comment
             m = re.search(r"(?://|#)\s*(.+)$", line, re.I)
             comment = m and m.group(1) or ""
+
+            if m and m.start() == 0:
+                ci += 1
+                continue
         
             # началась программа
             # закончилась программа
@@ -696,14 +700,15 @@ class TraceParser:
             # что-то выполнилось 1-й раз
             m = re.match(r"""(\S+)   # 1 name
                 \s+
-                (выполнил[оа]?с[ья])  # 2 phase
+                (начал[оа]?с[ья]|закончил[оа]?с[ья]|выполнил[оа]?с[ья])  # 2 phase
                 (?:\s+(\d+)[-_]?й?\s+раз)?   # 3 ith  (optional)
                 """, line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("{} {}".format(m.group(1), m.group(2)))
                 name = m.group(1)
                 ith = m.group(3)  if len(m.groups())>=3 else  None
-                phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
+                # phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
+                phase = "started"  if "начал" in m.group(2) else  ("finished"  if "закончил" in m.group(2) else  "performed")
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format("ветка иначе", ci)
                 result.append({
