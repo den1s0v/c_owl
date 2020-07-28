@@ -654,6 +654,8 @@ RULES_DICT = {
 	 ->  arg(?counter, ?counter)  # DEBUG
 """,
 
+# ============ Sequence mistakes ============ #
+
 # Дубликат акта в следовании [works with Pellet]
 # Базируется на ExtraAct
 "DuplicateOfAct-seq-b_Error": """
@@ -704,6 +706,19 @@ RULES_DICT = {
 	MissingAct(?c1), 
 	 -> DisplacedAct(?c1)
 """,
+
+# ============ Alternatives mistakes ============ #
+
+"NoFirstCondition-alt_Error": """
+	act_begin(?a),
+	executes(?a, ?alt),
+	alternative(?alt), 
+
+	student_next(?a, ?b),
+	Erroneous(?b), 
+	 -> NoFirstCondition(?b)
+""",
+
 
 }
 

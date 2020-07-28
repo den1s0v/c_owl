@@ -1109,6 +1109,7 @@ def init_persistent_structure(onto):
             
             # make Erroneous subclasses
             for class_name in [
+                # Sequence mistakes ...
                 "CorrespondingEndMismatched",
                 "CorrespondingEndPerformedDifferentTime",
                 "AfterTraceEnd",
@@ -1118,8 +1119,11 @@ def init_persistent_structure(onto):
                 "ExtraAct",
                 ("DuplicateOfAct", ["ExtraAct"]),
                 "MissingAct",
-                ("DisplacedAct", ["ExtraAct","MissingAct"]),
-                "TooEarly", # right after missing acts
+                ("TooEarly", # right after missing acts
+                            ["ExtraAct"]),
+                ("DisplacedAct", ["TooEarly","MissingAct"]),
+                # Alternatives mistakes ...
+                ("NoFirstCondition", ["DisplacedAct"]),
             ]:
                 if isinstance(class_name, str):
                     types.new_class(class_name, (Erroneous,))
