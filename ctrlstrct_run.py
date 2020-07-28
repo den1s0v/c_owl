@@ -1118,7 +1118,8 @@ def init_persistent_structure(onto):
                 "ExtraAct",
                 ("DuplicateOfAct", ["ExtraAct"]),
                 "MissingAct",
-                "TooEarly",
+                ("DisplacedAct", ["ExtraAct","MissingAct"]),
+                "TooEarly", # right after missing acts
             ]:
                 if isinstance(class_name, str):
                     types.new_class(class_name, (Erroneous,))

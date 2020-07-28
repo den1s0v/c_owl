@@ -455,8 +455,6 @@ RULES_DICT = {
 # (6 generating rules to construct alternatives)
 
 
-# !!!!!!!!!!!!!!!!
-
 
 	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
 
@@ -468,11 +466,14 @@ RULES_DICT = {
 				###################
 
 
-"-ErrOff- CorrespondingActsMismatch_Error": """
+"CorrespondingActsMismatch_Error": """
 	student_corresponding_end(?a, ?b), 
 	executes(?a, ?s1),
 	executes(?b, ?s2),
-	DifferentFrom(?s1, ?s2),
+	# DifferentFrom(?s1, ?s2),
+		id(?s1, ?ib),
+		id(?s2, ?ic),
+		notEqual(?ib, ?ic),
 	 -> CorrespondingEndMismatched(?b), cause(?b, ?a)
 """,
 
@@ -569,7 +570,7 @@ RULES_DICT = {
 """,
 
 
-"- GenericMisplaced_Mistake": """
+"- GenericDisplaced_Mistake": """
 	act_begin(?act1),
 	executes(?act1, ?st), 
 	parent_of(?st2, ?st),
@@ -655,7 +656,7 @@ RULES_DICT = {
 
 # Дубликат акта в следовании [works with Pellet]
 # Базируется на ExtraAct
-"DuplicateOfAct-b_Error": """
+"DuplicateOfAct-seq-b_Error": """
 	ExtraAct(?c1), 
 	act_begin(?c1),
 	student_parent_of(?p, ?c1),
@@ -673,7 +674,36 @@ RULES_DICT = {
 		notEqual(?ip, ?ic),
 	 -> cause(?c1, ?c), 
 	 DuplicateOfAct(?c1)
-"""
+""",
+# Дубликат акта в следовании [works with Pellet]
+# Базируется на ExtraAct
+"DuplicateOfAct-seq-e_Error": """
+	ExtraAct(?c1), 
+	act_end(?c1),
+	student_parent_of(?p, ?c1),
+	executes(?p, ?block),
+	sequence(?block),
+		body_item(?block, ?st),  # just to ensure the sequence is real (and thus has "body_item"s)
+	executes(?c1, ?st),
+
+	executes(?c, ?st),
+	parent_of(?p, ?c),
+	act_end(?c),
+
+		id(?p, ?ip),
+		id(?c, ?ic),
+		notEqual(?ip, ?ic),
+	 -> cause(?c1, ?c), 
+	 DuplicateOfAct(?c1)
+""",
+
+# Перемещённый акт [works with Pellet]
+# Базируется одновременно на ExtraAct и MissingAct
+"DisplacedAct_Error": """
+	ExtraAct(?c1), 
+	MissingAct(?c1), 
+	 -> DisplacedAct(?c1)
+""",
 
 }
 
