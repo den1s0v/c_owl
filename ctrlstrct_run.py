@@ -1119,17 +1119,17 @@ def init_persistent_structure(onto):
                 "ExtraAct",
                 ("DuplicateOfAct", ["ExtraAct"]),
                 "MissingAct",
-                ("TooEarly", # right after missing acts
-                            ["ExtraAct"]),
-                ("DisplacedAct", ["TooEarly","MissingAct"]),
+                "TooEarly", # right after missing acts
+                ("DisplacedAct", ["TooEarly","ExtraAct","MissingAct"]),
                 # Alternatives mistakes ...
                 ("NoFirstCondition", ["DisplacedAct"]),
+                ("BranchOfFalseCondition", ["ExtraAct"]),
             ]:
                 if isinstance(class_name, str):
                     types.new_class(class_name, (Erroneous,))
                 elif isinstance(class_name, tuple):
                     class_name, base_names = class_name
-                    bases = tuple(onto[base_name] for base_name in base_names)
+                    bases = tuple(onto[base_name] if type(base_name) is str else base_name for base_name in base_names)
                     # print(bases)
                     types.new_class(class_name, bases)
             

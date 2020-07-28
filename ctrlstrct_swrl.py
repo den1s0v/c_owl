@@ -709,6 +709,7 @@ RULES_DICT = {
 
 # ============ Alternatives mistakes ============ #
 
+# Развилка не начинается с условия [works with Pellet]
 "NoFirstCondition-alt_Error": """
 	act_begin(?a),
 	executes(?a, ?alt),
@@ -717,6 +718,26 @@ RULES_DICT = {
 	student_next(?a, ?b),
 	Erroneous(?b), 
 	 -> NoFirstCondition(?b)
+""",
+
+# Ветка при ложном условии [works with Pellet]
+"BranchOfFalseCondition-alt_Error": """
+	act_end(?a),
+	expr(?cnd), 
+	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, false),  # condition failed
+
+	cond(?br, ?cnd),  # corresponding branch
+	alt_branch(?br),  # belonds to an alternative
+
+	student_next(?a, ?b),
+	Erroneous(?b), 	  # как страховка, сработает и без этого
+	
+	act_begin(?b),
+	executes(?b, ?br),
+	 -> BranchOfFalseCondition(?b)
 """,
 
 
