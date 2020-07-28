@@ -150,20 +150,20 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 		if not expected and inferred:
 			return f"Correct line {line_i} has been recognized by the ontology as erroneous. Inferred mistakes: {', '.join(inferred)}"
 			
-		(recognised, not_recognised, extra) = ([], [], inferred[:])
+		(recognized, not_recognized, extra) = ([], [], inferred[:])
 		for err_word in expected:
 			for inferred_descr in extra[:]:
 				if err_word and err_word.lower() in inferred_descr.lower():
-					recognised.append(inferred_descr)
+					recognized.append(inferred_descr)
 					extra.remove(inferred_descr)
 					break
 			else:
-				not_recognised.append(err_word)
+				not_recognized.append(err_word)
 		
-		if not not_recognised and not extra:
+		if not not_recognized and not extra:
 			return None
 		
-		m = f"Erroneous line {line_i} has been recognized by the ontology partially only ({', '.join(recognised) or 'None in common'}). Expected but not recognised - {len(not_recognised)} ({', '.join(not_recognised) or None}). Inferred but not expected - {len(extra)} ({', '.join(extra) or None})."
+		m = f"Erroneous line {line_i} has been recognized by the ontology partially only ({', '.join(recognized) or 'None in common'}). Expected but not recognized - {len(not_recognized)} ({', '.join(not_recognized) or None}). Inferred but not expected - {len(extra)} ({', '.join(extra) or None})."
 		return m
 			
 				
