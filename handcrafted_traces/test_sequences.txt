@@ -13,7 +13,7 @@
 
 
 /* 
-SKIP_alg_inner_seq2 all ok
+SKIP____alg_inner_seq2 all ok
 */
 {
 началась программа
@@ -33,9 +33,9 @@ alg_inner_seq2 MisplacedBefore
 {
 началась программа
 outer_first выполнилось 1-й раз
-    inner_first выполнилось 1-й раз   // ошибка ! До содержащего следования
-началось следование inner_seq 1-й раз
-    inner_second выполнилось 1-й раз 
+    inner_first выполнилось 1-й раз     // ошибки DisplacedAct, WrongContext
+началось следование inner_seq 1-й раз   // ошибка DisplacedAct
+    inner_second выполнилось 1-й раз    // ошибка TooEarly
 закончилось следование inner_seq 1-й раз
 outer_second выполнилось 1-й раз
 outer_third выполнилось 1-й раз
@@ -43,7 +43,7 @@ outer_third выполнилось 1-й раз
 }
 
 /* 
-alg_inner_seq2 MisplacedAfter
+SKIP____alg_inner_seq2 MisplacedAfter
 */
 {
 началась программа
@@ -58,7 +58,7 @@ outer_third выполнилось 1-й раз
 }
 
 /* 
-alg_inner_seq2 Misplaced in Reverse
+SKIP____alg_inner_seq2 Misplaced in Reverse
 */
 {
 началась программа
