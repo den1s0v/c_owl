@@ -1100,7 +1100,7 @@ def init_persistent_structure(onto):
         # if not onto["message"]:
         #     message_prop = types.new_class("message", (trace_error >> str, FunctionalProperty, ))
         # объект-агрумент, на который делается ссылка
-        for prop_name in ("arg", "body"):
+        for prop_name in ("body", ):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
            
