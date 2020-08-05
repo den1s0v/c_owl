@@ -1093,12 +1093,12 @@ def init_persistent_structure(onto):
         # class contains_child(Thing >> Thing, ): pass
         # class contains_act(act_begin >> act, contains_child): pass
         
-        # -->
-        # Создать класс ошибки
-        class trace_error(Thing): pass
+        # # -->
+        # # Создать класс ошибки
+        # class trace_error(Thing): pass
 
-        if not onto["message"]:
-            message_prop = types.new_class("message", (trace_error >> str, FunctionalProperty, ))
+        # if not onto["message"]:
+        #     message_prop = types.new_class("message", (trace_error >> str, FunctionalProperty, ))
         # объект-агрумент, на который делается ссылка
         for prop_name in ("arg", "body"):
             if not onto[prop_name]:
