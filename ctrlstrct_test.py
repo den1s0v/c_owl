@@ -106,10 +106,10 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	
 	# extract erroneous acts provided by trace
 	def error_description(comment_str) -> list:
-		if "error" in comment_str or "ошибка" in comment_str:
+		if "error" in comment_str or "ошибк" in comment_str:
 			# For input str "error: AllFalseNoElse, TooEarly (Нет ветки ИНАЧЕ)"
 			# the result will be ['AllFalseNoElse', 'TooEarly']
-			m = re.search(r"(?:ошибка|error)\s*:?\s*([^()]*)\s*(?:\(.+\).*)?$", comment_str, re.I)
+			m = re.search(r"(?:ошибк[аи]|errors?)\s*:?\s*([^()]*)\s*(?:\(.+\).*)?$", comment_str, re.I)
 			if m:
 				err_names = m.group(1).strip()
 				return re.split(r"\s*,?\s+", err_names)

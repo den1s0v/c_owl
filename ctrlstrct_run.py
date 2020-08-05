@@ -1024,7 +1024,7 @@ def init_persistent_structure(onto):
 
         # make algorithm elements classes
         for class_name in [
-            "func", "alternative", "alt_branch", 
+            "func", "alternative", "alt_branch", "expr", 
         ]:
             types.new_class(class_name, (Thing,))
 
@@ -1033,6 +1033,11 @@ def init_persistent_structure(onto):
         ]:
             types.new_class(class_name, (onto.alt_branch,))
 
+        # make algorithm elements properties
+        for prop_name in ("body", "branches_item", "cond", ):
+            if not onto[prop_name]:
+                types.new_class(prop_name, (Thing >> Thing,))
+           
         # новое свойство executes
         prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
 
@@ -1093,17 +1098,6 @@ def init_persistent_structure(onto):
         # class contains_child(Thing >> Thing, ): pass
         # class contains_act(act_begin >> act, contains_child): pass
         
-        # # -->
-        # # Создать класс ошибки
-        # class trace_error(Thing): pass
-
-        # if not onto["message"]:
-        #     message_prop = types.new_class("message", (trace_error >> str, FunctionalProperty, ))
-        # объект-агрумент, на который делается ссылка
-        for prop_name in ("body", ):
-            if not onto[prop_name]:
-                types.new_class(prop_name, (Thing >> Thing,))
-           
        # объекты, спровоцировавшие ошибку
         if not onto["Erroneous"]:
             Erroneous = types.new_class("Erroneous", (Thing,))
