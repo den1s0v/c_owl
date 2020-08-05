@@ -1,0 +1,138 @@
+2   
+Begin_then_end (act a)
+1   ActStartsAfterEnd (act a)
+2   ActEndsDifferent (act a, act b)
+
+
+3
+IS_containment (act a_i, IS act a)
+1    MisplacedAfter
+2    MisplacedBefore
+3    MisplacedBeforeAndAfter
+4    MisplacedWithout
+5    MisplacedDeeper
+
+
+1
+SeqA_contains_B (Sequence A, statement B)
++1    MissingAct (act b, Sequence A)
+            Пропущен акт
++2    ExtraAct (act b, Sequence A)
+            Лишний акт
++3    DuplicateOfAct (act b, Sequence A)
+            Дубликат акта
+
+
+4
+LinearOrder (Sequence A)
+1    ActsPairMisorder (act a, act b, Sequence A)
+            Нарушен порядок следования
+
+    
+5 (5.1)
+Alternative
++1    AllFalseNoElse (Alternative act a)  // ни одна ветка не выполнилась
++2    NoFirstCondition (Alternative act a)
++3    AnotherExtraBranch (a, branch B)
++4    BranchOfFalseCondition (a, branch act b, condition act c)
++5    NoNextCondition (a, condition act c)
++6    NoBranchWhenConditionIsTrue (a, branch B, condition act c)
+7    NextConditionAfterTrueCondition (a, condition act c_true, condition act c_extra)  // выполнилось условие после предыдущего истинного
+8    AllFalseNoEnd (a, condition act c)
+9    DuplicateOfCondition  (a, condition act с1, condition act c2)
+10   ConditionsMisorder   (a, condition act с1, condition act c2)
+11   BranchBeforeCondition (a, branch act b, condition act c)
++12   ConditionAfterBranch (a, branch act b, condition act c)
+
+
+22 
+Conditional_Loop (Loop act L)	# Общие правила для циклов с Условием (For, ForEach, While и Do)
+  Допустимые действия на уровне цикла:
+    {
+        Condition
+        Iteration
+    }
+    
+1	NoCondition	(L) (условие не проверяется ни разу; ни одного условия)
+2	MissingIterationAfterTrueCondition	(L, condition act c)    (при истинном условии продолжения нет итерации; нет итерации после истинного условия)
+3	MissingIterationBetweenLoopConditions	(L, condition act с1, condition act c2) (дубликат условия; пропуск итерации между условиями)
+4	MissingConditionBetweenIterations	(L, iteration i1, i2)   (дубликат итерации; пропуск условия между итерациями)
+5	[no-break] MissingConditionAfterIteration	(L, iteration i)  (нет условия после итерации)
+6   ExtraActsBetweenFalseConditionAndLoopEnd  (L, condition act c, extra act e) (после завершающей проверки условия цикл не заканчивается)
+
+6 (6.1) (+ Conditional_Loop)
+While_Loop (WhileLoop act L)
+1    MissingConditionBeforeWhileIteration (L, iteration i)  (пропущено первое условие While)
+
+
+7 (7.1) (+ Conditional_Loop)
+Do_Loop (DoLoop act L)
+1    NoIterationsInDoLoop (L)  (нет ни одной итерации в цикле Do-While)
+2    MissingDoIterationBeforeCondition (L, condition act c)  (пропущена первая итерация Do-While)
+
+
+8 (8.1) (+ Conditional_Loop)
+For_Loop (ForLoop act L)
+  Допустимые действия на уровне цикла:
+    Init
+    {
+        Condition
+        Iteration
+        Update/ForUpdate
+    }
+    
+1	MissingInitActInForLoop (L)  (пропущена инициализация цикла For)
+2	DuplicatesOfForInit (L, for_init act init)  (несколькр актов инициализации цикла For)
+2   MissingConditionAfterForInit (L, i) === NoCondition (L) (цикл не начинается после Init; ни одной проверки условия)
+
+ -- 4,5 - проверки в конце цикла
+4   MissingForUpdateAfterIteration	(L, iteration i)  (пропущен переход цикла For)
+5	MissingConditionAfterForUpdate	(L, for_update act u)  (пропущена проверка условия после перехода цикла For; нет условия после перехода)
+    
+ -- 6,7,8 - в дополнение к 4,5 (для обработки ошибок цикличности "в толще" итераций)
+6   Missing ForUpdate Between Iteration and Condition (L, iteration i, condition act c)  (подряд итерация и условие)
+7   Missing Iteration Between Condition and ForUpdate (L, condition act c, update act u)  (подряд условие и переход)
+8   Missing Condition Between ForUpdate and Iteration (L, update act u, iteration i)  (подряд переход и итерация)
+
+
+X (X.x) (+ Conditional_Loop)
+Foreach_Loop (Foreach_Loop act L)
+  Допустимые действия на уровне цикла:
+    IsEmptyCheck (FirstExists/NotEmptyCondition)
+    Init/ForeachInit (FetchFirstElement)
+    {
+        Iteration
+        Condition (NextExists)
+        Update/ForeachUpdate  (FetchNextElement)
+    }
+    
+1   MissingIsEmptyCheckInForeach === NoCondition (L)  (нет проверки на пустоту коллекции)
+2   DuplicateOfIsEmptyCheckInForeach (L, check c1, c2)  (дубликат проверки на пустоту коллекции)
+3   ExtraActsBetweenFalseIsNotEmptyCheckAndForeachEnd	(L, check act c, extra act e)  (после завершающей проверки на пустоту коллекции цикл не заканчивается)
+4   MissingForeachInitIfNotEmpty (L) (Init не начинается после IsEmptyCheck; пропущена инициализация цикла Foreach)
+5   DuplicateOfForeachInit (L, init i1, i2)  (дубликат инициализации Foreach)
+6   MissingIsEmptyCheckBeforeForeachInit (L, init i) (пропущен IsEmptyCheck)
+7   MissingIterationAfterForeachInit (L, i) (итерация не начинается после Init; при непустой коллекции нет первой итерации)
+
+ -- 8,9 - проверки в конце цикла
+8   MissingForeachUpdateAfterTrueCondition (L, c)
+9   MissingIterationAfterForeachUpdate (L, u)
+
+ -- 10,11,12 - обработка ошибок цикличности "в толще" итераций
+10  Missing ForeachUpdate Between Iteration and Condition (L, iteration i, condition act c)
+11  Missing Iteration Between Condition and ForeachUpdate (L, condition act c, update act u)
+12  Missing Condition Between ForeachUpdate and Iteration (L, update act u, iteration i)
+   
+   
+
+
+
+17 (17.1)
+Switch (Switch act s)
+1	AllFalseNoDefault	(s)
+2	DuplicatesOfSwitchBranch	(s, branch act b)
+3	SwitchBranchWithNoTrueConditions	(s, branch act b)
+4	NoSwitchBranchWhenTrueConditionExists	(s, condition act c)
+5	DefaultBranchWhenTrueConditionExists	(s, branch act b, condition act c)
+
+
