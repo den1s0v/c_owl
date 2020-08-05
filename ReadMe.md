@@ -31,4 +31,4 @@ Status: proof-of-concept prototype.
 
  `python3 ctrlstrct_test.py`
 
-- note that all the examples (see handcrafted_traces/\*.txt) designed in russian language.
+- note that all the examples (see handcrafted_traces/\*.txt) designed in Russian language.

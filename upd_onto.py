@@ -114,21 +114,28 @@ _special_prefixes =  [
 
 
 def make_triple(subj, prop, obj):
-	# print(subj, prop, obj)
-	if FunctionalProperty in prop.is_a:
-		# "not asserted" workaround
-		setattr(subj, prop.python_name, obj)
-	else:
-		prop[subj].append(obj)
+	try:
+		if FunctionalProperty in prop.is_a:
+			# "not asserted" workaround
+			setattr(subj, prop.python_name, obj)
+		else:
+			prop[subj].append(obj)
+	except Exception as e:
+		print("make_triple: ", subj, prop, obj)
+		raise e
 
 
 def remove_triple(subj, prop, obj):
-	if FunctionalProperty in prop.is_a:
-		# "not removed" workaround
-		setattr(subj, prop.python_name, None)
-	else:
-		if obj in prop[subj]:
-			prop[subj].remove(obj)
+	try:
+		if FunctionalProperty in prop.is_a:
+			# "not removed" workaround
+			setattr(subj, prop.python_name, None)
+		else:
+			if obj in prop[subj]:
+				prop[subj].remove(obj)
+	except Exception as e:
+		print("remove_triple: ", subj, prop, obj)
+		raise e
 
 
 def get_relation_object(subj,prop):
