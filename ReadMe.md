@@ -8,6 +8,7 @@
 Status: proof-of-concept prototype.
 
 **Задача**: по данному алгоритму и фрагменту трассы найти все ошибки и сгенерировать понятные человеку объяснения по каждой из них.
+
 (**Task**: find all mistakes using this algorithm and a trace fragment and generate explanations for each of them that are clear to people.)
 
 ## Технологии (Technologies)
