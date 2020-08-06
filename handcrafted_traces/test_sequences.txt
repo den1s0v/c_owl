@@ -43,7 +43,7 @@ outer_third выполнилось 1-й раз
 }
 
 /* 
-alg_inner_seq2 MisplacedAfter
+SKIP____alg_inner_seq2 MisplacedAfter
 */
 {
 началась программа
@@ -58,17 +58,17 @@ outer_third выполнилось 1-й раз
 }
 
 /* 
-SKIP____alg_inner_seq2 Misplaced in Reverse
+alg_inner_seq2 Misplaced-in-Reverse
 */
 {
 началась программа
 outer_first выполнилось 1-й раз
-началось следование inner_first 1-й раз  // ошибка ! Это всего лишь простой акт!
 	началось следование inner_seq 1-й раз
-		inner_first выполнилось 1-й раз
+		началось следование inner_first 1-й раз  // (ошибка)-пока-не-опознаётся (из-за наивной простоты парсера) : Это всего лишь простой акт!
+			inner_first выполнилось 2-й раз    // ошибка ExtraAct
+		закончилось следование inner_first 1-й раз
 		inner_second выполнилось 1-й раз
 	закончилось следование inner_seq 1-й раз
-закончилось следование inner_first 1-й раз
 outer_second выполнилось 1-й раз
 outer_third выполнилось 1-й раз
 закончилась программа
