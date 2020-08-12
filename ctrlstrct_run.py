@@ -59,6 +59,7 @@ class TraceTester():
 
         # pprint(trace_data["trace"])
         # pprint(trace_data["algorithm"])
+        # exit()
         
         # индекс всех объектов АЛГОРИТМА для быстрого поиска по id
         self.id2obj = self.data["algorithm"].get("id2obj", {})
@@ -1018,9 +1019,63 @@ def init_persistent_structure(onto):
         # признак last
         class last_item(Thing, ): pass
 
-        # # создаём новый class - для создания n-арной ассоциации для подсчёта числа связей
-        # if not onto["Counter"]:
-        #     class Counter(Thing): pass
+        # ->
+        class loop(Thing): pass
+        
+        if loop:  # hide a block under code folding
+            # classes that regulate a loop execution start (which act should be first)
+            #
+            # start with cond
+            preconditional_loop = types.new_class("pre-conditional_loop", (loop,))
+            # start with body
+            postconditional_loop = types.new_class("post-conditional_loop", (loop,))
+            # start with init
+            loop_with_initialization = types.new_class("loop_with_initialization", (loop,))
+            
+            AllDisjoint([preconditional_loop, postconditional_loop, loop_with_initialization])
+            
+            # classes that regulate the use of condition in a loop
+            #
+            # normal condition effect (false->stop, true->start a body) like in while, do-while, for loop types
+            conditional_loop = types.new_class("conditional_loop", (loop,))
+            # inverse condition effect (false->start a body, true->stop) like in do-until loop
+            inverse_conditional_loop = types.new_class("inverse-conditional_loop", (loop,))
+            # no condition at all: infinite loop like while(true){...}. The only act executed is the loop body.
+            unconditional_loop = types.new_class("unconditional_loop", (loop, postconditional_loop))  # "postconditional_loop" parent here is a lifehack: the loop starts with body just like "do-while", "postconditional_loop" causes the body to be first act whthin a loop act.
+            
+            AllDisjoint([conditional_loop, inverse_conditional_loop, unconditional_loop])
+            
+            # classes that regulate the use of "update" step in a for-like loop (both subclasses of "loop_with_initialization" as that loop have "update" step too)
+            #
+            # update first, then the body, like in foreach loop type
+            pre_update_loop = types.new_class("pre-update_loop", (loop_with_initialization,))
+            # body first, then the update, like in for(;;) loop type
+            post_update_loop = types.new_class("post-update_loop", (loop_with_initialization,))
+            
+            AllDisjoint([pre_update_loop, post_update_loop])
+            
+            
+            # classes that indicate whether condition and body follow each other instantly or not (note that: these classes are not disjointed; these classes are to be inferred from another defined features via equivalent_to definition so no direct inheritance required for known loops)
+            class _body_then_cond(loop):
+                equivalent_to = [inverse_conditional_loop | (conditional_loop & (Not(post_update_loop)))]
+            class _cond_then_body(loop):
+                equivalent_to = [conditional_loop & (Not(pre_update_loop))]
+                
+            # classes that define well-known loops as subclasses of the above defined loop-feature classes. These classes are to be used publicly
+            class while_loop(conditional_loop, preconditional_loop): pass
+            
+            # class dowhile_loop(conditional_loop, postconditional_loop): pass
+            types.new_class("do-while_loop", (conditional_loop, postconditional_loop,))
+            
+            # class dountil_loop(inverse_conditional_loop, postconditional_loop): pass
+            types.new_class("do-until_loop", (inverse_conditional_loop, postconditional_loop,))
+            
+            class for_loop(conditional_loop, post_update_loop): pass
+            class foreach_loop(conditional_loop, pre_update_loop): pass
+            class infinite_loop(loop):  
+                equivalent_to = [unconditional_loop]  # reduce an inheritance level: use "equivalent_to" instead of inheritance
+              
+        
 
         # make algorithm elements classes
         for class_name in [
