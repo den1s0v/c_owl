@@ -1026,9 +1026,9 @@ def init_persistent_structure(onto):
             # classes that regulate a loop execution start (which act should be first)
             #
             # start with cond
-            preconditional_loop = types.new_class("pre-conditional_loop", (loop,))
+            preconditional_loop = types.new_class("pre_conditional_loop", (loop,))
             # start with body
-            postconditional_loop = types.new_class("post-conditional_loop", (loop,))
+            postconditional_loop = types.new_class("post_conditional_loop", (loop,))
             # start with init
             loop_with_initialization = types.new_class("loop_with_initialization", (loop,))
             
@@ -1039,7 +1039,7 @@ def init_persistent_structure(onto):
             # normal condition effect (false->stop, true->start a body) like in while, do-while, for loop types
             conditional_loop = types.new_class("conditional_loop", (loop,))
             # inverse condition effect (false->start a body, true->stop) like in do-until loop
-            inverse_conditional_loop = types.new_class("inverse-conditional_loop", (loop,))
+            inverse_conditional_loop = types.new_class("inverse_conditional_loop", (loop,))
             # no condition at all: infinite loop like while(true){...}. The only act executed is the loop body.
             unconditional_loop = types.new_class("unconditional_loop", (loop, postconditional_loop))  # "postconditional_loop" parent here is a lifehack: the loop starts with body just like "do-while", "postconditional_loop" causes the body to be first act whthin a loop act.
             
@@ -1048,9 +1048,9 @@ def init_persistent_structure(onto):
             # classes that regulate the use of "update" step in a for-like loop (both subclasses of "loop_with_initialization" as that loop have "update" step too)
             #
             # update first, then the body, like in foreach loop type
-            pre_update_loop = types.new_class("pre-update_loop", (loop_with_initialization,))
+            pre_update_loop = types.new_class("pre_update_loop", (loop_with_initialization,))
             # body first, then the update, like in for(;;) loop type
-            post_update_loop = types.new_class("post-update_loop", (loop_with_initialization,))
+            post_update_loop = types.new_class("post_update_loop", (loop_with_initialization,))
             
             AllDisjoint([pre_update_loop, post_update_loop])
             
@@ -1064,11 +1064,11 @@ def init_persistent_structure(onto):
             # classes that define well-known loops as subclasses of the above defined loop-feature classes. These classes are to be used publicly
             class while_loop(conditional_loop, preconditional_loop): pass
             
-            # class dowhile_loop(conditional_loop, postconditional_loop): pass
-            types.new_class("do-while_loop", (conditional_loop, postconditional_loop,))
+            # class do_while_loop(conditional_loop, postconditional_loop): pass
+            types.new_class("do_while_loop", (conditional_loop, postconditional_loop,))
             
-            # class dountil_loop(inverse_conditional_loop, postconditional_loop): pass
-            types.new_class("do-until_loop", (inverse_conditional_loop, postconditional_loop,))
+            # class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
+            types.new_class("do_until_loop", (inverse_conditional_loop, postconditional_loop,))
             
             class for_loop(conditional_loop, post_update_loop): pass
             class foreach_loop(conditional_loop, pre_update_loop): pass
@@ -1212,6 +1212,7 @@ def init_persistent_structure(onto):
             "AltElseBranchBegin",
             "AltEndAfterBranch",
             "AltEndAllFalse",
+            "PreCondLoopBegin",
         ]:
             # types.new_class(class_name, (Thing,))
             types.new_class(class_name, (correct_act,))

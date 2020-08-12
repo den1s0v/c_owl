@@ -232,7 +232,7 @@ class AlgorithmParser:
                 cond_name = m2.group(1)  # условие цикла (может быть в скобках)
                 result.append({
                     "id": self.newID(name),
-                    "type": "do-while_loop",
+                    "type": "do_while_loop",
                     "name": name,
                     "cond": self.parse_expr(cond_name),
                     "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
@@ -251,7 +251,7 @@ class AlgorithmParser:
                 cond_name = m2.group(1)  # условие цикла (может быть в скобках)
                 result.append({
                     "id": self.newID(name),
-                    "type": "do-until_loop",
+                    "type": "do_until_loop",
                     "name": name,
                     "cond": self.parse_expr(cond_name),
                     "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
