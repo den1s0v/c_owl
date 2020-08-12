@@ -213,7 +213,7 @@ class AlgorithmParser:
                 cond_name = m.group(1)  # условие цикла (может быть в скобках)
                 result.append({
                     "id": self.newID(name),
-                    "type": "while",
+                    "type": "while_loop",
                     "name": name,
                     "cond": self.parse_expr(cond_name),
                     "body":  parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
@@ -232,7 +232,26 @@ class AlgorithmParser:
                 cond_name = m2.group(1)  # условие цикла (может быть в скобках)
                 result.append({
                     "id": self.newID(name),
-                    "type": "do while",
+                    "type": "do-while_loop",
+                    "name": name,
+                    "cond": self.parse_expr(cond_name),
+                    "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                })
+                ci = e + 2
+                continue  # with next stmt on current level
+
+            # делать   // my-dowhile-2
+            #    ...
+            # до dountil-cond-2
+            m = re.match(r"делать\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m2 = e+1 < len(line_list)  and  re.match(r"до\s+(\(.+\)|\S+)",   line_list[ e+1 ].strip(), re.I)
+            if m and m2:
+                if self.verbose: print("do until")
+                name = m.group(1)  # имя цикла (пишется в комментарии)
+                cond_name = m2.group(1)  # условие цикла (может быть в скобках)
+                result.append({
+                    "id": self.newID(name),
+                    "type": "do-until_loop",
                     "name": name,
                     "cond": self.parse_expr(cond_name),
                     "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
@@ -252,7 +271,7 @@ class AlgorithmParser:
                 name =   m.group(5)  # имя цикла (пишется в комментарии)
                 result.append({
                     "id": self.newID(name),
-                    "type": "for",
+                    "type": "for_loop",
                     "name": name,
                     "variable": s_var,
                     "init":   self.parse_stmt("{}={}".format(s_var, s_from)),
@@ -273,7 +292,7 @@ class AlgorithmParser:
                 name =   m.group(3)  # имя цикла (пишется в комментарии)
                 result.append({
                     "id": self.newID(name),
-                    "type": "foreach",
+                    "type": "foreach_loop",
                     "name": name,
                     "variable": s_var,
                     "container": s_container,
