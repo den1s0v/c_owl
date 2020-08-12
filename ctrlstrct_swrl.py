@@ -455,6 +455,25 @@ RULES_DICT = {
 # (6 generating rules to construct alternatives)
 
 
+# ===== Loops ===== #
+
+
+# Начало цикла с предусловием [works with Pellet]
+"connect_LoopBegin-cond": """
+	correct_act(?a),
+	act_begin(?a),
+	pre_conditional_loop(?loop), 
+	executes(?a, ?loop),
+
+	cond(?loop, ?cnd),
+	
+	act_begin(?b),
+	executes(?b, ?cnd),  # expr
+	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+
+	 -> correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
+""",
 
 	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
 
