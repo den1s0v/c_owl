@@ -10,7 +10,7 @@
 import os
 import re
 
-from ctrlstrct_run import process_algtr, process_algtraces
+from ctrlstrct_run import process_algtraces
 from trace_gen.txt2algntr import parse_text_files, search_text_trace_files, find_by_key_in
 from upd_onto import get_relation_object
 
