@@ -712,9 +712,9 @@ def init_persistent_structure(onto):
             
             
             # classes that indicate whether condition and body follow each other instantly or not (note that: these classes are not disjointed; these classes are to be inferred from another defined features via equivalent_to definition so no direct inheritance required for known loops)
-            class _body_then_cond(loop):
+            class body_then_cond(loop):
                 equivalent_to = [inverse_conditional_loop | (conditional_loop & (Not(post_update_loop)))]
-            class _cond_then_body(loop):
+            class cond_then_body(loop):
                 equivalent_to = [conditional_loop & (Not(pre_update_loop))]
                 
             # classes that define well-known loops as subclasses of the above defined loop-feature classes. These classes are to be used publicly
