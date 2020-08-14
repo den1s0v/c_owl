@@ -709,7 +709,7 @@ RULES_DICT = {
 	student_parent_of(?p, ?c1),
 	executes(?p, ?block),
 	sequence(?block),
-		body_item(?block, ?st),  # just to ensure the sequence is real (and thus has "body_item"s)
+		body_item(?block, ?st),  # // just to ensure the sequence is real (and thus has "body_item"s)
 	executes(?c1, ?st),
 
 	executes(?c, ?st),
@@ -730,7 +730,7 @@ RULES_DICT = {
 	student_parent_of(?p, ?c1),
 	executes(?p, ?block),
 	sequence(?block),
-		body_item(?block, ?st),  # just to ensure the sequence is real (and thus has "body_item"s)
+		body_item(?block, ?st),  # // just to ensure the sequence is real (and thus has "body_item"s)
 	executes(?c1, ?st),
 
 	executes(?c, ?st),

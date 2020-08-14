@@ -359,7 +359,7 @@ class TraceTester():
                         if isinstance(v, dict) and "id" in v and "iri" in v:
                             link_objects(onto, d["iri"], k, v["iri"], (Thing >> Thing, onto.parent_of,) )
                         elif isinstance(v, (list, set)):
-                            # make an ordered sequence for list, unorederd for set
+                            # make an ordered linked_list for list, unorederd for set
                             # print("check out list", k, "...")
                             # сделаем список, если в нём нормальные "наши" объекты
                             subobject_iri_list = [subv["iri"] for subv in v  if isinstance(subv, dict) and "id" in subv and "iri" in subv]
@@ -368,10 +368,10 @@ class TraceTester():
                                 
                             iri = d["iri"]
                             
-                            # всякий список действий должен быть оформлен как sequence с полем body - списком.
+                            # всякий список (действий, веток, ...) должен быть оформлен как linked_list.
                             if k == "body" and isinstance(v, list):
                                 # делаем объект последовательностью (нужно для тел циклов, веток, функций)
-                                onto[iri].is_a.append( onto.sequence )
+                                onto[iri].is_a.append( onto.linked_list )
                             # else:  # это нормально для других списков
                             #     print("Warning: key of sequence is '%s' (consider using 'body')" % k)
                             
@@ -665,6 +665,9 @@ def init_persistent_structure(onto):
         # class current_act(act): pass
         
         # ->
+        class linked_list(Thing): pass
+        
+        # ->
         class sequence(Thing): pass
         
         # признак first
@@ -693,7 +696,7 @@ def init_persistent_structure(onto):
             conditional_loop = types.new_class("conditional_loop", (loop,))
             # inverse condition effect (false->start a body, true->stop) like in do-until loop
             inverse_conditional_loop = types.new_class("inverse_conditional_loop", (loop,))
-            # no condition at all: infinite loop like while(true){...}. The only act executed is the loop body.
+            # no condition at all: infinite loop like while(true){...}. The only act endlessly executed is the loop body.
             unconditional_loop = types.new_class("unconditional_loop", (loop, postconditional_loop))  # "postconditional_loop" parent here is a lifehack: the loop starts with body just like "do-while", "postconditional_loop" causes the body to be first act whthin a loop act.
             
             AllDisjoint([conditional_loop, inverse_conditional_loop, unconditional_loop])
