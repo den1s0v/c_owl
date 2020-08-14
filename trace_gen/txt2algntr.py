@@ -687,15 +687,18 @@ class TraceParser:
             if m:
                 if self.verbose: print("{} итерация цикла {}".format(m.group(1), m.group(4)))
                 loop_name = m.group(4)
-                name = loop_name  # !!!! Используем имя цикла, Потому что тело цикла не сделано отдельной сущностью
+                name = loop_name + "_loop_body"  # тело цикла сделано отдельной сущностью
                 ith = m.group(2)  or  m.group(3)
                 phase = "started"  if "начал" in m.group(1) else  "finished"
-                alg_obj_id = self.get_alg_node_id(name)
+                alg_obj_id = self.get_alg_node_id(loop_name)  # access body via loop
+                loop_dict = next(find_by_keyval_in("id", alg_obj_id, self.alg_dict))
+                alg_obj_id = loop_dict["body"]["id"]
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
-                      # "loop_name": name,    # имя цикла !
-                      "name": name,    # имя цикла !
+                      # "loop_name": name,
+                      # Добавлять информацию об объемлющем акте цикла?..
+                      "name": name,
                       "executes": alg_obj_id,
                       "phase": phase,
                       "iteration_n": ith,
