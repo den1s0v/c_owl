@@ -776,22 +776,31 @@ def init_persistent_structure(onto):
             
             
             # classes that indicate whether condition and body follow each other instantly or not (note that: these classes are not disjointed; these classes are to be inferred from another defined features via equivalent_to definition so no direct inheritance required for known loops)
-            class body_then_cond(loop):
-                equivalent_to = [inverse_conditional_loop | (conditional_loop & (Not(post_update_loop)))]
-            class cond_then_body(loop):
-                equivalent_to = [conditional_loop & (Not(pre_update_loop))]
+            # class body_then_cond(loop):
+            #     equivalent_to = [inverse_conditional_loop | (conditional_loop & (Not(post_update_loop)))]
+            # class cond_then_body(loop):
+            #     equivalent_to = [conditional_loop & (Not(pre_update_loop))]
+            
+            # workaround: do not use the inference, declare explicitly
+            class cond_then_body(loop): pass
+            class body_then_cond(loop): pass
                 
             # classes that define well-known loops as subclasses of the above defined loop-feature classes. These classes are to be used publicly
             class while_loop(conditional_loop, preconditional_loop): pass
+            while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
             
-            # class do_while_loop(conditional_loop, postconditional_loop): pass
-            types.new_class("do_while_loop", (conditional_loop, postconditional_loop,))
+            class do_while_loop(conditional_loop, postconditional_loop): pass
+            do_while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
             
-            # class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
-            types.new_class("do_until_loop", (inverse_conditional_loop, postconditional_loop,))
+            class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
+            do_until_loop.is_a += [body_then_cond]  # workaround
             
             class for_loop(conditional_loop, post_update_loop): pass
+            for_loop.is_a += [cond_then_body]  # workaround
+
             class foreach_loop(conditional_loop, pre_update_loop): pass
+            foreach_loop.is_a += [body_then_cond]  # workaround
+            
             class infinite_loop(loop):  
                 equivalent_to = [unconditional_loop]  # reduce an inheritance level: use "equivalent_to" instead of inheritance
               
@@ -916,6 +925,7 @@ def init_persistent_structure(onto):
 
         # make correct_act subclasses
         for class_name in [
+            # "DebugObj",
             "FunctionBegin",
             "FunctionEnd",
             "FunctionBodyBegin",
@@ -925,7 +935,6 @@ def init_persistent_structure(onto):
             "SequenceEnd",
             "StmtEnd",
             "ExprEnd",
-            # "DebugObj",
             "AltBegin",  # 1st condition
             "NextAltCondition",
             "AltBranchBegin",

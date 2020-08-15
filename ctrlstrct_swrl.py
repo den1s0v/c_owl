@@ -475,7 +475,7 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
 """,
 
-# Начало тела цикла при cond=1 [works with Pellet]
+# Начало тела цикла при cond=1 [works since simplified cond_then_body class declaration]
 "connect_LoopCond1-BodyBegin": """
 	correct_act(?a),
 	act_end(?a),
@@ -495,6 +495,7 @@ RULES_DICT = {
 
 	 -> correct_act(?b), next_act(?a, ?b), LoopBodyBeginOnTrueCond(?b)
 """,
+
 
 	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
 
