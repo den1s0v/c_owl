@@ -57,6 +57,7 @@ class TraceTester():
         """
         self.data = trace_data
 
+        # pprint(trace_data)
         # pprint(trace_data["trace"])
         # pprint(trace_data["algorithm"])
         # exit()
@@ -94,6 +95,7 @@ class TraceTester():
             v = next(self.condition_value_generator)
             v = bool(v)
             self.last_cond_tuple = (i+1, v)
+            print(f"next_cond_value: {v}")
             return v
             
         # long "multi-entry" function
@@ -494,6 +496,7 @@ class TraceTester():
                                 value = values[exec_n - 1]
                             else:
                                 value = False
+                                print("attach expr value: defaulting to False...")
                             # print(obj, onto.expr_value, value)
                             make_triple(obj, onto.expr_value, value)
                         
