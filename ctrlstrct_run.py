@@ -257,6 +257,67 @@ class TraceTester():
                       # "comment": None,
                 })
                     
+            if node["type"] in {"while_loop", "do_while_loop", "do_until_loop", "for_loop", "foreach_loop", "infinite_loop", }:
+                
+                phase = "started"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                
+                inverse_cond = node["type"] == "do_until_loop"
+                stop_cond_value = True == inverse_cond
+    
+                def _loop_context():  # wrapper for return
+                    # loop begin
+                    if node["type"] in {"for_loop", "foreach_loop"}:
+                        make_correct_trace_for_alg_node(node["init"])
+                    
+                    if node["type"] in {"while_loop", "for_loop", "foreach_loop"}:
+                        make_correct_trace_for_alg_node(node["cond"])
+                        if self.last_cond_tuple[1] == stop_cond_value:
+                            return
+                                
+                    # loop cycle
+                    
+                    while(True):
+                      
+                        if node["type"] in {"foreach_loop"}:
+                            make_correct_trace_for_alg_node(node["update"])
+                      
+                        # итерация цикла!
+                        make_correct_trace_for_alg_node(node["body"])
+                        # как обрабатывать break из цикла?
+                      
+                        if node["type"] in {"for_loop"}:
+                            make_correct_trace_for_alg_node(node["update"])
+                      
+                        if node["type"] not in {"infinite_loop"}:
+                            make_correct_trace_for_alg_node(node["cond"])
+                            if self.last_cond_tuple[1] == stop_cond_value:
+                                return
+                    
+                    
+                _loop_context()  # make a loop
+                
+                phase = "finished"
+                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+                
         
         alg_node = self.data["algorithm"]["entry_point"]
         
