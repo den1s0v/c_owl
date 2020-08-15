@@ -933,7 +933,9 @@ def init_persistent_structure(onto):
             "AltEndAfterBranch",
             "AltEndAllFalse",
             "PreCondLoopBegin",
+            "LoopBodyBeginOnTrueCond",
         ]:
+            # class_name = "reason_" + class_name
             # types.new_class(class_name, (Thing,))
             types.new_class(class_name, (correct_act,))
             

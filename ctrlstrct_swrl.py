@@ -475,6 +475,27 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
 """,
 
+# Начало тела цикла при cond=1 [works with Pellet]
+"connect_LoopCond1-BodyBegin": """
+	correct_act(?a),
+	act_end(?a),
+	cond_then_body(?loop), 
+	cond(?loop, ?cnd),
+	executes(?a, ?cnd),
+	
+	body(?loop, ?st),
+	# body_item(?loop, ?st),
+	# first_item(?st),
+	
+	act_begin(?b),
+	executes(?b, ?st),
+								# ????
+	next_sibling(?pr, ?b), correct_act(?pr),
+		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+
+	 -> correct_act(?b), next_act(?a, ?b), LoopBodyBeginOnTrueCond(?b)
+""",
+
 	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
 
 
