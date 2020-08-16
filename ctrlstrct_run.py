@@ -848,6 +848,8 @@ def init_persistent_structure(onto):
         # свойство index
         types.new_class("index", (Thing >> int, FunctionalProperty, ))
         types.new_class("student_index", (Thing >> int, FunctionalProperty, ))
+        
+        types.new_class("after_act", (Thing >> act, ))
 
         # новое свойство exec_time
         prop_exec_time = types.new_class("exec_time", (Thing >> int, FunctionalProperty, ))
@@ -942,7 +944,8 @@ def init_persistent_structure(onto):
             "AltEndAfterBranch",
             "AltEndAllFalse",
             "PreCondLoopBegin",
-            "LoopBodyBeginOnTrueCond",
+            "IterationBeginOnTrueCond",
+            "LoopCondBeginAfterIteration",
         ]:
             # class_name = "reason_" + class_name
             # types.new_class(class_name, (Thing,))

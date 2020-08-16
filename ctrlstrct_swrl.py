@@ -151,6 +151,25 @@ RULES_DICT = {
 	""",
 
 
+# Disambiguating siblings (1): init on previous correct sibling
+"Earliest_after_act_is_previous_correct_sibling": """
+	correct_act(?a),
+	next_sibling(?a, ?s),
+	 -> after_act(?s, ?a)
+""",
+# Disambiguating siblings (2): propagate till itself
+"Propagate_after_act": """
+	after_act(?s, ?a),
+	next_act(?a, ?b),
+	# DifferentFrom(?b, ?s),
+		id(?b, ?ib),
+		id(?s, ?is),
+		notEqual(?ib, ?is),
+	 -> after_act(?s, ?b)
+""",
+
+
+
 				######################
 				######################
 ################ Производящие правила ################
@@ -489,11 +508,29 @@ RULES_DICT = {
 	
 	act_begin(?b),
 	executes(?b, ?st),
-								# ????
+								# iteration belongs to ????
 	next_sibling(?pr, ?b), correct_act(?pr),
 		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 
-	 -> correct_act(?b), next_act(?a, ?b), LoopBodyBeginOnTrueCond(?b)
+	 -> correct_act(?b), next_act(?a, ?b), IterationBeginOnTrueCond(?b)
+""",
+
+# После тела цикла - на условие (cond) [works ?]
+"connect_LoopBody-CondBegin": """
+	correct_act(?a),
+	act_end(?a),
+	body_then_cond(?loop), 
+	body(?loop, ?st),
+	executes(?a, ?st),
+
+	cond(?loop, ?cnd),
+	act_begin(?b),
+	executes(?b, ?cnd),
+	
+	after_act(?b, ?a),
+
+	 -> # DebugObj(?b)
+	 correct_act(?b), next_act(?a, ?b), LoopCondBeginAfterIteration(?b)
 """,
 
 
