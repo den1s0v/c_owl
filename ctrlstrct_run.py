@@ -946,6 +946,7 @@ def init_persistent_structure(onto):
             "PreCondLoopBegin",
             "IterationBeginOnTrueCond",
             "LoopCondBeginAfterIteration",
+            "NormalLoopEnd",
         ]:
             # class_name = "reason_" + class_name
             # types.new_class(class_name, (Thing,))

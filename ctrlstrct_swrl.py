@@ -450,14 +450,30 @@ RULES_DICT = {
 	act_begin(?b),
 	executes(?b, ?st),
 								# iteration belongs to ????
-	# next_sibling(?pr, ?b), correct_act(?pr),
-	# 	index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	after_act(?b, ?a),
 
 	 -> correct_act(?b), next_act(?a, ?b), IterationBeginOnTrueCond(?b)
 """,
 
-# После тела цикла - на условие (cond) [works ?]
+# Конец цикла при cond=0 [works]
+"connect_LoopCond0-LoopEnd": """
+	correct_act(?a),
+	act_end(?a),
+	conditional_loop(?loop), 
+	cond(?loop, ?cnd),
+	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, false),  # condition passed
+	
+	act_end(?b),
+	executes(?b, ?loop),
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
+""",
+
+# После тела цикла - на условие (cond) [works]
 "connect_LoopBody-CondBegin": """
 	correct_act(?a),
 	act_end(?a),
