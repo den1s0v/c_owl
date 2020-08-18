@@ -927,7 +927,7 @@ def init_persistent_structure(onto):
 
         # make correct_act subclasses
         for class_name in [
-            # "DebugObj",
+            "DebugObj",
             "FunctionBegin",
             "FunctionEnd",
             "FunctionBodyBegin",

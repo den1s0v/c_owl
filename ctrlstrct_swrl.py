@@ -250,6 +250,8 @@ RULES_DICT = {
 	act_end(?b),
 	executes(?b, ?st),
 	
+	after_act(?b, ?a),
+
 	exec_time(?a, ?t), exec_time(?b, ?_t),
 	equal(?t, ?_t),
 	 -> correct_act(?b), next_act(?a, ?b), ExprEnd(?b)
@@ -425,8 +427,9 @@ RULES_DICT = {
 	
 	act_begin(?b),
 	executes(?b, ?cnd),  # expr
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	# next_sibling(?pr, ?b), correct_act(?pr),
+	# 	index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	after_act(?b, ?a),
 
 	 -> correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
 """,
@@ -438,6 +441,9 @@ RULES_DICT = {
 	cond_then_body(?loop), 
 	cond(?loop, ?cnd),
 	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, true),  # condition passed
 	
 	body(?loop, ?st),
 	# body_item(?loop, ?st),
@@ -446,8 +452,9 @@ RULES_DICT = {
 	act_begin(?b),
 	executes(?b, ?st),
 								# iteration belongs to ????
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	# next_sibling(?pr, ?b), correct_act(?pr),
+	# 	index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	after_act(?b, ?a),
 
 	 -> correct_act(?b), next_act(?a, ?b), IterationBeginOnTrueCond(?b)
 """,
@@ -467,7 +474,8 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> # DebugObj(?b)
-	 correct_act(?b), next_act(?a, ?b), LoopCondBeginAfterIteration(?b)
+	 correct_act(?b), next_act(?a, ?b),
+	 LoopCondBeginAfterIteration(?b)
 """,
 
 
