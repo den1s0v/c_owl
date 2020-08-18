@@ -157,12 +157,11 @@ RULES_DICT = {
 	body(?func_, ?st),
 	
 	act_begin(?b),
-	next_sibling(?pr, ?b), correct_act(?pr),  # check that previous execution of st was in correct sub-trace
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
-
 	executes(?b, ?st),
 	# SameAs(?st, ?_st), # stardog fails with error here
 	
+	after_act(?b, ?a),
+
 	 -> correct_act(?b), 
 	 next_act(?a, ?b), 
 	 FunctionBodyBegin(?b)
@@ -177,8 +176,8 @@ RULES_DICT = {
 	
 	act_end(?b),
 	executes(?b, ?func_),
-	next_sibling(?pr, ?b), correct_act(?pr),  # check that previous execution of st was in correct sub-trace
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	
+	after_act(?b, ?a),
 	
 	 -> next_act(?a, ?b), FunctionEnd(?b)  # correct_act(?b),
 """,
@@ -194,9 +193,9 @@ RULES_DICT = {
 	first_item(?st),
 	
 	act_begin(?b),
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	executes(?b, ?st),
+	
+	after_act(?b, ?a),
 	
 	 -> correct_act(?b), next_act(?a, ?b), SequenceBegin(?b)
 """,
@@ -214,9 +213,9 @@ RULES_DICT = {
 	next(?st, ?st2),
 	
 	act_begin(?b),
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	executes(?b, ?st2),
+	
+	after_act(?b, ?a),	
 	
 	 -> correct_act(?b), 
 	  next_act(?a, ?b), 
@@ -231,9 +230,9 @@ RULES_DICT = {
 	executes(?a, ?st),
 	
 	act_end(?b),
-	# next_sibling(?pr, ?b), correct_act(?pr),
-	# 	index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
 	executes(?b, ?st),
+	
+	after_act(?b, ?a),
 	
 	exec_time(?a, ?t), exec_time(?b, ?_t),
 	equal(?t, ?_t),
@@ -270,8 +269,9 @@ RULES_DICT = {
 #	sequence(?block),    # ???
 	executes(?b, ?block),
 	body_item(?block, ?st),
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	
+	after_act(?b, ?a),
+	
 	 -> correct_act(?b), next_act(?a, ?b), SequenceEnd(?b)
 """,
 
@@ -293,8 +293,8 @@ RULES_DICT = {
 	
 	act_begin(?b),
 	executes(?b, ?cnd),  # expr
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	
+	after_act(?b, ?a),
 
 	# exec_time(?a, ?t), exec_time(?b, ?_t),
 	# equal(?t, ?_t),
@@ -316,8 +316,8 @@ RULES_DICT = {
 	
 	act_begin(?b),
 	executes(?b, ?br),
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	
+	after_act(?b, ?a),
 
 	 -> correct_act(?b), next_act(?a, ?b), AltBranchBegin(?b)
 """,
@@ -340,8 +340,8 @@ RULES_DICT = {
 	
 	act_begin(?b),
 	executes(?b, ?cnd2),  # expr
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	
+	after_act(?b, ?a),
 
 	 -> correct_act(?b), next_act(?a, ?b), NextAltCondition(?b)
 """,
@@ -364,8 +364,7 @@ RULES_DICT = {
 	act_begin(?b),
 	executes(?b, ?br2),  # expr
 
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	after_act(?b, ?a),
 
 	 -> correct_act(?b), next_act(?a, ?b), AltElseBranchBegin(?b)
 """,
@@ -389,8 +388,7 @@ RULES_DICT = {
 	act_end(?b),
 	executes(?b, ?alt),  # expr
 
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	after_act(?b, ?a),
 
 	 -> correct_act(?b), next_act(?a, ?b), AltEndAllFalse(?b)
 """,
@@ -405,8 +403,9 @@ RULES_DICT = {
 
 	act_end(?b),
 	executes(?b, ?alt),  # ends whole alternative
-	next_sibling(?pr, ?b), correct_act(?pr),
-		index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	
+	after_act(?b, ?a),
+	
 	 -> correct_act(?b), next_act(?a, ?b), AltEndAfterBranch(?b)
 """,
 
@@ -427,8 +426,7 @@ RULES_DICT = {
 	
 	act_begin(?b),
 	executes(?b, ?cnd),  # expr
-	# next_sibling(?pr, ?b), correct_act(?pr),
-	# 	index(?a, ?ia), index(?pr, ?ipr), lessThan(?ipr, ?ia),
+	
 	after_act(?b, ?a),
 
 	 -> correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
