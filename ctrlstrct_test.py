@@ -279,8 +279,8 @@ if __name__ == '__main__':
 			
 	# 	# break
 	success_all = run_tests(process_kwargs=dict(
-		# reasoning=None, 
-		reasoning="pellet", 
+		reasoning=None, 
+		# reasoning="pellet", 
 		# reasoning="stardog", 
 		extra_act_entries=0
 		)
