@@ -1,10 +1,10 @@
 # import_algtr.py
 
 
-""" Импорт алгоритмов и трасс из JSON-формата (из файлов, сгенерированных json2alg2tr), 
+""" Импорт алгоритмов и трасс из текста (из файлов в handcrafted_traces/*), 
 наполнение ими чистой онтологии,  
-добавление SWRL-правил, определённых в ctrlstrct_swrl.py (используя import),
-запуск рсширеного ризонинга с UpdOnto.
+добавление SWRL-правил, определённых в ctrlstrct_swrl.py (используя import), сохранение исходной онтологии в файл,
+запуск ризонинга (опционально).
 """
 
 
@@ -944,6 +944,7 @@ def init_persistent_structure(onto):
             "AltEndAfterBranch",
             "AltEndAllFalse",
             "PreCondLoopBegin",
+            "PostCondLoopBegin",
             "IterationBeginOnTrueCond",
             "LoopCondBeginAfterIteration",
             "NormalLoopEnd",

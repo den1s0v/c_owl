@@ -432,6 +432,23 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
 """,
 
+# Начало цикла с постусловием [works]
+"connect_LoopBegin-body": """
+	correct_act(?a),
+	act_begin(?a),
+	post_conditional_loop(?loop), 
+	executes(?a, ?loop),
+
+	body(?loop, ?st),
+	
+	act_begin(?b),
+	executes(?b, ?st),
+	
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b), PostCondLoopBegin(?b)
+""",
+
 # Начало тела цикла при cond=1 [works since simplified cond_then_body class declaration]
 "connect_LoopCond1-BodyBegin": """
 	correct_act(?a),
