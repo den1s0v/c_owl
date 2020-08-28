@@ -449,6 +449,7 @@ class TraceParser:
         assert self.alg_dict
         self.name2id = self.name2id or name2id
         assert self.name2id
+        self.iteration_count_dict = {}
         
         self.trace += self.parse_trace_by_alg(line_list, start_line, end_line)
         
@@ -499,7 +500,7 @@ class TraceParser:
                       "name": name,
                       "executes": alg_obj_id,
                       "phase": phase,
-                      # "n": None,
+                      "n": 1,
                       "text_line": ci,
                       "comment": comment,
                 })
@@ -694,6 +695,10 @@ class TraceParser:
                 loop_dict = next(find_by_keyval_in("id", alg_obj_id, self.alg_dict))
                 alg_obj_id = loop_dict["body"]["id"]
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                count_dict = self.iteration_count_dict.get(alg_obj_id, {})
+                ith = count_dict.get(phase, 0) + 1
+                count_dict.update({phase: ith})
+                self.iteration_count_dict[alg_obj_id] = count_dict
                 result.append({
                       "id": self.newID(name),
                       # "loop_name": name,
@@ -701,6 +706,7 @@ class TraceParser:
                       "name": name,
                       "executes": alg_obj_id,
                       "phase": phase,
+                      "n": ith,
                       "iteration_n": ith,
                       "text_line": ci,
                       "comment": comment,

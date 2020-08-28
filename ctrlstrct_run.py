@@ -604,6 +604,7 @@ class TraceTester():
                 obj.is_a.append(onto.last_item)
             return obj
 
+
         def connect_next_act(obj):
             trace_acts_list.append(obj)                 
             # формируем последовательный список
@@ -614,20 +615,21 @@ class TraceTester():
                 # print(">>", prev_obj, obj)
                 make_triple(prev_obj, prop_class, obj)
             if trace_acts_list:
-              num = len(trace_acts_list)
-              make_triple(obj, onto.student_index, num)
-
-
+                num = len(trace_acts_list)
+                make_triple(obj, onto.student_index, num)
 
             
-        def find_act(class_, executes: int, exec_time: int):
+        def find_act(class_, executes: int, exec_time: int, **fields: dict):
             for obj in class_.instances():
                 # print(F"{obj}: ")
                 if (obj.executes.id == executes and
-                   obj.exec_time == exec_time):
+                    ((obj.exec_time == exec_time) or (exec_time is None)) and
+                    all((getattr(obj, k, None) == v) or (v is None)  for k,v in fields.items())):
                     return obj
-            print(f"act not found: ex={executes}, n={exec_time}")
+            print(f"act not found: ex={executes}, {', '.join([f'n={exec_time}'] + [f'{k}={v}' for k,v in fields.items()])}")
+            return None
 
+            
         prop_class = onto[next_propertyname]
 
         with onto:
@@ -642,6 +644,7 @@ class TraceTester():
                     # phase: (started|finished|performed)
                     phase       = d.get("phase")  # , "performed"
                     n           = d.get("n", None) or d.get("n_", None)
+                    iteration_n = d.get("iteration_n", None)
                     name        = d.get("name", None)  or  d.get("action", None)  # !  name <- action
                     text_line   = d.get("text_line", None)
                     
@@ -666,15 +669,18 @@ class TraceTester():
                         # obj = make_act(iri, onto.act_begin, alg_elem["iri"], 
                         #     prop_class=onto[next_propertyname], 
                         #     is_last=False)
-                        obj = find_act(onto.act_begin, executes, n or 1) 
+                        obj = find_act(onto.act_begin, executes, n or None)  # , iteration_n=iteration_n
                         if obj:
                             for class_ in additional_classes:
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
+                            if iteration_n:
+                                make_triple(obj, onto.student_iteration_n, iteration_n)
+                                
                             connect_next_act(obj)
                         else:
-                          print("  act name:", name)
+                            print("  act name:", name)
                         # # НЕ привязываем id (т.к. может повторяться у начал и концов. TO FIX?)
                             # if "value" in d:
                         #     make_triple(obj, onto.expr_value, d["value"])
@@ -687,13 +693,18 @@ class TraceTester():
                         # obj = make_act(iri, onto.act_end, alg_elem["iri"], 
                         #     prop_class=onto[next_propertyname], 
                         #     is_last=(i==len(self.data["trace"])))
-                        obj = find_act(onto.act_end, executes, n or 1) 
+                        obj = find_act(onto.act_end, executes, n or None)  # , iteration_n=iteration_n
                         if obj:
                             for class_ in additional_classes:
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
+                            if iteration_n:
+                                make_triple(obj, onto.student_iteration_n, iteration_n)
+                                
                             connect_next_act(obj)
+                        else:
+                            print("  act name:", name)
                         
             # iri_list_key = act_classnames[0] + "_iri_list"
             # self.data[iri_list_key] = trace_acts_list
@@ -848,6 +859,9 @@ def init_persistent_structure(onto):
         # свойство index
         types.new_class("index", (Thing >> int, FunctionalProperty, ))
         types.new_class("student_index", (Thing >> int, FunctionalProperty, ))
+        # номер итерации
+        types.new_class("student_iteration_n", (act >> int, FunctionalProperty, ))
+        types.new_class("iteration_n", (act >> int, FunctionalProperty, ))
         
         types.new_class("after_act", (Thing >> act, ))
 
