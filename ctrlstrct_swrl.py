@@ -787,6 +787,8 @@ RULES_DICT = {
 }
 
 _more_rules = {}
+
+# Поиск лишних и пропущенных актов (ограниченная дальность просмотра)
 for i in range(1, 6+1):
 
 	pattern1 = ''.join([f"student_next(?c{j}, ?c{j+1}), " for j in range(1,i)])
@@ -821,6 +823,67 @@ for i in range(1, 6+1):
 		""",
 
 		})
+
+
+# Расчёт номеров итераций для всех циклов
+for i in range(0, 3+1):
+
+	pattern1 = ''.join([f"""
+		executes(?c{j}, ?st{j}),
+		id(?st{j}, ?st{j}_i),
+		notEqual(?st{j}_i, ?body_i),
+		corresponding_end(?c{j}, ?ce{j}), 
+		next_act(?ce{j}, ?c{j+1}), 
+		""" 
+		for j in range(i)])
+	pattern2 = f"executes(?c{i}, ?st), corresponding_end(?c{i}, ?ce{i}), "
+	action = f"""iteration_n(?c{i}, 1),
+ 		iteration_n(?ce{i}, 1)
+ 		"""
+						
+	_more_rules.update({
+		f"LoopIteration1_after_{i}": f"""
+			act_begin(?a),
+			executes(?a, ?L),
+			loop(?L),
+			body(?L, ?st),
+			id(?st, ?body_i),
+			next_act(?a, ?c0),
+			{pattern1} 
+			{pattern2}  # executes(?ci, ?st),
+			 -> {action}
+		""",
+		})
+
+for i in range(0, 2+1):
+
+	pattern1 = ''.join([f"""
+		executes(?c{j}, ?st{j}),
+		id(?st{j}, ?st{j}_i),
+		notEqual(?st{j}_i, ?body_i),
+		corresponding_end(?c{j}, ?ce{j}), 
+		next_act(?ce{j}, ?c{j+1}), 
+		""" 
+		for j in range(i)])
+	pattern2 = f"executes(?c{i}, ?st), corresponding_end(?c{i}, ?ce{i}),"
+	action = f"""iteration_n(?c{i}, ?n_next),
+		iteration_n(?ce{i}, ?n_next)
+		"""
+						
+	_more_rules.update({
+		f"LoopIterationNext_after_{i}": f"""
+			act_end(?a),
+			iteration_n(?a, ?n),
+			executes(?a, ?st),
+			id(?st, ?body_i),
+			next_act(?a, ?c0),
+			{pattern1} 
+			{pattern2}  # executes(?ci, ?st),
+			add(?n_next, ?n, 1),
+			 -> {action}
+		""",
+		})
+
 
 RULES_DICT.update(_more_rules)
 
