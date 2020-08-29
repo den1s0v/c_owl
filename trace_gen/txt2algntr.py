@@ -389,13 +389,14 @@ class TraceParser:
         if isinstance(name, (list, set, tuple)):
             r = None
             for n in name:
-                r = self.get_alg_node_id(n)
+                r = self.get_alg_node_id(n, node_type=node_type)
                 if r:
+                    name = n
                     break
         else:
             r = self.name2id.get(name, None)
-            if not r and name[0]+name[-1] == "()":
-                r = self.get_alg_node_id(name[1:-1])
+            if not r and name[0] + name[-1] == "()":
+                return self.get_alg_node_id(name[1:-1], node_type=node_type)
             if not r:
                 name = name.replace(' ','')
                 if not self.name2id_no_whitespace:
@@ -573,9 +574,9 @@ class TraceParser:
                 value = m.group(4)
                 ith = m.group(3)  if len(m.groups())>=3 else  None
                 phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
-                alg_obj_id = self.get_alg_node_id(name)
+                # alg_obj_id = self.get_alg_node_id(name)
                 cond_obj_id = self.get_alg_node_id(name, node_type="expr")
-                assert alg_obj_id and cond_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                assert cond_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 
                 # convert value to true / false if matches so
                 value = {
