@@ -959,8 +959,12 @@ def init_persistent_structure(onto):
             "AltEndAllFalse",
             "PreCondLoopBegin",
             "PostCondLoopBegin",
+            "LoopWithInitBegin",
             "IterationBeginOnTrueCond",
             "LoopCondBeginAfterIteration",
+            "LoopCondBeginAfterInit",
+            "LoopCondAfterUpdate",
+            "LoopUpdateAfterIteration",
             "NormalLoopEnd",
         ]:
             # class_name = "reason_" + class_name

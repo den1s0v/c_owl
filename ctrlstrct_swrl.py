@@ -490,7 +490,7 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
 """,
 
-# После тела цикла - на условие (cond) [works]
+# После тела цикла - условие (cond) [works]
 "connect_LoopBody-CondBegin": """
 	correct_act(?a),
 	act_end(?a),
@@ -504,10 +504,83 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> # DebugObj(?b)
-	 correct_act(?b), next_act(?a, ?b),
+	 -> correct_act(?b), next_act(?a, ?b),
 	 LoopCondBeginAfterIteration(?b)
 """,
+
+
+# Начало цикла с инициализацией [works]
+"connect_LoopBegin-init": """
+	correct_act(?a),
+	act_begin(?a),
+	executes(?a, ?loop),
+	loop_with_initialization(?loop), 
+
+	init(?loop, ?st),
+	
+	act_begin(?b),
+	executes(?b, ?st),
+	
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b), LoopWithInitBegin(?b)
+""",
+
+# После инициализации цикла - условие (cond) [works]
+"connect_LoopInit-CondBegin": """
+	correct_act(?a),
+	act_end(?a),
+	loop_with_initialization(?loop), 
+	init(?loop, ?st),
+	executes(?a, ?st),
+
+	cond(?loop, ?cnd),
+	act_begin(?b),
+	executes(?b, ?cnd),
+	
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b),
+	 LoopCondBeginAfterInit(?b)
+""",
+
+# После тела цикла - переход (update) [works?]
+"connect_LoopBody-Update": """
+	correct_act(?a),
+	act_end(?a),
+	post_update_loop(?loop), 
+	body(?loop, ?st),
+	executes(?a, ?st),
+
+	update(?loop, ?upd),
+	act_begin(?b),
+	executes(?b, ?upd),
+	
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b),
+	 LoopUpdateAfterIteration(?b)
+""",
+
+# После перехода цикла - условие (cond) [works?]
+"connect_LoopUpdate-cond": """
+	correct_act(?a),
+	act_end(?a),
+	post_update_loop(?loop), 
+	update(?loop, ?st),
+	executes(?a, ?st),
+
+	cond(?loop, ?cnd),
+	act_begin(?b),
+	executes(?b, ?cnd),
+	
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b),
+	 LoopCondAfterUpdate(?b)
+""",
+
+
 
 
 	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
