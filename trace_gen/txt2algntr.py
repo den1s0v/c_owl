@@ -569,13 +569,30 @@ class TraceParser:
                 """, line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("условие {} {} выполнилось - {}".format(m.group(1) or "\b", m.group(2), m.group(4)))
-                # struct = {"развилки":"alternative", "цикла":"loop", }.get(m.group(1))
+                struct = {"развилки":"alternative", "цикла":"loop", }.get(m.group(1), "alternative or loop")
                 name = m.group(2)
                 value = m.group(4)
                 ith = m.group(3)  if len(m.groups())>=3 else  None
                 phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
                 # alg_obj_id = self.get_alg_node_id(name)
                 cond_obj_id = self.get_alg_node_id(name, node_type="expr")
+                if cond_obj_id is None:
+                    # имя не позволяет найти элемент алгоритма
+                    # поищем вверх начало ближайшей развилки и/или цикла
+                    criterion = lambda d: (type(d) is dict and "id" in d and (
+                            d["type"] in struct or 
+                            "loop" in struct and "loop" in d["type"]
+                        ))
+                    nodes = list(find_by_predicate(self.alg_dict, criterion, find_one=False))
+                    stmt_ids = [node["id"] for node in nodes]
+                    for act in reversed(result):
+                        if  act["executes"] in stmt_ids:
+                            node = nodes[stmt_ids.index(act["executes"])]
+                            cond_obj_id = node["cond"]["id"]
+                            print()
+                            print(f'warning: condition "{name}" at line {ci} resolved as {node["cond"]["name"]} (of {node["type"]}: {node["name"]})')
+                            break
+                    
                 assert cond_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 
                 # convert value to true / false if matches so
@@ -618,7 +635,7 @@ class TraceParser:
                     if "alternative" in obj:
                         else_branch_name = obj["alternative"] + "-else"  # используем правило формирования имени ветки "иначе"
                         break
-                if else_branch_name is None:
+                if else_branch_name is None:  # !!!!
                     # в трассе нет (ошибочная трасса!) - найдём первую попавшуюся ветку ИНАЧЕ в алгоритме (как часть развилки)
                     found = tuple(find_by_keyval_in("type", "else", self.alg_dict))
                     if found:
@@ -727,11 +744,24 @@ class TraceParser:
                 """, line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("{} {} {}".format(m.group(1), m.group(2), m.group(4)))
-                struct = m.group(2)
+                struct = {"инициализация":"init", "переход":"update", }.get(m.group(2), "none!")
                 name = m.group(3)
                 ith = m.group(4)  if len(m.groups())>=4 else  None
                 phase = "performed"
                 alg_obj_id = self.get_alg_node_id(name)
+                if alg_obj_id is None:
+                    # имя не позволяет найти элемент алгоритма
+                    # поищем вверх начало ближайшего цикла и возьмём имя из него
+                    criterion = lambda d: (type(d) is dict and "id" in d and "loop" in d["type"])
+                    nodes = list(find_by_predicate(self.alg_dict, criterion, find_one=False))
+                    stmt_ids = [node["id"] for node in nodes]
+                    for act in reversed(result):
+                        if  act["executes"] in stmt_ids:
+                            node = nodes[stmt_ids.index(act["executes"])]
+                            alg_obj_id = node[struct]["id"]
+                            print()
+                            print(f'warning: {struct} "{name}" at line {ci} resolved as {node[struct]["name"]} (of {node["type"]}: {node["name"]})')
+                            break
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
