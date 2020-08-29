@@ -699,6 +699,7 @@ class TraceParser:
                 count_dict = self.iteration_count_dict.get(alg_obj_id, {})
                 ith = count_dict.get(phase, 0) + 1
                 count_dict.update({phase: ith})
+                  # Временное решение! Не работает с рекурсией (считает все вхождения, идентично exec_time). Нужно отталкиваться от акта начала цикла, и запоминать все связанные непосредственно с ним итерации.
                 self.iteration_count_dict[alg_obj_id] = count_dict
                 result.append({
                       "id": self.newID(name),
