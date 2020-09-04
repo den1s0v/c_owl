@@ -415,7 +415,7 @@ RULES_DICT = {
 # ===== Loops ===== #
 
 
-# Начало цикла с предусловием [works with Pellet]
+# Начало цикла с предусловием (while) [works with Pellet]
 "connect_LoopBegin-cond": """
 	correct_act(?a),
 	act_begin(?a),
@@ -432,7 +432,7 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
 """,
 
-# Начало цикла с постусловием [works]
+# Начало цикла с постусловием (do-while, do-until) [works]
 "connect_LoopBegin-body": """
 	correct_act(?a),
 	act_begin(?a),
@@ -449,7 +449,7 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), PostCondLoopBegin(?b)
 """,
 
-# Начало тела цикла при cond=1 [works since simplified cond_then_body class declaration]
+# Начало тела цикла при cond=1 (while, do-while, for) [works since simplified cond_then_body class declaration]
 "connect_LoopCond1-BodyBegin": """
 	correct_act(?a),
 	act_end(?a),
@@ -472,7 +472,7 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), IterationBeginOnTrueCond(?b)
 """,
 
-# Конец цикла при cond=0 [works]
+# Конец цикла при cond=0 (while, do-while, for, foreach) [works]
 "connect_LoopCond0-LoopEnd": """
 	correct_act(?a),
 	act_end(?a),
@@ -490,8 +490,8 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
 """,
 
-# После тела цикла - условие (cond) [works]
-"connect_LoopBody-CondBegin": """
+# После тела цикла - условие (while, do-while, do-until, foreach) [works]
+"connect_LoopBody-cond": """
 	correct_act(?a),
 	act_end(?a),
 	body_then_cond(?loop), 
@@ -509,7 +509,7 @@ RULES_DICT = {
 """,
 
 
-# Начало цикла с инициализацией [works]
+# Начало цикла с инициализацией (for, foreach) [works]
 "connect_LoopBegin-init": """
 	correct_act(?a),
 	act_begin(?a),
@@ -526,8 +526,8 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), LoopWithInitBegin(?b)
 """,
 
-# После инициализации цикла - условие (cond) [works]
-"connect_LoopInit-CondBegin": """
+# После инициализации цикла - условие (for, foreach) [works]
+"connect_LoopInit-cond": """
 	correct_act(?a),
 	act_end(?a),
 	loop_with_initialization(?loop), 
@@ -544,8 +544,8 @@ RULES_DICT = {
 	 LoopCondBeginAfterInit(?b)
 """,
 
-# После тела цикла - переход (update) [works?]
-"connect_LoopBody-Update": """
+# После тела цикла - переход (update) (for) [works]
+"connect_LoopBody-update": """
 	correct_act(?a),
 	act_end(?a),
 	post_update_loop(?loop), 
@@ -562,7 +562,7 @@ RULES_DICT = {
 	 LoopUpdateAfterIteration(?b)
 """,
 
-# После перехода цикла - условие (cond) [works?]
+# После перехода цикла - условие (for) [works]
 "connect_LoopUpdate-cond": """
 	correct_act(?a),
 	act_end(?a),
