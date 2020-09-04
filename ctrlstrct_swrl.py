@@ -472,6 +472,44 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), IterationBeginOnTrueCond(?b)
 """,
 
+# Начало тела цикла при cond=1 (foreach) [works]
+"connect_LoopCond1-update": """
+	correct_act(?a),
+	act_end(?a),
+	pre_update_loop(?loop), 
+	cond(?loop, ?cnd),
+	executes(?a, ?cnd),
+
+	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
+	expr_value(?a1, true),  # condition passed
+	
+	update(?loop, ?upd),
+	act_begin(?b),
+	executes(?b, ?upd),
+								# iteration belongs to ????
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b), LoopUpdateOnTrueCond(?b)
+""",
+
+# После перехода цикла - условие (foreach) [works]
+"connect_LoopUpdate-body": """
+	correct_act(?a),
+	act_end(?a),
+	pre_update_loop(?loop), 
+	update(?loop, ?upd),
+	executes(?a, ?upd),
+
+	body(?loop, ?st),
+	act_begin(?b),
+	executes(?b, ?st),
+	
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b),
+	 LoopBodyAfterUpdate(?b)
+""",
+
 # Конец цикла при cond=0 (while, do-while, for, foreach) [works]
 "connect_LoopCond0-LoopEnd": """
 	correct_act(?a),
