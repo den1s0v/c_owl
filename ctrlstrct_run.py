@@ -829,7 +829,7 @@ def init_persistent_structure(onto):
             types.new_class(class_name, (onto.alt_branch,))
 
         # make algorithm elements properties
-        for prop_name in ("body", "branches_item", "cond", ):
+        for prop_name in ("body", "branches_item", "cond", "init", "update", ):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
            
