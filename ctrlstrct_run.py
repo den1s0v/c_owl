@@ -961,6 +961,7 @@ def init_persistent_structure(onto):
             "PostCondLoopBegin",
             "LoopWithInitBegin",
             "IterationBeginOnTrueCond",
+            "IterationBeginOnFalseCond",
             "LoopBodyAfterUpdate",
             "LoopCondBeginAfterIteration",
             "LoopCondBeginAfterInit",

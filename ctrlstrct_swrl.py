@@ -467,6 +467,28 @@ RULES_DICT = {
 	 -> correct_act(?b), next_act(?a, ?b), IterationBeginOnTrueCond(?b)
 """,
 
+# Начало тела цикла при cond=0 (do-until) [works]
+"connect_LoopCond0-body": """
+	correct_act(?a),
+	act_end(?a),
+	inverse_conditional_loop(?loop), 
+	cond(?loop, ?cnd),
+	executes(?a, ?cnd),
+
+	expr_value(?a, false),  # condition passed
+	
+	body(?loop, ?st),
+	# body_item(?loop, ?st),
+	# first_item(?st),
+	
+	act_begin(?b),
+	executes(?b, ?st),
+								# iteration belongs to ????
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b), IterationBeginOnFalseCond(?b)
+""",
+
 # Начало тела цикла при cond=1 (foreach) [works]
 "connect_LoopCond1-update": """
 	correct_act(?a),
@@ -513,6 +535,23 @@ RULES_DICT = {
 	executes(?a, ?cnd),
 
 	expr_value(?a, false),  # condition passed
+	
+	act_end(?b),
+	executes(?b, ?loop),
+	after_act(?b, ?a),
+
+	 -> correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
+""",
+
+# Конец цикла при cond=1 (do-until) [works]
+"connect_LoopCond1-LoopEnd": """
+	correct_act(?a),
+	act_end(?a),
+	inverse_conditional_loop(?loop), 
+	cond(?loop, ?cnd),
+	executes(?a, ?cnd),
+
+	expr_value(?a, true),  # condition failed
 	
 	act_end(?b),
 	executes(?b, ?loop),
