@@ -737,7 +737,12 @@ def init_persistent_structure(onto):
         # -->
         class correct_act(act): pass
         # # -->
-        # class current_act(act): pass
+        class normal_flow_correct_act(correct_act): pass
+        class breaking_flow_correct_act(correct_act): pass
+        AllDisjoint([
+          normal_flow_correct_act, 
+          breaking_flow_correct_act
+        ])
         
         # ->
         class linked_list(Thing): pass

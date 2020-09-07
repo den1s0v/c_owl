@@ -125,7 +125,7 @@ RULES_DICT = {
 	next_sibling(?a, ?b),  # ?pr === ?a
 	executes(?b, ?func_),
 
-	 -> correct_act(?b), 
+	 -> normal_flow_correct_act(?b), 
 	 next_act(?a, ?b), 
 	 FunctionBegin(?b)
 """,
@@ -142,7 +142,7 @@ RULES_DICT = {
 	next_sibling(?a, ?b),  # ?pr === ?a
 	executes(?b, ?gc),
 
-	 -> correct_act(?b), 
+	 -> normal_flow_correct_act(?b), 
 	 next_act(?a, ?b), GlobalCodeBegin(?b)
 """,
 
@@ -150,7 +150,7 @@ RULES_DICT = {
 # OK !
 # Начало тела функции  [works with Pellet] [works with Stardog]
 "connect_FunctionBodyBegin_rule_g5": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_begin(?a),
 	func(?func_), 
 	executes(?a, ?func_),
@@ -162,13 +162,13 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), 
+	 -> normal_flow_correct_act(?b), 
 	 next_act(?a, ?b), 
 	 FunctionBodyBegin(?b)
 """,
 # Конец тела функции
 "connect_FuncBodyEnd_rule_g5-2": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	func(?func_), 
 	body(?func_, ?st),
@@ -179,13 +179,13 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 	
-	 -> next_act(?a, ?b), FunctionEnd(?b)  # correct_act(?b),
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), FunctionEnd(?b)
 """,
 
 # Первый акт следования [works with Pellet] [FAILS with Stardog...]
 # Пустые следования (без действий) не поддерживаются!
 "connect_SequenceBegin_rule_g2": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_begin(?a),
 	sequence(?block), 
 	executes(?a, ?block),
@@ -197,12 +197,12 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 	
-	 -> correct_act(?b), next_act(?a, ?b), SequenceBegin(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), SequenceBegin(?b)
 """,
 
 # Следующий акт следования [works with Pellet]
 "connect_SequenceNext": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	parent_of(?p, ?a),
 	sequence(?block), 
@@ -217,14 +217,14 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),	
 	
-	 -> correct_act(?b), 
+	 -> normal_flow_correct_act(?b), 
 	  next_act(?a, ?b), 
 	  SequenceNext(?b)
 """,
 
 # Начало и конец простого акта [works with Pellet]
 "connect_StmtEnd": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_begin(?a),
 	stmt(?st), 
 	executes(?a, ?st),
@@ -236,12 +236,12 @@ RULES_DICT = {
 	
 	exec_time(?a, ?t), exec_time(?b, ?_t),
 	equal(?t, ?_t),
-	 -> correct_act(?b), next_act(?a, ?b), StmtEnd(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), StmtEnd(?b)
 """,
 
 # Начало и конец акта выражения [works with Pellet]
 "connect_ExprEnd": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_begin(?a),
 	expr(?st), 
 	executes(?a, ?st),
@@ -253,12 +253,12 @@ RULES_DICT = {
 
 	exec_time(?a, ?t), exec_time(?b, ?_t),
 	equal(?t, ?_t),
-	 -> correct_act(?b), next_act(?a, ?b), ExprEnd(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), ExprEnd(?b)
 """,
 
 #  [works with Pellet]
 "connect_SequenceEnd": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	executes(?a, ?st),
 	last_item(?st),
@@ -272,7 +272,7 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 	
-	 -> correct_act(?b), next_act(?a, ?b), SequenceEnd(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), SequenceEnd(?b)
 """,
 
 
@@ -281,7 +281,7 @@ RULES_DICT = {
 
 # Проверка первого условия развилки (if) [works with Pellet]
 "connect_AltBegin": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_begin(?a),
 	alternative(?alt), 
 	executes(?a, ?alt),
@@ -298,12 +298,12 @@ RULES_DICT = {
 
 	# exec_time(?a, ?t), exec_time(?b, ?_t),
 	# equal(?t, ?_t),
-	 -> correct_act(?b), next_act(?a, ?b), AltBegin(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltBegin(?b)
 """,
 
 # Начало ветки истинного условия развилки [works with Pellet]
 "connect_AltBranchBegin_CondTrue": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	expr(?cnd), 
 	executes(?a, ?cnd),
@@ -318,12 +318,12 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), AltBranchBegin(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltBranchBegin(?b)
 """,
 
 # Проверка следующего условия развилки (else-if) [works with Pellet]
 "connect_NextAltCondition": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	expr(?cnd), 
 	executes(?a, ?cnd),
@@ -341,12 +341,12 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), NextAltCondition(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), NextAltCondition(?b)
 """,
 
 # Переход к ветке ИНАЧЕ (else)  [works with Pellet]
 "connect_AltElseBranch": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	expr(?cnd), 
 	executes(?a, ?cnd),
@@ -363,12 +363,12 @@ RULES_DICT = {
 
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), AltElseBranchBegin(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltElseBranchBegin(?b)
 """,
 
 # Конец развилки, т.к. все условия ложны [works with Pellet]
 "connect_AltEndAllFalse": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	expr(?cnd), 
 	executes(?a, ?cnd),
@@ -386,12 +386,12 @@ RULES_DICT = {
 
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), AltEndAllFalse(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltEndAllFalse(?b)
 """,
 
 # Окончание развилки по завершению ветки [works with Pellet]
 "connect_AltEndAfterBranch": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	executes(?a, ?br),
 	branches_item(?alt, ?br),
@@ -402,7 +402,7 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 	
-	 -> correct_act(?b), next_act(?a, ?b), AltEndAfterBranch(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltEndAfterBranch(?b)
 """,
 
 # (6 generating rules to construct alternatives)
@@ -413,7 +413,7 @@ RULES_DICT = {
 
 # Начало цикла с предусловием (while) [works with Pellet]
 "connect_LoopBegin-cond": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_begin(?a),
 	pre_conditional_loop(?loop), 
 	executes(?a, ?loop),
@@ -425,12 +425,12 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
 """,
 
 # Начало цикла с постусловием (do-while, do-until) [works]
 "connect_LoopBegin-body": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_begin(?a),
 	post_conditional_loop(?loop), 
 	executes(?a, ?loop),
@@ -442,12 +442,12 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), PostCondLoopBegin(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), PostCondLoopBegin(?b)
 """,
 
 # Начало тела цикла при cond=1 (while, do-while, for) [works since simplified cond_then_body class declaration]
 "connect_LoopCond1-BodyBegin": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	cond_then_body(?loop), 
 	cond(?loop, ?cnd),
@@ -464,12 +464,12 @@ RULES_DICT = {
 								# iteration belongs to ????
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), IterationBeginOnTrueCond(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), IterationBeginOnTrueCond(?b)
 """,
 
 # Начало тела цикла при cond=0 (do-until) [works]
 "connect_LoopCond0-body": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	inverse_conditional_loop(?loop), 
 	cond(?loop, ?cnd),
@@ -486,12 +486,12 @@ RULES_DICT = {
 								# iteration belongs to ????
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), IterationBeginOnFalseCond(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), IterationBeginOnFalseCond(?b)
 """,
 
 # Начало тела цикла при cond=1 (foreach) [works]
 "connect_LoopCond1-update": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	pre_update_loop(?loop), 
 	cond(?loop, ?cnd),
@@ -505,12 +505,12 @@ RULES_DICT = {
 								# iteration belongs to ????
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), LoopUpdateOnTrueCond(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), LoopUpdateOnTrueCond(?b)
 """,
 
 # После перехода цикла - условие (foreach) [works]
 "connect_LoopUpdate-body": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	pre_update_loop(?loop), 
 	update(?loop, ?upd),
@@ -522,13 +522,13 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b),
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopBodyAfterUpdate(?b)
 """,
 
 # Конец цикла при cond=0 (while, do-while, for, foreach) [works]
 "connect_LoopCond0-LoopEnd": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	conditional_loop(?loop), 
 	cond(?loop, ?cnd),
@@ -540,12 +540,12 @@ RULES_DICT = {
 	executes(?b, ?loop),
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
 """,
 
 # Конец цикла при cond=1 (do-until) [works]
 "connect_LoopCond1-LoopEnd": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	inverse_conditional_loop(?loop), 
 	cond(?loop, ?cnd),
@@ -557,12 +557,12 @@ RULES_DICT = {
 	executes(?b, ?loop),
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
 """,
 
 # После тела цикла - условие (while, do-while, do-until, foreach) [works]
 "connect_LoopBody-cond": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	body_then_cond(?loop), 
 	body(?loop, ?st),
@@ -574,14 +574,14 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b),
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopCondBeginAfterIteration(?b)
 """,
 
 
 # Начало цикла с инициализацией (for, foreach) [works]
 "connect_LoopBegin-init": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_begin(?a),
 	executes(?a, ?loop),
 	loop_with_initialization(?loop), 
@@ -593,12 +593,12 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b), LoopWithInitBegin(?b)
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b), LoopWithInitBegin(?b)
 """,
 
 # После инициализации цикла - условие (for, foreach) [works]
 "connect_LoopInit-cond": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	loop_with_initialization(?loop), 
 	init(?loop, ?st),
@@ -610,13 +610,13 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b),
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopCondBeginAfterInit(?b)
 """,
 
 # После тела цикла - переход (update) (for) [works]
 "connect_LoopBody-update": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	post_update_loop(?loop), 
 	body(?loop, ?st),
@@ -628,13 +628,13 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b),
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopUpdateAfterIteration(?b)
 """,
 
 # После перехода цикла - условие (for) [works]
 "connect_LoopUpdate-cond": """
-	correct_act(?a),
+	normal_flow_correct_act(?a),
 	act_end(?a),
 	post_update_loop(?loop), 
 	update(?loop, ?st),
@@ -646,7 +646,7 @@ RULES_DICT = {
 	
 	after_act(?b, ?a),
 
-	 -> correct_act(?b), next_act(?a, ?b),
+	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopCondAfterUpdate(?b)
 """,
 
