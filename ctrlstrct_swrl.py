@@ -308,8 +308,7 @@ RULES_DICT = {
 	expr(?cnd), 
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, true),  # condition passed
+	expr_value(?a, true),  # condition passed
 
 	cond(?br, ?cnd),
 	alt_branch(?br),  # belonds to an alternative
@@ -329,8 +328,7 @@ RULES_DICT = {
 	expr(?cnd), 
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, false),  # condition failed
+	expr_value(?a, false),  # condition failed
 
 	cond(?br, ?cnd),
 	alt_branch(?br),  # belonds to an alternative
@@ -353,8 +351,7 @@ RULES_DICT = {
 	expr(?cnd), 
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, false),  # condition failed
+	expr_value(?a, false),  # condition failed
 
 	cond(?br, ?cnd),
 	alt_branch(?br),  # belonds to an alternative
@@ -376,8 +373,7 @@ RULES_DICT = {
 	expr(?cnd), 
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, false),  # condition failed
+	expr_value(?a, false),  # condition failed
 
 	cond(?br, ?cnd),
 	alt_branch(?br),  # belonds to an alternative
@@ -457,8 +453,7 @@ RULES_DICT = {
 	cond(?loop, ?cnd),
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, true),  # condition passed
+	expr_value(?a, true),  # condition passed
 	
 	body(?loop, ?st),
 	# body_item(?loop, ?st),
@@ -480,8 +475,7 @@ RULES_DICT = {
 	cond(?loop, ?cnd),
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, true),  # condition passed
+	expr_value(?a, true),  # condition passed
 	
 	update(?loop, ?upd),
 	act_begin(?b),
@@ -518,8 +512,7 @@ RULES_DICT = {
 	cond(?loop, ?cnd),
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, false),  # condition passed
+	expr_value(?a, false),  # condition passed
 	
 	act_end(?b),
 	executes(?b, ?loop),
@@ -780,8 +773,7 @@ RULES_DICT = {
 	expr(?cnd), 
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, false),  # condition failed
+	expr_value(?a, false),  # condition failed
 
 	cond(?br, ?cnd),  # corresponding branch
 	alt_branch(?br),  # belonds to an alternative
@@ -832,8 +824,7 @@ RULES_DICT = {
 	expr(?cnd), 
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, true),  # condition passed
+	expr_value(?a, true),  # condition passed
 
 	cond(?br, ?cnd),  # corresponding branch
 	alt_branch(?br),  # belonds to an alternative
@@ -849,8 +840,7 @@ RULES_DICT = {
 	expr(?cnd), 
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, false),  # condition failed
+	expr_value(?a, false),  # condition failed
 	cond(?br, ?cnd),  # corresponding branch
 	next(?br, ?br2),
 	else(?br2), 	  # "else" branch expected
@@ -866,8 +856,7 @@ RULES_DICT = {
 	expr(?cnd), 
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, false),  # condition failed
+	expr_value(?a, false),  # condition failed
 	cond(?br, ?cnd),  # corresponding branch
 	next(?br, ?br2),
 	cond(?br2, ?cnd2), 	  # one more condition expected
@@ -883,8 +872,7 @@ RULES_DICT = {
 	expr(?cnd), 
 	executes(?a, ?cnd),
 
-	corresponding_end(?a1, ?a),  # refer to act begin that holds expr_value
-	expr_value(?a1, false),  # condition failed
+	expr_value(?a, false),  # condition failed
 	cond(?br, ?cnd),  # corresponding branch
 	last_item(?br),   # no more conditions expected
 

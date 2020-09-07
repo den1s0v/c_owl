@@ -549,8 +549,8 @@ class TraceTester():
                         mark2act_obj[mark] = obj
 
                         
-                        # attach expr value: for act Begin only!
-                        if mark == "b" and alg_elem["type"] in {"expr"}:
+                        # attach expr value: for act_end only!
+                        if mark == "e" and alg_elem["type"] in {"expr"}:
                             values = self.expr_id2values[st_id] if st_id in self.expr_id2values else []
                             # if len(values) <= exec_n:
                             if exec_n <= len(values):
