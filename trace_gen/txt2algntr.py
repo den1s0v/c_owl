@@ -122,7 +122,7 @@ class AlgorithmParser:
             # print(*line_list[ci:e+1])
 
             # функция main
-            m = re.match(r"функция\s+(\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"(?:function|функция)\s+(\S+)", line_list[ci].strip(), re.I)
             if m:
                 if self.verbose: print("function")
                 name = m.group(1)  # имя функции
@@ -146,8 +146,8 @@ class AlgorithmParser:
             # если цвет==зелёный  // my-alt-1
             # если условие (цвет==зелёный)  // my-alt-1
             m = re.match(r"""
-                если
-                (?:\s+условие)?   # optional
+                (?:if|если)
+                (?:\s+condition|\s+условие)?   # optional
                 \s+
                 (\(.+\)|\S+)  # 1 cond_name
                 \s+
@@ -178,7 +178,7 @@ class AlgorithmParser:
 
             # иначе если цвет==желтый
             # иначе если условие (цвет==желтый)
-            m = re.match(r"иначе\s+если(?:\s+условие)?\s+(\(.+\)|\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"(?:else\s+if(?:\s+condition)?|иначе\s+если(?:\s+условие)?)\s+(\(.+\)|\S+)", line_list[ci].strip(), re.I)
             if m:
                 if self.verbose: print("alt elseif")
                 cond_name = m.group(1)  # условие else if (может быть в скобках)
@@ -198,7 +198,7 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # иначе
-            m = re.match(r"иначе", line_list[ci].strip(), re.I)
+            m = re.match(r"(?:else|иначе)", line_list[ci].strip(), re.I)
             if m:
                 if self.verbose: print("alt else")
                 assert len(result)>0 and result[-1]["type"] == "alternative", "Algorithm Error: 'иначе' does not follow 'если' :\n\t"+line_list[ci].strip()
@@ -215,7 +215,7 @@ class AlgorithmParser:
 
 
             # пока while-cond-1  // my-while-1
-            m = re.match(r"пока\s+(\(.+\)|\S+)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"(?:while|пока)\s+(\(.+\)|\S+)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
             if m:
                 if self.verbose: print("while")
                 name = m.group(2)  # имя цикла (пишется в комментарии)
@@ -236,8 +236,8 @@ class AlgorithmParser:
             # делать   // my-dowhile-2
             #    ...
             # пока dowhile-cond-2
-            m = re.match(r"делать\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
-            m2 = e+1 < len(line_list)  and  re.match(r"пока\s+(\(.+\)|\S+)",   line_list[ e+1 ].strip(), re.I)
+            m = re.match(r"(?:do|делать)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m2 = e+1 < len(line_list)  and  re.match(r"(?:while|пока)\s+(\(.+\)|\S+)",   line_list[ e+1 ].strip(), re.I)
             if m and m2:
                 if self.verbose: print("do while")
                 name = m.group(1)  # имя цикла (пишется в комментарии)
@@ -258,8 +258,8 @@ class AlgorithmParser:
             # делать   // my-dowhile-2
             #    ...
             # до dountil-cond-2
-            m = re.match(r"делать\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
-            m2 = e+1 < len(line_list)  and  re.match(r"до\s+(\(.+\)|\S+)",   line_list[ e+1 ].strip(), re.I)
+            m = re.match(r"(?:do|делать)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m2 = e+1 < len(line_list)  and  re.match(r"(?:until|до)\s+(\(.+\)|\S+)",   line_list[ e+1 ].strip(), re.I)
             if m and m2:
                 if self.verbose: print("do until")
                 name = m.group(1)  # имя цикла (пишется в комментарии)
@@ -278,8 +278,13 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # для день от 1 до 5 с шагом +1  // my-for-3
-            m = re.match(r"для\s+(\S+)\s+от\s+(\S+)\s+до\s+(\S+)\s+с\sшагом\s+(\S+)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
-            #                    ^ 1 var      ^ 2 from     ^ 3 to             ^ 4 step           ^ 5 name
+            m = re.match(r"""
+                            (?:for|для)\s+(\S+)\s+  # 1 var
+                            (?:from|от)\s+(\S+)\s+   # 2 from
+                            (?:to|до)\s+(\S+)\s+     # 3 to
+                            (?:step|с\s+шагом)\s+(\S+)\s+ # 4 step
+                            (?://|\#)\s*(\S+)         # 5 name
+                        """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("for")
                 s_var =  m.group(1)  # переменная цикла
@@ -304,8 +309,11 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # для каждого x в list  // my-for-in-4
-            m = re.match(r"для\s+каждого\s+(\S+)\s+в\s+(\S+)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
-            #                              ^ 1 var     ^ 2 in             ^ 3 name
+            m = re.match(r"""
+                (?:for\s*each|для\s+каждого)\s+(\S+)\s+ # 1 var
+                (?:in|в)\s+(\S+)\s+                     # 2 in
+                (?://|\#)\s*(\S+)                        # 3 name
+                """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("foreach")
                 s_var = m.group(1)  # переменная цикла
@@ -820,12 +828,16 @@ def word_in(words, text):
 def extract_alg_name(line) -> str:
     """Берём слово, стоящее за словом "алгоритм" """
     words = line.split()
-    if "алгоритм" not in words:
-        print("Warning: No", '"алгоритм"', "in line:", line)
+    choises = ("алгоритм", "algorithm")
+    choice = [w for w in words if w in choises]
+    if choice:
+        choice = choice[0]
+        i = words.index(choice)
+    else:
+        print("Warning: No", f"\"{choises.join('/')}\"", "in line:", line)
         return None
-    i = words.index("алгоритм")
-    if i+1 == len(words):
-        print("Warning: No algoritm name following", '"алгоритм"', "in line:", line)
+    if i == len(words) - 1:
+        print("Warning: No algoritm name following", f'"{choise}"', "in line:", line)
         return None
     return words[i+1]
 
@@ -908,9 +920,9 @@ def parse_text_file(txt_file_path, encoding="utf8"):
     alg_data = {}
 
     for i in range(0, last_line):
-        if word_in("алгоритм", lines[i]):
+        if word_in(("алгоритм", "algorithm"), lines[i]):
             # проверить начало алгоритма
-            if not re.search(r"\{|функция", lines[i+1]):
+            if not re.search(r"\{|функция|function", lines[i+1]):
                 print("Ignored (no alg. begin): line", i, lines[i])
                 continue
             # найти конец алгоритма
@@ -940,7 +952,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
     tr_data = {}
 
     for i in range(0, last_line):
-        if word_in("началась программа", lines[i]):
+        if word_in(("началась программа","program began"), lines[i]):
             # найти имя трассы
             name = None
             boolean_chain = None
@@ -967,7 +979,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
             # найти конец трассы
             for j in range(i + 1, last_line):
                 if "}" in lines[j+1]:  # закрывающая скобка
-                    if word_in("закончилась программа", lines[j]):
+                    if word_in(("закончилась программа","program ended"), lines[j]):
                         # найдено
                         tr_data[name] = {
                             "alg_name": alg_name,
@@ -997,10 +1009,11 @@ def parse_text_file(txt_file_path, encoding="utf8"):
                 print("Error !")
                 alg_data[alg_name]["erroneous"] = True
                 print("Error parsing algorithm:", alg_name, ":")
-                print(" ", e)            
+                print(" ", e)
+                # raise e
         
         if "alg_parser" not in alg_data[alg_name]:
-            print("Skipping trace:", tr_name, ", because no corresponding algorithm parsed:", alg_name)
+            print("Skipping trace:", tr_name, ", because the corresponding algorithm was not parsed:", alg_name)
             continue
             
         print("Parsing trace:", tr_name, "...", end='\t')
@@ -1015,7 +1028,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         except Exception as e:
             print("Error !")
             print("Error parsing trace:", tr_name, ":")
-            print(" ", e)
+            print(" ", repr(e))
             # raise e
             
             
