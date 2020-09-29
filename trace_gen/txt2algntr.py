@@ -491,14 +491,49 @@ class TraceParser:
             if m and m.start() == 0:
                 continue
         
+            BEGAN_ru = "(?:начал[оа]?с[ья])"
+            ENDED_ru = "(?:закончил[оа]?с[ья])"
+            EXECUTED_ru = "(?:выполнил[оа]?с[ья])"
+            BEGAN_en = "(?:began)"
+            ENDED_en = "(?:ended)"
+            EXECUTED_en = "(?:executed)"
+            BEGAN = "(?:начал[оа]?с[ья]|began)"
+            ENDED = "(?:закончил[оа]?с[ья]|ended)"
+            EXECUTED = "(?:выполнил[оа]?с[ья]|executed)"
+            Ith1_ru = r"(?:\s+(\d+)[-_]?й?\s+раз)"
+            Ith1_en = r"(?:\s+(\d+)(?:st|nd|th)?\s+time)"
+            Ith1 = r"(?:\s+(\d+)(?:st|nd|th|[-_]й)?\s+(?:time|раз))"
+            Ith1_femn = r"(?:\s+(\d+)(?:st|nd|th|[-_]я)?)"  # 1-я [итерация]
+            PHASE_dict = dict(BEGAN=BEGAN, ENDED=ENDED, EXECUTED=EXECUTED, 
+                BEGAN_ru=BEGAN_ru, ENDED_ru=ENDED_ru, EXECUTED_ru=EXECUTED_ru, 
+                BEGAN_en=BEGAN_en, ENDED_en=ENDED_en, EXECUTED_en=EXECUTED_en, 
+                Ith1=Ith1, Ith1_femn=Ith1_femn, )
+            BEGAN_re = re.compile(BEGAN, re.I)
+            ENDED_re = re.compile(ENDED, re.I)
+            EXECUTED_re = re.compile(EXECUTED, re.I)
+            
+            def get_phase_by_str(phase_str):
+                if BEGAN_re.match(phase_str):
+                    return "started"  
+                elif ENDED_re.match(phase_str):
+                    return "finished"  
+                elif EXECUTED_re.match(phase_str):
+                    return "performed"
+                else:
+                    return "U-N-K-N-O-W-N"
+                
+        
             # началась программа
             # закончилась программа
-            m = re.match(r"(началась|закончилась)\s+программа", line, re.I)
+            # program began
+            # program ended
+            m = re.match(r"({BEGAN_ru}|{ENDED_ru})\s+программа|program\s+({BEGAN_en}|{ENDED_en})".format(**PHASE_dict), line, re.I)
             if m:
-                if self.verbose: print("{} программа".format(m.group(1)))
+                phase_str = m.group(1) or m.group(2)
+                if self.verbose: print("{} программа".format(phase_str))
                 #   {"id": 32, "action": "программа", "executes": 25, "gen": "she", "phase": "started", "n": null},
-                name = "программа"
-                phase = "started"  if m.group(1) == "началась" else  "finished"
+                name = "program"
+                phase = get_phase_by_str(phase_str)  # "started"  if BEGAN_re.match(phase_str) else  "finished"
                 # alg_obj_id = self.get_alg_node_id(("algorithm","алгоритм"))
                 # assert alg_obj_id, "TraceError: no corresporning '{}' found for '{}'".format("algorithm' or 'алгоритм", name)
                 alg_obj_id = self.alg_dict["entry_point"]["id"]
@@ -525,24 +560,29 @@ class TraceParser:
             # началась развилка my-alt-1 1-й раз
             # началась функция main 1-й раз
             # выполнилась функция main 1-й раз
-            m = re.match(r"""(начал[оа]?с[ья]|закончил[оа]?с[ья]|выполнил[оа]?с[ья])  # 1 phase 
-                \s+
-                (следование|развилка|цикл|функция)   # 2 struct 
+            #     alternative by_response ended 1st time
+            m = re.match(r"""(?:({BEGAN_ru}|{ENDED_ru}|{EXECUTED_ru})\s+)?  # 1 phase (ru)
+                (следование|развилка|цикл|функция|sequence|alternative|loop|function)   # 2 struct 
                 \s+(\S+)                     # 3 name 
-                (?:\s+(\d+)[-_]?й?\s+раз)?   # 4 ith  (optional)
-                """, line, re.I | re.VERBOSE)
+                (?:\s+({BEGAN_en}|{ENDED_en}|{EXECUTED_en}))?  # 4 phase (en)
+                {Ith1}?   # 5 ith  (optional)
+                """.format(**PHASE_dict), line, re.I | re.VERBOSE)
             if m:
-                if self.verbose: print("{} {}".format(m.group(1), m.group(2)))
+                struct_str = m.group(2)
+                phase_str = m.group(1) or m.group(4)
+                assert phase_str, "TraceError: phase term (began/ended/executed) is missing at line {}".format(ci)
+                if self.verbose: print("{} {}".format(phase_str, struct_str))
                 #   {"id": 32, "action": "программа", "executes": 25, "gen": "she", "phase": "started", "n": null},
                 struct = {
-                            "следование":"sequence", 
-                            "развилка":"alternative", 
-                            "цикл":"loop", 
-                            "функция":"func"
-                         }[m.group(2)]
+                            "следование": "sequence", 
+                            "развилка": "alternative", 
+                            "цикл": "loop", 
+                            "функция": "func",
+                            "function": "func",
+                         }.get(struct_str, struct_str)
                 name = m.group(3)
-                ith = m.group(4)  if len(m.groups())>=4 else  None
-                phase = "started"  if "начал" in m.group(1) else  ("finished"  if "закончил" in m.group(1) else  "performed")
+                ith = m.group(5)  if len(m.groups())>=5 else  None
+                phase = get_phase_by_str(phase_str)
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 if struct == "func":
@@ -561,20 +601,21 @@ class TraceParser:
         
             # условие развилки (цвет==зелёный) выполнилось 1-й раз - истина
             # условие цикла (while-cond-1) выполнилось 1-й раз - истина
-            # условие (!!) (while-cond-1) выполнилось 1-й раз - истина
-            m = re.match(r"""условие
+            # условие (while-cond-1) выполнилось 1-й раз - ложь
+            # condition (response_is_positive) executed 1st time - true
+            m = re.match(r"""(?:условие|condition)
                 \s*
-                (развилки|цикла)?  # 1 struct (optional)
+                (развилки|цикла|of\s+alternative|of\s+loop)?  # 1 struct (optional)
                 \s+
                 (\(.+\)|\S+)   # 2 cond name 
                 \s+
-                выполнил[оа]?с[ья]
-                (?:\s+(\d+)[-_]?й?\s+раз)?   # 3 ith  (optional)
+                {EXECUTED}      # добавить остальные фазы - после расширения/усложнения логики
+                {Ith1}?   # 3 ith  (optional)
                 \s+
                 - >?    # - or ->
                 \s+
                 (\S+)   # 4 value
-                """, line, re.I | re.VERBOSE)
+                """.format(**PHASE_dict), line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("условие {} {} выполнилось - {}".format(m.group(1) or "\b", m.group(2), m.group(4)))
                 struct = {"развилки":"alternative", "цикла":"loop", }.get(m.group(1), "alternative or loop")
@@ -628,12 +669,16 @@ class TraceParser:
             
             # ветка иначе началась 1-й раз
             # ветка иначе закончилась 1-й раз
-            m = re.match(r"""ветка
+            m = re.match(r"""(?:
+                    ветка\s+ин[аa]ч[еe]   # транслит букв (раз начал использовать, нужно себя обезопасить)
+                |
+                    else\s+branch
+                )
                 \s+
-                ин[аa]ч[еe]   # транслит букв (раз начал использовать, нужно себя обезопасить)
-                \s+
-                (начал[оа]?с[ья]|закончил[оа]?с[ья])  # 1 phase
-                (?:\s+(\d+)[-_]?й?\s+раз)?   # 2 ith  (optional)
+                    # (начал[оа]?с[ья]|закончил[оа]?с[ья])  # 1 phase
+                ({BEGAN}|{ENDED})  # 1 phase
+                    # (?:\s+(\d+)[-_]?й?\s+раз)?   # 2 ith  (optional)
+                {Ith1}?   # 2 ith  (optional)
                 """, line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("ветка иначе {}".format(m.group(1)))
@@ -652,7 +697,7 @@ class TraceParser:
                         raise ValueError("TraceError: no else_branch element found in algorithm to bound '{}' at line {}!".format("ветка иначе", ci))
                 name = else_branch_name
                 ith = m.group(2)  if len(m.groups())>=2 else  None
-                phase = "started"  if "начал" in m.group(1) else  "finished"
+                phase = get_phase_by_str(m.group(1))  # "started"  if "начал" in m.group(1) else  "finished"
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format("ветка иначе", ci)
                 result.append({
@@ -669,20 +714,34 @@ class TraceParser:
 
             # ветка условия развилки (цвет==зелёный) началась 1-й раз
             # ветка условия развилки (цвет==зелёный) закончилась 1-й раз
-            m = re.match(r"""ветка
-                (?:\s+условия)?
-                (?:\s+развилки)?
+            m = re.match(r"""
+                (?:
+                    ветка
+                    (?:\s+условия)?
+                    (?:\s+развилки)?
+                |
+                    (?:alternative\s+)?
+                    (?:condition\s+)?
+                    branch
+                |
+                    branch
+                    (?:\s+of\s+condition)?
+                    (?:\s+of\s+alternative)?
+                )
                 \s+
-                \(?(\S+?.*?)\)?  # 1 cond name (optional braces not inclusive)
+                # \(?(\S+?.*?)\)?  # 1 cond name (optional braces not inclusive)
+                (?: \((\S+?)\) | (\S+) )  # 1, 2 cond name (optional braces not inclusive)
                 \s+
-                (начал[оа]?с[ья]|закончил[оа]?с[ья])  # 2 phase
-                (?:\s+(\d+)[-_]?й?\s+раз)?   # 3 ith  (optional)
-                """, line, re.I | re.VERBOSE)
+                    # (начал[оа]?с[ья]|закончил[оа]?с[ья])  # 3 phase
+                ({BEGAN}|{ENDED})  # 3 phase
+                    # (?:\s+(\d+)[-_]?й?\s+раз)?   # 4 ith  (optional)
+                {Ith1}   # 4 ith  (optional)
+                """.format(**PHASE_dict), line, re.I | re.VERBOSE)
             if m:
-                if self.verbose: print("ветка {} {}".format(m.group(1), m.group(2)))
-                name = m.group(1)
-                ith = m.group(3)  if len(m.groups())>=3 else  None
-                phase = "started"  if "начал" in m.group(2) else  "finished"
+                name = m.group(1) or m.group(2)
+                phase = get_phase_by_str(m.group(3))  # "started"  if "начал" in m.group(2) else  "finished"
+                if self.verbose: print("ветка {} {}".format(name, phase))
+                ith = m.group(4)  if len(m.groups())>=4 else  None
                 alg_obj_id = self.get_alg_node_id([prfx+name for prfx in ("if-","elseif-")])  # префиксы для веток "if" и "else if" - ветка Иначе здесь не обрабатывается!
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
@@ -698,34 +757,37 @@ class TraceParser:
                 continue  # with next act
                 
             # началась итерация 1 цикла my-while-1
+            # началась итерация 1 цикла ожидание
             # началась 1-я итерация цикла my-while-1
             m = re.match(r"""
-                (начал[оа]?с[ья]|закончил[оа]?с[ья])  # 1 phase
-                \s+
+                (?:({BEGAN_ru}|{ENDED_ru})\s+)?  # 1 phase_1 - (началась|закончилась)
                 (?:
-                    итерация\s+(\d+)         # 2 numb_1
+                    (?:итерация|iteration)\s+(\d+)         # 2 numb_1
                     |
-                    (\d+)[-_]?я?\s+итерация     # 3 numb_2
-                )
-                (?:\s+цикла)
-                \s+
+                    {Ith1_femn}  # (\d+)[-_]?я?     # 3 numb_2
+                    \s+(?:итерация|iteration)
+                )\s+
+                (?:цикла|of\s+loop)\s+
                 (\S+)  # 4 loop name
-                """, line, re.I | re.VERBOSE)
+                (?:\s+({BEGAN_en}|{ENDED_en}))?  # 5 phase_2
+                """.format(**PHASE_dict), line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("{} итерация цикла {}".format(m.group(1), m.group(4)))
                 loop_name = m.group(4)
                 name = loop_name + "_loop_body"  # тело цикла сделано отдельной сущностью
-                ith = m.group(2)  or  m.group(3)
-                phase = "started"  if "начал" in m.group(1) else  "finished"
+                ith = m.group(2) or m.group(3)
+                phase = get_phase_by_str(m.group(1) or m.group(5))  # "started"  if "начал" in m.group(1) else  "finished"
                 alg_obj_id = self.get_alg_node_id(loop_name)  # access body via loop
                 loop_dict = next(find_by_keyval_in("id", alg_obj_id, self.alg_dict))
                 alg_obj_id = loop_dict["body"]["id"]
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                
                 count_dict = self.iteration_count_dict.get(alg_obj_id, {})
                 ith = count_dict.get(phase, 0) + 1
                 count_dict.update({phase: ith})
                   # Временное решение! Не работает с рекурсией (считает все вхождения, идентично exec_time). Нужно отталкиваться от акта начала цикла, и запоминать все связанные непосредственно с ним итерации.
                 self.iteration_count_dict[alg_obj_id] = count_dict
+                
                 result.append({
                       "id": self.newID(name),
                       # "loop_name": name,
@@ -743,16 +805,17 @@ class TraceParser:
             # выполнилась инициализация (день = 1) 1-й раз
             # выполнился переход (день=день+1) 1-й раз
             m = re.match(r"""
-                (выполнил[оа]?с[ья])  # 1 phase
+                ({EXECUTED})  # (выполнил[оа]?с[ья])  # 1 phase
                 \s+
-                (инициализация|переход)  # 2 struct
+                (инициализация|переход|init|initialization|update)  # 2 struct
                 \s+
-                (\(.+\)|\S+)  # 2 name (optional braces inclusive!)
-                (?:\s+(\d+)[-_]?й?\s+раз)?   # 3 ith  (optional)
-                """, line, re.I | re.VERBOSE)
+                (\(.+\)|[^()\s]+)  # 3 name (optional braces inclusive!)
+                {Ith1}?  # (?:\s+(\d+)[-_]?й?\s+раз)?   # 4 ith  (optional)
+                """.format(**PHASE_dict), line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("{} {} {}".format(m.group(1), m.group(2), m.group(4)))
-                struct = {"инициализация":"init", "переход":"update", }.get(m.group(2), "none!")
+                struct_str = m.group(2)
+                struct = {"инициализация":"init", "initialization":"init", "переход":"update", }.get(struct_str, struct_str)
                 name = m.group(3)
                 ith = m.group(4)  if len(m.groups())>=4 else  None
                 phase = "performed"
@@ -785,17 +848,19 @@ class TraceParser:
             
                 
             # что-то выполнилось 1-й раз
-            m = re.match(r"""(\S+)   # 1 name
+            # greet executed 1st time 
+            m = re.match(r"""
+                (\S+)   # 1 name
                 \s+
-                (начал[оа]?с[ья]|закончил[оа]?с[ья]|выполнил[оа]?с[ья])  # 2 phase
-                (?:\s+(\d+)[-_]?й?\s+раз)?   # 3 ith  (optional)
-                """, line, re.I | re.VERBOSE)
+                ({BEGAN}|{ENDED}|{EXECUTED})  # 2 phase
+                {Ith1}?   # 3 ith  (optional)
+                """.format(**PHASE_dict), line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("{} {}".format(m.group(1), m.group(2)))
                 name = m.group(1)
                 ith = m.group(3)  if len(m.groups())>=3 else  None
                 # phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
-                phase = "started"  if "начал" in m.group(2) else  ("finished"  if "закончил" in m.group(2) else  "performed")
+                phase = get_phase_by_str(phase_str)
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
