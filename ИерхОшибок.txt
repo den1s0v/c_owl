@@ -54,21 +54,21 @@ Conditional_Loop (Loop act L)	# Общие правила для циклов с
     }
     
 1	NoCondition	(L) (условие не проверяется ни разу; ни одного условия)
-2	MissingIterationAfterTrueCondition	(L, condition act c)    (при истинном условии продолжения нет итерации; нет итерации после истинного условия)
+-2	MissingIterationAfterSuccessfulCondition	(L, condition act c)    (при истинном условии продолжения нет итерации; нет итерации после истинного условия)
 3	MissingIterationBetweenLoopConditions	(L, condition act с1, condition act c2) (дубликат условия; пропуск итерации между условиями)
 4	MissingConditionBetweenIterations	(L, iteration i1, i2)   (дубликат итерации; пропуск условия между итерациями)
 5	[no-break] MissingConditionAfterIteration	(L, iteration i)  (нет условия после итерации)
-6   ExtraActsBetweenFalseConditionAndLoopEnd  (L, condition act c, extra act e) (после завершающей проверки условия цикл не заканчивается)
+-6  NoLoopEndA FailedCondition  (L, condition act c, extra act e) (после завершающей проверки условия цикл не заканчивается)
 
 6 (6.1) (+ Conditional_Loop)
 While_Loop (WhileLoop act L)
-1    MissingConditionBeforeWhileIteration (L, iteration i)  (пропущено первое условие While)
+-1    MissingConditionBeforeWhileIteration (L, iteration i)  (пропущено первое условие While)
 
 
 7 (7.1) (+ Conditional_Loop)
 Do_Loop (DoLoop act L)
 1    NoIterationsInDoLoop (L)  (нет ни одной итерации в цикле Do-While)
-2    MissingDoIterationBeforeCondition (L, condition act c)  (пропущена первая итерация Do-While)
+-2    MissingDoIterationBeforeCondition (L, condition act c)  (пропущена первая итерация Do-While)
 
 
 8 (8.1) (+ Conditional_Loop)
@@ -81,13 +81,13 @@ For_Loop (ForLoop act L)
         Update/ForUpdate
     }
     
-1	MissingInitActInForLoop (L)  (пропущена инициализация цикла For)
+-1	MissingInitActInForLoop (L)  (пропущена инициализация цикла For)
 2	DuplicatesOfForInit (L, for_init act init)  (несколькр актов инициализации цикла For)
-2   MissingConditionAfterForInit (L, i) === NoCondition (L) (цикл не начинается после Init; ни одной проверки условия)
+-2   MissingConditionAfterForInit (L, i) === NoCondition (L) (цикл не начинается после Init; ни одной проверки условия)
 
  -- 4,5 - проверки в конце цикла
-4   MissingForUpdateAfterIteration	(L, iteration i)  (пропущен переход цикла For)
-5	MissingConditionAfterForUpdate	(L, for_update act u)  (пропущена проверка условия после перехода цикла For; нет условия после перехода)
+-4   MissingForUpdateAfterIteration	(L, iteration i)  (пропущен переход цикла For)
+-5	MissingConditionAfterForUpdate	(L, for_update act u)  (пропущена проверка условия после перехода цикла For; нет условия после перехода)
     
  -- 6,7,8 - в дополнение к 4,5 (для обработки ошибок цикличности "в толще" итераций)
 6   Missing ForUpdate Between Iteration and Condition (L, iteration i, condition act c)  (подряд итерация и условие)

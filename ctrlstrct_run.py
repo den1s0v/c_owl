@@ -931,6 +931,8 @@ def init_persistent_structure(onto):
                 "AllFalseNoElse",
                 "NoNextCondition",
                 "AllFalseNoEnd",
+                # Loops mistakes ...
+                "MissingIterationAfterSuccessfulCondition",
             ]:
                 if isinstance(class_name, str):
                     types.new_class(class_name, (Erroneous,))

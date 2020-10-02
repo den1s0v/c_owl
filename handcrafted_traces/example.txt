@@ -57,7 +57,7 @@
 	wish_good_luck
 }
 
-// example_alt_eng 01 first trace
+// SKIP____example_alt_eng 01 first trace
 {
 program began
 	greet executed 1st time 

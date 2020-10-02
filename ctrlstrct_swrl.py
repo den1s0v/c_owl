@@ -922,6 +922,38 @@ RULES_DICT = {
 """,
 
 
+# ============ Loops mistakes ============ #
+
+# Нет итерации после успешного условия при cond=1 (while, do-while, for) [works]
+"MissingIterationAfterSuccessfulCondition-1-loop_Error": """
+	normal_flow_correct_act(?a),
+	act_end(?a),
+	cond_then_body(?loop), 
+	cond(?loop, ?cnd),
+	executes(?a, ?cnd),
+
+	expr_value(?a, true),  # condition passed
+
+	student_next(?a, ?b),
+	Erroneous(?b), 
+	 -> MissingIterationAfterSuccessfulCondition(?b)
+""",
+
+# Нет итерации после успешного условия при cond=0 (do-until) [works?]
+"MissingIterationAfterSuccessfulCondition-0-loop_Error": """
+	normal_flow_correct_act(?a),
+	act_end(?a),
+	cond_then_body(?loop), 
+	cond(?loop, ?cnd),
+	executes(?a, ?cnd),
+
+	expr_value(?a, false),  # condition passed
+
+	student_next(?a, ?b),
+	Erroneous(?b), 
+	 -> MissingIterationAfterSuccessfulCondition(?b)
+""",
+
 }
 
 _more_rules = {}

@@ -2,6 +2,6 @@ SKIP    correct_branching.txt
 SKIP    err_branching.txt
 SKIP    correct_loops.txt
 SKIP    err_loops.txt
-example.txt
+SKIP    example.txt
 SKIP    test_sequences.txt
-SKIP    * test_loops.txt
+test_loops.txt
