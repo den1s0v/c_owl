@@ -123,9 +123,6 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	err_objs = []
 	err_obj_id2msgs = {}
 	
-	# retrieve property object(s)
-	prop_text_line = onto["text_line"]
-
 	# get text lines of the inferred erroneous acts
 	inferred_error_lines = [dct["text_line"] for dct in mistakes]
 	inferred_error_lines = [arr[0] if arr else None for arr in inferred_error_lines]
@@ -279,8 +276,8 @@ if __name__ == '__main__':
 			
 	# 	# break
 	success_all = run_tests(process_kwargs=dict(
-		reasoning=None, 
-		# reasoning="pellet", 
+		# reasoning=None, 
+		reasoning="pellet", 
 		# reasoning="stardog", 
 		extra_act_entries=0
 		)
