@@ -986,20 +986,18 @@ def init_persistent_structure(onto):
         #         types.new_class(prop_name, (correct_act >> Thing,))
 
 
-def load_swrl_rules(onto, rules_dict, rules_filter=None):
+def load_swrl_rules(onto, rules_list, rules_filter=None):
     """ rules_filter: None or callable hat receives name of rule and returns boolean """
-    
     with onto:
-        for k in rules_dict:
-            if rules_filter and not rules_filter(k):
-                print("Ignoring SWRL rule:", k)
+        for r in rules_list:
+            if rules_filter and not rules_filter(r):
+                print("Ignoring SWRL rule:", r)
                 continue
                 
-            rule = rules_dict[k]
             try:
-                Imp(k).set_as_rule(rule)
+                Imp(r.name).set_as_rule(r.swrl)
             except Exception as e:
-                print("Error in SWRL rule: \t", k)
+                print("Error in SWRL rule: \t", r.name)
                 print(e)
                 raise e
             
@@ -1081,8 +1079,12 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
 
     # после наложения обёртки можно добавлять SWRL-правила
     if True:
-        from ctrlstrct_swrl import RULES_DICT as swrl_rules_dict
-        load_swrl_rules(onto, swrl_rules_dict, rules_filter=rules_filter)
+        from ctrlstrct_swrl import filtered_rules
+        # hardcode so far >
+        tags_enabled = set("""
+        	helper correct mistake entry function sequence alternative loop
+        	""".split())
+        load_swrl_rules(onto, filtered_rules(tags_enabled), rules_filter=rules_filter)
     
     if debug_rdf_fpath:
         onto.save(file=debug_rdf_fpath, format='rdfxml')

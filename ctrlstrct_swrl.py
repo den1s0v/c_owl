@@ -2,7 +2,42 @@
 
 import re
 
-RULES_DICT = {
+__COMMENT_RE = re.compile(r"(?://|#).*$")
+RULES = []
+
+
+
+def strip_comments_out(text):
+	# strip all the comments out ...
+	# ... replacing them by spaces 
+	# in order to preserve char positions reported by lexing parser
+	lines = [
+				__COMMENT_RE.sub(lambda m: " "*len(m.group(0)), line)
+				for line in text.split("\n")
+			]
+	return "\n".join(lines)
+
+
+class DomainRule:
+	def __init__(self, swrl, name="", tags={}):
+		self.name = str(name)
+		self.swrl = strip_comments_out(swrl)
+		self.tags = tags
+	
+	def valid_for_tags(self, tags={}):
+		return self.tags in tags
+	
+	def __str__(self):
+		return self.swrl
+	
+	
+def filtered_rules(tags):
+	# print(tags)
+	# print("RULES:", len(RULES))
+	filtered = [r for r in RULES if r.tags <= tags]
+	# print("filtered:", len(filtered))
+	return filtered
+
 
 # помечаем минусом в начале имени отключенные правила.
 # из текста удаляются комментарии в стиле Си (//) и Python (#).
@@ -23,79 +58,110 @@ RULES_DICT = {
 # func_a            func_a.body             func_a.body.first
 
 
-"Incr_index": """
+# RULES.append(DomainRule(name=, tags={}, swrl=))
+# if not dr.name.startswith("-"): RULES.append(dr)
+	
+RULES.append(DomainRule(name="Incr_index", 
+	tags={'correct', 'helper'}, 
+	swrl="""
 	next_act(?a, ?b), index(?a, ?ia), add(?ib, ?ia, 1)
-	 -> index(?b, ?ib)""",
-"-hardcoded- student_Incr_index": """
+	 -> index(?b, ?ib)"""))
+RULES.append(DomainRule(name="-hardcoded- student_Incr_index", 
+	tags={'mistake', 'helper'}, 
+	swrl="""
 	student_next(?a, ?b), student_index(?a, ?ia), add(?ib, ?ia, 1)
-	 -> student_index(?b, ?ib)""",
+	 -> student_index(?b, ?ib)"""))
 
 # (s6)
-"DepthIncr_rule_s6": """
+RULES.append(DomainRule(name="DepthIncr_rule_s6", 
+	tags={'correct', 'helper'}, 
+	swrl="""
 	act_begin(?a), next_act(?a, ?b), act_begin(?b)
 	 -> parent_of(?a, ?b)
-	""",
-"student_DepthIncr_rule_s6": """
+	"""))
+RULES.append(DomainRule(name="student_DepthIncr_rule_s6", 
+	tags={'mistake', 'helper'},
+	swrl="""
 	act_begin(?a), student_next(?a, ?b), act_begin(?b)
 	 -> student_parent_of(?a, ?b)
-	""",
+	"""))
 
 # (s7)
-"DepthSame_b-e_rule_s7": """
+RULES.append(DomainRule(name="DepthSame_b-e_rule_s7", 
+	tags={'correct', 'helper'},
+	swrl="""
 	act_begin(?a), next_act(?a, ?b), act_end(?b), 
 	parent_of(?p, ?a),
 	 -> parent_of(?p, ?b), corresponding_end(?a, ?b)
-	""",
-"student_DepthSame_b-e_rule_s7": """
+	"""))
+RULES.append(DomainRule(name="student_DepthSame_b-e_rule_s7", 
+	tags={'mistake', 'helper'},
+	swrl="""
 	act_begin(?a), student_next(?a, ?b), act_end(?b), 
 	student_parent_of(?p, ?a),
 	 -> student_parent_of(?p, ?b), student_corresponding_end(?a, ?b)
-	""",
+	"""))
 	
 # (s8)
  # проверка на Начало А - Конец Б (должен был быть Конец А) - CorrespondingActsMismatch_Error
-"DepthSame_e-b_rule_s8": """
+RULES.append(DomainRule(name="DepthSame_e-b_rule_s8", 
+	tags={'correct', 'helper'},
+	swrl="""
 	act_end(?a), next_act(?a, ?b), act_begin(?b), 
 	parent_of(?p, ?a)  # depth(?a, ?da),
 	 -> parent_of(?p, ?b)  # depth(?b, ?da), 
-	""",
-"student_DepthSame_e-b_rule_s8": """
+	"""))
+RULES.append(DomainRule(name="student_DepthSame_e-b_rule_s8", 
+	tags={'mistake', 'helper'},
+	swrl="""
 	act_end(?a), student_next(?a, ?b), act_begin(?b), 
 	student_parent_of(?p, ?a)
 	 -> student_parent_of(?p, ?b)
-	""",
+	"""))
 
 # (s9)
-"DepthDecr_rule_s9": """
+RULES.append(DomainRule(name="DepthDecr_rule_s9", 
+	tags={'correct', 'helper'},
+	swrl="""
 	act_end(?a), next_act(?a, ?b), act_end(?b), 
 	parent_of(?p, ?a)
 	 -> corresponding_end(?p, ?b)
-	""",
-"student_DepthDecr_rule_s9": """
+	"""))
+RULES.append(DomainRule(name="student_DepthDecr_rule_s9", 
+	tags={'mistake', 'helper'},
+	swrl="""
 	act_end(?a), student_next(?a, ?b), act_end(?b), 
 	student_parent_of(?p, ?a)
 	 -> student_corresponding_end(?p, ?b)
-	""",
+	"""))
 
 # (s10)
-"SameParentOfCorrActs_rule_s10": """
+RULES.append(DomainRule(name="SameParentOfCorrActs_rule_s10", 
+	tags={'correct', 'helper'},
+	swrl="""
 	corresponding_end(?a, ?b), parent_of(?p, ?a)
 	 -> parent_of(?p, ?b)
-	""",
-"student_SameParentOfCorrActs_rule_s10": """
+	"""))
+RULES.append(DomainRule(name="student_SameParentOfCorrActs_rule_s10", 
+	tags={'mistake', 'helper'},
+	swrl="""
 	corresponding_end(?a, ?b), student_parent_of(?p, ?a)
 	 -> student_parent_of(?p, ?b)
-	""",
+	"""))
 
 
 # Disambiguating siblings (1): init on previous correct sibling
-"Earliest_after_act_is_previous_correct_sibling": """
+RULES.append(DomainRule(name="Earliest_after_act_is_previous_correct_sibling", 
+	tags={'correct', 'helper'},
+	swrl="""
 	correct_act(?a),
 	next_sibling(?a, ?s),
 	 -> after_act(?s, ?a)
-""",
+"""))
 # Disambiguating siblings (2): propagate till itself
-"Propagate_after_act": """
+RULES.append(DomainRule(name="Propagate_after_act", 
+	tags={'correct', 'helper'},
+	swrl="""
 	after_act(?s, ?a),
 	next_act(?a, ?b),
 	# DifferentFrom(?b, ?s),
@@ -103,7 +169,7 @@ RULES_DICT = {
 		id(?s, ?is),
 		notEqual(?ib, ?is),
 	 -> after_act(?s, ?b)
-""",
+"""))
 
 
 
@@ -114,7 +180,9 @@ RULES_DICT = {
 				######################
 
 # Точка входа в трассу - функция  [works with Pellet] [works with Stardog]
-"start__to__MainFunctionBegin__rule_g3": """
+RULES.append(DomainRule(name="start__to__MainFunctionBegin__rule_g3", 
+	tags={'correct', 'entry', 'function'},
+	swrl="""
 	trace(?a),
 	executes(?a, ?alg),
 	entry_point(?alg, ?func_),
@@ -128,10 +196,12 @@ RULES_DICT = {
 	 -> normal_flow_correct_act(?b), 
 	 next_act(?a, ?b), 
 	 FunctionBegin(?b)
-""",
+"""))
 
 # Точка входа в трассу - глобальный код  [works with Pellet]
-"start__to__GlobalCode__rule_g4": """
+RULES.append(DomainRule(name="start__to__GlobalCode__rule_g4", 
+	tags={'correct', 'entry', 'sequence'},
+	swrl="""
 	trace(?a),
 	executes(?a, ?alg),
 	entry_point(?alg, ?gc),
@@ -144,12 +214,14 @@ RULES_DICT = {
 
 	 -> normal_flow_correct_act(?b), 
 	 next_act(?a, ?b), GlobalCodeBegin(?b)
-""",
+"""))
 
 
 # OK !
 # Начало тела функции  [works with Pellet] [works with Stardog]
-"connect_FunctionBodyBegin_rule_g5": """
+RULES.append(DomainRule(name="connect_FunctionBodyBegin_rule_g5", 
+	tags={'correct', 'function'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_begin(?a),
 	func(?func_), 
@@ -165,9 +237,11 @@ RULES_DICT = {
 	 -> normal_flow_correct_act(?b), 
 	 next_act(?a, ?b), 
 	 FunctionBodyBegin(?b)
-""",
+"""))
 # Конец тела функции
-"connect_FuncBodyEnd_rule_g5-2": """
+RULES.append(DomainRule(name="connect_FuncBodyEnd_rule_g5-2", 
+	tags={'correct', 'function'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	func(?func_), 
@@ -180,11 +254,13 @@ RULES_DICT = {
 	after_act(?b, ?a),
 	
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), FunctionEnd(?b)
-""",
+"""))
 
 # Первый акт следования [works with Pellet] [FAILS with Stardog...]
 # Пустые следования (без действий) не поддерживаются!
-"connect_SequenceBegin_rule_g2": """
+RULES.append(DomainRule(name="connect_SequenceBegin_rule_g2", 
+	tags={'correct', 'sequence'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_begin(?a),
 	sequence(?block), 
@@ -198,10 +274,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 	
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), SequenceBegin(?b)
-""",
+"""))
 
 # Следующий акт следования [works with Pellet]
-"connect_SequenceNext": """
+RULES.append(DomainRule(name="connect_SequenceNext", 
+	tags={'correct', 'sequence'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	parent_of(?p, ?a),
@@ -220,10 +298,12 @@ RULES_DICT = {
 	 -> normal_flow_correct_act(?b), 
 	  next_act(?a, ?b), 
 	  SequenceNext(?b)
-""",
+"""))
 
 # Начало и конец простого акта [works with Pellet]
-"connect_StmtEnd": """
+RULES.append(DomainRule(name="connect_StmtEnd", 
+	tags={'correct', 'sequence'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_begin(?a),
 	stmt(?st), 
@@ -237,10 +317,12 @@ RULES_DICT = {
 	exec_time(?a, ?t), exec_time(?b, ?_t),
 	equal(?t, ?_t),
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), StmtEnd(?b)
-""",
+"""))
 
 # Начало и конец акта выражения [works with Pellet]
-"connect_ExprEnd": """
+RULES.append(DomainRule(name="connect_ExprEnd", 
+	tags={'correct', 'sequence'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_begin(?a),
 	expr(?st), 
@@ -254,10 +336,12 @@ RULES_DICT = {
 	exec_time(?a, ?t), exec_time(?b, ?_t),
 	equal(?t, ?_t),
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), ExprEnd(?b)
-""",
+"""))
 
 #  [works with Pellet]
-"connect_SequenceEnd": """
+RULES.append(DomainRule(name="connect_SequenceEnd", 
+	tags={'correct', 'sequence'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	executes(?a, ?st),
@@ -273,14 +357,16 @@ RULES_DICT = {
 	after_act(?b, ?a),
 	
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), SequenceEnd(?b)
-""",
+"""))
 
 
 # ===== Alt ===== #
 
 
 # Проверка первого условия развилки (if) [works with Pellet]
-"connect_AltBegin": """
+RULES.append(DomainRule(name="connect_AltBegin", 
+	tags={'correct', 'alternative'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_begin(?a),
 	alternative(?alt), 
@@ -299,10 +385,12 @@ RULES_DICT = {
 	# exec_time(?a, ?t), exec_time(?b, ?_t),
 	# equal(?t, ?_t),
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltBegin(?b)
-""",
+"""))
 
 # Начало ветки истинного условия развилки [works with Pellet]
-"connect_AltBranchBegin_CondTrue": """
+RULES.append(DomainRule(name="connect_AltBranchBegin_CondTrue", 
+	tags={'correct', 'alternative'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	expr(?cnd), 
@@ -319,10 +407,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltBranchBegin(?b)
-""",
+"""))
 
 # Проверка следующего условия развилки (else-if) [works with Pellet]
-"connect_NextAltCondition": """
+RULES.append(DomainRule(name="connect_NextAltCondition", 
+	tags={'correct', 'alternative'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	expr(?cnd), 
@@ -342,10 +432,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), NextAltCondition(?b)
-""",
+"""))
 
 # Переход к ветке ИНАЧЕ (else)  [works with Pellet]
-"connect_AltElseBranch": """
+RULES.append(DomainRule(name="connect_AltElseBranch", 
+	tags={'correct', 'alternative'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	expr(?cnd), 
@@ -364,10 +456,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltElseBranchBegin(?b)
-""",
+"""))
 
 # Конец развилки, т.к. все условия ложны [works with Pellet]
-"connect_AltEndAllFalse": """
+RULES.append(DomainRule(name="connect_AltEndAllFalse", 
+	tags={'correct', 'alternative'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	expr(?cnd), 
@@ -387,10 +481,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltEndAllFalse(?b)
-""",
+"""))
 
 # Окончание развилки по завершению ветки [works with Pellet]
-"connect_AltEndAfterBranch": """
+RULES.append(DomainRule(name="connect_AltEndAfterBranch", 
+	tags={'correct', 'alternative'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	executes(?a, ?br),
@@ -403,7 +499,7 @@ RULES_DICT = {
 	after_act(?b, ?a),
 	
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltEndAfterBranch(?b)
-""",
+"""))
 
 # (6 generating rules to construct alternatives)
 
@@ -412,7 +508,9 @@ RULES_DICT = {
 
 
 # Начало цикла с предусловием (while) [works with Pellet]
-"connect_LoopBegin-cond": """
+RULES.append(DomainRule(name="connect_LoopBegin-cond", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_begin(?a),
 	pre_conditional_loop(?loop), 
@@ -426,10 +524,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), PreCondLoopBegin(?b)
-""",
+"""))
 
 # Начало цикла с постусловием (do-while, do-until) [works]
-"connect_LoopBegin-body": """
+RULES.append(DomainRule(name="connect_LoopBegin-body", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_begin(?a),
 	post_conditional_loop(?loop), 
@@ -443,10 +543,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), PostCondLoopBegin(?b)
-""",
+"""))
 
 # Начало тела цикла при cond=1 (while, do-while, for) [works since simplified cond_then_body class declaration]
-"connect_LoopCond1-BodyBegin": """
+RULES.append(DomainRule(name="connect_LoopCond1-BodyBegin", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	cond_then_body(?loop), 
@@ -465,10 +567,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), IterationBeginOnTrueCond(?b)
-""",
+"""))
 
 # Начало тела цикла при cond=0 (do-until) [works]
-"connect_LoopCond0-body": """
+RULES.append(DomainRule(name="connect_LoopCond0-body", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	inverse_conditional_loop(?loop), 
@@ -487,10 +591,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), IterationBeginOnFalseCond(?b)
-""",
+"""))
 
 # Начало тела цикла при cond=1 (foreach) [works]
-"connect_LoopCond1-update": """
+RULES.append(DomainRule(name="connect_LoopCond1-update", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	pre_update_loop(?loop), 
@@ -506,10 +612,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), LoopUpdateOnTrueCond(?b)
-""",
+"""))
 
 # После перехода цикла - условие (foreach) [works]
-"connect_LoopUpdate-body": """
+RULES.append(DomainRule(name="connect_LoopUpdate-body", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	pre_update_loop(?loop), 
@@ -524,10 +632,12 @@ RULES_DICT = {
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopBodyAfterUpdate(?b)
-""",
+"""))
 
 # Конец цикла при cond=0 (while, do-while, for, foreach) [works]
-"connect_LoopCond0-LoopEnd": """
+RULES.append(DomainRule(name="connect_LoopCond0-LoopEnd", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	conditional_loop(?loop), 
@@ -541,10 +651,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
-""",
+"""))
 
 # Конец цикла при cond=1 (do-until) [works]
-"connect_LoopCond1-LoopEnd": """
+RULES.append(DomainRule(name="connect_LoopCond1-LoopEnd", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	inverse_conditional_loop(?loop), 
@@ -558,10 +670,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), NormalLoopEnd(?b)
-""",
+"""))
 
 # После тела цикла - условие (while, do-while, do-until, foreach) [works]
-"connect_LoopBody-cond": """
+RULES.append(DomainRule(name="connect_LoopBody-cond", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	body_then_cond(?loop), 
@@ -576,11 +690,13 @@ RULES_DICT = {
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopCondBeginAfterIteration(?b)
-""",
+"""))
 
 
 # Начало цикла с инициализацией (for, foreach) [works]
-"connect_LoopBegin-init": """
+RULES.append(DomainRule(name="connect_LoopBegin-init", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_begin(?a),
 	executes(?a, ?loop),
@@ -594,10 +710,12 @@ RULES_DICT = {
 	after_act(?b, ?a),
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), LoopWithInitBegin(?b)
-""",
+"""))
 
 # После инициализации цикла - условие (for, foreach) [works]
-"connect_LoopInit-cond": """
+RULES.append(DomainRule(name="connect_LoopInit-cond", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	loop_with_initialization(?loop), 
@@ -612,10 +730,12 @@ RULES_DICT = {
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopCondBeginAfterInit(?b)
-""",
+"""))
 
 # После тела цикла - переход (update) (for) [works]
-"connect_LoopBody-update": """
+RULES.append(DomainRule(name="connect_LoopBody-update", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	post_update_loop(?loop), 
@@ -630,10 +750,12 @@ RULES_DICT = {
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopUpdateAfterIteration(?b)
-""",
+"""))
 
 # После перехода цикла - условие (for) [works]
-"connect_LoopUpdate-cond": """
+RULES.append(DomainRule(name="connect_LoopUpdate-cond", 
+	tags={'correct', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	post_update_loop(?loop), 
@@ -648,22 +770,24 @@ RULES_DICT = {
 
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b),
 	 LoopCondAfterUpdate(?b)
-""",
+"""))
 
 
 
 
-	 	 # dont forget to add suffix '_rule_#' if continue testing the rules.
+		 # dont forget to add suffix '_rule_#' if continue testing the rules.
 
 
 				###################
 				###################
-################ Смысловые правила ################
+################ Правила на ошибки ################
 				###################
 				###################
 
 
-"CorrespondingActsMismatch_Error": """
+RULES.append(DomainRule(name="CorrespondingActsMismatch_Error", 
+	tags={'mistake'},
+	swrl="""
 	student_corresponding_end(?a, ?b), 
 	executes(?a, ?s1),
 	executes(?b, ?s2),
@@ -672,9 +796,11 @@ RULES_DICT = {
 		id(?s2, ?ic),
 		notEqual(?ib, ?ic),
 	 -> CorrespondingEndMismatched(?b), cause(?b, ?a)
-""",
+"""))
 
-"-ErrOff- CorrespondingActsHaveDifferentExecTime_Error": """
+RULES.append(DomainRule(name="-ErrOff- CorrespondingActsHaveDifferentExecTime_Error", 
+	tags={'mistake'},
+	swrl="""
 	student_corresponding_end(?a, ?b), 
 	executes(?a, ?st),
 	executes(?b, ?st),
@@ -685,10 +811,12 @@ RULES_DICT = {
 	exec_time(?b, ?n2),
 	notEqual(?n1, ?n2),
 	 -> CorrespondingEndPerformedDifferentTime(?b), cause(?b, ?a)
-""",
+"""))
 
 
-"GenericWrongAct_Error": """
+RULES.append(DomainRule(name="GenericWrongAct_Error", 
+	tags={'mistake'},
+	swrl="""
 	next_act(?a, ?b),
 	student_next(?a, ?c),
 	# DifferentFrom(?b, ?c),
@@ -698,9 +826,11 @@ RULES_DICT = {
 	 -> should_be(?c, ?b), 
 	 cause(?c, ?a), 
 	 Erroneous(?c)
-""",
+"""))
 
-"GenericWrongParent_Error": """
+RULES.append(DomainRule(name="GenericWrongParent_Error", 
+	tags={'mistake'},
+	swrl="""
 	parent_of(?p, ?a),
 	student_parent_of(?c, ?a),
 	# DifferentFrom(?p, ?c),
@@ -710,9 +840,11 @@ RULES_DICT = {
 	 -> context_should_be(?a, ?p), 
 	 # cause(?a, ?c), 
 	 WrongContext(?a)
-""",
+"""))
 
-"GenericWrongExecTime-b_Error": """
+RULES.append(DomainRule(name="GenericWrongExecTime-b_Error", 
+	tags={'mistake'},
+	swrl="""
 	Erroneous(?c),
 	should_be(?c, ?b),
 	act_begin(?b),
@@ -723,9 +855,11 @@ RULES_DICT = {
 	exec_time(?b, ?n2),
 	notEqual(?n1, ?n2),
 	 -> WrongExecTime(?c)
-""",
+"""))
 
-"GenericWrongExecTime-e_Error": """
+RULES.append(DomainRule(name="GenericWrongExecTime-e_Error", 
+	tags={'mistake'},
+	swrl="""
 	Erroneous(?c),
 	should_be(?c, ?b),
 	act_end(?b),
@@ -736,7 +870,7 @@ RULES_DICT = {
 	exec_time(?b, ?n2),
 	notEqual(?n1, ?n2),
 	 -> WrongExecTime(?c)
-""",
+"""))
 
 
 
@@ -744,7 +878,9 @@ RULES_DICT = {
 
 # Дубликат акта в следовании [works with Pellet]
 # Базируется на ExtraAct
-"DuplicateOfAct-seq-b_Error": """
+RULES.append(DomainRule(name="DuplicateOfAct-seq-b_Error", 
+	tags={'mistake', 'sequence'},
+	swrl="""
 	ExtraAct(?c1), 
 	act_begin(?c1),
 	student_parent_of(?p, ?c1),
@@ -762,10 +898,12 @@ RULES_DICT = {
 		notEqual(?ic1, ?ic),
 	 -> cause(?c1, ?c), 
 	 DuplicateOfAct(?c1)
-""",
+"""))
 # Дубликат акта в следовании [works with Pellet]
 # Базируется на ExtraAct
-"DuplicateOfAct-seq-e_Error": """
+RULES.append(DomainRule(name="DuplicateOfAct-seq-e_Error", 
+	tags={'mistake', 'sequence'},
+	swrl="""
 	ExtraAct(?c1), 
 	act_end(?c1),
 	student_parent_of(?p, ?c1),
@@ -783,20 +921,24 @@ RULES_DICT = {
 		notEqual(?ic1, ?ic),
 	 -> cause(?c1, ?c), 
 	 DuplicateOfAct(?c1)
-""",
+"""))
 
 # Перемещённый акт [works with Pellet]
 # Базируется одновременно на ExtraAct и MissingAct
-"DisplacedAct_Error": """
+RULES.append(DomainRule(name="DisplacedAct_Error", 
+	tags={'mistake', 'sequence'},
+	swrl="""
 	ExtraAct(?c1), 
 	MissingAct(?c1), 
 	 -> DisplacedAct(?c1)
-""",
+"""))
 
 # ============ Alternatives mistakes ============ #
 
 # Развилка не начинается с условия [works with Pellet]
-"NoFirstCondition-alt_Error": """
+RULES.append(DomainRule(name="NoFirstCondition-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
 	act_begin(?a),
 	executes(?a, ?alt),
 	alternative(?alt), 
@@ -804,10 +946,12 @@ RULES_DICT = {
 	student_next(?a, ?b),
 	Erroneous(?b), 
 	 -> NoFirstCondition(?b)
-""",
+"""))
 
 # Ветка при ложном условии [works with Pellet]
-"BranchOfFalseCondition-alt_Error": """
+RULES.append(DomainRule(name="BranchOfFalseCondition-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
 	act_end(?a),
 	expr(?cnd), 
 	executes(?a, ?cnd),
@@ -823,10 +967,12 @@ RULES_DICT = {
 	act_begin(?b),
 	executes(?b, ?br),
 	 -> BranchOfFalseCondition(?b)
-""",
+"""))
 
 # Условие после ветки  [works with Pellet]
-"ConditionAfterBranch-alt_Error": """
+RULES.append(DomainRule(name="ConditionAfterBranch-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
 	act_end(?a),
 	executes(?a, ?br),
 	branches_item(?alt, ?br),
@@ -839,10 +985,12 @@ RULES_DICT = {
 	expr(?cnd), 	# a condition
 	
 	 -> ConditionAfterBranch(?b)
-""",
+"""))
 
 # Вторая ветка в альтернативе [works with Pellet]
-"AnotherExtraBranch-alt_Error": """
+RULES.append(DomainRule(name="AnotherExtraBranch-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
 	act_end(?a),
 	executes(?a, ?br),
 	branches_item(?alt, ?br),
@@ -855,10 +1003,12 @@ RULES_DICT = {
 	branches_item(?alt2, ?br2),
 	
 	 -> AnotherExtraBranch(?b)
-""",
+"""))
 
 # После истинного условия нет его ветки [works with Pellet]
-"NoBranchWhenConditionIsTrue-alt_Error": """
+RULES.append(DomainRule(name="NoBranchWhenConditionIsTrue-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
 	act_end(?a),
 	expr(?cnd), 
 	executes(?a, ?cnd),
@@ -872,9 +1022,11 @@ RULES_DICT = {
 	Erroneous(?b), 	  # как страховка, сработает и без этого
 	
 	 -> NoBranchWhenConditionIsTrue(?b)
-""",
+"""))
 
-"AllFalseNoElse-alt_Error": """
+RULES.append(DomainRule(name="AllFalseNoElse-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
 	act_end(?a),
 	expr(?cnd), 
 	executes(?a, ?cnd),
@@ -888,9 +1040,11 @@ RULES_DICT = {
 	Erroneous(?b),
 	
 	 -> AllFalseNoElse(?b)
-""",
+"""))
 
-"NoNextCondition-alt_Error": """
+RULES.append(DomainRule(name="NoNextCondition-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
 	act_end(?a),
 	expr(?cnd), 
 	executes(?a, ?cnd),
@@ -904,9 +1058,11 @@ RULES_DICT = {
 	Erroneous(?b),
 	
 	 -> NoNextCondition(?b)
-""",
+"""))
 
-"AllFalseNoEnd-alt_Error": """
+RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
 	act_end(?a),
 	expr(?cnd), 
 	executes(?a, ?cnd),
@@ -919,13 +1075,15 @@ RULES_DICT = {
 	Erroneous(?b),
 	
 	 -> AllFalseNoEnd(?b)
-""",
+"""))
 
 
 # ============ Loops mistakes ============ #
 
 # Нет итерации после успешного условия при cond=1 (while, do-while, for) [works]
-"MissingIterationAfterSuccessfulCondition-1-loop_Error": """
+RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-1-loop_Error", 
+	tags={'mistake', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	cond_then_body(?loop), 
@@ -937,10 +1095,12 @@ RULES_DICT = {
 	student_next(?a, ?b),
 	Erroneous(?b), 
 	 -> MissingIterationAfterSuccessfulCondition(?b)
-""",
+"""))
 
 # Нет итерации после успешного условия при cond=0 (do-until) [works?]
-"MissingIterationAfterSuccessfulCondition-0-loop_Error": """
+RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-0-loop_Error", 
+	tags={'mistake', 'loop'},
+	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
 	cond_then_body(?loop), 
@@ -952,9 +1112,9 @@ RULES_DICT = {
 	student_next(?a, ?b),
 	Erroneous(?b), 
 	 -> MissingIterationAfterSuccessfulCondition(?b)
-""",
+"""))
 
-}
+
 
 _more_rules = {}
 
@@ -964,35 +1124,33 @@ for i in range(1, 6+1):
 	pattern1 = ''.join([f"student_next(?c{j}, ?c{j+1}), " for j in range(1,i)])
 	pattern2 = f"student_next(?c{i}, ?b),"
 	action = ', '.join([f"ExtraAct(?c{j})" for j in range(1,i+1)])
-	_more_rules.update({
-		f"ExtraAct_{i}_Error": f"""
-			next_act(?a, ?b),
-			student_next(?a, ?c1),
-			# DifferentFrom(?b, ?c1),
-			{pattern1}
-			{pattern2}
-			 -> {action} ## ExtraAct(?c1)
-		""",
-
-		})
+	RULES.append(DomainRule(name=f"ExtraAct_{i}_Error", 
+		tags={'mistake'},
+		swrl=f"""
+		next_act(?a, ?b),
+		student_next(?a, ?c1),
+		# DifferentFrom(?b, ?c1),
+		{pattern1}
+		{pattern2}
+		 -> {action} ## ExtraAct(?c1)
+	"""))
 
 	pattern1 = ''.join([f"next_act(?c{j}, ?c{j+1}), "
 						for j in range(1,i)])
 	pattern2 = f"next_act(?c{i}, ?b),"
 	action = ',  '.join([f"MissingAct(?c{j}), should_be_before(?c{j}, ?b)"
 						for j in range(1,i+1)])
-	_more_rules.update({
-		f"MissingAct_{i}_Error": f"""
-			student_next(?a, ?b),
-			next_act(?a, ?c1),
-			# DifferentFrom(?b, ?c1),
-			{pattern1}
-			{pattern2}
-			 -> {action}, ## MissingAct(?c1)]
-			 TooEarly(?b)
-		""",
-
-		})
+	RULES.append(DomainRule(name=f"MissingAct_{i}_Error", 
+		tags={'mistake'},
+		swrl=f"""
+		student_next(?a, ?b),
+		next_act(?a, ?c1),
+		# DifferentFrom(?b, ?c1),
+		{pattern1}
+		{pattern2}
+		 -> {action}, ## MissingAct(?c1)]
+		 TooEarly(?b)
+	"""))
 
 
 # Расчёт номеров итераций для всех циклов
@@ -1008,22 +1166,23 @@ for i in range(0, 3+1):
 		for j in range(i)])
 	pattern2 = f"executes(?c{i}, ?st), corresponding_end(?c{i}, ?ce{i}), "
 	action = f"""iteration_n(?c{i}, 1),
- 		iteration_n(?ce{i}, 1)
- 		"""
+		iteration_n(?ce{i}, 1)
+		"""
 						
-	_more_rules.update({
-		f"LoopIteration1_after_{i}": f"""
-			act_begin(?a),
-			executes(?a, ?L),
-			loop(?L),
-			body(?L, ?st),
-			id(?st, ?body_i),
-			next_act(?a, ?c0),
-			{pattern1} 
-			{pattern2}  # executes(?ci, ?st),
-			 -> {action}
-		""",
-		})
+	RULES.append(DomainRule(name=f"LoopIteration1_after_{i}", 
+		tags={'correct', 'helper', 'loop'},
+		swrl=f"""
+		act_begin(?a),
+		executes(?a, ?L),
+		loop(?L),
+		body(?L, ?st),
+		id(?st, ?body_i),
+		next_act(?a, ?c0),
+		{pattern1} 
+		{pattern2}  # executes(?ci, ?st),
+		 -> {action}
+	"""))
+
 
 for i in range(0, 2+1):
 
@@ -1040,47 +1199,33 @@ for i in range(0, 2+1):
 		iteration_n(?ce{i}, ?n_next)
 		"""
 						
-	_more_rules.update({
-		f"LoopIterationNext_after_{i}": f"""
-			act_end(?a),
-			iteration_n(?a, ?n),
-			executes(?a, ?st),
-			id(?st, ?body_i),
-			next_act(?a, ?c0),
-			{pattern1} 
-			{pattern2}  # executes(?ci, ?st),
-			add(?n_next, ?n, 1),
-			 -> {action}
-		""",
-		})
+	RULES.append(DomainRule(name=f"LoopIterationNext_after_{i}", 
+		tags={'correct', 'helper', 'loop'},
+		swrl=f"""
+		act_end(?a),
+		iteration_n(?a, ?n),
+		executes(?a, ?st),
+		id(?st, ?body_i),
+		next_act(?a, ?c0),
+		{pattern1} 
+		{pattern2}  # executes(?ci, ?st),
+		add(?n_next, ?n, 1),
+		 -> {action}
+	"""))
 
 
-RULES_DICT.update(_more_rules)
 
-# strip all the comments out ...
-# ... replacing them by spaces in order to preserve char positions reported by lexing parser
-comment_re = re.compile(r"(?://|#).*$")
 
-for k in tuple(RULES_DICT.keys()):
-	if k.startswith("-"):
-		# print("skipping SWRL rule due to minus: \t", k)
-		del RULES_DICT[k]
-		continue
-	txt = RULES_DICT[k]
-	lines = [
-				comment_re.sub(lambda m:" "*len(m.group(0)), line)
-				for line in 
-				txt.split("\n")
-			]
-	RULES_DICT[k] = "\n".join(lines)
+for r in RULES[:]:
+	if r.name.startswith("-"):
+		# print("skipping SWRL rule due to minus: \t", r)
+		RULES.remove(r)
 
 if 1:  # check correctness of modified rules text
 	with open("swrl_dbg.txt", "w") as f:
-	# 	# f.write(repr(RULES_DICT))
-		for k, v in RULES_DICT.items():
-			print(f'"{k}": ', end="", file=f)
-			print(v, file=f)
+	# 	# f.write(repr(RULES))
+		for r in RULES:
+			print(f'"{r.name}": ', end="", file=f)
+			print(r.swrl, file=f)
 
-		# print(RULES_DICT)
-	
-# debug! # RULES_DICT = {}
+# debug! # RULES = {}
