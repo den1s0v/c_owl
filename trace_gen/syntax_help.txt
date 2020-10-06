@@ -1,0 +1,22 @@
+# syntax_help.txt
+
+
+===   Algorithms   ===
+
+функция main
+function main
+
+
+если цвет==зелёный  // my-alt-1
+if color==green  -> true,false,true // my-alt-1
+если условие (цвет==зелёный) -> 101 // my-alt-1
+if condition (color==green) -> 1(01) // my-alt-1
+
+иначе если цвет==желтый
+иначе если условие (цвет==желтый)  -> true,false,true
+else if color==yellow  -> 101
+else if condition (color==yellow)
+
+else
+иначе
+

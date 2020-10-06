@@ -7,7 +7,7 @@ Begin_then_end (act a)
 3
 IS_containment (act a_i, IS act a)
 1    MisplacedAfter
-2    MisplacedBefore
+2    MisplacedBefore - вне объемлющего акта, ДО
 3    MisplacedBeforeAndAfter
 4    MisplacedWithout
 5    MisplacedDeeper
@@ -43,6 +43,19 @@ Alternative
 10   ConditionsMisorder   (a, condition act с1, condition act c2)
 11   BranchBeforeCondition (a, branch act b, condition act c)
 +12   ConditionAfterBranch (a, branch act b, condition act c)
+
+
+Вопросы, проверяющие знание базовых концептов:
+
+    NoBranchWhenConditionIsTrue:
+        - ConditionIsTrue - ?
+        - Branch - ?
+        - Condition - ?
+        - Alternative - ?
+        
+    MisplacedBefore - вне объемлющего акта, ДО:
+        - В каком акте непосредственно содержится проблемный акт?
+        - Где начинается непосредственно содержащий акт?
 
 
 22 
