@@ -6,6 +6,83 @@ import re
 _maxAlgID = 1
 _maxTrID = 1
 
+TRUTH_ALIASES = ("истина","да","true","1")
+FALSE_ALIASES = ("ложь","нет","false","0")
+TRUTH_ALIASES_re = re.compile("|".join(TRUTH_ALIASES))
+FALSE_ALIASES_re = re.compile("|".join(FALSE_ALIASES))
+
+
+def parse_expr_value(s: str):
+    value = s
+    s = s.lower()
+    if s in TRUTH_ALIASES:
+        value = True
+    if s in FALSE_ALIASES:
+        value = False
+    return value
+
+def parse_expr_values(s: str) -> list:
+    """
+    101             -> (True, False, True)
+    1 0 1           -> (True, False, True)
+    true FalsE TRUE -> (True, False, True)
+    ДА НЕТ 1        -> (True, False, True)
+    
+    Допустимы скобочки повторения (как в периодических дробях):
+    1(0)  means  100000...  -> (True, "(", False, ")")
+    (001)  means  001001001...   -> ("(", False, False, True, ")")
+    
+    """
+    values = []
+    s = s.lower()
+    repetition_start_i = -1
+    while s:
+        nchars = 1
+        m = TRUTH_ALIASES_re.match(s)
+        if m:
+            values.append(True)
+            nchars = len(m.group(0))
+        else:
+            m = FALSE_ALIASES_re.match(s)
+            if m:
+                values.append(False)
+                nchars = len(m.group(0))
+            # расстановка скобочек повторения: только эффективная группировка
+            elif s[0] == "(":
+                repetition_start_i = len(values)
+            elif s[0] == ")" and repetition_start_i >= 0:
+                values.insert(repetition_start_i, "(")
+                values.append(s[0])
+                break
+        s = s[nchars:]  # strip some chars from left
+    return tuple(values)
+
+def get_ith_expr_value(expr_values: tuple, i: int):
+    """Decodes the result of 'parse_expr_values' function.
+    Return None if 'i' is out of range
+    """
+    print(i, "from expr_values:", expr_values)
+    if "(" not in expr_values:
+        return expr_values[i] if i < len(expr_values) else None
+        
+    b_i = expr_values.index("(")
+    if i < b_i:
+        return expr_values[i]
+    
+    repeat_i = i - b_i
+    
+    b_i += 1  # skip the "(" element itself
+    assert expr_values[-1] == ")", str(expr_values)
+    e_i = expr_values.index(")")
+    repeat_len = e_i - b_i
+    if repeat_len <= 0:  # in case of stupid empty repeat: (True, "(", ")") 
+        return None
+    
+    return expr_values[b_i + repeat_i % repeat_len]
+    
+
+
+
 class AlgorithmParser:
     def __init__(self, line_list=None, start_id=1, verbose=0):
         assert type(start_id) is int
@@ -30,6 +107,7 @@ class AlgorithmParser:
                     "body": []
                 },
               "entry_point": None,
+              "expr_values": {},
         }
 
             
@@ -56,8 +134,10 @@ class AlgorithmParser:
                 
                 
         
-    def parse_expr(self, name:str) -> dict:
+    def parse_expr(self, name: str, values=None) -> dict:
         "Нововведение: самостоятельный объект для выражений (пока - только условия)"
+        if values:
+            self.algorithm["expr_values"][name] = parse_expr_values(values)
         return {
             "id": self.newID(name),
             "type": "expr",
@@ -144,18 +224,25 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # если цвет==зелёный  // my-alt-1
-            # если условие (цвет==зелёный)  // my-alt-1
+            # if color==green  -> true,false,true // my-alt-1
+            # если условие (цвет==зелёный) -> 101 // my-alt-1
+            # if condition (color==green) -> 1(01) // my-alt-1
             m = re.match(r"""
                 (?:if|если)
                 (?:\s+condition|\s+условие)?   # optional
                 \s+
                 (\(.+\)|\S+)  # 1 cond_name
+                (?:
+                    \s+ - >?    # - or ->   
+                    \s+ (\S+)   # 2 optional values
+                )?
                 \s+
-                (?://|\#)\s*(\S+)  # 2 name
+                (?://|\#)\s*(\S+)  # 3 name
                 """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("alt if")
-                name = m.group(2)  # имя альтернативы (пишется в комментарии)
+                name = m.group(3)  # имя альтернативы (пишется в комментарии)
+                values = m.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 cond_name = m.group(1)  # условие if (может быть в скобках)
                 if cond_name[0]+cond_name[-1] == "()":
                     cond_name = cond_name[1:-1]      # удалить скобки
@@ -169,7 +256,7 @@ class AlgorithmParser:
                         "id": self.newID(branch_name),
                         "type": "if",
                         "name": branch_name,
-                        "cond":  self.parse_expr(cond_name),
+                        "cond":  self.parse_expr(cond_name, values=values),
                         "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 })
@@ -177,13 +264,27 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # иначе если цвет==желтый
-            # иначе если условие (цвет==желтый)
-            m = re.match(r"(?:else\s+if(?:\s+condition)?|иначе\s+если(?:\s+условие)?)\s+(\(.+\)|\S+)", line_list[ci].strip(), re.I)
+            # иначе если условие (цвет==желтый)  -> true,false,true
+            # else if color==yellow  -> 101
+            # else if condition (color==yellow)
+            m = re.match(r"""
+                (?:
+                    else \s+ if (?:\s+condition)?
+                |
+                    иначе \s+ если (?:\s+условие)?
+                )
+                (?:
+                    \s+ - >?    # - or ->   
+                    \s+ (\S+)   # 1 optional values
+                )?
+                \s+(\(.+\)|\S+) # 2 cond_name
+                """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("alt elseif")
-                cond_name = m.group(1)  # условие else if (может быть в скобках)
+                cond_name = m.group(2)  # условие else if (условие может быть в скобках)
                 if cond_name[0]+cond_name[-1] == "()":
                     cond_name = cond_name[1:-1]      # удалить скобки
+                values = m.group(1)  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 branch_name = "elseif-"+cond_name  # имя ветки должно отличаться от имени условия
                 assert len(result)>0 and result[-1]["type"] == "alternative", "Algorithm Error: 'иначе если' does not follow 'если' :\n\t"+line_list[ci].strip()
                 alt_obj = result[-1]
@@ -191,7 +292,7 @@ class AlgorithmParser:
                         "id": self.newID(branch_name),
                         "type": "else-if",
                         "name": branch_name,
-                        "cond":  self.parse_expr(cond_name),
+                        "cond":  self.parse_expr(cond_name, values=values),
                         "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 ci = e + 1
@@ -215,16 +316,28 @@ class AlgorithmParser:
 
 
             # пока while-cond-1  // my-while-1
-            m = re.match(r"(?:while|пока)\s+(\(.+\)|\S+)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            # while my-cond-2   -> 101 // my-while-2
+            m = re.match(r"""
+                (?:while|пока)
+                \s+
+                (\(.+\)|\S+)    # 1 cond_name
+                (?:
+                    \s+ - >?    # - or ->   
+                    \s+ (\S+)   # 2 optional values
+                )?
+                \s+ (?://|\#)
+                \s* (\S+)       # 3 loop name
+                """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("while")
-                name = m.group(2)  # имя цикла (пишется в комментарии)
+                name = m.group(3)  # имя цикла (пишется в комментарии)
+                values = m.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 cond_name = m.group(1)  # условие цикла (может быть в скобках)
                 result.append({
                     "id": self.newID(name),
                     "type": "while_loop",
                     "name": name,
-                    "cond": self.parse_expr(cond_name),
+                    "cond": self.parse_expr(cond_name, values=values),
                     "body":  make_loop_body(
                                 name,
                                 parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
@@ -236,17 +349,32 @@ class AlgorithmParser:
             # делать   // my-dowhile-2
             #    ...
             # пока dowhile-cond-2
+            # 
+            # 
+            # do   // my-dowhile-3
+            #    ...
+            # while dowhile-cond-3  -> 100011100
             m = re.match(r"(?:do|делать)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
-            m2 = e+1 < len(line_list)  and  re.match(r"(?:while|пока)\s+(\(.+\)|\S+)",   line_list[ e+1 ].strip(), re.I)
+            m2 = e+1 < len(line_list)  and  re.match(r"""
+                (?:while|пока)
+                \s+
+                (\(.+\)|\S+)  # 1 cond_name
+                (?:
+                    \s+ - >?    # - or ->   
+                    \s+ (\S+)   # 2 optional values
+                )?
+                \s+
+                """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
             if m and m2:
                 if self.verbose: print("do while")
                 name = m.group(1)  # имя цикла (пишется в комментарии)
                 cond_name = m2.group(1)  # условие цикла (может быть в скобках)
+                values = m2.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 result.append({
                     "id": self.newID(name),
                     "type": "do_while_loop",
                     "name": name,
-                    "cond": self.parse_expr(cond_name),
+                    "cond": self.parse_expr(cond_name, values=values),
                     "body": make_loop_body(
                                 name,
                                 parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
@@ -255,20 +383,35 @@ class AlgorithmParser:
                 ci = e + 2
                 continue  # with next stmt on current level
 
-            # делать   // my-dowhile-2
+            # делать   // my-dountil-2
             #    ...
             # до dountil-cond-2
+            # 
+            # 
+            # do   // my-dountil-3
+            #    ...
+            # until dountil-cond-3  -> 100011100
             m = re.match(r"(?:do|делать)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
-            m2 = e+1 < len(line_list)  and  re.match(r"(?:until|до)\s+(\(.+\)|\S+)",   line_list[ e+1 ].strip(), re.I)
+            m2 = e+1 < len(line_list)  and  re.match(r"""
+                (?:until|до)
+                \s+
+                (\(.+\)|\S+)  # 1 cond_name
+                (?:
+                    \s+ - >?    # - or ->   
+                    \s+ (\S+)   # 2 optional values
+                )?
+                \s+
+                """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
             if m and m2:
                 if self.verbose: print("do until")
                 name = m.group(1)  # имя цикла (пишется в комментарии)
                 cond_name = m2.group(1)  # условие цикла (может быть в скобках)
+                values = m2.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 result.append({
                     "id": self.newID(name),
                     "type": "do_until_loop",
                     "name": name,
-                    "cond": self.parse_expr(cond_name),
+                    "cond": self.parse_expr(cond_name, values=values),
                     "body": make_loop_body(
                                 name,
                                 parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
@@ -278,12 +421,17 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # для день от 1 до 5 с шагом +1  // my-for-3
+            # for day from 1 to 5 step +1  // my-for-4
             m = re.match(r"""
                             (?:for|для)\s+(\S+)\s+  # 1 var
-                            (?:from|от)\s+(\S+)\s+   # 2 from
-                            (?:to|до)\s+(\S+)\s+     # 3 to
-                            (?:step|с\s+шагом)\s+(\S+)\s+ # 4 step
-                            (?://|\#)\s*(\S+)         # 5 name
+                            (?:from|от)\s+([-+]?\d*.?\d+)\s+   # 2 from
+                            (?:to|до)\s+([-+]?\d*.?\d+)\s+     # 3 to
+                            (?:step|с\s+шагом)\s+([-+]?\d*.?\d+) # 4 step
+                            (?:
+                                \s+ - >?    # - or ->   
+                                \s+ (\S+)   # 5 optional values
+                            )?
+                            \s+ (?://|\#)\s*(\S+)         # 6 name
                         """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("for")
@@ -291,14 +439,15 @@ class AlgorithmParser:
                 s_from = m.group(2)  # нижняя граница цикла
                 s_to =   m.group(3)  # верхняя граница цикла
                 s_step = m.group(4)  # шаг цикла
-                name =   m.group(5)  # имя цикла (пишется в комментарии)
+                values = m.group(5)  # значения, принимаемые выражением - условием продолжения цикла - по мере выполнения программы (опционально)
+                name =   m.group(6)  # имя цикла (пишется в комментарии)
                 result.append({
                     "id": self.newID(name),
                     "type": "for_loop",
                     "name": name,
                     "variable": s_var,
                     "init":   self.parse_stmt("{}={}".format(s_var, s_from)),
-                    "cond":   self.parse_expr("{}<={}".format(s_var,s_to)),
+                    "cond":   self.parse_expr("{}<={}".format(s_var,s_to), values=values),
                     "update": self.parse_stmt("{v}={v}{:+d}".format(int(s_step), v=s_var)),
                     "body":  make_loop_body(
                                 name,
@@ -309,16 +458,24 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # для каждого x в list  // my-for-in-4
+            # foreach x in list -> 1110110  // my-for-in-5
+            # for each x in list  // my-for-in-5
             m = re.match(r"""
-                (?:for\s*each|для\s+каждого)\s+(\S+)\s+ # 1 var
-                (?:in|в)\s+(\S+)\s+                     # 2 in
-                (?://|\#)\s*(\S+)                        # 3 name
+                (?:for\s*each|для\s+каждого)
+                \s+ (\S+)             # 1 var
+                \s+ (?:in|в)\s+(\S+)  # 2 in (container name)
+                (?:
+                    \s+ - >?    # - or ->   
+                    \s+ (\S+)   # 3 optional values
+                )?
+                \s+ (?://|\#)\s*(\S+)  # 4 name
                 """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("foreach")
                 s_var = m.group(1)  # переменная цикла
                 s_container = m.group(2)  # контейнер
-                name =   m.group(3)  # имя цикла (пишется в комментарии)
+                values = m.group(3)  # значения, принимаемые выражением - условием продолжения цикла - по мере выполнения программы (опционально)
+                name =   m.group(4)  # имя цикла (пишется в комментарии)
                 result.append({
                     "id": self.newID(name),
                     "type": "foreach_loop",
@@ -326,7 +483,7 @@ class AlgorithmParser:
                     "variable": s_var,
                     "container": s_container,
                     "init":   self.parse_stmt("{}={}.first()".format(s_var, s_container)),
-                    "cond":   self.parse_expr("{}!={}.last()".format(s_var,s_container)),
+                    "cond":   self.parse_expr("{}!={}.last()".format(s_var,s_container), values=values),
                     "update": self.parse_stmt("{v}=next({},{v})".format(s_container, v=s_var)),
                     "body":  make_loop_body(
                                 name,
@@ -603,18 +760,15 @@ class TraceParser:
             # условие цикла (while-cond-1) выполнилось 1-й раз - истина
             # условие (while-cond-1) выполнилось 1-й раз - ложь
             # condition (response_is_positive) executed 1st time - true
-            m = re.match(r"""(?:условие|condition)
+            m = re.match(r"""
+                (?:условие|condition)
                 \s*
                 (развилки|цикла|of\s+alternative|of\s+loop)?  # 1 struct (optional)
-                \s+
-                (\(.+\)|\S+)   # 2 cond name 
-                \s+
-                {EXECUTED}      # добавить остальные фазы - после расширения/усложнения логики
+                \s+ (\(.+\)|\S+)   # 2 cond name
+                \s+ {EXECUTED}  # добавить остальные фазы - после расширения/усложнения логики
                 {Ith1}?   # 3 ith  (optional)
-                \s+
-                - >?    # - or ->
-                \s+
-                (\S+)   # 4 value
+                \s+ - >?    # - or ->
+                \s+ (\S+)   # 4 value
                 """.format(**PHASE_dict), line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("условие {} {} выполнилось - {}".format(m.group(1) or "\b", m.group(2), m.group(4)))
@@ -645,12 +799,13 @@ class TraceParser:
                 assert cond_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 
                 # convert value to true / false if matches so
-                value = {
-                    "истина":True,
-                    "true"  :True,
-                    "ложь" :False,
-                    "false":False,
-                    }.get(value.lower(), value)
+                value = parse_expr_value(value)
+                # value = {
+                #     "истина":True,
+                #     "true"  :True,
+                #     "ложь" :False,
+                #     "false":False,
+                #     }.get(value.lower(), value)
                 if isinstance(value, bool):
                     self.boolean_chain.append(value)
                 
@@ -669,6 +824,7 @@ class TraceParser:
             
             # ветка иначе началась 1-й раз
             # ветка иначе закончилась 1-й раз
+            # else branch began 1st time
             m = re.match(r"""(?:
                     ветка\s+ин[аa]ч[еe]   # транслит букв (раз начал использовать, нужно себя обезопасить)
                 |
@@ -860,7 +1016,7 @@ class TraceParser:
                 name = m.group(1)
                 ith = m.group(3)  if len(m.groups())>=3 else  None
                 # phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
-                phase = get_phase_by_str(phase_str)
+                phase = get_phase_by_str(m.group(2))
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
@@ -997,7 +1153,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
                         # найдено
                         name = extract_alg_name(lines[i])
                         alg_data[name] = {
-                            "lines":(i+1, j)  # строки текста алгоритма (вкл-но)
+                            "lines": (i+1, j)  # строки текста алгоритма (вкл-но)
                         }
                         # print("line", i, name)  # , lines[i])
                     # иначе - не найдено
@@ -1011,21 +1167,23 @@ def parse_text_file(txt_file_path, encoding="utf8"):
                     
     last_line = len(lines)-1
     
+    # регулярка для всех имён алгоритмов: одно целое слово (имя одного из алгоритмов) должно быть найдено в заголовке трассы
     alg_names_rgx = "|".join([r"\b%s\b"%re.escape(w) for w in alg_data.keys()])
     alg_names_rgx = re.compile(alg_names_rgx)
     
     tr_data = {}
 
     for i in range(0, last_line):
-        if word_in(("началась программа","program began"), lines[i]):
+        if word_in(("началась программа", "program began"), lines[i]):
             # найти имя трассы
             name = None
             boolean_chain = None
+            # ищем ссылку на алгоритм...
             for j in range(i-1, i-5, -1):  # проверяем 4 строки вверх
                 m = alg_names_rgx.search(lines[j])
                 if m:
                     alg_name = m.group(0)
-                    # отбрасываем комментарий / strip comment mark out
+                    # отбрасываем комментарий / strip comment out
                     name = re.sub(r"^\s*(?:/\*|//|#)\s*", "", lines[j])
                     
                     # найти цепочку из 0 и 1, стоящую за именем алгоритма (если есть)
@@ -1039,7 +1197,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
                     break
     
             if not name:
-                print("Ignored (no related algorithm found by name): line", i, lines[i])
+                print("Ignored (no reference to an algorithm found): line", i, lines[i])
                 continue
             # найти конец трассы
             for j in range(i + 1, last_line):
@@ -1049,6 +1207,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
                         tr_data[name] = {
                             "alg_name": alg_name,
                             "boolean_chain": boolean_chain,  # последовательность из 0 и 1 - значения условий в порядке появления в трассе
+                            # !
                             "lines":(i, j)  # строки текста трассы (вкл-но)
                         }
 
@@ -1078,7 +1237,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
                 # raise e
         
         if "alg_parser" not in alg_data[alg_name]:
-            print("Skipping trace:", tr_name, ", because the corresponding algorithm was not parsed:", alg_name)
+            print("Skipping trace:", tr_name, ", because the corresponding algorithm could not be parsed:", alg_name)
             continue
             
         print("Parsing trace:", tr_name, "...", end='\t')
@@ -1104,7 +1263,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         "algorithm"     : alg_data[trdct["alg_name"]]["alg_parser"].algorithm,
         "header_boolean_chain" : trdct["boolean_chain"], 
         
-    } for nm,trdct in tr_data.items() if "trace_parser" in trdct]
+    } for nm, trdct in tr_data.items() if "trace_parser" in trdct]
     
     print()
     print("Total in file (%s):" % txt_file_path)
@@ -1178,8 +1337,15 @@ def main():
     # ])
 
 
-    parse_text_files( search_text_trace_files() )
+    result = parse_text_files( search_text_trace_files() )
+    from pprint import pprint
+    pprint(result)
     
 
 if __name__ == '__main__':
 	main()
+    
+    # v = get_ith_expr_value(
+    #         ("(", 1, 2, 3, 4, ")", ), 16
+    #     )
+    # print(v)

@@ -15,7 +15,7 @@ import re
 
 from upd_onto import *
 from transliterate import slugify
-from trace_gen.txt2algntr import find_by_key_in, find_by_keyval_in
+from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
 
 
 ONTOLOGY_maxID = 1
@@ -73,8 +73,8 @@ class TraceTester():
         return self._maxID            
         
     def make_correct_trace(self):
-        if "correct_trace" in self.data or "header_boolean_chain" not in self.data:
-            print("make_correct_trace: aborting.")
+        if "correct_trace" in self.data:
+            print("make_correct_trace(): correct_trace already exists, aborting.")
             return
             
         self.data["correct_trace"] = []
@@ -83,22 +83,70 @@ class TraceTester():
             for ch in states_str:
                 yield bool(int(ch))
             while 1:
-                yield False
+                yield None
                 
-        self.condition_value_generator = _gen(self.data["header_boolean_chain"])
         self.last_cond_tuple = (-1, False)
+        
         self._maxID = max(self._maxID, max(self.id2obj.keys()) + 10)
         self.expr_id2values = {}
         
-        def next_cond_value():
-            i,_ = self.last_cond_tuple
-            v = next(self.condition_value_generator)
-            v = bool(v)
+        # decide where to read expr values from
+        self.values_source = None
+        if self.data["header_boolean_chain"]:
+            # source №1: the boolean chain attached to the trace
+            self.values_source = "boolean_chain"
+            self.condition_value_generator = _gen(self.data["header_boolean_chain"])
+        elif self.data["algorithm"]["expr_values"]:
+            # source №2: the values defined beside algorithm lines (this is used for 1-1 case when no boolean chain specified)
+            self.values_source = "algorithm"
+        else:
+            # source №3: the values defined beside trace lines
+            #  (this is less preffered as the trace may contain errors)
+            self.values_source = "trace"
+            
+        print("values_source detected:", self.values_source)
+        
+        def next_cond_value(expr_name=None, executes_id=None, n=None, default=False):
+          
+            i, _ = self.last_cond_tuple
+            v = None
+            
+            if self.values_source == "boolean_chain":
+                v = next(self.condition_value_generator)
+            else:
+                assert n is not None, str(n)
+                
+                if self.values_source == "algorithm":
+                    assert expr_name is not None, str(expr_name)
+                    expr_values = self.data["algorithm"]["expr_values"][expr_name]
+                    v = get_ith_expr_value(expr_values, i=n - 1)
+                
+                if self.values_source == "trace":
+                    # find act with appropriate name and exec_time (phase is defaulted to "finished" as values are attached to these only)
+                    assert expr_name is not None or executes_id is not None, str((expr_name, executes_id))
+                    # print(self.data["trace"])
+                    acts = [
+                        act for act in 
+                        find_by_keyval_in("n", str(n), self.data["trace"])
+                        # act["n"] == n and 
+                        if act["phase"] in ("finished", 'performed') and (act["name"] == expr_name or act["executes"] == executes_id)
+                        ]
+                    if acts:
+                        assert len(acts) == 1, str(acts)
+                        act = acts[0]
+                        v = act.get("value", None)
+                    else:
+                        print("Warning: cannot find student_act: %s" % (dict(expr_name=expr_name, executes_id=executes_id, n=n)))
+                
+            if v is None:
+                v = default
+                print("next_cond_value(): defaulting to", default)
+            # v = bool(v)
             self.last_cond_tuple = (i+1, v)
-            print(f"next_cond_value: {v}")
+            # print(f"next_cond_value: {v}")
             return v
             
-        # long "multi-entry" function
+        # long recursive function
         def make_correct_trace_for_alg_node(node):
             # copy reference
             result = self.data["correct_trace"]
@@ -229,9 +277,9 @@ class TraceTester():
                 
                 
             if node["type"] in {"expr"}:
-                value = next_cond_value()
                 phase = "performed"
                 ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                value = next_cond_value(node["name"], node["id"], ith)
                 self.expr_id2values[node["id"]] = self.expr_id2values.get(node["id"], []) + [value]
                 result.append({
                       "id": self.newID(),
@@ -933,6 +981,7 @@ def init_persistent_structure(onto):
                 "AllFalseNoEnd",
                 # Loops mistakes ...
                 "MissingIterationAfterSuccessfulCondition",
+                "MissingLoopEndAfterFailedCondition",
             ]:
                 if isinstance(class_name, str):
                     types.new_class(class_name, (Erroneous,))
