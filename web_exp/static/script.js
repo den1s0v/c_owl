@@ -35,7 +35,8 @@ $(document).ready(function(){
         	url: '/process', 
         	method: 'post',
         	dataType: 'json',
-        	data: data,
+        	contentType: "application/json",
+        	data: JSON.stringify(data),
         	success: function(data){
         		alert("ajax OK");
         		$('#status').html(JSON.stringify(data));
