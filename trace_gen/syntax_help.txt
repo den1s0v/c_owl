@@ -5,18 +5,86 @@
 
 функция main
 function main
+{
+	...
+}
 
 
 если цвет==зелёный  // my-alt-1
 if color==green  -> true,false,true // my-alt-1
 если условие (цвет==зелёный) -> 101 // my-alt-1
 if condition (color==green) -> 1(01) // my-alt-1
+{
+	...
+}
 
 иначе если цвет==желтый
 иначе если условие (цвет==желтый)  -> true,false,true
 else if color==yellow  -> 101
 else if condition (color==yellow)
+{
+	...
+}
 
 else
 иначе
+{
+	...
+}
 
+
+пока while-cond-1  // my-while-1
+while my-cond-2   -> 101 // my-while-2
+{
+	...
+}
+
+
+делать   // my-dowhile-2
+{
+	...
+}
+пока dowhile-cond-2
+
+do   // my-dowhile-3
+{
+	...
+}
+while dowhile-cond-3  -> 100011100
+
+
+
+делать   // my-dountil-2
+{
+	...
+}
+до dountil-cond-2
+
+do   // my-dountil-3
+{
+	...
+}
+until dountil-cond-3  -> 100011100
+
+
+
+для день от 1 до 5 с шагом +1  // my-for-3
+for day from 1 to 5 step +1  // my-for-4
+{
+	...
+}
+
+
+
+для каждого x в list  // my-for-in-4
+foreach x in list -> 1110110  // my-for-in-5
+for each x in list  // my-for-in-5
+{
+	...
+}
+
+
+
+{  // myseq-1  -  начало именованного следования
+	...
+}
