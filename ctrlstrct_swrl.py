@@ -1103,7 +1103,7 @@ RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-0-loop_Er
 	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
-	cond_then_body(?loop), 
+	inverse_conditional_loop(?loop), 
 	cond(?loop, ?cnd),
 	executes(?a, ?cnd),
 
@@ -1112,6 +1112,23 @@ RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-0-loop_Er
 	student_next(?a, ?b),
 	Erroneous(?b), 
 	 -> MissingIterationAfterSuccessfulCondition(?b)
+"""))
+
+# Нет конца цикла после неуспешного условия - при cond=0 (while, do-while, for, ?) [works?]
+RULES.append(DomainRule(name="MissingLoopEndAfterFailedCondition-0-loop_Error", 
+	tags={'mistake', 'loop'},
+	swrl="""
+	normal_flow_correct_act(?a),
+	act_end(?a),
+	cond_then_body(?loop), 
+	cond(?loop, ?cnd),
+	executes(?a, ?cnd),
+
+	expr_value(?a, false),  # condition failed
+
+	student_next(?a, ?b),
+	Erroneous(?b), 
+	 -> MissingLoopEndAfterFailedCondition(?b)
 """))
 
 
