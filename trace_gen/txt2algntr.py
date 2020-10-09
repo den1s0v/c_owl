@@ -1125,15 +1125,42 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         print(f"Error reading file {txt_file_path} :\n  " + str(e))
         return []
 
-    text = text.replace("\t", " "*4)
-    lines = text.split("\n")
-    text = None
-    
-    
     print("="*40)
     print("Parsing algorithms and traces from".center(40))
     print(txt_file_path.center(40))
     print("="*40)
+    
+    valid_alg_trs = parse_algorithms_and_traces_from_text(text)
+
+    print()
+    print("Total in file (%s):" % txt_file_path)
+    print("  Number of effective algorithms:", len( {
+        trdct["algorithm_name"] 
+        for trdct in valid_alg_trs 
+        # if "erroneous" not in trdct["algorithm"]
+        } ))
+    print("  Number of valid traces:", len(valid_alg_trs))
+    print()
+    
+    return valid_alg_trs
+    
+    
+def parse_algorithms_and_traces_from_text(text: str):
+    """Returns list of dicts like
+    {
+        "trace_name"    : str,
+        "algorithm_name": str,
+        "trace"         : list,
+        "algorithm"     : dict,
+        "header_boolean_chain" : list of bool, 
+    }
+    collected from specified file_path.
+    """
+
+    text = text.replace("\t", " "*4)  # expand tabs to spaces (if any)
+    lines = text.split("\n")
+    text = None
+    
     
     # Алгоритмы ...
     
@@ -1265,11 +1292,11 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         
     } for nm, trdct in tr_data.items() if "trace_parser" in trdct]
     
-    print()
-    print("Total in file (%s):" % txt_file_path)
-    print("  Number of valid algorithms:", len( {nm for nm,adct in alg_data.items() if "erroneous" not in adct} ))
-    print("  Number of valid traces:", len(valid_alg_trs))
-    print()
+    # print()
+    # print("Total in file (%s):" % txt_file_path)
+    # print("  Number of valid algorithms:", len( {nm for nm,adct in alg_data.items() if "erroneous" not in adct} ))
+    # print("  Number of valid traces:", len(valid_alg_trs))
+    # print()
     
     return valid_alg_trs
             
