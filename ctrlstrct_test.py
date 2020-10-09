@@ -11,7 +11,7 @@ import os
 import re
 
 from ctrlstrct_run import process_algtraces
-from trace_gen.txt2algntr import parse_text_files, search_text_trace_files, find_by_key_in
+from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, find_by_key_in
 from upd_onto import get_relation_object
 
 
@@ -186,6 +186,28 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	if differences:
 		return False, "\n\t> ".join(["",*differences])
 	return True, "Validation ok."
+
+def process_algorithm_and_trace_from_text(text: str, process_kwargs=dict(reasoning="pellet")):
+	feedback = {"messages": []}
+	
+	alg_trs = parse_algorithms_and_traces_from_text(text)
+	
+	if not alg_trs:
+		feedback["messages"] += ["Nothing to process: no valid algorithm / trace found."]
+		return feedback
+		
+	try:
+		_onto, mistakes = process_algtraces(alg_trs, verbose=0, mistakes_as_objects=True, **process_kwargs)
+	except Exception as e:
+		msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
+		feedback["messages"] += [msg]
+		print(msg)
+		return feedback
+
+	feedback["messages"] += ["Processing of algorithm & trace finished OK."]
+	feedback["mistakes"] = mistakes
+	
+	return feedback
 
 
 def run_tests(directory="test_data/", process_kwargs={}):
