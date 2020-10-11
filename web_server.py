@@ -2,7 +2,7 @@
 
 import re
 
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, url_for, redirect
 
 from ctrlstrct_test import process_algorithm_and_trace_from_text
 
@@ -16,12 +16,19 @@ app = Flask(__name__, template_folder='web_exp/views', static_folder='web_exp/st
 # def hello():
 #     return "Hello, World!"
 
-@app.route('/demo')
-@app.route('/')
-@app.route('/index')
-@app.route('/index.html')
+# @app.route('/index.html')
+# @app.route('/index/')
+# @app.route('/')
+# @app.route('/demo/')
+@app.route('/iswc/demo/')
 def index():
 	return render_template('index.html')
+	
+@app.errorhandler(404)
+def http_404_handler(error):
+    # return "<p>HTTP 404 Error Encountered</p>", 404
+	url = url_for('index')
+	return redirect(url)
 
 @app.route('/process', methods = ['POST'])
 def process_data():
@@ -34,8 +41,11 @@ def process_data():
 	except Exception as ex:
 		raise ex
 		return dict(messages=[f"Error processing the request - {ex.__class__.__name__}: {str(ex)}"])
-  
-  
+
+
+
+
+
 def process_algorithm_and_trace_request(json):
 	assert "alg" in json
 	assert "trace" in json
@@ -139,6 +149,6 @@ SKIP____10_while 10 (с.3) проверка условия (While_Loop)
 
 if __name__ == "__main__":
 	# debug()
-	app.run(debug = 1)
+	app.run(debug = 1, port=2020)
 	
 
