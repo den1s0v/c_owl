@@ -236,8 +236,7 @@ class AlgorithmParser:
                     \s+ - >?    # - or ->   
                     \s+ (\S+)   # 2 optional values
                 )?
-                \s+
-                (?://|\#)\s*(\S+)  # 3 name
+                \s* (?://|\#)\s*(\S+)  # 3 name
                 """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("alt if")
@@ -325,7 +324,7 @@ class AlgorithmParser:
                     \s+ - >?    # - or ->   
                     \s+ (\S+)   # 2 optional values
                 )?
-                \s+ (?://|\#)
+                \s* (?://|\#)
                 \s* (\S+)       # 3 loop name
                 """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
@@ -354,7 +353,7 @@ class AlgorithmParser:
             # do   // my-dowhile-3
             #    ...
             # while dowhile-cond-3  -> 100011100
-            m = re.match(r"(?:do|делать)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
             m2 = e+1 < len(line_list)  and  re.match(r"""
                 (?:while|пока)
                 \s+
@@ -391,7 +390,7 @@ class AlgorithmParser:
             # do   // my-dountil-3
             #    ...
             # until dountil-cond-3  -> 100011100
-            m = re.match(r"(?:do|делать)\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
             m2 = e+1 < len(line_list)  and  re.match(r"""
                 (?:until|до)
                 \s+
@@ -431,7 +430,7 @@ class AlgorithmParser:
                                 \s+ - >?    # - or ->   
                                 \s+ (\S+)   # 5 optional values
                             )?
-                            \s+ (?://|\#)\s*(\S+)         # 6 name
+                            \s* (?://|\#)\s*(\S+)         # 6 name
                         """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("for")
@@ -468,7 +467,7 @@ class AlgorithmParser:
                     \s+ - >?    # - or ->   
                     \s+ (\S+)   # 3 optional values
                 )?
-                \s+ (?://|\#)\s*(\S+)  # 4 name
+                \s* (?://|\#)\s*(\S+)  # 4 name
                 """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("foreach")
@@ -495,9 +494,10 @@ class AlgorithmParser:
 
 
             # {  // myseq-5  -  начало именованного следования
-            m = re.match(r"\{\s+(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"\{\s*(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
             if m:
-                if self.verbose: print("named sequence")
+                if self.verbose or 1: 
+                	print("named sequence:", m.group(1))
                 name =   m.group(1)  # имя следования (пишется в комментарии)
                 result.append({
                     "id": self.newID(name),
