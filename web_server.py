@@ -24,6 +24,12 @@ app = Flask(__name__, template_folder='web_exp/views', static_folder='web_exp/st
 def index():
 	return render_template('index.html')
 	
+@app.route('/favicon.ico')
+def icon():
+	url = url_for('static', filename='ISWC2020_logo_v.png')
+	return redirect(url)
+	# return render_template('index.html')
+	
 @app.errorhandler(404)
 def http_404_handler(error):
     # return "<p>HTTP 404 Error Encountered</p>", 404
