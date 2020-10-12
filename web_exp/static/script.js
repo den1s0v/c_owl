@@ -8,9 +8,8 @@ $(document).ready(function(){
 		    $('#alg').prop('disabled', false);
 		    $('#trace').prop('disabled', false);
 		    
-	     //    $('#new-tip').toggleClass("active");
-		    // $('#new-tip').slideToggle("slow");
-		    // $('#new-tip').animate({ opacity: "show" }, 3000).animate({ opacity: "hide" }, 3000);
+		    load_fields()  // reset the values to the stored at send
+		    
 		    $("#new").html("New (clear both fields)")
 		}
 		else
@@ -21,17 +20,21 @@ $(document).ready(function(){
     });
     
     $("#send").click(function(){
+        if ($('#alg').prop('disabled') == true)
+        	// fields was not changed, so reset the values to the stored before previous send
+        	load_fields()
+        
 	    // Заблокировать
 	    $('#alg').prop('disabled', true);
 	    $('#trace').prop('disabled', true);
 	    
-	    // $('#new-tip').animate({ opacity: "hide" }, 3000);
 	    $("#new").html("Edit (enable fields)")
 	     
 	    data = {
-	            alg: $("#alg").val(),
-	            trace: $("#trace").val()
-	        }
+            alg: $("#alg").val(),
+            trace: $("#trace").val()
+        }
+        
 	        
 	    save_fields(data)  // alg, trace -> localStorage
 	    
@@ -46,7 +49,6 @@ $(document).ready(function(){
         	},
         	success: function(data){
         		// alert("ajax OK");
-        		// $('#status').html(JSON.stringify(data));
         		processing_callback(data)
         	},
         	error: function(data){
@@ -56,14 +58,7 @@ $(document).ready(function(){
         });
     });
     
-    // // pass "alg" or "trace"
-    // function load_field(field_name)
-    $("#alg").val(load_field("alg"))
-    $("#trace").val(load_field("trace"))
-
-    
-    // alert('Waw!')
-    // $('#new-tip').animate({ opacity: "hide" }, 3000).animate({ opacity: "show" }, 3000);
+    load_fields()  // read text stored at localStorage
 });
 
 
@@ -77,20 +72,53 @@ function processing_callback(response="wait")
 	
 	if(response == "fail")
 	{
-		$('#status').html("Server could not send a response. Try again later ...");
+		$('#status').html("An error occured while requesting the server (it can be busy or inaccessible). Please try again.");
 		return
 	}
 	
 	if(response.messages)
 	{	
-		messages = response.messages.join("\n")
+		messages = response.messages.join("\n<br>")
 		
 		mistakes_count = 0
-		if(response.mitakes)
+		if(response.mistakes)
 			mistakes_count = response.mistakes.length
 		
-		$('#status').html("Server responded:\n" + messages + '\n' + mistakes_count + ` mistakes.`
-			+ '\n' + JSON.stringify(response));
+		$('#status').html("Server responded:\n" + messages + '\n<br>' + mistakes_count + ` mistakes.`
+			+ '\n<br>' + JSON.stringify(response));
+		
+		if(response.mistakes)
+		{
+			// add mistakes annotation to the end of each trace lines
+			line2names = {}
+			for(let m of response.mistakes)
+			{
+				if(m["text_line"])
+				{
+					line = parseInt(m["text_line"])
+					if(!line2names[line])
+						line2names[line] = m["names"]
+					else
+						line2names[line] = line2names[line].concat(m["names"])
+				}
+			}
+			
+			lines = load_field("trace").split('\n')
+			for(let i in line2names)
+			{
+				if(1 <= i && i <= lines.length)
+				{
+					names = [...new Set(line2names[i])]
+					names.sort()
+					addition = '  // error: ' + names.join(', ')
+					if(! lines[i-1].endsWith(addition))
+						lines[i-1] += addition
+				}
+				else
+					console.warn({i, lines_length: lines.length})
+			}
+			$("#trace").val(lines.join("\n"))
+		}
 	}	
 }
 
@@ -108,6 +136,12 @@ function save_fields(data=null)
 	}
 	
 	localStorage.algtrace = JSON.stringify(data);
+}
+
+function load_fields()
+{
+    $("#alg").val(load_field("alg"))
+    $("#trace").val(load_field("trace"))
 }
 
 // pass "alg" or "trace"
