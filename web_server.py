@@ -77,7 +77,7 @@ def process_algorithm_and_trace_request(json):
 user_alg {boolean_chain}user_trace
 {open_brace}
 {trace}
-{close_brace}	""".format(
+{close_brace}""".format(
 		alg=alg_text,
 		trace=trace_text,
 		boolean_chain=json["boolean_chain"] + " " if "boolean_chain" in json else '',
@@ -88,7 +88,7 @@ user_alg {boolean_chain}user_trace
 	alg_line_i = 3
 	trace_line_i = alg_line_i + len(alg_text.split("\n")) + 3
 	
-	# print(full_text)
+	print(full_text)
 	print(dict(alg_line_i=alg_line_i, trace_line_i=trace_line_i))
 	
 	feedback = process_algorithm_and_trace_from_text(full_text)
@@ -97,9 +97,17 @@ user_alg {boolean_chain}user_trace
 	from pprint import pprint
 	pprint(feedback)
 	
-	formatted_feedback = {"messages": feedback["messages"], "mistakes": []}
+	formatted_feedback = {"messages": [], "mistakes": []}
 	
 	# convert result for use in a webpage
+	def convert_line_index(i: int):
+		return i - trace_line_i
+	
+	if "messages" in feedback:
+		for s in feedback["messages"]:
+			if "line" in s:
+				s = __LINE_IDNEX_RE.sub(lambda s: f"line {convert_line_index(int(s.group(1)))}", s)
+			formatted_feedback["messages"].append(s)
 	
 	if "mistakes" in feedback:
 		for m in feedback["mistakes"]:
@@ -113,7 +121,7 @@ user_alg {boolean_chain}user_trace
 			if "should_be_before" in m and m["should_be_before"]:
 				line = m["should_be_before"][0].text_line
 				if line is not None:
-					d["should_be_before_line"] = line - trace_line_i
+					d["should_be_before_line"] = convert_line_index(line)
 			formatted_feedback["mistakes"].append(d)
 	
 	# return str(feedback)
@@ -121,6 +129,7 @@ user_alg {boolean_chain}user_trace
 
 
 __CAMELCASE_RE = re.compile(r"([a-z])([A-Z])")
+__LINE_IDNEX_RE = re.compile(r"line\s*(\d+)")
 
 def camelcase_to_snakecase(s: str, sep='_') -> str:
 	return __CAMELCASE_RE.sub(lambda m: f"{m.group(1)}{sep}{m.group(2)}", s).lower()

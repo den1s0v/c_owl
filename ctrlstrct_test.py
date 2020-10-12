@@ -190,7 +190,11 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 def process_algorithm_and_trace_from_text(text: str, process_kwargs=dict(reasoning="pellet")):
 	feedback = {"messages": []}
 	
-	alg_trs = parse_algorithms_and_traces_from_text(text)
+	try:
+		alg_trs = parse_algorithms_and_traces_from_text(text)
+	except Exception as ex:
+		alg_trs = None
+		feedback["messages"] += [str(ex)]
 	
 	if not alg_trs:
 		feedback["messages"] += ["Nothing to process: no valid algorithm / trace found."]

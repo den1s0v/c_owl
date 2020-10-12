@@ -1261,7 +1261,7 @@ def parse_algorithms_and_traces_from_text(text: str):
                 alg_data[alg_name]["erroneous"] = True
                 print("Error parsing algorithm:", alg_name, ":")
                 print(" ", e)
-                # raise e
+                raise e
         
         if "alg_parser" not in alg_data[alg_name]:
             print("Skipping trace:", tr_name, ", because the corresponding algorithm could not be parsed:", alg_name)
@@ -1280,7 +1280,7 @@ def parse_algorithms_and_traces_from_text(text: str):
             print("Error !")
             print("Error parsing trace:", tr_name, ":")
             print(" ", repr(e))
-            # raise e
+            raise e
             
             
     valid_alg_trs = [{
