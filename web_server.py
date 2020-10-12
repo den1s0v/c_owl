@@ -4,14 +4,20 @@ import re
 
 from flask import Flask, request, render_template, jsonify, url_for, redirect
 
+# import the flask extension
+from flask_caching import Cache  
+
 from ctrlstrct_test import process_algorithm_and_trace_from_text
 
 
+cache = Cache(config={'CACHE_TYPE': 'simple'})
 
 app = Flask(__name__, template_folder='web_exp/views', static_folder='web_exp/static',)
 
-# app.port = 2020
- 
+# bind the cache instance on to the app 
+cache.init_app(app)
+
+
 # @app.route("/")
 # def hello():
 #     return "Hello, World!"
@@ -37,6 +43,8 @@ def http_404_handler(error):
 	return redirect(url)
 
 @app.route('/process', methods = ['POST'])
+# caching is for debug only! Disable when is in public access!
+# @cache.cached(timeout=100)  # time seconds
 def process_data():
 	# print(request.is_json)
 	# print(request.json)
