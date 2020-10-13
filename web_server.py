@@ -17,11 +17,6 @@ app = Flask(__name__, template_folder='web_exp/views', static_folder='web_exp/st
 # bind the cache instance on to the app 
 cache.init_app(app)
 
-
-# @app.route("/")
-# def hello():
-#     return "Hello, World!"
-
 # @app.route('/index.html')
 # @app.route('/index/')
 # @app.route('/')
@@ -46,9 +41,6 @@ def http_404_handler(error):
 # caching is for debug only! Disable when is in public access!
 # @cache.cached(timeout=100)  # time seconds
 def process_data():
-	# print(request.is_json)
-	# print(request.json)
-	# sleep(20)
 	try:
 		feedback = process_algorithm_and_trace_request(request.json)
 		return jsonify(feedback)
@@ -173,5 +165,6 @@ SKIP____10_while 10 (с.3) проверка условия (While_Loop)
 if __name__ == "__main__":
 	# debug()
 	app.run(debug = 1, port=2020)
+	# app.run(debug = 1, host="109.206.169.214", port=2020)
 	
 
