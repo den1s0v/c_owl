@@ -496,8 +496,7 @@ class AlgorithmParser:
             # {  // myseq-5  -  начало именованного следования
             m = re.match(r"\{\s*(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
             if m:
-                if self.verbose or 1: 
-                	print("named sequence:", m.group(1))
+                if self.verbose: print("named sequence:", m.group(1))
                 name =   m.group(1)  # имя следования (пишется в комментарии)
                 result.append({
                     "id": self.newID(name),
@@ -833,9 +832,8 @@ class TraceParser:
                 \s+
                     # (начал[оа]?с[ья]|закончил[оа]?с[ья])  # 1 phase
                 ({BEGAN}|{ENDED})  # 1 phase
-                    # (?:\s+(\d+)[-_]?й?\s+раз)?   # 2 ith  (optional)
                 {Ith1}?   # 2 ith  (optional)
-                """, line, re.I | re.VERBOSE)
+                """.format(**PHASE_dict), line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("ветка иначе {}".format(m.group(1)))
                 # строка не хранит данных о развилке, найдём первую развилку выше ...
@@ -1055,7 +1053,7 @@ def extract_alg_name(line) -> str:
         choice = choice[0]
         i = words.index(choice)
     else:
-        print("Warning: No", f"\"{choises.join('/')}\"", "in line:", line)
+        print("Warning: No", f"\"{'/'.join(choises)}\"", "in line:", line)
         return None
     if i == len(words) - 1:
         print("Warning: No algoritm name following", f'"{choise}"', "in line:", line)
@@ -1168,7 +1166,7 @@ def parse_algorithms_and_traces_from_text(text: str):
     alg_data = {}
 
     for i in range(0, last_line):
-        if word_in(("алгоритм", "algorithm"), lines[i]):
+        if word_in(("алгоритм", "algorithm"), lines[i]) and '"algorithm"' not in lines[i]:
             # проверить начало алгоритма
             if not re.search(r"\{|функция|function", lines[i+1]):
                 print("Ignored (no alg. begin): line", i, lines[i])

@@ -1,7 +1,7 @@
-SKIP    correct_branching.txt
+correct_branching.txt
 SKIP    err_branching.txt
 SKIP    correct_loops.txt
 SKIP    err_loops.txt
 SKIP    example.txt
 SKIP    test_sequences.txt
-test_loops.txt
+SKIP    test_loops.txt

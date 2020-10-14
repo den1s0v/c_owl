@@ -86,8 +86,8 @@ user_alg {boolean_chain}user_trace
 	feedback = process_algorithm_and_trace_from_text(full_text)
 	
 	###
-	from pprint import pprint
-	pprint(feedback)
+	# from pprint import pprint
+	# pprint(feedback)
 	
 	formatted_feedback = {"messages": [], "mistakes": []}
 	
