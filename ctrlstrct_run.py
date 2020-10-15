@@ -542,10 +542,16 @@ class TraceTester():
 
 
         # make top-level act representing the trace
-        iri = f'trace_{self.data["trace_name"]}_{"".join(map(str, map(int, self.data["header_boolean_chain"])))}'
-        iri = uniqualize_iri(onto, iri)
+        iri = f'trace_{self.data["trace_name"]}'
+        if self.data["header_boolean_chain"]:
+        	iri += f'_c{"".join(map(str, map(int, self.data["header_boolean_chain"])))}'
+        
+        iri = iri.replace(" ", "_").strip("_")
+        
         iri = prepare_name(iri)
+        iri = uniqualize_iri(onto, iri)
         trace_obj = onto.trace(iri)
+        self.trace_obj = trace_obj  # remember for trace injection
         trace_obj.is_a.append(onto.correct_act)
         make_triple(trace_obj, onto.executes, onto[self.data["algorithm"]["iri"]])
         set_id(trace_obj)
@@ -644,6 +650,7 @@ class TraceTester():
                 # print(F"{obj}: ")
                 if (obj.executes.id == executes and
                     ((obj.exec_time == exec_time) or (exec_time is None)) and
+                    (self.trace_obj in obj.in_trace) and
                     all((getattr(obj, k, None) == v) or (v is None)  for k,v in fields.items())):
                     return obj
             print(f"act not found: ex={executes}, {', '.join([f'n={exec_time}'] + [f'{k}={v}' for k,v in fields.items()])}")
