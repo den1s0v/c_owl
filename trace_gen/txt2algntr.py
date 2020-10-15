@@ -1193,7 +1193,10 @@ def parse_algorithms_and_traces_from_text(text: str):
     last_line = len(lines)-1
     
     # регулярка для всех имён алгоритмов: одно целое слово (имя одного из алгоритмов) должно быть найдено в заголовке трассы
-    alg_names_rgx = "|".join([r"\b%s\b"%re.escape(w) for w in alg_data.keys()])
+    
+    print("Algorithm names:", *list(alg_data.keys()))
+    
+    alg_names_rgx = "|".join([r"\b%s\b" % re.escape(w) for w in alg_data.keys()])
     alg_names_rgx = re.compile(alg_names_rgx)
     
     tr_data = {}

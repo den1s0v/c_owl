@@ -21,6 +21,7 @@ from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_key
 ONTOLOGY_maxID = 1
 
 def prepare_name(s):
+    """Transliterate given word is needed"""
     return slugify(s) or s
     
             
@@ -104,7 +105,7 @@ class TraceTester():
             #  (this is less preffered as the trace may contain errors)
             self.values_source = "trace"
             
-        print("values_source detected:", self.values_source)
+        print(f'Trace {self.data["trace_name"]}: values_source detected:', self.values_source)
         
         def next_cond_value(expr_name=None, executes_id=None, n=None, default=False):
           
@@ -505,7 +506,7 @@ class TraceTester():
                                         onto[subiri].is_a.append(onto.last_item)
 
         
-    def prepare_act_candidates(self, onto, extra_act_entries=2):
+    def prepare_act_candidates(self, onto, extra_act_entries=0):
         """Create all possible acts for each statement. 
         Maximum executon number will be exceeded by `extra_act_entries`.
         /* Resulting set of acts of size N will be repeated N times, each act to be possibly placed at each index of the trace, covering the set of all possible traces. */ """
@@ -614,44 +615,15 @@ class TraceTester():
                         #     obj.is_a.append(onto.correct_act)
                         #     # obj.is_a.append(onto.current_act)
                         #     make_triple(trace_obj, onto.next_act, obj)
-                            
-                            
-                    
-                    
+    
+    
     def inject_trace_to_ontology(self, onto, trace, act_classnames=("act",), next_propertyname=None):
-        "Writes specified trace to ontology."
+        "Writes specified trace to ontology asigning properties to pre-created acts."
         
         additional_classes = [onto[nm] for nm in act_classnames]
         assert all(additional_classes), (additional_classes, act_classnames, onto)
         
         # make trace acts as individuals
-
-        def make_act(iri, onto_class, alg_iri, prop_class=onto.next_act, is_last=False):
-
-            raise "Deprecated !"
-            
-            # nonlocal trace_acts_list
-            iri = uniqualize_iri(onto, iri)
-            
-            trace_acts_list.append(iri)                 
-            # создаём объект
-            obj = onto_class(iri)
-            # привязываем связанный элемент алгоритма
-            make_triple(obj, onto.executes, onto[alg_elem["iri"]])
-            
-            # формируем последовательный список
-            if prop_class and len(trace_acts_list) > 1:
-                # привязываем next, если указано
-                prev_iri = trace_acts_list[-2]
-                make_triple(onto[prev_iri], prop_class, obj)
-            elif len(trace_acts_list) == 1:
-                # mark as first act of the list
-                obj.is_a.append(onto.first_item)
-            if is_last:
-                # mark as last act of the list
-                obj.is_a.append(onto.last_item)
-            return obj
-
 
         def connect_next_act(obj):
             trace_acts_list.append(obj)                 
