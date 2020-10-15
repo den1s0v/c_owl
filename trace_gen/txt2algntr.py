@@ -362,7 +362,6 @@ class AlgorithmParser:
                     \s+ - >?    # - or ->   
                     \s+ (\S+)   # 2 optional values
                 )?
-                \s+
                 """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
             if m and m2:
                 if self.verbose: print("do while")
@@ -399,7 +398,6 @@ class AlgorithmParser:
                     \s+ - >?    # - or ->   
                     \s+ (\S+)   # 2 optional values
                 )?
-                \s+
                 """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
             if m and m2:
                 if self.verbose: print("do until")
