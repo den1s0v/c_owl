@@ -1,12 +1,17 @@
 
+var cm_alg, cm_trace;
+var e_alg, e_trace;
+
 $(document).ready(function(){
 	
     $("#new").click(function(){
-        if ($('#alg').prop('disabled') == true)
+        if (cm_alg.getOption("readOnly") == true)
         {
 		    // Разблокировать
-		    $('#alg').prop('disabled', false);
-		    $('#trace').prop('disabled', false);
+		    // $('#alg').prop('disabled', false);
+		    // $('#trace').prop('disabled', false);
+		    cm_alg.setOption("readOnly", false)
+		    cm_trace.setOption("readOnly", false)
 		    
 		    load_fields()  // reset the values to the stored at send
 		    
@@ -14,25 +19,32 @@ $(document).ready(function(){
 		}
 		else
 		{
-	        $("#alg").val("");
-	        $("#trace").val("");
+	        // $("#alg").val("");
+	        // $("#trace").val("");
+		    e_alg.setValue("")
+		    e_trace.setValue("")
 		}
-    });
+		
+    }); 	
     
     $("#send").click(function(){
-        if ($('#alg').prop('disabled') == true)
+        if (cm_alg.getOption("readOnly") == true)
         	// fields was not changed, so reset the values to the stored before previous send
         	load_fields()
         
 	    // Заблокировать
-	    $('#alg').prop('disabled', true);
-	    $('#trace').prop('disabled', true);
+	    // $('#alg').prop('disabled', true);
+	    // $('#trace').prop('disabled', true);
+	    cm_alg.setOption("readOnly", true)
+	    cm_trace.setOption("readOnly", true)
 	    
 	    $("#new").html("Edit (enable fields)")
 	     
 	    data = {
-            alg: $("#alg").val(),
-            trace: $("#trace").val()
+            // alg: $("#alg").val(),
+            // trace: $("#trace").val()
+	        alg: e_alg.getValue(),
+	        trace: e_trace.getValue()
         }
         
 	        
@@ -58,6 +70,18 @@ $(document).ready(function(){
         });
     });
     
+    
+    cm_config = {
+    	lineNumbers: true,
+    	theme: "elegant"
+    }
+    
+	cm_alg = CodeMirror.fromTextArea(document.getElementById("alg"), cm_config);
+	cm_trace = CodeMirror.fromTextArea(document.getElementById("trace"), cm_config);
+	e_alg = cm_alg.getDoc();
+	e_trace = cm_trace.getDoc();
+	
+	
     load_fields()  // read text stored at localStorage
 });
 
@@ -117,7 +141,9 @@ function processing_callback(response="wait")
 				else
 					console.warn({i, lines_length: lines.length})
 			}
-			$("#trace").val(lines.join("\n"))
+			var text = lines.join("\n")
+			// $("#trace").val(lines.join("\n"))
+			e_trace.setValue(text)
 		}
 	}	
 }
@@ -130,8 +156,11 @@ function save_fields(data=null)
 	if(data === null)
 	{
 		data = {
-			alg: $("#alg").val(),
-			trace: $("#trace").val()
+			// alg: $("#alg").val(),
+			// trace: $("#trace").val()
+			alg: e_alg.getValue(),
+			trace: e_trace.getValue()
+			
 		}
 	}
 	
@@ -140,8 +169,10 @@ function save_fields(data=null)
 
 function load_fields()
 {
-    $("#alg").val(load_field("alg"))
-    $("#trace").val(load_field("trace"))
+    // $("#alg").val(load_field("alg"))
+    // $("#trace").val(load_field("trace"))
+    e_alg.setValue(load_field("alg"))
+    e_trace.setValue(load_field("trace"))
 }
 
 // pass "alg" or "trace"
