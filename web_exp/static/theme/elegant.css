@@ -1,10 +1,15 @@
-.cm-s-elegant span.cm-number, .cm-s-elegant span.cm-string, .cm-s-elegant span.cm-atom { color: #762; }
+.cm-s-elegant span.cm-string, .cm-s-elegant span.cm-atom { color: #f08; font-style: italic; font-weight: bold; }
 .cm-s-elegant span.cm-comment { color: #262; font-style: italic; line-height: 1em; }
 .cm-s-elegant span.cm-meta { color: #555; font-style: italic; line-height: 1em; }
-.cm-s-elegant span.cm-variable { color: black; }
+.cm-s-elegant span.cm-variable { color: #700; text-decoration: underline; }
 .cm-s-elegant span.cm-variable-2 { color: #b11; }
+.cm-s-elegant span.cm-struct { color: #07c; font-weight: bold; }
+.cm-s-elegant span.cm-number { color: #f00; font-weight: bold; }
+.cm-s-elegant span.cm-program { color: #f70; font-weight: bold; }
+.cm-s-elegant span.cm-function { color: #707; font-weight: bold; }
+.cm-s-elegant span.cm-action { color: #077; font-weight: bold; }
 .cm-s-elegant span.cm-qualifier { color: #555; }
-.cm-s-elegant span.cm-keyword { color: #730; }
+.cm-s-elegant span.cm-keyword { color: #00a; font-weight: bold; }
 .cm-s-elegant span.cm-builtin { color: #30a; }
 .cm-s-elegant span.cm-link { color: #762; }
 .cm-s-elegant span.cm-error { background-color: #fdd; }

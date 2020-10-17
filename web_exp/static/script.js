@@ -61,6 +61,8 @@ $(document).ready(function(){
     });
     
     
+    define_syntax_mode();
+    
     cm_config = {
     	lineNumbers: true,
     	theme: "elegant"
@@ -173,3 +175,37 @@ function load_field(field_name)
 	return data[field_name]
 }
 
+
+
+////////// CM : Custom syntax //////////
+
+
+function define_syntax_mode() {
+
+	keyword_re = /(?:начался|началась|началось|began|закончился|закончилась|закончилось|ended|выполнился|выполнилась|выполнилось|executed|если|иначе|делать|пока|для|от|до|шаг|с\s+шагом|if|else|do|while|for|from|to|with\s+step|step|каждого|в|из|по|к|foreach|each|in)\b/i
+	
+	struct_re = /развилка|развилки|альтернативная|ветка|branch|alternative|условия|переход|update|итерация|iteration|иначe|условие|цикла|condition|of|loop|инициализация|init|initialization|цикл|следование/i
+	
+	// выполнилось
+	CodeMirror.defineSimpleMode("algtracemode", {
+	  // The start state contains the rules that are intially used
+	  start: [
+	    {regex: keyword_re, token: "keyword"},
+	    {regex: /true|false|ложь|истина/i, token: "atom"},
+	    {regex: /\d+(?:st|nd|th)?/i,
+	    	// /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
+	     token: "number"},
+	    {regex: /(?:\/\/|#).*/, token: "comment"},
+	    {regex: struct_re, token: "struct"},
+	    {regex: /действие|action/i, token: "action"},
+	    {regex: /программа|program/i, token: "program"},
+	    {regex: /функция|function/i, token: "function"},
+	    {regex: /й|раз|time/i, token: null},
+	    {regex: /[\wа-яё]+/i, token: "variable"}
+	  ],
+	  meta: {
+	    dontIndentStates: ["comment"],
+	    lineComment: "//"
+	  }
+	});
+}
