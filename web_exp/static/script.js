@@ -5,11 +5,9 @@ var e_alg, e_trace;
 $(document).ready(function(){
 	
     $("#new").click(function(){
-        if (cm_alg.getOption("readOnly") == true)
+        if (cm_alg.isReadOnly())
         {
 		    // Разблокировать
-		    // $('#alg').prop('disabled', false);
-		    // $('#trace').prop('disabled', false);
 		    cm_alg.setOption("readOnly", false)
 		    cm_trace.setOption("readOnly", false)
 		    
@@ -19,8 +17,6 @@ $(document).ready(function(){
 		}
 		else
 		{
-	        // $("#alg").val("");
-	        // $("#trace").val("");
 		    e_alg.setValue("")
 		    e_trace.setValue("")
 		}
@@ -28,21 +24,17 @@ $(document).ready(function(){
     }); 	
     
     $("#send").click(function(){
-        if (cm_alg.getOption("readOnly") == true)
+        if (cm_alg.isReadOnly())
         	// fields was not changed, so reset the values to the stored before previous send
         	load_fields()
         
 	    // Заблокировать
-	    // $('#alg').prop('disabled', true);
-	    // $('#trace').prop('disabled', true);
 	    cm_alg.setOption("readOnly", true)
 	    cm_trace.setOption("readOnly", true)
 	    
 	    $("#new").html("Edit (enable fields)")
 	     
 	    data = {
-            // alg: $("#alg").val(),
-            // trace: $("#trace").val()
 	        alg: e_alg.getValue(),
 	        trace: e_trace.getValue()
         }
@@ -60,11 +52,9 @@ $(document).ready(function(){
         		processing_callback("wait")
         	},
         	success: function(data){
-        		// alert("ajax OK");
         		processing_callback(data)
         	},
         	error: function(data){
-        		// alert("ajax FAIL");
         		processing_callback("fail")
         	}
         });
@@ -142,7 +132,6 @@ function processing_callback(response="wait")
 					console.warn({i, lines_length: lines.length})
 			}
 			var text = lines.join("\n")
-			// $("#trace").val(lines.join("\n"))
 			e_trace.setValue(text)
 		}
 	}	
@@ -156,8 +145,6 @@ function save_fields(data=null)
 	if(data === null)
 	{
 		data = {
-			// alg: $("#alg").val(),
-			// trace: $("#trace").val()
 			alg: e_alg.getValue(),
 			trace: e_trace.getValue()
 			
@@ -169,8 +156,6 @@ function save_fields(data=null)
 
 function load_fields()
 {
-    // $("#alg").val(load_field("alg"))
-    // $("#trace").val(load_field("trace"))
     e_alg.setValue(load_field("alg"))
     e_trace.setValue(load_field("trace"))
 }
