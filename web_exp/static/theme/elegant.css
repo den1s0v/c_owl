@@ -16,3 +16,9 @@
 
 .cm-s-elegant .CodeMirror-activeline-background { background: #e8f2ff; }
 .cm-s-elegant .CodeMirror-matchingbracket { outline:1px solid grey; color:black !important; }
+
+.CodeMirror {
+	border: 1px solid #888;
+	background: #fff;
+	border-radius: 4px;
+}

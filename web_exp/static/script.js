@@ -8,8 +8,7 @@ $(document).ready(function(){
         if (cm_alg.isReadOnly())
         {
 		    // Разблокировать
-		    cm_alg.setOption("readOnly", false)
-		    cm_trace.setOption("readOnly", false)
+		    set_editors_enabled(true);
 		    
 		    load_fields()  // reset the values to the stored at send
 		    
@@ -23,14 +22,14 @@ $(document).ready(function(){
 		
     }); 	
     
+    
     $("#send").click(function(){
         if (cm_alg.isReadOnly())
         	// fields was not changed, so reset the values to the stored before previous send
         	load_fields()
         
 	    // Заблокировать
-	    cm_alg.setOption("readOnly", true)
-	    cm_trace.setOption("readOnly", true)
+	    set_editors_enabled(false);
 	    
 	    $("#new").html("Edit (enable fields)")
 	     
@@ -38,8 +37,7 @@ $(document).ready(function(){
 	        alg: e_alg.getValue(),
 	        trace: e_trace.getValue()
         }
-        
-	        
+
 	    save_fields(data)  // alg, trace -> localStorage
 	    
         $.ajax({
@@ -70,6 +68,8 @@ $(document).ready(function(){
     
 	cm_alg = CodeMirror.fromTextArea(document.getElementById("alg"), cm_config);
 	cm_trace = CodeMirror.fromTextArea(document.getElementById("trace"), cm_config);
+	cm_alg.setSize("60%", "20%");
+	cm_trace.setSize("60%", "35%");
 	e_alg = cm_alg.getDoc();
 	e_trace = cm_trace.getDoc();
 	
@@ -137,6 +137,15 @@ function processing_callback(response="wait")
 			e_trace.setValue(text)
 		}
 	}	
+}
+
+
+function set_editors_enabled(enabled=true)
+{
+	cm_alg.setOption("readOnly", !enabled)
+	cm_trace.setOption("readOnly", !enabled)
+	const color = enabled? "#fff" : "#eee";
+	$('.CodeMirror').css('background', color);
 }
 
 
