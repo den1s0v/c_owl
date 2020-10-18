@@ -130,10 +130,14 @@ class TraceTester():
                         act for act in 
                         find_by_keyval_in("n", str(n), self.data["trace"])
                         # act["n"] == n and 
-                        if act["phase"] in ("finished", 'performed') and (act["name"] == expr_name or act["executes"] == executes_id)
+                        if act["phase"] in ("finished", 'performed') 
+                            and (
+                                # act["name"] == expr_name or 
+                                act["executes"] == executes_id
+                            )
                         ]
                     if acts:
-                        assert len(acts) == 1, str(acts)
+                        assert len(acts) == 1, "Expected 1 act to be found, but got:\n " + str(acts)
                         act = acts[0]
                         v = act.get("value", None)
                     else:
@@ -511,7 +515,7 @@ class TraceTester():
         Maximum executon number will be exceeded by `extra_act_entries`.
         /* Resulting set of acts of size N will be repeated N times, each act to be possibly placed at each index of the trace, covering the set of all possible traces. */ """
         
-        assert extra_act_entries >= 0, extra_act_entries
+        assert extra_act_entries >= 0, f"extra_act_entries={extra_act_entries}"
         
         alg_id2max_exec_n = {}  # executed stmt id to max exec_time in correct trace
 
@@ -544,7 +548,7 @@ class TraceTester():
         # make top-level act representing the trace
         iri = f'trace_{self.data["trace_name"]}'
         if self.data["header_boolean_chain"]:
-        	iri += f'_c{"".join(map(str, map(int, self.data["header_boolean_chain"])))}'
+            iri += f'_c{"".join(map(str, map(int, self.data["header_boolean_chain"])))}'
         
         iri = iri.replace(" ", "_").strip("_")
         
@@ -627,7 +631,7 @@ class TraceTester():
         "Writes specified trace to ontology asigning properties to pre-created acts."
         
         additional_classes = [onto[nm] for nm in act_classnames]
-        assert all(additional_classes), (additional_classes, act_classnames, onto)
+        assert all(additional_classes), f"additional_classes={additional_classes}, {act_classnames}, {onto}"
         
         # make trace acts as individuals
 
@@ -1110,8 +1114,8 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         from ctrlstrct_swrl import filtered_rules
         # hardcode so far >
         tags_enabled = set("""
-        	helper correct mistake entry function sequence alternative loop
-        	""".split())
+            helper correct mistake entry function sequence alternative loop
+            """.split())
         load_swrl_rules(onto, filtered_rules(tags_enabled), rules_filter=rules_filter)
     
     if debug_rdf_fpath:

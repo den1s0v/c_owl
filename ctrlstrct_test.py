@@ -206,6 +206,7 @@ def process_algorithm_and_trace_from_text(text: str, process_kwargs=dict(reasoni
 		msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
 		feedback["messages"] += [msg]
 		print(msg)
+		### raise e
 		return feedback
 
 	feedback["messages"] += ["Processing of algorithm & trace finished OK."]
