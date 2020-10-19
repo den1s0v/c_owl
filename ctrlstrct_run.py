@@ -781,6 +781,9 @@ def init_persistent_structure(onto):
         # ->
         class sequence(Thing): pass
         
+        # -->
+        class alt_branch(sequence): pass
+        
         # признак first
         class first_item(Thing, ): pass
         # признак last
@@ -958,7 +961,8 @@ def init_persistent_structure(onto):
                 ("BranchOfFalseCondition", ["ExtraAct"]),
                 ("ConditionAfterBranch", ["ExtraAct"]),
                 ("AnotherExtraBranch", ["ExtraAct"]),
-                ("NoBranchWhenConditionIsTrue", ["MissingAct"]),
+                # ("NoBranchWhenConditionIsTrue", ["MissingAct"]),
+                "NoBranchWhenConditionIsTrue",
                 "AllFalseNoElse",
                 "NoNextCondition",
                 "AllFalseNoEnd",

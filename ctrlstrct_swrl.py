@@ -960,12 +960,15 @@ RULES.append(DomainRule(name="BranchOfFalseCondition-alt_Error",
 
 	cond(?br, ?cnd),  # corresponding branch
 	alt_branch(?br),  # belonds to an alternative
-
-	student_next(?a, ?b),
-	Erroneous(?b), 	  # как страховка, сработает и без этого
 	
 	act_begin(?b),
 	executes(?b, ?br),
+	
+	student_parent_of(?alt_act, ?a),
+	student_parent_of(?alt_act, ?b),
+	
+	# student_next(?a, ?b),
+	Erroneous(?b), 	  # как страховка, сработает и без этого
 	 -> BranchOfFalseCondition(?b)
 """))
 
@@ -996,12 +999,16 @@ RULES.append(DomainRule(name="AnotherExtraBranch-alt_Error",
 	branches_item(?alt, ?br),
 	alternative(?alt), 
 
-	student_next(?a, ?b),
-	ExtraAct(?b), 	  # как страховка, сработает и без этого
-	# act_begin(?b),
+	act_begin(?b),
 	executes(?b, ?br2),
-	branches_item(?alt2, ?br2),
+	branches_item(?alt, ?br2),
 	
+	student_parent_of(?alt_act, ?a),
+	student_parent_of(?alt_act, ?b),
+	
+	student_index(?a, ?sia),
+	student_index(?b, ?sib),
+	greaterThan(?sib, ?sia),
 	 -> AnotherExtraBranch(?b)
 """))
 
