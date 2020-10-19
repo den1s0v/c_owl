@@ -1,0 +1,200 @@
+Saved RDF file: test_data/test_make_trace_output.rdf !
+Saved RDF file: test_data/test_make_trace_output.rdf_ext.rdf !
+[FAIL] 'alg00_alt 00 AllFalseNoElse (с.5) Конец развилки вместо else':	
+	> Erroneous line 38 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (AllFalseNoElse).
+[FAIL] 'alg00_alt 00 NoFirstCondition-1 (с.3) Пропущено первое условие':	
+	> Erroneous line 53 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (TooEarly, NoFirstCondition).
+[FAIL] 'alg00_alt 00 NoFirstCondition-2 (с.3) Пропущены оба условия':	
+	> Erroneous line 71 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (TooEarly, NoFirstCondition).
+
+*
+[FAIL] 'alg00_alt 00 DuplicatesOfBranch (с.8) Начало второй ветки "иначе"':	
+	> Erroneous line 94 hasn't been recognized by the ontology. Expected mistakes: !
+
+
+[FAIL] 'alg00_alt 00 BranchWithFalseCondition-1 (с.4) Начало ветки при ложном условии':	
+	> Erroneous line 114 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (BranchOfFalseCondition, NoNextCondition).
+[FAIL] 'alg00_alt 00 BranchWithFalseCondition-2 (с.5) Начало ветки при ложном условии':	
+	> Erroneous line 134 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (BranchOfFalseCondition, AllFalseNoElse).
+[FAIL] 'alg00_alt 00 NoNextCondition-1 (с.4) Пропущено второе условие':	
+	> Erroneous line 153 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (TooEarly, NoNextCondition).
+[FAIL] 'alg00_alt 00 NoNextCondition-2 (с.4) Конец развилки вместо второго условия':	
+	> Erroneous line 173 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (NoNextCondition).
+[FAIL] 'alg00_alt 00 DuplicateOfCondition-1 (с.4) Повтор первого условия':	
+	> Erroneous line 190 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (ExtraAct, NoNextCondition).
+[FAIL] 'alg00_alt 00 DuplicateOfCondition-2 (с.5) Повтор второго условия':	
+	> Erroneous line 212 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (ExtraAct, AllFalseNoElse).
+[FAIL] 'alg00_alt 00 ConditionsMisorder (с.3) Второе условие вместо первого':	
+	> Erroneous line 231 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (NoFirstCondition, DisplacedAct).
+	> Correct line 232 has been recognized by the ontology as erroneous. Inferred mistakes: AllFalseNoElse, DisplacedAct
+	> Correct line 233 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly, NoNextCondition
+[FAIL] 'alg00_alt 00 BranchBeforeCondition-1 (с.4) Ветка "иначе" не в конце развилки':	
+	> Erroneous line 252 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 3 (ExtraAct, TooEarly, NoNextCondition).
+	> Correct line 253 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+	> Correct line 254 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+    
+    *
+	> Correct line 255 has been recognized by the ontology as erroneous. Inferred mistakes: MissingAct
+    
+    !: MissingAct -> TooLate
+    
+    
+	> Correct line 256 has been recognized by the ontology as erroneous. Inferred mistakes: AllFalseNoElse
+[FAIL] 'alg00_alt 00 BranchBeforeCondition-2 (с.3) Ветка "иначе" в начале развилки':	
+	> Erroneous line 272 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 3 (ExtraAct, TooEarly, NoFirstCondition).
+	> Correct line 273 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+	> Correct line 274 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+	> Correct line 275 has been recognized by the ontology as erroneous. Inferred mistakes: MissingAct
+	> Correct line 276 has been recognized by the ontology as erroneous. Inferred mistakes: MissingAct, NoNextCondition
+    
+    
+    *
+    NoNextCondition ????
+    
+    
+	> Correct line 277 has been recognized by the ontology as erroneous. Inferred mistakes: AllFalseNoElse
+[FAIL] 'alg00_alt 01 NoBranchWhenConditionIsTrue (с.5) Пропущена вторая ветка':	
+	> Erroneous line 296 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (NoBranchWhenConditionIsTrue).
+[FAIL] 'alg00_alt 01 ElseBranchWhenTrueConditionExists-1 (с.8) Ветка иначe после условной ветки':	
+
+
+	> Erroneous line 316 hasn't been recognized by the ontology. Expected mistakes: !
+    
+    
+[FAIL] 'alg00_alt 01 ElseBranchWhenTrueConditionExists-2 (с.5) Ветка иначe вместо условной ветки':	
+	> Erroneous line 336 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (NoBranchWhenConditionIsTrue).
+[FAIL] 'alg00_alt 01 DuplicateOfCondition-1 (с.4) Повтор первого условия':	
+	> Erroneous line 356 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (ExtraAct, NoNextCondition).
+[FAIL] 'alg00_alt 01 DuplicateOfCondition-2 (с.5) Повтор второго условия':	
+	> Erroneous line 378 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 3 (ExtraAct, NoBranchWhenConditionIsTrue, DisplacedAct).
+    
+    
+    DisplacedAct ??
+    
+    
+[FAIL] 'alg00_alt 01 ConditionsMisorder (с.3) Второе условие вместо первого':	
+	> Erroneous line 396 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 3 (ExtraAct, TooEarly, NoFirstCondition).
+	> Correct line 397 has been recognized by the ontology as erroneous. Inferred mistakes: MissingAct, NoBranchWhenConditionIsTrue
+	> Correct line 398 has been recognized by the ontology as erroneous. Inferred mistakes: BranchOfFalseCondition, NoNextCondition
+[FAIL] 'alg00_alt 01 BranchBeforeCondition-1 (с.4) Ветка до условия':	
+	> Erroneous line 417 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 3 (ExtraAct, TooEarly, NoNextCondition).
+	> Correct line 418 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+	> Correct line 419 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+	> Correct line 420 has been recognized by the ontology as erroneous. Inferred mistakes: MissingAct
+	> Correct line 421 has been recognized by the ontology as erroneous. Inferred mistakes: NoBranchWhenConditionIsTrue
+[FAIL] 'alg00_alt 01 BranchBeforeCondition-2 (с.3) Ветка "иначе" в начале развилки':	
+	> Erroneous line 437 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (ExtraAct, NoFirstCondition).
+	> Correct line 438 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+	> Correct line 439 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+	> Correct line 442 has been recognized by the ontology as erroneous. Inferred mistakes: NoBranchWhenConditionIsTrue
+[FAIL] 'alg00_alt 1 DuplicatesOfBranch (с.7) Повтор условной ветки':
+
+	
+	> Erroneous line 464 hasn't been recognized by the ontology. Expected mistakes: !
+    
+    
+[FAIL] 'alg00_alt 1 NoBranchWhenConditionIsTrue (с.4) Пропущена первая ветка':	
+	> Erroneous line 483 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (NoBranchWhenConditionIsTrue).
+[FAIL] 'alg00_alt 1 NextConditionAfterTrueCondition (с.7) Лишнее следующее условие':	
+	> Erroneous line 502 hasn't been recognized by the ontology. Expected mistakes: !
+[FAIL] 'alg00_alt 1 ElseBranchWhenTrueConditionExists-1 (с.7) Ветка иначe после условной ветки':	
+	> Erroneous line 522 hasn't been recognized by the ontology. Expected mistakes: !
+[FAIL] 'alg00_alt 1 ElseBranchWhenTrueConditionExists-2 (с.4) Ветка иначe вместо условной ветки':	
+	> Erroneous line 541 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (NoBranchWhenConditionIsTrue).
+[FAIL] 'alg00_alt 1 DuplicateOfCondition (с.4) Повтор первого условия':	
+	> Erroneous line 560 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 3 (ExtraAct, NoBranchWhenConditionIsTrue, DisplacedAct).
+[FAIL] 'alg00_alt 1 BranchBeforeCondition-1 (с.3) Ветка до условия':	
+	> Erroneous line 579 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 3 (ExtraAct, TooEarly, NoFirstCondition).
+	> Correct line 580 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+	> Correct line 581 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct
+	> Correct line 582 has been recognized by the ontology as erroneous. Inferred mistakes: MissingAct
+	> Correct line 583 has been recognized by the ontology as erroneous. Inferred mistakes: NoBranchWhenConditionIsTrue
+[FAIL] 'alg00_alt 01 BranchWithFalseCondition (с.5) Начало ветки при ложном условии':	
+	> Erroneous line 600 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (NoBranchWhenConditionIsTrue).
+[FAIL] 'alg00_alt 01 MisplacedWithout (с.6) Действие из другой ветки':	
+	> Correct line 620 has been recognized by the ontology as erroneous. Inferred mistakes: NoBranchWhenConditionIsTrue
+	> Erroneous line 621 hasn't been recognized by the ontology. Expected mistakes: !
+[FAIL] 'alg04_alt 00 MisplacedDeeper-1 (с.6) Последующий акт попал в развилку':	
+	> Erroneous line 686 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 3 (WrongContext, AllFalseNoEnd, DisplacedAct).
+	> Correct line 687 has been recognized by the ontology as erroneous. Inferred mistakes: DisplacedAct
+	> Correct line 688 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+[FAIL] 'alg04_alt 1 MisplacedDeeper-2 (с.8) Последующий акт попал в развилку':	
+	> Erroneous line 706 hasn't been recognized by the ontology. Expected mistakes: !
+[FAIL] 'alg04_alt 01 MisplacedDeeper-3 (с.6) Последующий акт попал в развилку':	
+	> Erroneous line 729 hasn't been recognized by the ontology. Expected mistakes: !
+[FAIL] 'alg04_alt 1 ActsPairMisorder (с.3) Акт и развилка поменялись местами':	
+	> Erroneous line 746 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (ExtraAct).
+[FAIL] 'alg04_alt 00 NoNextCondition (с.5) Конец развилки вместо второго условия':	
+	> Erroneous line 769 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (TooEarly, NoNextCondition).
+[FAIL] 'alg03_seq3 MisplacedBefore (с.2) Акт до main':	
+	> Erroneous line 813 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (WrongContext, DisplacedAct).
+	> Correct line 814 has been recognized by the ontology as erroneous. Inferred mistakes: DisplacedAct
+	> Correct line 815 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+[FAIL] 'alg03_seq3 MisplacedAfter-1 (с.6) Акт после main':	
+	> Correct line 833 has been recognized by the ontology as erroneous. Inferred mistakes: DisplacedAct
+	> Erroneous line 834 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (WrongContext, DisplacedAct).
+	> Correct line 835 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+[FAIL] 'alg03_seq3 MisplacedAfter-2 (с.3) Акт после main':	
+	> Correct line 847 has been recognized by the ontology as erroneous. Inferred mistakes: DisplacedAct
+	> Erroneous line 848 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (WrongContext, DisplacedAct).
+	> Correct line 849 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext, DisplacedAct
+	> Correct line 850 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext, DisplacedAct
+	> Correct line 851 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+[FAIL] 'alg03_seq3 MisplacedBefore (с.3) Акт до main':	
+	> Correct line 863 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext, DisplacedAct
+	> Erroneous line 864 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (WrongContext, DisplacedAct).
+	> Correct line 865 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext, DisplacedAct
+	> Correct line 866 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly, DisplacedAct
+[FAIL] 'alg03_seq3 MisplacedBeforeAndAfter (с.5) Акт до и после main':	
+	> Correct line 879 has been recognized by the ontology as erroneous. Inferred mistakes: ExtraAct, TooEarly
+	> Correct line 880 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext, MissingAct
+	> Correct line 881 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext, MissingAct
+	> Erroneous line 882 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (WrongContext, MissingAct).
+	> Correct line 883 has been recognized by the ontology as erroneous. Inferred mistakes: Erroneous
+[FAIL] 'alg03_seq3 MisplacedWithout-1 (с.2) Акт при отсутствии main':	
+	> Erroneous line 896 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 2 (WrongContext, TooEarly).
+	> Correct line 897 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext
+	> Correct line 898 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext
+	> Correct line 899 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+[FAIL] 'alg03_seq3 MisplacedWithout-2 (с.3) Акт при отсутствии main':	
+	> Correct line 911 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext, TooEarly
+	> Erroneous line 912 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (WrongContext).
+	> Correct line 913 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext
+	> Correct line 914 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+[FAIL] 'alg03_seq3 MisplacedWithout-3 (с.4) Акт при отсутствии main':	
+	> Correct line 926 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext, TooEarly
+	> Correct line 927 has been recognized by the ontology as erroneous. Inferred mistakes: WrongContext
+	> Erroneous line 928 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (WrongContext).
+	> Correct line 929 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+[FAIL] 'alg03_seq3 DuplicatesOfAct-1 (с.4) Дубликат в следовании':	
+	> Erroneous line 943 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (DuplicateOfAct).
+[FAIL] 'alg03_seq3 DuplicatesOfAct-2 (с.5) Дубликат в следовании':	
+	> Erroneous line 962 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (DuplicateOfAct).
+[FAIL] 'alg03_seq3 DuplicatesOfAct-3 (с.6) Дубликат в следовании':	
+	> Erroneous line 981 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (DuplicateOfAct).
+[FAIL] 'alg03_seq3 DuplicatesOfAct-4 (с.4) Дубликат в следовании':	
+	> Erroneous line 997 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (DuplicateOfAct).
+	> Correct line 999 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+[FAIL] 'alg03_seq3 DuplicatesOfAct-5 (с.4) Дубликат в следовании':	
+	> Erroneous line 1014 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (Erroneous).
+[FAIL] 'alg03_seq3 DuplicatesOfAct-6 (с.4) Дубликат в следовании':	
+	> Erroneous line 1031 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (Erroneous).
+[FAIL] 'alg03_seq3 MissingAct-1 (с.3) Пропущен акт в следовании':	
+	> Erroneous line 1047 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (TooEarly).
+[FAIL] 'alg03_seq3 MissingAct-2 (с.4) Пропущен акт в следовании':	
+	> Erroneous line 1065 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (TooEarly).
+[FAIL] 'alg03_seq3 MissingAct-3 (с.5) Пропущен акт в следовании':	
+	> Erroneous line 1082 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (TooEarly).
+[FAIL] 'alg03_seq3 ActsPairMisorder-1 (с.3) Нарушен порядок следования':	
+	> Erroneous line 1096 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (DisplacedAct).
+	> Correct line 1097 has been recognized by the ontology as erroneous. Inferred mistakes: DisplacedAct
+	> Correct line 1098 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+[FAIL] 'alg03_seq3 ActsPairMisorder-2 (с.4) Нарушен порядок следования':	
+	> Erroneous line 1114 has been recognized by the ontology partially only (None in common). Expected but not recognized - 1 (!). Inferred but not expected - 1 (DisplacedAct).
+	> Correct line 1115 has been recognized by the ontology as erroneous. Inferred mistakes: DisplacedAct
+	> Correct line 1116 has been recognized by the ontology as erroneous. Inferred mistakes: TooEarly
+
+========================================
+Tests passed: False
+tests failed: 54 of 54.
+[Finished in 110.9s]
