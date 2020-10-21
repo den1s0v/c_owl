@@ -201,7 +201,7 @@ function define_syntax_mode() {
 	  start: [
 	    {regex: keyword_re, token: "keyword"},
 	    {regex: /true|false|ложь|истина/i, token: "atom"},
-	    {regex: /\d+(?:st|nd|th)?/i,
+	    {regex: /\d+(?:st|nd|rd|th)?/i,
 	    	// /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
 	     token: "number"},
 	    {regex: /(?:\/\/|#).*/, token: "comment"},

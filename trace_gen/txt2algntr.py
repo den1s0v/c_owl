@@ -655,9 +655,9 @@ class TraceParser:
             ENDED = "(?:закончил[оа]?с[ья]|ended)"
             EXECUTED = "(?:выполнил[оа]?с[ья]|executed)"
             Ith1_ru = r"(?:\s+(\d+)[-_]?й?\s+раз)"
-            Ith1_en = r"(?:\s+(\d+)(?:st|nd|th)?\s+time)"
-            Ith1 = r"(?:\s+(\d+)(?:st|nd|th|[-_]й)?\s+(?:time|раз))"
-            Ith1_femn = r"(?:\s+(\d+)(?:st|nd|th|[-_]я)?)"  # 1-я [итерация]
+            Ith1_en = r"(?:\s+(\d+)(?:st|nd|rd|th)?\s+time)"
+            Ith1 = r"(?:\s+(\d+)(?:st|nd|rd|th|[-_]й)?\s+(?:time|раз))"
+            Ith1_femn = r"(?:\s+(\d+)(?:st|nd|rd|th|[-_]я)?)"  # 1-я [итерация]
             PHASE_dict = dict(BEGAN=BEGAN, ENDED=ENDED, EXECUTED=EXECUTED, 
                 BEGAN_ru=BEGAN_ru, ENDED_ru=ENDED_ru, EXECUTED_ru=EXECUTED_ru, 
                 BEGAN_en=BEGAN_en, ENDED_en=ENDED_en, EXECUTED_en=EXECUTED_en, 
