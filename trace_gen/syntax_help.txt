@@ -1,5 +1,7 @@
 # syntax_help.txt
 
+Examples of correctly parsed algorithm structures trace lines can be found here.
+
 
 ===   Algorithms   ===
 
@@ -88,3 +90,57 @@ for each x in list  // my-for-in-5
 {  // myseq-1  -  начало именованного следования
 	...
 }
+
+
+
+===   Traces   ===
+
+
+
+началась программа
+закончилась программа
+program began
+program ended
+
+
+
+началось следование global_code 1-й раз
+закончилось следование global_code 1-й раз
+начался цикл my-while-1 1-й раз
+началась развилка my-alt-1 1-й раз
+началась функция main 1-й раз
+выполнилась функция main 1-й раз
+alternative over_color began 1st time
+loop by_response ended 1st time
+
+
+условие развилки (цвет==зелёный) выполнилось 1-й раз - истина
+условие цикла (while-cond-1) выполнилось 1-й раз - истина
+условие (while-cond-1) выполнилось 1-й раз - ложь
+condition (response_is_positive) executed 1st time - true
+condition of alternative (color_is_red) executed 1st time - true
+
+
+ветка иначе началась 1-й раз
+ветка иначе закончилась 1-й раз
+else branch began 1st time
+
+
+ветка условия развилки (цвет==зелёный) началась 1-й раз
+ветка условия развилки (цвет==зелёный) закончилась 1-й раз
+branch of condition (color_is_red) began 1st time
+
+
+началась итерация 1 цикла my-while-1
+началась итерация 1 цикла ожидание
+началась 1-я итерация цикла my-while-1
+iteration 1 of loop my-while-1 began
+1st iteration of loop my-while-1 began
+
+
+выполнилась инициализация (день = 1) 1-й раз
+выполнился переход (день=день+1) 1-й раз
+
+
+что-то выполнилось 1-й раз
+greet executed 1st time 

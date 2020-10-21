@@ -714,6 +714,7 @@ class TraceParser:
             # началась развилка my-alt-1 1-й раз
             # началась функция main 1-й раз
             # выполнилась функция main 1-й раз
+            # alternative over_color began 1st time
             #     alternative by_response ended 1st time
             m = re.match(r"""(?:({BEGAN_ru}|{ENDED_ru}|{EXECUTED_ru})\s+)?  # 1 phase (ru)
                 (следование|развилка|цикл|функция|sequence|alternative|loop|function)   # 2 struct 
@@ -757,6 +758,7 @@ class TraceParser:
             # условие цикла (while-cond-1) выполнилось 1-й раз - истина
             # условие (while-cond-1) выполнилось 1-й раз - ложь
             # condition (response_is_positive) executed 1st time - true
+            # condition of alternative (color_is_red) executed 1st time - true
             m = re.match(r"""
                 (?:условие|condition)
                 \s*
@@ -866,6 +868,7 @@ class TraceParser:
 
             # ветка условия развилки (цвет==зелёный) началась 1-й раз
             # ветка условия развилки (цвет==зелёный) закончилась 1-й раз
+            # branch of condition (color_is_red) began 1st time
             m = re.match(r"""
                 (?:
                     ветка
@@ -911,6 +914,8 @@ class TraceParser:
             # началась итерация 1 цикла my-while-1
             # началась итерация 1 цикла ожидание
             # началась 1-я итерация цикла my-while-1
+            # iteration 1 of loop my-while-1 began
+            # 1st iteration of loop my-while-1 began
             m = re.match(r"""
                 (?:({BEGAN_ru}|{ENDED_ru})\s+)?  # 1 phase_1 - (началась|закончилась)
                 (?:
