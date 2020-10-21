@@ -101,7 +101,8 @@ function processing_callback(response="wait")
 			mistakes_count = response.mistakes.length
 		
 		$('#status').html("Server's response:\n" + messages + '\n<br>' + mistakes_count + ` mistakes.`
-			+ '\n<br>' + JSON.stringify(response));
+			/// + '\n<br>' + JSON.stringify(response)
+			);
 		
 		if(response.mistakes)
 		{
