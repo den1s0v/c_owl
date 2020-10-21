@@ -2,6 +2,7 @@
 
 import copy
 import json
+import re
 from collections import namedtuple
 
 
@@ -19,7 +20,11 @@ def tr(word_en, case='nomn'):
 				.replace("(it)", '')
 				.replace("(branch)", '')
 				.replace("comment", '// ')
-				.replace("nth time", '-th time')
+				.replace("nth time", 'th time')
+				.replace("started", 'began')
+				.replace("finished", 'ended')
+				.replace("performed", 'executed')
+				.replace("cond", 'condition of')
 				.strip()
 		)
 	if TARGET_LANG != "ru":
@@ -2022,13 +2027,40 @@ if __name__ == "__main__":
 			f.write(str(alg_v))
 			print("Saved: ", "algorithm as text")
 
-			# tr_v_list = []
 			for boolean_line in tr_boolean_lines:
 				boolean_line = boolean_line.strip()
 				tr_v = TraceTextVisitor(boolean_line)
 				r.accept(tr_v)
-				f.write("\n\n// " + boolean_line_usage_report(boolean_line,tr_v) + '\n' + str(tr_v))
-				# tr_v_list.append(tr_v)
+				trace = str(tr_v)
+				
+				# apply patches
+				trace = trace.replace(
+						"1th", "1st"
+					).replace(
+						"2th", "2nd"
+					).replace(
+						"3th", "3rd"
+					).replace(
+						"branch condition of alternative", "branch of condition"
+					).replace(
+						"began program", "program began"
+					).replace(
+						"ended program", "program ended"
+					)
+					
+				###
+				# print(trace)
+					
+				# move <phase word> right before <ith>
+				trace = re.sub(r"^(\s*)(began\s+|ended\s+|executed\s+)(.+?\s+)(\d+\w+)", r"\1\3\2\4", trace, flags=re.M)
+
+				# remove "sequence global_code" lines
+				trace = re.sub(r"^\s*sequence\s+global_code.*?\s*^", "", trace, flags=re.M)
+					
+				# move <phase word> to the end of line on iteration line 
+				trace = re.sub(r"(began|ended|executed)\s+(iteration)(.+?)loop(.+?)$", r"\2\3of loop\4 \1", trace, flags=re.M)
+
+				f.write("\n\n// " + boolean_line_usage_report(boolean_line,tr_v) + '\n' + trace)
 
 
 		alg = stringify(r.to_dict_4onto(), False)
