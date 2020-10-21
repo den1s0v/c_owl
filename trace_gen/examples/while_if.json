@@ -1,0 +1,13 @@
+{
+"algorithm": [
+
+	{"while":"not_green", "name":"waiting", "body": [
+		{"alternative":"over_color", "branches": [
+				{"if": "color_is_red", "then": [
+					"wait"
+				]}
+			]
+		}
+	]}
+]
+}
