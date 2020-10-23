@@ -7,7 +7,7 @@ while not_green  // waiting
 
 // alg correct_trace
 {
-program began
+program began  // The trace is initially correct. Modify it to introduce mistakes, and then press "Send" button
   loop waiting began 1st time
     condition of loop (not_green) evaluated 1st time - true
     iteration 1 of loop waiting began
@@ -26,7 +26,7 @@ program began
     iteration 2 of loop waiting ended
     condition of loop (not_green) evaluated 3rd time - false
   loop waiting ended 1st time
-program ended
+program ended  // Don't know where to start? Try deleting rows other than the first and last one ones.
 }
 
 // alg broken_trace

@@ -23,6 +23,43 @@ $(document).ready(function(){
     }); 	
     
     
+    $("#load").click(function(){
+        if (cm_alg.isReadOnly())
+        {
+		    alert("Cannot insert the example data now.\nPlease enable the fields first by clicking 'Edit' button.")
+		}
+		else
+		{
+		    e_alg.setValue(`while not_green  // waiting
+  if color_is_red  // over_color
+    wait
+`);
+		    e_trace.setValue(`program began  // The trace is initially correct. Modify it to introduce mistakes, and then press "Send" button
+  loop waiting began 1st time
+    condition of loop (not_green) evaluated 1st time - true
+    iteration 1 of loop waiting began
+      alternative over_color began 1st time
+        condition (color_is_red) evaluated 1st time - true
+        branch of condition (color_is_red) began 1st time
+          wait executed 1st time
+        branch of condition (color_is_red) ended 1st time
+      alternative over_color ended 1st time
+    iteration 1 of loop waiting ended
+    condition of loop (not_green) evaluated 2nd time - true
+    iteration 2 of loop waiting began
+      alternative over_color began 2nd time
+        condition (color_is_red) evaluated 2nd time - false
+      alternative over_color ended 2nd time
+    iteration 2 of loop waiting ended
+    condition of loop (not_green) evaluated 3rd time - false
+  loop waiting ended 1st time
+program ended  // Don't know where to start? Try deleting rows other than the first and last one ones.
+`)
+		}
+		
+    }); 	
+    
+    
     $("#send").click(function(){
         if (cm_alg.isReadOnly())
         	// fields was not changed, so reset the values to the stored before previous send
@@ -100,7 +137,7 @@ function processing_callback(response="wait")
 		if(response.mistakes)
 			mistakes_count = response.mistakes.length
 		
-		$('#status').html("Server's response:\n" + messages + '\n<br>' + mistakes_count + ` mistakes.`
+		$('#status').html("Server's response:\n" + messages + '\n<br>' + mistakes_count + ` mistakes (the internal representation).`
 			/// + '\n<br>' + JSON.stringify(response)
 			);
 		
