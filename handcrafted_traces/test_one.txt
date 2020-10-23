@@ -1,24 +1,30 @@
 // algorithm alg
 {
-если условие (сейчас_красный)  // по_цвету
-    ждать
-иначе если условие (сейчас_зелёный)
-    бежать
-иначе
-    лежать
+while not_green  // waiting
+    if color_is_red  // over_color
+        wait
 }
 
 // alg trace
 {
-началась программа
-    началась развилка по_цвету 1-й раз
-        условие (сейчас_красный) выполнилось 1-й раз - истина
-        ветка условия (сейчас_красный) началась 1-й раз
-            ждать выполнилось 1-й раз 
-        ветка условия (сейчас_красный) закончилась 1-й раз
-        ветка иначe началась 1-й раз  // ошибка !!
-            лежать выполнилось 1-й раз 
-        ветка иначe закончилась 1-й раз
-    закончилась развилка по_цвету 1-й раз
-закончилась программа
+program began
+    loop waiting began 1st time
+        condition of loop (not_green) evaluated 1st time - true
+        iteration 1 of loop waiting began
+            alternative over_color began 1st time
+                condition of alternative (color_is_red) evaluated 1st time - true
+                branch of condition (color_is_red) began 1st time
+                    wait executed 1st time
+                branch of condition (color_is_red) ended 1st time
+            alternative over_color ended 1st time
+        iteration 1 of loop waiting ended
+        condition of loop (not_green) evaluated 2nd time - true
+        iteration 2 of loop waiting began
+            alternative over_color began 2nd time
+                condition of alternative (color_is_red) evaluated 2nd time - false
+            alternative over_color ended 2nd time
+        iteration 2 of loop waiting ended
+        condition of loop (not_green) evaluated 3rd time - false
+    loop waiting ended 1st time
+program ended
 }

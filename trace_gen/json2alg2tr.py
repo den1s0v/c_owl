@@ -2060,6 +2060,9 @@ if __name__ == "__main__":
 				# move <phase word> to the end of line on iteration line 
 				trace = re.sub(r"(began|ended|executed)\s+(iteration)(.+?)loop(.+?)$", r"\2\3of loop\4 \1", trace, flags=re.M)
 
+				# replace "executed" to "evaluated" (for condition lines only)
+				trace = re.sub(r"(condition[^\n\r]+)executed", r"\1evaluated", trace, flags=re.M)
+					
 				f.write("\n\n// " + boolean_line_usage_report(boolean_line,tr_v) + '\n' + trace)
 
 
