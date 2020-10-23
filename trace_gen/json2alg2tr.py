@@ -15,9 +15,9 @@ def tr(word_en, case='nomn'):
 	if TARGET_LANG == "en":
 		return (
 			str(word_en).lower()
-				.replace("(he)", '')
-				.replace("(she)", '')
-				.replace("(it)", '')
+				.replace("(he)", '')  # 1 leading space remains
+				.replace("(she)", '') # 1 leading space remains
+				.replace("(it)", '')  # 1 leading space remains
 				.replace("(branch)", '')
 				.replace("comment", '// ')
 				.replace("nth time", 'th time')
@@ -25,7 +25,7 @@ def tr(word_en, case='nomn'):
 				.replace("finished", 'ended')
 				.replace("performed", 'executed')
 				.replace("cond", 'condition of')
-				.strip()
+				.lstrip()
 		)
 	if TARGET_LANG != "ru":
 		raise ValueError("TARGET_LANG variable must contain one of {%s}, but has `%s`" % (str(SUPPORTED_LANGS),TARGET_LANG))
