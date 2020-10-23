@@ -10,7 +10,7 @@
             <Keywords name="Numbers, prefix2"></Keywords>
             <Keywords name="Numbers, extras1"></Keywords>
             <Keywords name="Numbers, extras2"></Keywords>
-            <Keywords name="Numbers, suffix1">st nd th</Keywords>
+            <Keywords name="Numbers, suffix1">st nd rd th</Keywords>
             <Keywords name="Numbers, suffix2">i</Keywords>
             <Keywords name="Numbers, range"></Keywords>
             <Keywords name="Operators1">; ( ) - [ ] , : &lt; &gt; &lt;= &gt;= = != + - * / .</Keywords>
