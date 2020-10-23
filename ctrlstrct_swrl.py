@@ -1143,7 +1143,7 @@ RULES.append(DomainRule(name="MissingLoopEndAfterFailedCondition-0-loop_Error",
 _more_rules = {}
 
 # Поиск лишних и пропущенных актов (ограниченная дальность просмотра)
-for i in range(1, 6+1):
+for i in range(1, 12+1):
 
 	pattern1 = ''.join([f"student_next(?c{j}, ?c{j+1}), " for j in range(1,i)])
 	pattern2 = f"student_next(?c{i}, ?b),"
