@@ -105,7 +105,8 @@ user_alg {boolean_chain}user_trace
 		for m in feedback["mistakes"]:
 			d = {
 				# ', '.join
-				"names": ([camelcase_to_snakecase(s) for s in m["classes"]]),
+				# "names": ([camelcase_to_snakecase(s) for s in m["classes"]]),
+				"names": m["classes"],
 				"act_abbr": ', '.join(str(o) for o in m["name"]),
 				"explanation": '; <br>&nbsp;&nbsp; '.join(str(o) for o in m["explanations"]),
 			}
