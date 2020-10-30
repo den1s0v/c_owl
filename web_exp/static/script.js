@@ -23,7 +23,7 @@ $(document).ready(function(){
     }); 	
     
     
-    $("#load").click(function(){
+    $("#load-correct").click(function(){
         if (cm_alg.isReadOnly())
         {
 		    alert("Cannot insert the example data now.\nPlease enable the fields first by clicking 'Edit' button.")
@@ -57,6 +57,35 @@ program ended  // Don't know where to start? Try deleting rows other than the fi
 `)
 		}
 		
+    }); 	
+    
+    $("#load-incorrect").click(function(){
+        if (cm_alg.isReadOnly())
+        {
+		    alert("Cannot insert the example data now.\nPlease enable the fields first by clicking 'Edit' button.")
+		}
+		else
+		{
+		    e_alg.setValue(`while not_green  // waiting
+  if color_is_red  // over_color
+    wait
+`);
+		    e_trace.setValue(`program began
+  loop waiting began 1st time
+    condition of loop (not_green) evaluated 1st time - true
+    iteration 1 of loop waiting began
+      alternative over_color began 1st time
+        condition (color_is_red) evaluated 1st time - false
+        branch of condition (color_is_red) began 1st time
+          wait executed 1st time
+        branch of condition (color_is_red) ended 1st time
+      alternative over_color ended 1st time
+    iteration 1 of loop waiting ended
+    condition of loop (not_green) evaluated 2nd time - true
+  loop waiting ended 1st time
+program ended`)
+		}
+		// e_trace.addLineClass(3, "background", "error-line")
     }); 	
     
     
