@@ -107,6 +107,7 @@ user_alg {boolean_chain}user_trace
 				# ', '.join
 				"names": ([camelcase_to_snakecase(s) for s in m["classes"]]),
 				"act_abbr": ', '.join(str(o) for o in m["name"]),
+				"explanation": '; <br>&nbsp;&nbsp; '.join(str(o) for o in m["explanations"]),
 			}
 			if m["text_line"]:
 				d["text_line"] = m["text_line"][0] - trace_line_i,

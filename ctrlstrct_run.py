@@ -16,6 +16,7 @@ import re
 from upd_onto import *
 from transliterate import slugify
 from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
+from explanations import format_explanation
 
 
 ONTOLOGY_maxID = 1
@@ -460,7 +461,8 @@ class TraceTester():
                     obj = class_(iri)
                     # привязываем id
                     make_triple(obj, onto.id, id_)
-                    # (имя не привязываем.)
+                    # привязываем имя
+                    make_triple(obj, onto.stmt_name, name)
                     
                     # make special string link identifying algorithm
                     if type_ == "algorithm":
@@ -882,6 +884,9 @@ def init_persistent_structure(onto):
         # новое свойство expr_value
         prop_expr_value = types.new_class("expr_value", (DataProperty, FunctionalProperty, ))
 
+        # новое свойство stmt_name
+        prop_stmt_name = types.new_class("stmt_name", (Thing >> str, DataProperty, FunctionalProperty, ))
+
         # новое свойство next
         types.new_class("next", (Thing >> Thing, ))
         types.new_class("next_act", (correct_act >> correct_act, FunctionalProperty, InverseFunctionalProperty))
@@ -951,9 +956,9 @@ def init_persistent_structure(onto):
                 "CorrespondingEndMismatched",
                 "CorrespondingEndPerformedDifferentTime",
                 "WrongExecTime",
+                "ActStartsAfterItsEnd", "ActEndsWithoutStart",
                 # "AfterTraceEnd",
                 # "DuplicateActInSequence",
-                "WrongExecTime",
                 "WrongContext",
                 "ExtraAct",
                 ("DuplicateOfAct", ["ExtraAct"]), # act was moved somewhere
@@ -982,7 +987,7 @@ def init_persistent_structure(onto):
                     # print(bases)
                     types.new_class(class_name, bases)
             
-        for prop_name in ("cause", "cause2", "should_be", "should_be_before", "context_should_be"):
+        for prop_name in ("precursor", "cause", "cause2", "should_be", "should_be_before", "context_should_be"):
             if not onto[prop_name]:
                 types.new_class(prop_name, (onto["Erroneous"] >> Thing,))
 
@@ -1048,6 +1053,7 @@ def extact_mistakes(onto, as_objects=False) -> dict:
     """Searches for instances of trace_error class and constructs a dict of the following form:
         "<error_instance1_name>": {
             "classes": ["list", "of", "class", "names", ...],
+            "explanations": ["list", "of", "messages", ...],
             "<property1_name>": ["list", "of", "property", "values", ...],
             "<property2_name>": [onto.iri_1, "reference", "can present", "too", ...],
             ...
@@ -1058,7 +1064,7 @@ def extact_mistakes(onto, as_objects=False) -> dict:
      """
     error_classes = onto.Erroneous.descendants()  # a set of the descendant Classes (including self)
 
-    properties_to_extract = ("name", onto.cause, onto.should_be, onto.should_be_before, onto.context_should_be, onto.text_line, )
+    properties_to_extract = ("name", onto.precursor, onto.cause, onto.should_be, onto.should_be_before, onto.context_should_be, onto.text_line, )
     mistakes = {}
 
     # The .instances() class method can be used to iterate through all Instances of a Class (including its subclasses). It returns a generator.
@@ -1085,6 +1091,7 @@ def extact_mistakes(onto, as_objects=False) -> dict:
         # print(classes, "-" ,base_classes)
         classes -= base_classes  # remove less precise bases
         mistakes[inst.name]["classes"] = [class_.name for class_ in classes]
+        mistakes[inst.name]["explanations"] = format_explanation(onto, inst)
     
     return mistakes
 

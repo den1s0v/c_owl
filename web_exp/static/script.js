@@ -125,21 +125,17 @@ function processing_callback(response="wait")
 	
 	if(response == "fail")
 	{
-		$('#status').html("An error occured while requesting the server (it can be busy or inaccessible). Please try again.<br>(Note that current environment is in debugging mode so can be slow and hang on concurrent requests.)");
+		$('#status').html("An error occured while requesting the server (it can fail with the request, be busy or inaccessible). Please try again.<br>(Note that current environment is in debugging mode so can be slow and hang on concurrent requests.)");
 		return
 	}
 	
 	if(response.messages)
 	{	
-		messages = response.messages.join("\n<br>")
-		
 		mistakes_count = 0
 		if(response.mistakes)
 			mistakes_count = response.mistakes.length
 		
-		$('#status').html("Server's response:\n" + messages + '\n<br>' + mistakes_count + ` mistakes (the internal representation).`
-			/// + '\n<br>' + JSON.stringify(response)
-			);
+		explanations = []
 		
 		if(response.mistakes)
 		{
@@ -149,13 +145,22 @@ function processing_callback(response="wait")
 			{
 				if(m["text_line"])
 				{
-					line = parseInt(m["text_line"])
+					const line = parseInt(m["text_line"])
 					if(!line2names[line])
 						line2names[line] = m["names"]
 					else
 						line2names[line] = line2names[line].concat(m["names"])
+	
+					if(m["explanation"])
+					{
+						// explanations = explanations.concat(m["explanations"])
+						explanations.push([line, "Line <b>" + line + "</b>: " + m["explanation"]])
+					}
 				}
 			}
+			
+			explanations.sort(function compare(a, b) {return a[0] - b[0]})
+			explanations = explanations.map( function(a) {return a[1]} )
 			
 			lines = load_field("trace").split('\n')
 			for(let i in line2names)
@@ -174,6 +179,14 @@ function processing_callback(response="wait")
 			var text = lines.join("\n")
 			e_trace.setValue(text)
 		}
+		
+		messages = (response.messages.concat(explanations)).join("\n<br>")
+		
+		$('#status').html("Server's response:\n" + messages + '\n<br>' 
+			+ mistakes_count + ` mistakes (in internal representation).`
+			// + '\n<br>' + JSON.stringify(response)
+			);
+		
 	}	
 }
 

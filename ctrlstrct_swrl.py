@@ -824,7 +824,7 @@ RULES.append(DomainRule(name="GenericWrongAct_Error",
 		id(?c, ?ic),
 		notEqual(?ib, ?ic),
 	 -> should_be(?c, ?b), 
-	 cause(?c, ?a), 
+	 precursor(?c, ?a), 
 	 Erroneous(?c)
 """))
 
@@ -870,6 +870,24 @@ RULES.append(DomainRule(name="GenericWrongExecTime-e_Error",
 	exec_time(?b, ?n2),
 	notEqual(?n1, ?n2),
 	 -> WrongExecTime(?c)
+"""))
+
+
+RULES.append(DomainRule(name="ActStartsAfterItsEnd_Error", 
+	tags={'mistake'},
+	swrl="""
+	act_begin(?a),
+	act_end(?b),
+	executes(?a, ?st),
+	executes(?b, ?st),
+	exec_time(?a, ?n),
+	exec_time(?b, ?n),
+	student_index(?a, ?ia),
+	student_index(?b, ?ib),
+	lessThan(?ib, ?ia),  # b < a
+	 -> cause(?a, ?b), cause(?b, ?a), 
+	  ActStartsAfterItsEnd(?a),
+	  ActEndsWithoutStart(?b)
 """))
 
 
@@ -933,6 +951,16 @@ RULES.append(DomainRule(name="DisplacedAct_Error",
 	 -> DisplacedAct(?c1)
 """))
 
+# # Перемещённый акт [works with Pellet]
+# # Базируется одновременно на ExtraAct и MissingAct
+# RULES.append(DomainRule(name="DisplacedAct_Error", 
+# 	tags={'mistake', 'sequence'},
+# 	swrl="""
+# 	ExtraAct(?c1), 
+# 	MissingAct(?c1), 
+# 	 -> DisplacedAct(?c1)
+# """))
+
 # ============ Alternatives mistakes ============ #
 
 # Развилка не начинается с условия [works with Pellet]
@@ -969,7 +997,8 @@ RULES.append(DomainRule(name="BranchOfFalseCondition-alt_Error",
 	
 	# student_next(?a, ?b),
 	Erroneous(?b), 	  # как страховка, сработает и без этого
-	 -> BranchOfFalseCondition(?b)
+	 -> cause(?b, ?a),
+	 BranchOfFalseCondition(?b)
 """))
 
 # Условие после ветки  [works with Pellet]
