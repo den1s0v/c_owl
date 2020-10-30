@@ -119,7 +119,11 @@ class TraceTester():
                 
                 if self.values_source == "algorithm":
                     assert expr_name is not None, str(expr_name)
-                    expr_values = self.data["algorithm"]["expr_values"][expr_name]
+                    expr_values_dict = self.data["algorithm"]["expr_values"]
+                    if expr_name in expr_values_dict:
+                        expr_values = expr_values_dict[expr_name]
+                    else:
+                        raise ValueError(f"Algorithm processing error: No values of condition expression '{expr_name}' are provided.\nConsider example of how to specify values [true, true, false] for this condition as if it belongs to a loop:\n <pre>while {expr_name} -> 110  // loop_name</pre>")
                     v = get_ith_expr_value(expr_values, i=n - 1)
                 
                 if self.values_source == "trace":
@@ -467,7 +471,8 @@ class TraceTester():
                                 prop = types.new_class("algorithm_name", (Thing >> str, ))
                         make_triple(obj, prop, self.data["algorithm_name"])
                 # else: raise "no id!"
-                    
+            
+            # link the instances
             for d in alg_objects:
                 if "id" in d:
                     for k in d:  # ищем объекты среди полей словаря
@@ -781,9 +786,6 @@ def init_persistent_structure(onto):
         # ->
         class sequence(Thing): pass
         
-        # -->
-        class alt_branch(sequence): pass
-        
         # признак first
         class first_item(Thing, ): pass
         # признак last
@@ -855,10 +857,12 @@ def init_persistent_structure(onto):
                 equivalent_to = [unconditional_loop]  # reduce an inheritance level: use "equivalent_to" instead of inheritance
               
         
+        # -->
+        class alt_branch(sequence): pass
 
         # make algorithm elements classes
         for class_name in [
-            "func", "alternative", "alt_branch", "expr", 
+            "func", "alternative", "expr", 
         ]:
             types.new_class(class_name, (Thing,))
 

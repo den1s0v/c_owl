@@ -121,7 +121,7 @@ def make_triple(subj, prop, obj):
 		else:
 			prop[subj].append(obj)
 	except Exception as e:
-		print("make_triple: ", subj, prop, obj)
+		print("Exception in make_triple: ", subj, prop, obj)
 		raise e
 
 
@@ -134,11 +134,11 @@ def remove_triple(subj, prop, obj):
 			if obj in prop[subj]:
 				prop[subj].remove(obj)
 	except Exception as e:
-		print("remove_triple: ", subj, prop, obj)
+		print("Exception in remove_triple: ", subj, prop, obj)
 		raise e
 
 
-def get_relation_object(subj,prop):
+def get_relation_object(subj, prop):
 	"""
 	Another way to retrieve 3rd element of stored triple.
 	Usage:
