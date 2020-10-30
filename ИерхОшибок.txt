@@ -1,14 +1,18 @@
+A list of errors & explanation templates
+https://docs.google.com  !  /spreadsheets/d/1ex2ZoqpyhaHF8JWvUnW4IwE6azig8P9LFY8aWwHQr-s/edit#gid=0
+
+
 2   
 Begin_then_end (act a)
-1   ActStartsAfterEnd (act a)
-2   ActEndsDifferent (act a, act b)
+-1   ActStartsAfterItsEnd / ActEndsWithoutStart (act a, act b)
++2   ActEndsDifferent = CorrespondingEndMismatched (act a, act b) Открылся один акт, а закрылся другой
 
 
 3
 IS_containment (act a_i, IS act a)
 1    MisplacedAfter
 2    MisplacedBefore - вне объемлющего акта, ДО
-3    MisplacedBeforeAndAfter
+3    MisplacedBeforeAndAfter ?
 4    MisplacedWithout
 5    MisplacedDeeper
 
@@ -67,11 +71,11 @@ Conditional_Loop (Loop act L)	# Общие правила для циклов с
     }
     
 1	NoCondition	(L) (условие не проверяется ни разу; ни одного условия)
--2	MissingIterationAfterSuccessfulCondition	(L, condition act c)    (при истинном условии продолжения нет итерации; нет итерации после истинного условия)
++2	MissingIterationAfterSuccessfulCondition	(L, condition act c)    (при истинном условии продолжения нет итерации; нет итерации после истинного условия)
 3	MissingIterationBetweenLoopConditions	(L, condition act с1, condition act c2) (дубликат условия; пропуск итерации между условиями)
 4	MissingConditionBetweenIterations	(L, iteration i1, i2)   (дубликат итерации; пропуск условия между итерациями)
 5	[no-break] MissingConditionAfterIteration	(L, iteration i)  (нет условия после итерации)
--6  NoLoopEndA FailedCondition  (L, condition act c, extra act e) (после завершающей проверки условия цикл не заканчивается)
++6  MissingLoopEndAfterFailedCondition  (L, condition act c, extra act e) (после завершающей проверки условия цикл не заканчивается)
 
 6 (6.1) (+ Conditional_Loop)
 While_Loop (WhileLoop act L)
@@ -80,7 +84,7 @@ While_Loop (WhileLoop act L)
 
 7 (7.1) (+ Conditional_Loop)
 Do_Loop (DoLoop act L)
-1    NoIterationsInDoLoop (L)  (нет ни одной итерации в цикле Do-While)
+-1    NoIterationsInDoLoop (L)  (нет ни одной итерации в цикле Do-While)
 -2    MissingDoIterationBeforeCondition (L, condition act c)  (пропущена первая итерация Do-While)
 
 
@@ -95,7 +99,7 @@ For_Loop (ForLoop act L)
     }
     
 -1	MissingInitActInForLoop (L)  (пропущена инициализация цикла For)
-2	DuplicatesOfForInit (L, for_init act init)  (несколькр актов инициализации цикла For)
+-2	DuplicatesOfForInit (L, for_init act init)  (несколько актов инициализации цикла For)
 -2   MissingConditionAfterForInit (L, i) === NoCondition (L) (цикл не начинается после Init; ни одной проверки условия)
 
  -- 4,5 - проверки в конце цикла
