@@ -95,10 +95,14 @@ user_alg {boolean_chain}user_trace
 	def convert_line_index(i: int):
 		return i - trace_line_i
 	
+	def convert_line_index_in_str(s):
+		if "line" in s:
+			s = __LINE_IDNEX_RE.sub(lambda s: f"line {convert_line_index(int(s.group(1)))}", s)
+		return s
+	
 	if "messages" in feedback:
 		for s in feedback["messages"]:
-			if "line" in s:
-				s = __LINE_IDNEX_RE.sub(lambda s: f"line {convert_line_index(int(s.group(1)))}", s)
+			s = convert_line_index_in_str(s)
 			formatted_feedback["messages"].append(s)
 	
 	if "mistakes" in feedback:
@@ -108,7 +112,7 @@ user_alg {boolean_chain}user_trace
 				# "names": ([camelcase_to_snakecase(s) for s in m["classes"]]),
 				"names": m["classes"],
 				"act_abbr": ', '.join(str(o) for o in m["name"]),
-				"explanation": '; <br>&nbsp;&nbsp; '.join(str(o) for o in m["explanations"]),
+				"explanation": '; <br>&nbsp;&nbsp; '.join(convert_line_index_in_str(o) for o in m["explanations"]),
 			}
 			if m["text_line"]:
 				d["text_line"] = m["text_line"][0] - trace_line_i,
