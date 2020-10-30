@@ -1,3 +1,66 @@
+// алгоритм MUTE____alg_inner_seq2 (следование со вложенным следованием)
+{
+    outer_first
+    {  # inner_seq
+		inner_first
+		inner_second
+	}
+	outer_second
+    outer_third
+}
+
+/* 
+alg_inner_seq2 try
+*/
+{
+началась программа
+outer_first выполнилось 1-й раз
+закончилось следование inner_seq 1-й раз
+    inner_first выполнилось 1-й раз 
+    inner_second выполнилось 1-й раз 
+началось следование inner_seq 1-й раз
+outer_second выполнилось 1-й раз
+outer_third выполнилось 1-й раз
+закончилась программа
+}
+
+
+/* 
+SKIP____alg_inner_seq2 all ok
+*/
+{
+началась программа
+outer_first выполнилось 1-й раз
+началось следование inner_seq 1-й раз
+    inner_first выполнилось 1-й раз 
+    inner_second выполнилось 1-й раз 
+закончилось следование inner_seq 1-й раз
+outer_second выполнилось 1-й раз
+outer_third выполнилось 1-й раз
+закончилась программа
+}
+
+
+
+
+/* 
+SKIP____alg_inner_seq2 MisplacedBefore
+*/
+{
+началась программа
+outer_first выполнилось 1-й раз
+    inner_first выполнилось 1-й раз     // ошибки DisplacedAct, WrongContext
+началось следование inner_seq 1-й раз   // ошибка DisplacedAct
+    inner_second выполнилось 1-й раз    // ошибка TooEarly
+закончилось следование inner_seq 1-й раз
+outer_second выполнилось 1-й раз
+outer_third выполнилось 1-й раз
+закончилась программа
+}
+
+
+
+
 // algorithm alg
 {
 while not_green  // waiting
@@ -5,7 +68,7 @@ while not_green  // waiting
     wait
 }
 
-// alg correct_trace
+// SKIP____alg correct_trace
 {
 program began  // The trace is initially correct. Modify it to introduce mistakes, and then press "Send" button
   loop waiting began 1st time
@@ -29,7 +92,7 @@ program began  // The trace is initially correct. Modify it to introduce mistake
 program ended  // Don't know where to start? Try deleting rows other than the first and last one ones.
 }
 
-// alg broken_trace
+// SKIP____alg broken_trace
 {
 program began
   loop waiting began 1st time
@@ -41,5 +104,41 @@ program began
     iteration 1 of loop waiting ended
     condition of loop (not_green) evaluated 2nd time - true
   loop waiting ended 1st time
+program ended
+}
+
+// SKIP____alg broken_trace2
+{
+program began
+  loop waiting began 1st time
+    condition of loop (not_green) evaluated 1st time - true
+    iteration 1 of loop waiting began
+      alternative over_color began 1st time
+        condition (color_is_red) evaluated 1st time - false
+        branch of condition (color_is_red) began 1st time
+          wait executed 1st time
+        branch of condition (color_is_red) ended 1st time
+      alternative over_color ended 1st time
+    iteration 1 of loop waiting ended
+    condition of loop (not_green) evaluated 2nd time - true
+  loop waiting ended 1st time
+program ended
+}
+
+// alg broken_trace2 - inferred
+{
+program began
+  loop waiting began 1st time
+    condition of loop (not_green) evaluated 1st time - true
+    iteration 1 of loop waiting began
+      alternative over_color began 1st time
+        condition (color_is_red) evaluated 1st time - false
+        branch of condition (color_is_red) began 1st time  // error: all_false_no_end, branch_of_false_condition
+          wait executed 1st time  // error: extra_act
+        branch of condition (color_is_red) ended 1st time  // error: extra_act
+      alternative over_color ended 1st time
+    iteration 1 of loop waiting ended
+    condition of loop (not_green) evaluated 2nd time - true
+  loop waiting ended 1st time  // error: missing_iteration_after_successful_condition, too_early
 program ended
 }
