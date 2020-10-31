@@ -11,8 +11,8 @@ Begin_then_end (act a)
 3
 IS_containment (act a_i, IS act a)
 +  WrongContext:
--1    MisplacedAfter
--2    MisplacedBefore - вне объемлющего акта, ДО
++1    MisplacedAfter
++2    MisplacedBefore - вне объемлющего акта, ДО
 3    MisplacedBeforeAndAfter ?
 4    MisplacedWithout
 -5    MisplacedDeeper

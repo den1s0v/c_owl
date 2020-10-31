@@ -963,6 +963,7 @@ def init_persistent_structure(onto):
                 "WrongContext",
                 ("MisplacedBefore", ["WrongContext"]),
                 ("MisplacedAfter", ["WrongContext"]),
+                ("MisplacedDeeper", ["WrongContext"]),
                 
                 "ExtraAct",
                 ("DuplicateOfAct", ["ExtraAct"]), # act was moved somewhere

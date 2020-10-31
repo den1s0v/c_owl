@@ -872,6 +872,25 @@ RULES.append(DomainRule(name="MisplacedAfter_Error",
 	 MisplacedAfter(?a),
 	 MisplacedAfter(?e)
 """))
+# when act of right context (?p) is present
+RULES.append(DomainRule(name="MisplacedDeeper_Error", 
+	tags={'mistake'},
+	swrl="""
+	WrongContext(?a),
+	corresponding_end(?a, ?e),
+	parent_of(?p, ?a),
+	corresponding_end(?p, ?pe),
+	# p < a [<] e < pe
+		student_index(?a, ?ia),
+		student_index(?p, ?ip),
+		lessThan(?ip, ?ia),
+		student_index(?e, ?ie),
+		student_index(?pe, ?ipe),
+		lessThan(?ie, ?ipe),
+	 -> 
+	 MisplacedDeeper(?a),
+	 MisplacedDeeper(?e)
+"""))
 
 RULES.append(DomainRule(name="GenericWrongExecTime-b_Error", 
 	tags={'mistake'},
