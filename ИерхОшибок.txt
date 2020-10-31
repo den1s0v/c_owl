@@ -4,17 +4,18 @@ https://docs.google.com  !  /spreadsheets/d/1ex2ZoqpyhaHF8JWvUnW4IwE6azig8P9LFY8
 
 2   
 Begin_then_end (act a)
--1   ActStartsAfterItsEnd / ActEndsWithoutStart (act a, act b)
++1   ActStartsAfterItsEnd / ActEndsWithoutStart (act a, act b)
 +2   ActEndsDifferent = CorrespondingEndMismatched (act a, act b) Открылся один акт, а закрылся другой
 
 
 3
 IS_containment (act a_i, IS act a)
-1    MisplacedAfter
-2    MisplacedBefore - вне объемлющего акта, ДО
++  WrongContext:
+-1    MisplacedAfter
+-2    MisplacedBefore - вне объемлющего акта, ДО
 3    MisplacedBeforeAndAfter ?
 4    MisplacedWithout
-5    MisplacedDeeper
+-5    MisplacedDeeper
 
 
 1

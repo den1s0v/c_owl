@@ -841,6 +841,37 @@ RULES.append(DomainRule(name="GenericWrongParent_Error",
 	 # cause(?a, ?c), 
 	 WrongContext(?a)
 """))
+# when act of right context (?p) is present
+RULES.append(DomainRule(name="MisplacedBefore_Error", 
+	tags={'mistake'},
+	swrl="""
+	WrongContext(?a),
+	corresponding_end(?a, ?e),
+	parent_of(?p, ?a),
+	# [a <] e < p
+		student_index(?e, ?ie),
+		student_index(?p, ?ip),
+		lessThan(?ie, ?ip),
+	 -> 
+	 MisplacedBefore(?a),
+	 MisplacedBefore(?e)
+"""))
+# when act of right context (?p) is present
+RULES.append(DomainRule(name="MisplacedAfter_Error", 
+	tags={'mistake'},
+	swrl="""
+	WrongContext(?a),
+	corresponding_end(?a, ?e),
+	parent_of(?p, ?a),
+	corresponding_end(?p, ?pe),
+	# [p <] pe < a [< e]
+		student_index(?a, ?ia),
+		student_index(?pe, ?ipe),
+		lessThan(?ipe, ?ia),
+	 -> 
+	 MisplacedAfter(?a),
+	 MisplacedAfter(?e)
+"""))
 
 RULES.append(DomainRule(name="GenericWrongExecTime-b_Error", 
 	tags={'mistake'},
@@ -908,7 +939,7 @@ RULES.append(DomainRule(name="DuplicateOfAct-seq-b_Error",
 	executes(?c1, ?st),
 
 	executes(?c, ?st),
-	parent_of(?p, ?c),
+	student_parent_of(?p, ?c),
 	act_begin(?c),
 
 		id(?c1, ?ic1),
@@ -931,7 +962,7 @@ RULES.append(DomainRule(name="DuplicateOfAct-seq-e_Error",
 	executes(?c1, ?st),
 
 	executes(?c, ?st),
-	parent_of(?p, ?c),
+	student_parent_of(?p, ?c),
 	act_end(?c),
 
 		id(?c1, ?ic1),

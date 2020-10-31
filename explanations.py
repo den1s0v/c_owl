@@ -115,7 +115,7 @@ def format_by_spec(format_str: str, **params: dict):
 		format_str = format_str.replace(key, value)
 		
 	###
-	print(format_str)
+	print('*', format_str)
 		
 	return format_str
 	# return 'cannot format it...'
@@ -140,10 +140,12 @@ def register_explanation_handlers(onto):
 	class_name = list(class_name.split())[0]
 	
 	def _param_provider(a: 'act_instance'):
-		sequence_act = get_relation_subject(onto.parent_of, a)
+		# sequence_act = get_relation_subject(onto.parent_of, a)
+		item = get_relation_object(a, onto.executes)
+		sequence = get_relation_subject(onto.body_item, item)
 		return {
-			'<B>': format_full_name(a, 0).capitalize(),
-			'<A>': format_full_name(sequence_act, 0,0,0),
+			'<B>': format_full_name(a, 0,0,0),
+			'<A>': format_full_name(sequence, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	

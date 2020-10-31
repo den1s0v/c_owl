@@ -959,7 +959,11 @@ def init_persistent_structure(onto):
                 "ActStartsAfterItsEnd", "ActEndsWithoutStart",
                 # "AfterTraceEnd",
                 # "DuplicateActInSequence",
+                
                 "WrongContext",
+                ("MisplacedBefore", ["WrongContext"]),
+                ("MisplacedAfter", ["WrongContext"]),
+                
                 "ExtraAct",
                 ("DuplicateOfAct", ["ExtraAct"]), # act was moved somewhere
                 "MissingAct",

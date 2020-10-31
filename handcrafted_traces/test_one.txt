@@ -1,4 +1,4 @@
-// алгоритм MUTE____alg_inner_seq2 (следование со вложенным следованием)
+// алгоритм alg_inner_seq2 (следование со вложенным следованием)
 {
     outer_first
     {  # inner_seq
@@ -15,10 +15,11 @@ alg_inner_seq2 try
 {
 началась программа
 outer_first выполнилось 1-й раз
-закончилось следование inner_seq 1-й раз
     inner_first выполнилось 1-й раз 
-    inner_second выполнилось 1-й раз 
 началось следование inner_seq 1-й раз
+    inner_first выполнилось 2-й раз 
+закончилось следование inner_seq 1-й раз
+    inner_second выполнилось 1-й раз 
 outer_second выполнилось 1-й раз
 outer_third выполнилось 1-й раз
 закончилась программа
@@ -61,7 +62,7 @@ outer_third выполнилось 1-й раз
 
 
 
-// algorithm alg
+// algorithm MUTE____alg
 {
 while not_green  // waiting
   if color_is_red  // over_color
