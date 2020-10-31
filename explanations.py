@@ -239,3 +239,56 @@ def register_explanation_handlers(onto):
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
+	
+	spec = """MisplacedBefore	<Акт Б> не может выполняться раньше <начало акта А> потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>
+"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		correct_parent_act = get_relation_object(a, onto.context_should_be)
+		return {
+			'<A>': format_full_name(correct_parent_act, 0,0,0),
+			'<B>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """MisplacedAfter	<Акт Б> не может выполняться позже <конец акта А> потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed outside of (later than) <A>
+"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		correct_parent_act = get_relation_object(a, onto.context_should_be)
+		return {
+			'<A>': format_full_name(correct_parent_act, 0,0,0),
+			'<B>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """MisplacedDeeper	<Акт Б> не может выполняться в рамках акта <В>, вложенного в <акт А>, потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed whitin act nested to <A>
+"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		correct_parent_act = get_relation_object(a, onto.context_should_be)
+		return {
+			'<A>': format_full_name(correct_parent_act, 0,0,0),
+			'<B>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+# WrongContext is left not replaced in case if absence of correct act
+	spec = """WrongContext	<Акт Б> не может выполняться при отсутствии выполения <акта А>, потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed while no act of <A> exists
+"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		correct_parent_act = get_relation_object(a, onto.context_should_be)
+		return {
+			'<A>': format_full_name(correct_parent_act, 0,0,0),
+			'<B>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	

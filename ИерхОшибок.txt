@@ -14,8 +14,8 @@ IS_containment (act a_i, IS act a)
 +1    MisplacedAfter
 +2    MisplacedBefore - вне объемлющего акта, ДО
 3    MisplacedBeforeAndAfter ?
-4    MisplacedWithout
--5    MisplacedDeeper
+(+)4    MisplacedWithout === WrongContext после фильтрации подклассами
++5    MisplacedDeeper
 
 
 1
