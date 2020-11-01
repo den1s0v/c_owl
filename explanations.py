@@ -230,6 +230,29 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 	
 	
+	spec = """TooEarlyInSequence	<конец акта А> не может находится позже <начало акта Б>, потому что в <следование В><оператор А> находится перед <оператор Б>	Act <A> is placed in sequnce <C> before act <B> so act <A> must finish before act <B> starts"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		item = get_relation_object(a, onto.executes)
+		sequence = get_relation_subject(onto.body_item, item)
+		missing_acts = list(onto.should_be_after[a])
+		stmts = {format_full_name(act, 0,0,0) for act in missing_acts}
+		plur1_s = 's' if len(stmts) > 1 else ''
+		is1_are = 'are' if len(stmts) > 1 else 'is'
+		stmts = ", ".join(stmts)
+		acts = ", ".join("'%s'"%format_full_name(act, 1,0,0, quote='') for act in missing_acts)
+		plur2_s = 's:' if len(stmts) > 1 else ''
+		
+		return {
+			'Act <A> is': f"Act{plur1_s} {stmts} {is1_are}",
+			'act <A>': f"act{plur2_s} {acts}",
+			'<B>': format_full_name(a, 0,0,0),
+			'<C>': format_full_name(sequence, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
 	spec = """ExtraAct		<A> must not happen here due to previous error(s)"""
 	class_name, _, format_str = spec.split('\t')
 	

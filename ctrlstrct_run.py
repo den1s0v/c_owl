@@ -970,6 +970,7 @@ def init_persistent_structure(onto):
                 "MissingAct",
                 "TooEarly", # right after missing acts
                 ("DisplacedAct", ["TooEarly","ExtraAct","MissingAct"]),
+                ("TooEarlyInSequence", ["TooEarly"]),
                 # Alternatives mistakes ...
                 "NoFirstCondition",
                 ("BranchOfFalseCondition", ["ExtraAct"]),
@@ -992,7 +993,7 @@ def init_persistent_structure(onto):
                     # print(bases)
                     types.new_class(class_name, bases)
             
-        for prop_name in ("precursor", "cause", "cause2", "should_be", "should_be_before", "context_should_be"):
+        for prop_name in ("precursor", "cause", "cause2", "should_be", "should_be_before", "should_be_after", "context_should_be"):
             if not onto[prop_name]:
                 types.new_class(prop_name, (onto["Erroneous"] >> Thing,))
 

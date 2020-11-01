@@ -991,7 +991,7 @@ RULES.append(DomainRule(name="DuplicateOfAct-seq-e_Error",
 	 DuplicateOfAct(?c1)
 """))
 
-# Перемещённый акт [works with Pellet]
+# Moved act [works with Pellet]
 # Базируется одновременно на ExtraAct и MissingAct
 RULES.append(DomainRule(name="DisplacedAct_Error", 
 	tags={'mistake', 'sequence'},
@@ -1001,15 +1001,19 @@ RULES.append(DomainRule(name="DisplacedAct_Error",
 	 -> DisplacedAct(?c1)
 """))
 
-# # Перемещённый акт [works with Pellet]
-# # Базируется одновременно на ExtraAct и MissingAct
-# RULES.append(DomainRule(name="DisplacedAct_Error", 
-# 	tags={'mistake', 'sequence'},
-# 	swrl="""
-# 	ExtraAct(?c1), 
-# 	MissingAct(?c1), 
-# 	 -> DisplacedAct(?c1)
-# """))
+# TooEarly act in sequence [works with Pellet?]
+RULES.append(DomainRule(name="TooEarlyInSequence_Error", 
+	tags={'mistake', 'sequence'},
+	swrl="""
+	TooEarly(?b), 
+	student_parent_of(?sa, ?b),
+	executes(?sa, ?seq),
+	sequence(?seq),
+	should_be_before(?a, ?b), 
+	student_parent_of(?sa, ?a),
+	 -> should_be_after(?b, ?a), 
+	 TooEarlyInSequence(?b)
+"""))
 
 # ============ Alternatives mistakes ============ #
 
