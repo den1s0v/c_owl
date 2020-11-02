@@ -5,3 +5,7 @@ test_data/*/*.rdf
 test_data/*.rdf
 *report*
 *dbg*
+
+trace_gen/*out*.*
+trace_gen/tr_in.txt
+trace_gen/alg_in.json
