@@ -32,16 +32,19 @@ SeqA_contains_B (Sequence A, statement B)
 LinearOrder (Sequence A)
 1    ActsPairMisorder (act a, act b, Sequence A)
             Нарушен порядок следования
++2	TooEarlyInSequence
+			should_be_after [acts]
 
     
 5 (5.1)
 Alternative
 +1    AllFalseNoElse (Alternative act a)  // ни одна ветка не выполнилась
 +2    NoFirstCondition (Alternative act a)
-+3    AnotherExtraBranch (a, branch B)
-+4    BranchOfFalseCondition (a, branch act b, condition act c)
-+5    NoNextCondition (a, condition act c)
-+6    NoBranchWhenConditionIsTrue (a, branch B, condition act c)
++3    NoNextCondition (a, condition act c)
++	  WrongBranch (=> BranchOfLaterCondition):
++4    	AnotherExtraBranch (a, branch B)
++5    	BranchOfFalseCondition (a, branch act b, condition act c)
++6    	NoBranchWhenConditionIsTrue (a, branch B, condition act c)
 7    NextConditionAfterTrueCondition (a, condition act c_true, condition act c_extra)  // выполнилось условие после предыдущего истинного
 8    AllFalseNoEnd (a, condition act c)
 9    DuplicateOfCondition  (a, condition act с1, condition act c2)

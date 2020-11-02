@@ -133,42 +133,13 @@ def register_handler(class_name, format_str, method):
 	# 	print(f" Warning: cannot register_explanation_handler for '{class_name}': no such class in the ontology.")
 	
 
+
 def register_explanation_handlers(onto):
 	
-	spec = """DuplicateOfAct (sequence only)	Оператор Б входит в следование А, при этом между  началом акта А и концом акта А содержится больше одного акта Б	Act <B> is a part of sequence <A> so each execution of <A> can contain strictly one execution of <B>"""
-	class_name, _, format_str = spec.split('\t')
-	class_name = list(class_name.split())[0]
 	
-	def _param_provider(a: 'act_instance'):
-		# sequence_act = get_relation_subject(onto.parent_of, a)
-		item = get_relation_object(a, onto.executes)
-		sequence = get_relation_subject(onto.body_item, item)
-		return {
-			'<B>': format_full_name(a, 0,0,0),
-			'<A>': format_full_name(sequence, 0,0,0),
-			}
-	register_handler(class_name, format_str, _param_provider)
+	######### General act mistakes #########
+	########========================########
 	
-	
-	spec = """MissingIterationAfterSuccessfulCondition	Во время выполнения цикла <акт А> на <i-ой> итерации должно выполниться тело <В>, потому что условие <Бi> истинно	Iteration <C> of loop <A> must happen because condition <B> is true"""
-	class_name, _, format_str = spec.split('\t')
-	
-	def _param_provider(a: 'act_instance'):
-		onto = a.namespace
-		
-		# cond_act = get_relation_subject(onto.student_next, a)
-		cond_act = get_relation_object(a, onto.precursor)
-		cond = get_relation_object(cond_act, onto.executes)
-		loop = get_relation_subject(onto.cond, cond)
-		
-		return {
-			'<C> ': '',
-			'<B>': format_full_name(cond, 0),
-			'<A>': format_full_name(loop, 0,0,0),
-			}
-	register_handler(class_name, format_str, _param_provider)
-	
-
 	spec = """ActEndsWithoutStart	<начало акта А> не может выполняться позже <конец акта А>.	Act <A> can't finish in this line because it didn't start yet."""
 	class_name, _, format_str = spec.split('\t')
 	
@@ -189,95 +160,6 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """BranchOfFalseCondition	Во время выполнения альтернативы <акт А> не должна выполниться ветка <В>, потому что условие <Б> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
-	class_name, _, format_str = spec.split('\t')
-	
-	def _param_provider(a: 'act_instance'):
-		onto = a.namespace  # debugging reassignment (useless until different 'onto' appear)
-		cond_act = get_relation_object(a, onto.cause)
-		# cond = get_relation_object(cond_act, onto.executes)
-		alt_act = get_relation_subject(onto.student_parent_of, a)
-		return {
-			'<A>': format_full_name(alt_act, 0,0,0),
-			'<B>': format_full_name(cond_act, 0,1,1),
-			'<C>': format_full_name(a, 0,0,0),
-			}
-	register_handler(class_name, format_str, _param_provider)
-
-
-	spec = """AllFalseNoEnd		Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
-	class_name, _, format_str = spec.split('\t')
-	
-	def _param_provider(a: 'act_instance'):
-		onto = a.namespace
-		cond_act = get_relation_object(a, onto.precursor)
-		# cond = get_relation_object(cond_act, onto.executes)
-		alt_act = get_relation_subject(onto.student_parent_of, cond_act)
-		return {
-			'<A>': format_full_name(alt_act, 0,0,0),
-			'<B>': format_full_name(cond_act, 0,1,1),
-			}
-	register_handler(class_name, format_str, _param_provider)
-
-
-	spec = """AllFalseNoElse	Во время выполнения альтернативы <акт А> должна выполниться ветка <Г>, потому что условие <Б> ложно	Alternative <A> must execute branch <D> because the condition <B> is false"""
-	class_name, _, format_str = spec.split('\t')
-	
-	def _param_provider(a: 'act_instance'):
-		onto = a.namespace
-		cond_act = get_relation_object(a, onto.precursor)
-		alt_act = get_relation_subject(onto.student_parent_of, cond_act)
-		return {
-			'<A>': format_full_name(alt_act, 0,0,0),
-			'<B>': format_full_name(cond_act, 0,1,1),
-			'<D>': "'else'",
-			}
-	register_handler(class_name, format_str, _param_provider)
-	
-	
-	spec = """TooEarly		<A> must happen later, after some missing acts"""
-	class_name, _, format_str = spec.split('\t')
-	
-	def _param_provider(a: 'act_instance'):
-		return {
-			'<A>': format_full_name(a, 1,1,0).capitalize(),
-			}
-	register_handler(class_name, format_str, _param_provider)
-	
-	
-	spec = """TooEarlyInSequence	<конец акта А> не может находится позже <начало акта Б>, потому что в <следование В><оператор А> находится перед <оператор Б>	Act <A> is placed in sequnce <C> before act <B> so act <A> must finish before act <B> starts"""
-	class_name, _, format_str = spec.split('\t')
-	
-	def _param_provider(a: 'act_instance'):
-		item = get_relation_object(a, onto.executes)
-		sequence = get_relation_subject(onto.body_item, item)
-		missing_acts = list(onto.should_be_after[a])
-		stmts = {format_full_name(act, 0,0,0) for act in missing_acts}
-		plur1_s = 's' if len(stmts) > 1 else ''
-		is1_are = 'are' if len(stmts) > 1 else 'is'
-		stmts = ", ".join(stmts)
-		acts = ", ".join("'%s'"%format_full_name(act, 1,0,0, quote='') for act in missing_acts)
-		plur2_s = 's:' if len(stmts) > 1 else ''
-		
-		return {
-			'Act <A> is': f"Act{plur1_s} {stmts} {is1_are}",
-			'act <A>': f"act{plur2_s} {acts}",
-			'<B>': format_full_name(a, 0,0,0),
-			'<C>': format_full_name(sequence, 0,0,0),
-			}
-	register_handler(class_name, format_str, _param_provider)
-	
-	
-	spec = """ExtraAct		<A> must not happen here due to previous error(s)"""
-	class_name, _, format_str = spec.split('\t')
-	
-	def _param_provider(a: 'act_instance'):
-		return {
-			'<A>': format_full_name(a, 1,1,0).capitalize(),
-			}
-	register_handler(class_name, format_str, _param_provider)
-	
-	
 	spec = """MisplacedBefore	<Акт Б> не может выполняться раньше <начало акта А> потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>"""
 	class_name, _, format_str = spec.split('\t')
 	
@@ -314,7 +196,7 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-# WrongContext is left not replaced in case if absence of correct act
+	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
 	spec = """WrongContext	<Акт Б> не может выполняться при отсутствии выполения <акта А>, потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed while no act of <A> exists"""
 	class_name, _, format_str = spec.split('\t')
 	
@@ -326,3 +208,175 @@ def register_explanation_handlers(onto):
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
+	
+	spec = """ExtraAct		<A> must not happen here due to previous error(s)"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		return {
+			'<A>': format_full_name(a, 1,1,0).capitalize(),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """TooEarly		<A> must happen later, after some missing acts"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		return {
+			'<A>': format_full_name(a, 1,1,0).capitalize(),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	
+	######### Sequence mistakes #########
+	########=====================########
+	
+	spec = """TooEarlyInSequence	<конец акта А> не может находится позже <начало акта Б>, потому что в <следование В><оператор А> находится перед <оператор Б>	Act <A> is placed in sequnce <C> before act <B> so act <A> must finish before act <B> starts"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		item = get_relation_object(a, onto.executes)
+		sequence = get_relation_subject(onto.body_item, item)
+		missing_acts = list(onto.should_be_after[a])
+		stmts = {format_full_name(act, 0,0,0) for act in missing_acts}
+		plur1_s = 's' if len(stmts) > 1 else ''
+		is1_are = 'are' if len(stmts) > 1 else 'is'
+		stmts = ", ".join(stmts)
+		acts = ", ".join("'%s'"%format_full_name(act, 1,0,0, quote='') for act in missing_acts)
+		plur2_s = 's:' if len(stmts) > 1 else ''
+		
+		return {
+			'Act <A> is': f"Act{plur1_s} {stmts} {is1_are}",
+			'act <A>': f"act{plur2_s} {acts}",
+			'<B>': format_full_name(a, 0,0,0),
+			'<C>': format_full_name(sequence, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """DuplicateOfAct (sequence only)	Оператор Б входит в следование А, при этом между  началом акта А и концом акта А содержится больше одного акта Б	Act <B> is a part of sequence <A> so each execution of <A> can contain strictly one execution of <B>"""
+	class_name, _, format_str = spec.split('\t')
+	class_name = list(class_name.split())[0]
+	
+	def _param_provider(a: 'act_instance'):
+		# sequence_act = get_relation_subject(onto.parent_of, a)
+		item = get_relation_object(a, onto.executes)
+		sequence = get_relation_subject(onto.body_item, item)
+		return {
+			'<B>': format_full_name(a, 0,0,0),
+			'<A>': format_full_name(sequence, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	
+	######### Alternative mistakes #########
+	########========================########
+	
+	spec = """BranchOfFalseCondition	Во время выполнения альтернативы <акт А> не должна выполниться ветка <В>, потому что условие <Б> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		onto = a.namespace  # debugging reassignment (useless until different 'onto' appear)
+		cond_act = get_relation_object(a, onto.cause)
+		# cond = get_relation_object(cond_act, onto.executes)
+		alt_act = get_relation_subject(onto.student_parent_of, a)
+		return {
+			'<A>': format_full_name(alt_act, 0,0,0),
+			'<B>': format_full_name(cond_act, 0,1,1),
+			'<C>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+	spec = """WrongBranch -> BranchOfLaterCondition	Во время выполнения альтернативы <акт А> не должна выполниться ветка <В>, потому что условие <Б> не должно проверяться после истинного условия	Alternative <A> must not execute branch <D> because the condition <B> must not execute after condition <C> which is true"""
+	class_name, _, format_str = spec.split('\t')
+	class_name = list(class_name.split())[0]
+	
+	def _param_provider(a: 'act_instance'):
+		wrong_branch_act = a
+		wrong_branch = get_relation_object(wrong_branch_act, onto.executes)
+		wrong_cond = get_relation_object(wrong_branch, onto.cond)
+		correct_branch_act = get_relation_object(a, onto.should_be)
+		correct_branch = get_relation_object(correct_branch_act, onto.executes)
+		true_cond = get_relation_object(correct_branch, onto.cond)
+		alt_act = get_relation_subject(onto.student_parent_of, a)
+		return {
+			'<A>': format_full_name(alt_act, 0,0,0),
+			'<B>': format_full_name(wrong_cond, 0,1,1),
+			'<C>': format_full_name(true_cond, 0,0,0),
+			'<D>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+	spec = """NoBranchWhenConditionIsTrue	Во время выполнения альтернативы <акт А> должна выполниться ветка <В>, потому что условие <Б> истинно	Alternative <A> must execute branch <C> because the condition <B> is true"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		cond_act = get_relation_object(a, onto.precursor)
+		correct_branch_act = get_relation_object(a, onto.should_be)
+		alt_act = get_relation_subject(onto.student_parent_of, cond_act)
+		return {
+			'<A>': format_full_name(alt_act, 0,0,0),
+			'<B>': format_full_name(cond_act, 0,1,1),
+			'<C>': format_full_name(correct_branch_act, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+	spec = """AllFalseNoEnd		Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		onto = a.namespace
+		cond_act = get_relation_object(a, onto.precursor)
+		# cond = get_relation_object(cond_act, onto.executes)
+		alt_act = get_relation_subject(onto.student_parent_of, cond_act)
+		return {
+			'<A>': format_full_name(alt_act, 0,0,0),
+			'<B>': format_full_name(cond_act, 0,1,1),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+	spec = """AllFalseNoElse	Во время выполнения альтернативы <акт А> должна выполниться ветка <Г>, потому что условие <Б> ложно	Alternative <A> must execute branch <D> because the condition <B> is false"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		onto = a.namespace
+		cond_act = get_relation_object(a, onto.precursor)
+		alt_act = get_relation_subject(onto.student_parent_of, cond_act)
+		return {
+			'<A>': format_full_name(alt_act, 0,0,0),
+			'<B>': format_full_name(cond_act, 0,1,1),
+			'<D>': "'else'",
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+
+	######### Lops mistakes #########
+	########=================########
+	
+	spec = """MissingIterationAfterSuccessfulCondition	Во время выполнения цикла <акт А> на <i-ой> итерации должно выполниться тело <В>, потому что условие <Бi> истинно	Iteration <C> of loop <A> must happen because condition <B> is true"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		onto = a.namespace
+		
+		# cond_act = get_relation_subject(onto.student_next, a)
+		cond_act = get_relation_object(a, onto.precursor)
+		cond = get_relation_object(cond_act, onto.executes)
+		loop = get_relation_subject(onto.cond, cond)
+		
+		return {
+			'<C> ': '',
+			'<B>': format_full_name(cond, 0),
+			'<A>': format_full_name(loop, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+
