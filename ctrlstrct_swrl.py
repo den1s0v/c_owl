@@ -1046,13 +1046,37 @@ RULES.append(DomainRule(name="BranchOfFalseCondition-alt_Error",
 	act_begin(?b),
 	executes(?b, ?br),
 	
-	student_parent_of(?alt_act, ?a),
+	parent_of(?alt_act, ?a),  # ensure the act is found by the rule (because can be missing in student's trace)
 	student_parent_of(?alt_act, ?b),
 	
 	# student_next(?a, ?b),
 	Erroneous(?b), 	  # как страховка, сработает и без этого
 	 -> cause(?b, ?a),
 	 BranchOfFalseCondition(?b)
+"""))
+
+# Ошибочная ветка вообще [works with Pellet]
+RULES.append(DomainRule(name="WrongBranch-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
+	act_begin(?a),
+	executes(?a, ?br),
+	branches_item(?alt, ?br),
+	alternative(?alt), 
+
+	act_begin(?b),
+	executes(?b, ?br2),
+	branches_item(?alt, ?br2),
+	
+	# branches are different
+		id(?br, ?i),
+		id(?br2, ?i2),
+		notEqual(?i, ?i2),
+	
+	parent_of(?alt_act, ?a),
+	student_parent_of(?alt_act, ?b),
+	 -> should_be(?b, ?a),
+	 WrongBranch(?b)
 """))
 
 # Условие после ветки  [works with Pellet]
@@ -1077,7 +1101,7 @@ RULES.append(DomainRule(name="ConditionAfterBranch-alt_Error",
 RULES.append(DomainRule(name="AnotherExtraBranch-alt_Error", 
 	tags={'mistake', 'alternative'},
 	swrl="""
-	act_end(?a),
+	act_begin(?a),
 	executes(?a, ?br),
 	branches_item(?alt, ?br),
 	alternative(?alt), 
@@ -1092,7 +1116,8 @@ RULES.append(DomainRule(name="AnotherExtraBranch-alt_Error",
 	student_index(?a, ?sia),
 	student_index(?b, ?sib),
 	greaterThan(?sib, ?sia),
-	 -> AnotherExtraBranch(?b)
+	 -> cause(?b, ?a),
+	  AnotherExtraBranch(?b)
 """))
 
 # После истинного условия нет его ветки [works with Pellet]

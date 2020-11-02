@@ -47,7 +47,7 @@ def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, in
 			if i:
 				line_index = f" (at line {i})"
 			else:
-				line_index = " (the line is missing) "
+				line_index = " (the line is missing)"
 		
 		if is_act:
 			stmt = get_relation_object(a, onto.executes)
@@ -274,6 +274,42 @@ def register_explanation_handlers(onto):
 	
 	######### Alternative mistakes #########
 	########========================########
+	
+	spec = """NoFirstCondition		The first condition <B> must be executed right after alternative <A> starts"""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		onto = a.namespace  # debugging reassignment (useless until different 'onto' appear)
+		alt_act = get_relation_object(a, onto.precursor)
+		# cond = get_relation_object(cond_act, onto.executes)
+		cond_act = get_relation_object(a, onto.should_be)
+		return {
+			'<A>': format_full_name(alt_act, 0,0,0),
+			'<B>': format_full_name(cond_act, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+	spec = """WrongBranch -> BranchOfLaterCondition	Во время выполнения альтернативы <акт А> не должна выполниться ветка <В>, потому что условие <Б> не должно проверяться после истинного условия	Alternative <A> must not execute branch <D> because the condition <B> must not execute after condition <C> which is true"""
+	class_name, _, format_str = spec.split('\t')
+	class_name = list(class_name.split())[0]
+	
+	def _param_provider(a: 'act_instance'):
+		wrong_branch_act = a
+		wrong_branch = get_relation_object(wrong_branch_act, onto.executes)
+		wrong_cond = get_relation_object(wrong_branch, onto.cond)
+		correct_branch_act = get_relation_object(a, onto.should_be)
+		correct_branch = get_relation_object(correct_branch_act, onto.executes)
+		true_cond = get_relation_object(correct_branch, onto.cond)
+		alt_act = get_relation_subject(onto.student_parent_of, a)
+		return {
+			'<A>': format_full_name(alt_act, 0,0,0),
+			'<B>': format_full_name(wrong_cond, 0,1,1),
+			'<C>': format_full_name(true_cond, 0,0,0),
+			'<D>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
 	
 	spec = """BranchOfFalseCondition	Во время выполнения альтернативы <акт А> не должна выполниться ветка <В>, потому что условие <Б> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
 	class_name, _, format_str = spec.split('\t')

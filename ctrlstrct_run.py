@@ -971,6 +971,7 @@ def init_persistent_structure(onto):
                 "TooEarly", # right after missing acts
                 ("DisplacedAct", ["TooEarly","ExtraAct","MissingAct"]),
                 ("TooEarlyInSequence", ["TooEarly"]),
+                
                 # Alternatives mistakes ...
                 "NoFirstCondition",
                 ("ConditionAfterBranch", ["ExtraAct"]),
@@ -982,6 +983,7 @@ def init_persistent_structure(onto):
                 "AllFalseNoElse",
                 "NoNextCondition",
                 "AllFalseNoEnd",
+                
                 # Loops mistakes ...
                 "MissingIterationAfterSuccessfulCondition",
                 "MissingLoopEndAfterFailedCondition",
