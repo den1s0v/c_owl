@@ -33,7 +33,15 @@ def icon():
 	
 @app.errorhandler(404)
 def http_404_handler(error):
-    # return "<p>HTTP 404 Error Encountered</p>", 404
+	# return "<p>HTTP 404 Error Encountered</p>", 404
+	if not 'static' in request.url:
+		# print()
+		# print(vars(request))
+		# print(request.path)
+		# print()
+		url = url_for('static', filename=request.path)
+		return redirect(url)
+	
 	url = url_for('index')
 	return redirect(url)
 
