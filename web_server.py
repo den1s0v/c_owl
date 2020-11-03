@@ -7,56 +7,63 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect
 # import the flask extension
 from flask_caching import Cache  
 
+from waitress import serve
+
 from ctrlstrct_test import process_algorithm_and_trace_from_text
 
+from options import DEBUG
 
-cache = Cache(config={'CACHE_TYPE': 'simple'})
 
-app = Flask(__name__, template_folder='web_exp/views', static_folder='web_exp/static',)
+def create_app():
 
-# bind the cache instance on to the app 
-cache.init_app(app)
+	cache = Cache(config={'CACHE_TYPE': 'simple'})
 
-# @app.route('/index.html')
-# @app.route('/index/')
-# @app.route('/')
-# @app.route('/demo/')
-@app.route('/iswc/demo/')
-def index():
-	return render_template('index.html')
-	
-@app.route('/favicon.ico')
-def icon():
-	url = url_for('static', filename='ISWC2020_logo_v.png')
-	return redirect(url)
-	# return render_template('index.html')
-	
-@app.errorhandler(404)
-def http_404_handler(error):
-	# return "<p>HTTP 404 Error Encountered</p>", 404
-	if not 'static' in request.url:
-		# print()
-		# print(vars(request))
-		# print(request.path)
-		# print()
-		url = url_for('static', filename=request.path)
+	app = Flask(__name__, template_folder='web_exp/views', static_folder='web_exp/static',)
+
+	# bind the cache instance on to the app 
+	cache.init_app(app)
+
+	# @app.route('/index.html')
+	# @app.route('/index/')
+	# @app.route('/')
+	# @app.route('/demo/')
+	@app.route('/iswc/demo/')
+	def index():
+		return render_template('index.html')
+		
+	@app.route('/favicon.ico')
+	def icon():
+		url = url_for('static', filename='ISWC2020_logo_v.png')
 		return redirect(url)
-	
-	url = url_for('index')
-	return redirect(url)
+		# return render_template('index.html')
+		
+	@app.errorhandler(404)
+	def http_404_handler(error):
+		# return "<p>HTTP 404 Error Encountered</p>", 404
+		if not 'static' in request.url:
+			# print()
+			# print(vars(request))
+			# print(request.path)
+			# print()
+			url = url_for('static', filename=request.path)
+			return redirect(url)
+		
+		url = url_for('index')
+		return redirect(url)
 
-@app.route('/process', methods = ['POST'])
-# caching is for debug only! Disable when is in public access!
-# @cache.cached(timeout=100)  # time seconds
-def process_data():
-	try:
-		feedback = process_algorithm_and_trace_request(request.json)
-		return jsonify(feedback)
-	except Exception as ex:
-		raise ex
-		return dict(messages=[f"Error processing the request - {ex.__class__.__name__}: {str(ex)}"])
+	@app.route('/process', methods = ['POST'])
+	# caching is for debug only! Disable when is in public access!
+	# @cache.cached(timeout=100)  # time seconds
+	def process_data():
+		try:
+			feedback = process_algorithm_and_trace_request(request.json)
+			return jsonify(feedback)
+		except Exception as ex:
+			raise ex
+			return dict(messages=[f"Error processing the request - {ex.__class__.__name__}: {str(ex)}"])
 
 
+	return app
 
 
 
@@ -177,8 +184,11 @@ SKIP____10_while 10 (с.3) проверка условия (While_Loop)
 
 
 if __name__ == "__main__":
-	# debug()
-	app.run(debug = 1, port=2020)
-	# app.run(debug = 1, host="109.206.169.214", port=2020)
-	
-
+	app = create_app()
+	if DEBUG:
+		# debug()
+		app.run(debug = 1, port=2020)
+		# app.run(debug = 1, host="109.206.169.214", port=2020)
+	else:	
+		# serve(app, port=2020)
+		serve(app, host="109.206.169.214", port=2020)

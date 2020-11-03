@@ -3,3 +3,4 @@ transliterate
 pystardog
 Flask
 Flask-Caching
+waitress
