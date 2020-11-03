@@ -121,14 +121,14 @@ condition (response_is_positive) executed 1st time - true
 condition of alternative (color_is_red) executed 1st time - true
 
 
-ветка иначе началась 1-й раз
-ветка иначе закончилась 1-й раз
-else branch began 1st time
-
-
 ветка условия развилки (цвет==зелёный) началась 1-й раз
 ветка условия развилки (цвет==зелёный) закончилась 1-й раз
 branch of condition (color_is_red) began 1st time
+
+
+ветка иначе началась 1-й раз
+ветка иначе закончилась 1-й раз
+else branch began 1st time
 
 
 началась итерация 1 цикла my-while-1
