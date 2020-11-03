@@ -1,5 +1,6 @@
 *.pyc
 #*.txt
+~*.*
 test_data/*/*output*
 test_data/*/*.rdf
 test_data/*.rdf
@@ -9,3 +10,6 @@ test_data/*.rdf
 trace_gen/*out*.*
 trace_gen/tr_in.txt
 trace_gen/alg_in.json
+
+web_exp/static/quick-guide-syntax.files/*.xml
+web_exp/static/quick-guide-syntax.files/*.thmx
