@@ -59,10 +59,10 @@ class TraceTester():
         """
         self.data = trace_data
 
-        # pprint(trace_data)
+        pprint(trace_data)
         # pprint(trace_data["trace"])
         # pprint(trace_data["algorithm"])
-        # exit()
+        exit()
         
         # индекс всех объектов АЛГОРИТМА для быстрого поиска по id
         self.id2obj = self.data["algorithm"].get("id2obj", {})

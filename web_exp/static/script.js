@@ -134,8 +134,8 @@ program ended`)
     
 	cm_alg = CodeMirror.fromTextArea(document.getElementById("alg"), cm_config);
 	cm_trace = CodeMirror.fromTextArea(document.getElementById("trace"), cm_config);
-	cm_alg.setSize("60%", "20%");
-	cm_trace.setSize("60%", "35%");
+	cm_alg.setSize("70%", "20%");
+	cm_trace.setSize("70%", "35%");
 	e_alg = cm_alg.getDoc();
 	e_trace = cm_trace.getDoc();
 	

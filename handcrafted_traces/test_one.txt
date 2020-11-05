@@ -1,178 +1,35 @@
-// алгоритм alg00_alt (развилка over_colour с 2+1 ветками)
+// алгоритм example_alt (<< ... после имени, через пробел допускается произвольный текст)
 {
-если условие (red)  // over_colour
-    ждать
-иначе если условие (green)
-    бежать
-иначе
-    лежать
-}
-
-// SKIP____alg00_alt 00 AllFalseNoElse (с.5) Конец развилки вместо else
-{
-началась программа
-    началась развилка over_colour 1-й раз
-        условие (red) выполнилось 1-й раз - ложь
-        условие (green) выполнилось 1-й раз - ложь
-    закончилась развилка over_colour 1-й раз  // ошибка AllFalseNoElse
-закончилась программа
-}
-
-/*
-alg00_alt BranchWithFalseCondition-2 (с.5) Начало ветки при ложном условии
-трасса категории ошибок: Alternative (BranchWithFalseCondition) */
-{
-началась программа
-    началась развилка over_colour 1-й раз
-        ветка условия (green) началась 1-й раз
-            бежать выполнилось 1-й раз 
-        ветка условия (green) закончилась 1-й раз
-    закончилась развилка over_colour 1-й раз
-закончилась программа
-}
-
-
-// алгоритм MUTE____alg_inner_seq2 (следование со вложенным следованием)
-{
-    outer_first
-    {  # inner_seq
-		inner_first
-		inner_second
+	поприветствовать
+	если ответ_позитивный -> ложь // по_ответу  <<- первое слово комментария - это имя сложной структуры (здесь - развилки), остальное игнорируется.
+		поддержать_тон
+		рассказать_анекдот
+	иначе если ответ_негативный -> истина
+	{
+		удивиться
+		узнать_что_случилось
+		посочувствовать
 	}
-	outer_second
-    outer_third
+	иначе
+		спросить_о_настроении
+	пожелать_удачи
 }
 
-/* 
-alg_inner_seq2 try
-*/
+
+// example_alt первая трасса
+// в строке выше - имя трассы (комментарий "//" или "#" отбрасывается)
 {
 началась программа
-outer_first выполнилось 1-й раз
-началось следование inner_seq 1-й раз
-    inner_first выполнилось 1-й раз 
-    inner_second выполнилось 1-й раз 
-закончилось следование inner_seq 1-й раз
-outer_third выполнилось 1-й раз
-outer_second выполнилось 1-й раз
+	поприветствовать выполнилось 1-й раз 
+    началась развилка по_ответу 1-й раз  // начало развилки
+        условие (ответ_позитивный) выполнилось 1-й раз - ложь
+        условие (ответ_негативный) выполнилось 1-й раз - истина
+        ветка условия (ответ_негативный) началась 1-й раз
+            удивиться выполнилось 1-й раз 
+            узнать_что_случилось выполнилось 1-й раз // в трассе можно добавлять любые комментарии
+            посочувствовать выполнилось 1-й раз 
+        ветка условия (ответ_негативный) закончилась 1-й раз
+    закончилась развилка по_ответу 1-й раз
+	пожелать_удачи выполнилось 1-й раз 
 закончилась программа
-}
-
-
-/* 
-SKIP____alg_inner_seq2 all ok
-*/
-{
-началась программа
-outer_first выполнилось 1-й раз
-началось следование inner_seq 1-й раз
-    inner_first выполнилось 1-й раз 
-    inner_second выполнилось 1-й раз 
-закончилось следование inner_seq 1-й раз
-outer_second выполнилось 1-й раз
-outer_third выполнилось 1-й раз
-закончилась программа
-}
-
-
-
-
-/* 
-SKIP____alg_inner_seq2 MisplacedBefore
-*/
-{
-началась программа
-outer_first выполнилось 1-й раз
-    inner_first выполнилось 1-й раз     // ошибки DisplacedAct, WrongContext
-началось следование inner_seq 1-й раз   // ошибка DisplacedAct
-    inner_second выполнилось 1-й раз    // ошибка TooEarly
-закончилось следование inner_seq 1-й раз
-outer_second выполнилось 1-й раз
-outer_third выполнилось 1-й раз
-закончилась программа
-}
-
-
-
-
-// algorithm MUTE____alg
-{
-while not_green  // waiting
-  if color_is_red  // over_color
-    wait
-}
-
-// SKIP____alg correct_trace
-{
-program began  // The trace is initially correct. Modify it to introduce mistakes, and then press "Send" button
-  loop waiting began 1st time
-    condition of loop (not_green) evaluated 1st time - true
-    iteration 1 of loop waiting began
-      alternative over_color began 1st time
-        condition (color_is_red) evaluated 1st time - true
-        branch of condition (color_is_red) began 1st time
-          wait executed 1st time
-        branch of condition (color_is_red) ended 1st time
-      alternative over_color ended 1st time
-    iteration 1 of loop waiting ended
-    condition of loop (not_green) evaluated 2nd time - true
-    iteration 2 of loop waiting began
-      alternative over_color began 2nd time
-        condition (color_is_red) evaluated 2nd time - false
-      alternative over_color ended 2nd time
-    iteration 2 of loop waiting ended
-    condition of loop (not_green) evaluated 3rd time - false
-  loop waiting ended 1st time
-program ended  // Don't know where to start? Try deleting rows other than the first and last one ones.
-}
-
-// SKIP____alg broken_trace
-{
-program began
-  loop waiting began 1st time
-    condition of loop (not_green) evaluated 1st time - true
-    iteration 1 of loop waiting began
-      alternative over_color began 1st time
-        condition (color_is_red) evaluated 1st time - true
-      alternative over_color ended 1st time
-    iteration 1 of loop waiting ended
-    condition of loop (not_green) evaluated 2nd time - true
-  loop waiting ended 1st time
-program ended
-}
-
-// SKIP____alg broken_trace2
-{
-program began
-  loop waiting began 1st time
-    condition of loop (not_green) evaluated 1st time - true
-    iteration 1 of loop waiting began
-      alternative over_color began 1st time
-        condition (color_is_red) evaluated 1st time - false
-        branch of condition (color_is_red) began 1st time
-          wait executed 1st time
-        branch of condition (color_is_red) ended 1st time
-      alternative over_color ended 1st time
-    iteration 1 of loop waiting ended
-    condition of loop (not_green) evaluated 2nd time - true
-  loop waiting ended 1st time
-program ended
-}
-
-// alg broken_trace2 - inferred
-{
-program began
-  loop waiting began 1st time
-    condition of loop (not_green) evaluated 1st time - true
-    iteration 1 of loop waiting began
-      alternative over_color began 1st time
-        condition (color_is_red) evaluated 1st time - false
-        branch of condition (color_is_red) began 1st time  // error: all_false_no_end, branch_of_false_condition
-          wait executed 1st time  // error: extra_act
-        branch of condition (color_is_red) ended 1st time  // error: extra_act
-      alternative over_color ended 1st time
-    iteration 1 of loop waiting ended
-    condition of loop (not_green) evaluated 2nd time - true
-  loop waiting ended 1st time  // error: missing_iteration_after_successful_condition, too_early
-program ended
 }
