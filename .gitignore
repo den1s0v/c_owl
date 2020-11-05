@@ -1,4 +1,5 @@
 *.pyc
+*.lnk
 #*.txt
 ~*.*
 test_data/*/*output*
