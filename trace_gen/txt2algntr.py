@@ -272,18 +272,18 @@ class AlgorithmParser:
                 |
                     иначе \s+ если (?:\s+условие)?
                 )
+                \s+(\(.+\)|\S+) # 1 cond_name
                 (?:
                     \s+ - >?    # - or ->   
-                    \s+ (\S+)   # 1 optional values
+                    \s+ (\S+)   # 2 optional values
                 )?
-                \s+(\(.+\)|\S+) # 2 cond_name
                 """, line_list[ci].strip(), re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("alt elseif")
-                cond_name = m.group(2)  # условие else if (условие может быть в скобках)
+                cond_name = m.group(1)  # условие else if (условие может быть в скобках)
                 if cond_name[0]+cond_name[-1] == "()":
                     cond_name = cond_name[1:-1]      # удалить скобки
-                values = m.group(1)  # значения, принимаемые выражением по мере выполнения программы (опционально)
+                values = m.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 branch_name = "elseif-"+cond_name  # имя ветки должно отличаться от имени условия
                 assert len(result)>0 and result[-1]["type"] == "alternative", "Algorithm Error: 'иначе если' does not follow 'если' :\n\t"+line_list[ci].strip()
                 alt_obj = result[-1]
