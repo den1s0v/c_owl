@@ -7,8 +7,8 @@ from collections import namedtuple
 
 
 SUPPORTED_LANGS = ("ru","en")
-# TARGET_LANG = "ru"
-TARGET_LANG = "en"
+TARGET_LANG = "ru"
+# TARGET_LANG = "en"
 
 def tr(word_en, case='nomn'):
 	""" Перевод на русский язык, если TARGET_LANG=="ru" """

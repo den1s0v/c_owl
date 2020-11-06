@@ -1,0 +1,53 @@
+{
+  "messages": [
+    "Processing of algorithm & trace finished OK."
+  ], 
+  "mistakes": [
+    {
+      "act_abbr": "b_po_tsvetu_n01", 
+      "explanation": "TooEarly: Begin of alternative '\u00ef\u00ee_\u00f6\u00e2\u00e5\u00f2\u00f3' must happen later, after some missing acts; <br>&nbsp;&nbsp; MissingIterationAfterSuccessfulCondition: Iteration of loop '\u00ee\u00e6\u00e8\u00e4\u00e0\u00ed\u00e8\u00e5' must happen because condition expr '\u00ed\u00e5_\u00e7\u00e5\u00eb\u00b8\u00ed\u00fb\u00e9' is true", 
+      "names": [
+        "TooEarly", 
+        "MissingIterationAfterSuccessfulCondition"
+      ], 
+      "text_line": [
+        5
+      ]
+    }, 
+    {
+      "act_abbr": "b_ne_zelenyj_n01", 
+      "explanation": "MisplacedDeeper: Act '\u00ed\u00e5_\u00e7\u00e5\u00eb\u00b8\u00ed\u00fb\u00e9' is a part of '\u00ee\u00e6\u00e8\u00e4\u00e0\u00ed\u00e8\u00e5' so it can't be executed whitin act nested to '\u00ee\u00e6\u00e8\u00e4\u00e0\u00ed\u00e8\u00e5'", 
+      "names": [
+        "MisplacedDeeper", 
+        "DisplacedAct"
+      ], 
+      "should_be_before_line": 3, 
+      "text_line": [
+        4
+      ]
+    }, 
+    {
+      "act_abbr": "e_ne_zelenyj_n01", 
+      "explanation": "MisplacedDeeper: Act '\u00ed\u00e5_\u00e7\u00e5\u00eb\u00b8\u00ed\u00fb\u00e9' is a part of '\u00ee\u00e6\u00e8\u00e4\u00e0\u00ed\u00e8\u00e5' so it can't be executed whitin act nested to '\u00ee\u00e6\u00e8\u00e4\u00e0\u00ed\u00e8\u00e5'", 
+      "names": [
+        "MisplacedDeeper", 
+        "DisplacedAct"
+      ], 
+      "should_be_before_line": 3, 
+      "text_line": [
+        4
+      ]
+    }, 
+    {
+      "act_abbr": "b_ozhidanie_loop_body_n01", 
+      "explanation": "", 
+      "names": [
+        "DisplacedAct"
+      ], 
+      "should_be_before_line": 5, 
+      "text_line": [
+        3
+      ]
+    }
+  ]
+}
