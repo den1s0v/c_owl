@@ -895,7 +895,7 @@ def init_persistent_structure(onto):
         prop_expr_value = types.new_class("expr_value", (DataProperty, FunctionalProperty, ))
 
         # новое свойство stmt_name
-        prop_stmt_name = types.new_class("stmt_name", (Thing >> str, DataProperty, FunctionalProperty, ))
+        prop_stmt_name = types.new_class("stmt_name", (Thing >> str, DataProperty, ))
 
         # новое свойство next
         types.new_class("next", (Thing >> Thing, ))
