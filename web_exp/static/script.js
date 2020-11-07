@@ -89,7 +89,7 @@ program ended`)
     }); 	
     
     
-    $("#send").click(function(){
+    $("#send_text").click(function(){
         if (cm_alg.isReadOnly())
         	// fields was not changed, so reset the values to the stored before previous send
         	load_fields()
@@ -107,7 +107,7 @@ program ended`)
 	    save_fields(data)  // alg, trace -> localStorage
 	    
         $.ajax({
-        	url: '/process', 
+        	url: '/process_as_text', 
         	method: 'post',
         	dataType: 'json',
         	contentType: "application/json",
@@ -122,6 +122,28 @@ program ended`)
         		processing_callback("fail")
         	}
         });
+    });
+
+    $("#send_json").click(function(){
+	    data = JSON_example
+
+        $.ajax({
+        	url: '/process_as_json', 
+        	method: 'post',
+        	dataType: 'json',
+        	contentType: "application/json",
+        	data: JSON.stringify(data),
+        	beforeSend: function(data){
+        		processing_callback("wait")
+        	},
+        	success: function(data){
+        		processing_callback(data)
+        	},
+        	error: function(data){
+        		processing_callback("fail")
+        	}
+        });
+    	
     });
     
     
@@ -291,10 +313,171 @@ function define_syntax_mode() {
 	    {regex: /функция|function/i, token: "function"},
 	    {regex: /й|раз|time/i, token: null},
 	    {regex: /[\wа-яё]+/i, token: "variable"}
-	  ],
-	  meta: {
+	    ],
+	    meta: {
 	    dontIndentStates: ["comment"],
 	    lineComment: "//"
-	  }
+	    }
 	});
 }
+
+
+JSON_example = {"algorithm": {"expr_values": {"не_зелёный": [true, true, false],
+                                 "цвет_жёлтый": [false],
+                                 "цвет_красный": [true, false]},
+                 "functions": [],
+                 "global_code": {"body": [{"body": {"body": [{"branches": [{"body": [{"id": 9,
+                                          "name": "ждать",
+                                          "type": "stmt"}],
+                                      "cond": {"id": 8,
+                                           "name": "цвет_красный",
+                                           "type": "expr"},
+                                      "id": 7,
+                                      "name": "if-цвет_красный",
+                                      "type": "if"},
+                                     {"body": [{"id": 12,
+                                          "name": "приготовиться",
+                                          "type": "stmt"}],
+                                      "cond": {"id": 11,
+                                           "name": "цвет_жёлтый",
+                                           "type": "expr"},
+                                      "id": 10,
+                                      "name": "elseif-цвет_жёлтый",
+                                      "type": "else-if"}],
+                              "id": 6,
+                              "name": "по_цвету",
+                              "type": "alternative"}],
+                          "id": 13,
+                          "name": "ожидание_loop_body",
+                          "type": "sequence"},
+                     "cond": {"id": 5,
+                          "name": "не_зелёный",
+                          "type": "expr"},
+                     "id": 4,
+                     "name": "ожидание",
+                     "type": "while_loop"}],
+                 "id": 3,
+                 "name": "global_code",
+                 "type": "sequence"},
+         "id": 2,
+         "name": "algorithm",
+         "type": "algorithm"},
+ "algorithm_name": "alg",
+ "header_boolean_chain": [],
+ "trace": [{"comment": "",
+            "executes": 3,
+            "id": 15,
+            "n": 1,
+            "name": "program", "phase": "started",
+            "text_line": 13},
+             {"comment": "",
+            "executes": 4, "id": 17,
+            "n": "1",
+            "name": "ожидание", "phase": "started",
+            "text_line": 15},
+             {"comment": "",
+            "executes": 13,
+            "id": 19, "iteration_n": 1,
+            "n": 1,
+            "name": "ожидание_loop_body", "phase": "started",
+            "text_line": 17},
+	             {"comment": "",
+	            "executes": 5, "id": 18,
+	            "n": "1",
+	            "name": "(не_зелёный)", "phase": "performed",
+	            "text_line": 16,
+	            "value": true},
+             {"comment": "",
+            "executes": 6, "id": 20,
+            "n": "1",
+            "name": "по_цвету", "phase": "started",
+            "text_line": 18},
+             {"comment": "",
+            "executes": 8, "id": 21,
+            "n": "1",
+            "name": "(цвет_красный)", "phase": "performed",
+            "text_line": 19,
+            "value": true},
+             {"comment": "",
+            "executes": 7, "id": 22,
+            "n": "1",
+            "name": "цвет_красный", "phase": "started",
+            "text_line": 20},
+             {"comment": "",
+            "executes": 9, "id": 23,
+            "n": "1",
+            "name": "ждать", "phase": "performed",
+            "text_line": 21},
+             {"comment": "",
+            "executes": 7, "id": 24,
+            "n": "1",
+            "name": "цвет_красный", "phase": "finished",
+            "text_line": 22},
+             {"comment": "",
+            "executes": 6, "id": 25,
+            "n": "1",
+            "name": "по_цвету", "phase": "finished",
+            "text_line": 23},
+             {"comment": "",
+            "executes": 13,
+            "id": 26, "iteration_n": 1,
+            "n": 1,
+            "name": "ожидание_loop_body", "phase": "finished",
+            "text_line": 24},
+             {"comment": "",
+            "executes": 5, "id": 27,
+            "n": "2",
+            "name": "(не_зелёный)", "phase": "performed",
+            "text_line": 25,
+            "value": true},
+             {"comment": "",
+            "executes": 13,
+            "id": 28, "iteration_n": 2,
+            "n": 2,
+            "name": "ожидание_loop_body", "phase": "started",
+            "text_line": 26},
+             {"comment": "",
+            "executes": 6, "id": 29,
+            "n": "2",
+            "name": "по_цвету", "phase": "started",
+            "text_line": 27},
+             {"comment": "",
+            "executes": 8, "id": 30,
+            "n": "2",
+            "name": "(цвет_красный)", "phase": "performed",
+            "text_line": 28,
+            "value": false},
+             {"comment": "",
+            "executes": 11, "id": 31,
+            "n": "1",
+            "name": "(цвет_жёлтый)", "phase": "performed",
+            "text_line": 29,
+            "value": false},
+             {"comment": "",
+            "executes": 6, "id": 32,
+            "n": "2",
+            "name": "по_цвету", "phase": "finished",
+            "text_line": 30},
+             {"comment": "",
+            "executes": 13,
+            "id": 33, "iteration_n": 2,
+            "n": 2,
+            "name": "ожидание_loop_body", "phase": "finished",
+            "text_line": 31},
+             {"comment": "",
+            "executes": 5, "id": 34,
+            "n": "3",
+            "name": "(не_зелёный)", "phase": "performed",
+            "text_line": 32,
+            "value": false},
+             {"comment": "",
+            "executes": 4, "id": 35,
+            "n": "1",
+            "name": "ожидание", "phase": "finished",
+            "text_line": 33},
+             {"comment": "",
+            "executes": 3, "id": 37,
+            "n": 1,
+            "name": "program", "phase": "finished",
+            "text_line": 35}],
+ "trace_name": "alg трасса "};
