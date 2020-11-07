@@ -225,5 +225,6 @@ if __name__ == "__main__":
 		app.run(debug = 1, port=2020)
 		# app.run(debug = 1, host="109.206.169.214", port=2020)
 	else:	
+		from waitress import serve
 		# serve(app, port=2020)
 		serve(app, host="109.206.169.214", port=2020)
