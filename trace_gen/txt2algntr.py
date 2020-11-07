@@ -1155,7 +1155,7 @@ def parse_algorithms_and_traces_from_text(text: str):
         "algorithm"     : dict,
         "header_boolean_chain" : list of bool, 
     }
-    collected from specified file_path.
+    collected from specified text data.
     """
 
     text = text.replace("\t", " "*4)  # expand tabs to spaces (if any)

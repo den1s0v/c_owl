@@ -30,7 +30,7 @@ def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, in
 	try:
 		onto = a.namespace
 		
-		is_act = bool({onto.act_begin, onto.act_end} & set(a.is_a))
+		is_act = bool({onto.act_begin, onto.act_end, onto.trace} & set(a.is_a))
 		
 		### print(" * ! is_act:", is_act, "for a:", a)
 		
