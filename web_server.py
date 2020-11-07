@@ -7,9 +7,7 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect
 # import the flask extension
 from flask_caching import Cache  
 
-from waitress import serve
-
-from ctrlstrct_test import process_algorithm_and_trace_from_text
+from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json
 
 from options import DEBUG
 
@@ -51,12 +49,21 @@ def create_app():
 		url = url_for('index')
 		return redirect(url)
 
-	@app.route('/process', methods = ['POST'])
+	@app.route('/process_as_text', methods = ['POST'])
 	# caching is for debug only! Disable when is in public access!
 	# @cache.cached(timeout=100)  # time seconds
-	def process_data():
+	def process_data_as_text():
 		try:
-			feedback = process_algorithm_and_trace_request(request.json)
+			feedback = process_algorithm_and_trace_as_text_request(request.json)
+			return jsonify(feedback)
+		except Exception as ex:
+			raise ex
+			return dict(messages=[f"Error processing the request - {ex.__class__.__name__}: {str(ex)}"])
+
+	@app.route('/process_as_json', methods = ['POST'])
+	def process_data_as_json():
+		try:
+			feedback = process_algorithm_and_trace_as_json_request(request.json)
 			return jsonify(feedback)
 		except Exception as ex:
 			raise ex
@@ -67,7 +74,7 @@ def create_app():
 
 
 
-def process_algorithm_and_trace_request(json):
+def process_algorithm_and_trace_as_text_request(json):
 	assert "alg" in json
 	assert "trace" in json
 	
@@ -141,6 +148,34 @@ user_alg {boolean_chain}user_trace
 	return formatted_feedback
 
 
+def process_algorithm_and_trace_as_json_request(json):
+	feedback = process_algorithm_and_trace_from_json(json, process_kwargs={'reasoning': "pellet", 'debug_rdf_fpath': 'test_data/http_task_dump.rdf'})
+	###
+	# from pprint import pprint
+	# pprint(feedback)
+	
+	formatted_feedback = {"messages": [], "mistakes": []}
+	formatted_feedback["messages"] = feedback["messages"]
+	
+	if "mistakes" in feedback:
+		for m in feedback["mistakes"]:
+			d = {
+				"names": m["classes"],
+				"act_abbr": ', '.join(str(o) for o in m["name"]),
+				"explanation": '; <br>&nbsp;&nbsp; '.join(m["explanations"]),
+			}
+			if m["text_line"]:
+				d["text_line"] = m["text_line"][0],
+			if "should_be_before" in m and m["should_be_before"]:
+				line = m["should_be_before"][0].text_line
+				if line is not None:
+					d["should_be_before_line"] = line
+			formatted_feedback["mistakes"].append(d)
+	
+	# return str(feedback)
+	return formatted_feedback
+
+
 __CAMELCASE_RE = re.compile(r"([a-z])([A-Z])")
 __LINE_IDNEX_RE = re.compile(r"line\s*(\d+)")
 
@@ -190,5 +225,6 @@ if __name__ == "__main__":
 		app.run(debug = 1, port=2020)
 		# app.run(debug = 1, host="109.206.169.214", port=2020)
 	else:	
+		from waitress import serve
 		# serve(app, port=2020)
 		serve(app, host="109.206.169.214", port=2020)

@@ -200,19 +200,73 @@ def process_algorithm_and_trace_from_text(text: str, process_kwargs=dict(reasoni
 		feedback["messages"] += ["Nothing to process: no valid algorithm / trace found."]
 		return feedback
 		
-	try:
-		_onto, mistakes = process_algtraces(alg_trs, verbose=0, mistakes_as_objects=True, **process_kwargs)
-	except Exception as e:
-		msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
-		feedback["messages"] += [msg]
-		print(msg)
-		### raise e
-		return feedback
-
-	feedback["messages"] += ["Processing of algorithm & trace finished OK."]
-	feedback["mistakes"] = mistakes
+	mistakes, err_msg = process_algorithms_and_traces(alg_trs, process_kwargs)	
+	
+	if err_msg:
+		feedback["messages"] += [err_msg]
+	else:
+		feedback["messages"] += ["Processing of algorithm & trace finished OK."]
+		feedback["mistakes"] = mistakes
 	
 	return feedback
+
+def process_algorithm_and_trace_from_json(alg_tr: dict, process_kwargs=dict(reasoning="pellet")):
+	feedback = {"messages": []}
+	
+	# validate input alg_tr
+	# {
+	#     "trace_name"    : str,
+	#     "algorithm_name": str,
+	#     "trace"         : list,
+	#     "algorithm"     : dict,
+	#     "header_boolean_chain" : list of bool, 
+	# }
+	try:
+		assert alg_tr, f"Empty data"
+		assert type(alg_tr) == dict, f"'JSON data is not a dict!"; 
+		key = "trace_name"; t = str; 
+		assert key in alg_tr, f"Key '{key}' is missing"; assert type(alg_tr[key]) == t, f"'{key}' -> is not a {str(t)}";
+		key = "algorithm_name";  t = str;
+		assert key in alg_tr, f"Key '{key}' is missing"; assert type(alg_tr[key]) == t, f"'{key}' -> is not a {str(t)}";
+		key = "trace";  t = list; 
+		assert key in alg_tr, f"Key '{key}' is missing"; assert type(alg_tr[key]) == t, f"'{key}' -> is not a {str(t)}";
+		key = "algorithm";  t = dict; 
+		assert key in alg_tr, f"Key '{key}' is missing"; assert type(alg_tr[key]) == t, f"'{key}' -> is not a {str(t)}";
+	except Exception as e:
+		feedback["messages"] += [f"JSON error: {str(e)}\n{alg_tr}"]
+		return feedback
+
+	alg_trs = [alg_tr]
+	
+	if not alg_trs:
+		feedback["messages"] += ["Nothing to process: no valid algorithm / trace found."]
+		return feedback
+		
+	print("alg_trs >")
+	print(alg_trs)
+	print("< alg_trs")
+		
+	mistakes, err_msg = process_algorithms_and_traces(alg_trs, process_kwargs)	
+	
+	if err_msg:
+		feedback["messages"] += [err_msg]
+	else:
+		feedback["messages"] += ["Processing of algorithm & trace finished OK."]
+		feedback["mistakes"] = mistakes
+	
+	return feedback
+
+def process_algorithms_and_traces(alg_trs_dict: dict, process_kwargs=dict(reasoning="pellet")) -> ('mistakes', 'error_message: str or None'):
+		
+	try:
+		_onto, mistakes = process_algtraces(alg_trs_dict, verbose=0, mistakes_as_objects=True, **process_kwargs)
+	except Exception as e:
+		msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
+		raise e
+		print(msg)
+		return [], msg
+	
+	return mistakes, None
 
 
 def run_tests(directory="test_data/", process_kwargs={}):
