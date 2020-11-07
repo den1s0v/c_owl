@@ -377,7 +377,10 @@ class TraceTester():
                 })
                 
         
-        alg_node = self.data["algorithm"]["entry_point"]
+        if "entry_point" in self.data["algorithm"]:
+	        alg_node = self.data["algorithm"]["entry_point"]
+        else:
+        	raise "Cannot resolve 'entry_point' from algorithm's keys: " + str(list(self.data["algorithm"].keys()))
         
         name = "программа"
         phase = "started"
@@ -419,6 +422,13 @@ class TraceTester():
         
     def inject_algorithm_to_ontology(self, onto):
         "Prepares self.id2obj and writes algorithm to ontology if it isn't there."
+        
+        if "entry_point" not in self.data["algorithm"]:
+	        alg_node = self.data["algorithm"]["global_code"]
+	        # polyfill entry_point to be global_code
+	        self.data["algorithm"]["entry_point"] = alg_node
+
+    
         with onto:
             alg_objects = list(find_by_type(self.data["algorithm"]))
             if not self.id2obj:
