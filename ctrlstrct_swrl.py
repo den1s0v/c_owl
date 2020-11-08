@@ -1027,7 +1027,9 @@ RULES.append(DomainRule(name="NoFirstCondition-alt_Error",
 
 	student_next(?a, ?b),
 	Erroneous(?b), 
-	 -> NoFirstCondition(?b)
+	 -> should_be(?b, ?a), 
+	 precursor(?b, ?a),
+	 NoFirstCondition(?b)
 """))
 
 # Ветка при ложном условии [works with Pellet]
@@ -1051,7 +1053,9 @@ RULES.append(DomainRule(name="BranchOfFalseCondition-alt_Error",
 	
 	# student_next(?a, ?b),
 	Erroneous(?b), 	  # как страховка, сработает и без этого
-	 -> cause(?b, ?a),
+	 -> should_be(?b, ?a), 
+	 precursor(?b, ?a),
+	 cause(?b, ?a),
 	 BranchOfFalseCondition(?b)
 """))
 
@@ -1075,7 +1079,8 @@ RULES.append(DomainRule(name="WrongBranch-alt_Error",
 	
 	parent_of(?alt_act, ?a),
 	student_parent_of(?alt_act, ?b),
-	 -> should_be(?b, ?a),
+	 -> should_be(?b, ?a), 
+	 precursor(?b, ?a),
 	 WrongBranch(?b)
 """))
 
@@ -1094,7 +1099,9 @@ RULES.append(DomainRule(name="ConditionAfterBranch-alt_Error",
 	executes(?b, ?cnd),
 	expr(?cnd), 	# a condition
 	
-	 -> ConditionAfterBranch(?b)
+	 -> should_be(?b, ?a), 
+	 precursor(?b, ?a),
+	 ConditionAfterBranch(?b)
 """))
 
 # Вторая ветка в альтернативе [works with Pellet]
@@ -1116,7 +1123,9 @@ RULES.append(DomainRule(name="AnotherExtraBranch-alt_Error",
 	student_index(?a, ?sia),
 	student_index(?b, ?sib),
 	greaterThan(?sib, ?sia),
-	 -> cause(?b, ?a),
+	 -> should_be(?b, ?a), 
+	  precursor(?b, ?a),
+	  cause(?b, ?a),
 	  AnotherExtraBranch(?b)
 """))
 
@@ -1136,7 +1145,9 @@ RULES.append(DomainRule(name="NoBranchWhenConditionIsTrue-alt_Error",
 	student_next(?a, ?b),
 	Erroneous(?b), 	  # как страховка, сработает и без этого
 	
-	 -> NoBranchWhenConditionIsTrue(?b)
+	 -> should_be(?b, ?a), 
+	  precursor(?b, ?a),
+	  NoBranchWhenConditionIsTrue(?b)
 """))
 
 RULES.append(DomainRule(name="AllFalseNoElse-alt_Error", 
@@ -1154,7 +1165,9 @@ RULES.append(DomainRule(name="AllFalseNoElse-alt_Error",
 	student_next(?a, ?b),
 	Erroneous(?b),
 	
-	 -> AllFalseNoElse(?b)
+	 -> should_be(?b, ?a), 
+	  precursor(?b, ?a),
+	  AllFalseNoElse(?b)
 """))
 
 RULES.append(DomainRule(name="NoNextCondition-alt_Error", 
@@ -1172,7 +1185,9 @@ RULES.append(DomainRule(name="NoNextCondition-alt_Error",
 	student_next(?a, ?b),
 	Erroneous(?b),
 	
-	 -> NoNextCondition(?b)
+	 -> should_be(?b, ?a), 
+	  precursor(?b, ?a),
+	  NoNextCondition(?b)
 """))
 
 RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error", 
@@ -1189,7 +1204,9 @@ RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error",
 	student_next(?a, ?b),
 	Erroneous(?b),
 	
-	 -> AllFalseNoEnd(?b)
+	 -> should_be(?b, ?a), 
+	 precursor(?b, ?a),
+	 AllFalseNoEnd(?b)
 """))
 
 
@@ -1209,7 +1226,9 @@ RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-1-loop_Er
 
 	student_next(?a, ?b),
 	Erroneous(?b), 
-	 -> MissingIterationAfterSuccessfulCondition(?b)
+	 -> should_be(?b, ?a), 
+	 precursor(?b, ?a),
+	 MissingIterationAfterSuccessfulCondition(?b)
 """))
 
 # Нет итерации после успешного условия при cond=0 (do-until) [works?]
@@ -1226,10 +1245,12 @@ RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-0-loop_Er
 
 	student_next(?a, ?b),
 	Erroneous(?b), 
-	 -> MissingIterationAfterSuccessfulCondition(?b)
+	 -> should_be(?b, ?a), 
+	 precursor(?b, ?a),
+	 MissingIterationAfterSuccessfulCondition(?b)
 """))
 
-# Нет конца цикла после неуспешного условия - при cond=0 (while, do-while, for, ?) [works?]
+# Нет конца цикла после неуспешного условия - при cond=0 (while, do-while, for, ?) [works]
 RULES.append(DomainRule(name="MissingLoopEndAfterFailedCondition-0-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""
@@ -1243,7 +1264,10 @@ RULES.append(DomainRule(name="MissingLoopEndAfterFailedCondition-0-loop_Error",
 
 	student_next(?a, ?b),
 	Erroneous(?b), 
-	 -> MissingLoopEndAfterFailedCondition(?b)
+	 -> should_be(?b, ?a), 
+	 precursor(?b, ?a),
+	 MissingLoopEndAfterFailedCondition(?b)
+"""))
 """))
 
 

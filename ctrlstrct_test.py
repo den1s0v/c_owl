@@ -242,10 +242,6 @@ def process_algorithm_and_trace_from_json(alg_tr: dict, process_kwargs=dict(reas
 		feedback["messages"] += ["Nothing to process: no valid algorithm / trace found."]
 		return feedback
 		
-	print("alg_trs >")
-	print(alg_trs)
-	print("< alg_trs")
-		
 	mistakes, err_msg = process_algorithms_and_traces(alg_trs, process_kwargs)	
 	
 	if err_msg:
