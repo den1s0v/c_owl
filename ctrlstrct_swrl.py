@@ -1268,6 +1268,19 @@ RULES.append(DomainRule(name="MissingLoopEndAfterFailedCondition-0-loop_Error",
 	 precursor(?b, ?a),
 	 MissingLoopEndAfterFailedCondition(?b)
 """))
+
+# IterationAfterFailedCondition is-a MissingLoopEndAfterFailedCondition when act is an iteration [works]
+RULES.append(DomainRule(name="IterationAfterFailedCondition-loop_Error", 
+	tags={'mistake', 'loop'},
+	swrl="""
+	MissingLoopEndAfterFailedCondition(?b),
+	act_begin(?b),
+	executes(?b, ?st),
+	body(?L, ?st),
+	loop(?L),
+	 -> should_be(?b, ?a), 
+	 precursor(?b, ?a),
+	 IterationAfterFailedCondition(?b)
 """))
 
 

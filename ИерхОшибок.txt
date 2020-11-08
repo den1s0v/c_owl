@@ -80,6 +80,7 @@ Conditional_Loop (Loop act L)	# Общие правила для циклов с
 4	MissingConditionBetweenIterations	(L, iteration i1, i2)   (дубликат итерации; пропуск условия между итерациями)
 5	[no-break] MissingConditionAfterIteration	(L, iteration i)  (нет условия после итерации)
 +6  MissingLoopEndAfterFailedCondition  (L, condition act c, extra act e) (после завершающей проверки условия цикл не заканчивается)
++7	IterationAfterFailedCondition (L, condition act c, extra iteration act e) <|--- MissingLoopEndAfterFailedCondition
 
 6 (6.1) (+ Conditional_Loop)
 While_Loop (WhileLoop act L)

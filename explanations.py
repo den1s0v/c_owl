@@ -415,4 +415,21 @@ def register_explanation_handlers(onto):
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
+	
+	spec = """IterationAfterFailedCondition	Во время выполнения цикла <акт А> на очередной итерации не должно выполниться тело <В>, потому что условие <Б> ложно	During execution of loop <A>, iteration <C> mustn't happen because condition <B> is false."""
+	class_name, _, format_str = spec.split('\t')
+	
+	def _param_provider(a: 'act_instance'):
+		onto = a.namespace
+		cond_act = get_relation_object(a, onto.precursor)
+		cond = get_relation_object(cond_act, onto.executes)
+		loop = get_relation_subject(onto.cond, cond)
+		
+		return {
+			'<C> ': '',
+			'<B>': format_full_name(cond, 0),
+			'<A>': format_full_name(loop, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
 
