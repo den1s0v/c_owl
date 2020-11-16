@@ -4,7 +4,7 @@
 :- use_module(library(semweb/rdf_db)).
 
 % % load syntactic wrappers
-% [my_onto_hand].
+% [my_onto].
 
 % load data
 load_onto :-
@@ -312,10 +312,10 @@ run_swrl :-
 	run_swrl(Count, 1), !.
 
 run_swrl :-   % Когда граф пуст / не создан
-	statistics(walltime, [_ | [_]]),
-	not(swrl_rule_once), 
-			statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
-			format("Run-once-rules finished in ~d ms.", [TimeSinceLastCall]), nl ,
+	% statistics(walltime, [_ | [_]]),
+	% not(swrl_rule_once), 
+			% statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
+			% format("Run-once-rules finished in ~d ms.", [TimeSinceLastCall]), nl ,
 	run_swrl(0, 1), !.
 
 % run_swrl(Prev3plesCount) :- 

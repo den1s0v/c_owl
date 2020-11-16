@@ -21,6 +21,7 @@ def strip_comments_out(text):
 class DomainRule:
 	def __init__(self, swrl, name="", tags={}):
 		self.name = str(name)
+		self._original_swrl = swrl
 		self.swrl = strip_comments_out(swrl)
 		self.tags = tags
 	

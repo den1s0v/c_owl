@@ -5,7 +5,7 @@
 
 
 load_onto :-
-        rdf_load('test_data/test_all_output.rdf').
+        rdf_load('test_data/test_make_trace_output.rdf').
 
 w_onto :-
         load_onto,
