@@ -54,7 +54,11 @@ run_swrl(Prev3plesCount, Depth) :-
 		;
 		% !, 
 		statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
-		format("Reasoning finished in ~d iterations, ~d triples in graph total.\nTime it took: ~d ms.", [Depth, Count, TimeSinceLastCall]), nl
+		format("Reasoning finished in ~d iterations, ~d triples in graph total.\n\tTime it took: ~d ms.", [Depth, Count, TimeSinceLastCall]), nl,
+		
+		Out_file = 'test_data/prolog_output.rdf',
+		rdf_save(Out_file),
+		format("Saved all the triples to file:\n\t~s", [Out_file]), nl
 	).
 
 
