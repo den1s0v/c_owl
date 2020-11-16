@@ -1123,9 +1123,7 @@ RULES.append(DomainRule(name="AnotherExtraBranch-alt_Error",
 	student_index(?a, ?sia),
 	student_index(?b, ?sib),
 	greaterThan(?sib, ?sia),
-	 -> should_be(?b, ?a), 
-	  precursor(?b, ?a),
-	  cause(?b, ?a),
+	 -> cause(?b, ?a),
 	  AnotherExtraBranch(?b)
 """))
 
