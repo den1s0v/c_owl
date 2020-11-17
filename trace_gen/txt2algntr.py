@@ -1176,7 +1176,8 @@ def parse_algorithms_and_traces_from_text(text: str):
                 continue
             # найти конец алгоритма
             for j in range(i + 3, last_line):
-                if not lines[j+1].strip() or re.search(r"/\*|//|#", lines[j+1]):  # пустая или комментарий
+                next_line = lines[j+1].strip()
+                if not next_line or re.match(r"/\*|//|#", next_line):  # следующая - пустая или комментарий
                     if "}" in lines[j]:
                         # найдено
                         name = extract_alg_name(lines[i])
@@ -1186,7 +1187,7 @@ def parse_algorithms_and_traces_from_text(text: str):
                         # print("line", i, name)  # , lines[i])
                     # иначе - не найдено
                     else:
-                        print("Ignored: line", i, lines[i])
+                        print(f"Ignored line {i}: {lines[i]}\n\tas no '{'}'}' found at line {j}: {lines[j]}")
                     break
 
 
