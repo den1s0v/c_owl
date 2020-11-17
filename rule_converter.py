@@ -10,7 +10,7 @@ RE_q2upper = re.compile(r'\?([\w\d]+)', flags=re.I)
 def q2upper_replace(m):
     s = m[1].upper()
     if s.startswith('_'):
-        s = 'tmp' + s
+        s = 'Tmp' + s
     return s
 
 def convert_varnames(s):
@@ -26,7 +26,7 @@ def getting_datatype_property(varname):
     #     ^^(IB,_)
     return f'^^({varname},_)'
 
-RE_DatatypeProp = re.compile(r'id|\w*index|exec_time')
+RE_DatatypeProp = re.compile(r'id|\w*index|exec_time|\w*iteration_n|text_line')
 
 def getting_property(propname, varname):
     if RE_DatatypeProp.match(propname):
@@ -75,19 +75,19 @@ def convert_rulehead(s):
 
     
 def swrl2prolog(swrl, name=None):
-    rule = convert_predicate_calls(convert_rulehead(convert_varnames(swrl))).replace('#', '%')
+    rule = convert_predicate_calls(convert_rulehead(convert_varnames(swrl))).replace('# ', '% ')
     if not name:
         title = '% Rule\n'
     else:
         title = f'% Rule: {name}\n'
-    return f'''{title}swrl_rule() :- \n{rule}'''
+    debug_print_rulename = f"writeln('\t{name},')," if 0 else ""
+    return f'''{title}swrl_rule() :- {debug_print_rulename}\n{rule}'''
 
 
 
-def main():
-	RULES = ctrlstrct_swrl.RULES
-	with open('from_swrl.pl', 'w') as file:
-		for rule in RULES:
+def to_prolog(rules, out_path='from_swrl.pl'):
+	with open(out_path, 'w') as file:
+		for rule in rules:
 			# swrl = rule._original_swrl
 			swrl = rule.swrl
 			prolog = swrl2prolog(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
@@ -95,5 +95,11 @@ def main():
 			file.write(prolog)
 
 
+def main():
+	RULES = ctrlstrct_swrl.RULES
+	to_prolog(RULES)
+
+
 if __name__ == '__main__':
 	main()
+
