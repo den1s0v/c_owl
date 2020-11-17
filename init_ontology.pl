@@ -1,17 +1,26 @@
 % init_ontology
 
-:- ensure_loaded( library(rdfs2pl) ).
-:- use_module(library(semweb/rdf_db)).
+% :- use_module(library(semweb/rdf_db)).  % migrate to newer wrapper "rdf11"
+:- use_module(library(semweb/rdf11)).
 
 % % load syntactic wrappers
 % [my_onto].
 
 % load data
 load_onto :-
-        rdf_db:rdf_load('test_data/test_make_trace_output.rdf', []) ,
+        rdf_load('test_data/test_make_trace_output.rdf', []) ,
 		[my_onto], [polyfill], [from_swrl].
 
 
+dump_rdf(Filename)  :-
+		rdf_save(Filename),
+		format("Saved all the triples to file:\n\t~s", [Filename]), nl.
+
+count_triples(CountOut) :-
+  % получение числа триплетов RDF
+	% rdf_graph_property(user, triples(CountOut))  % old variant
+	rdf_statistics(triples(CountOut))
+	.
 
 
 % %%%%%%%%%%%%%%%  Запуск  %%%%%%%%%%%%%%%
@@ -23,31 +32,36 @@ run_onto :-
 	
 			statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
 			format("Loading the ontology took ~d ms.", [TimeSinceLastCall]), nl ,
+	dump_rdf('test_data/prolog_pre-output.rdf'),
 	run_swrl, !.         
 
 
-% Запуск всех "правил SWRL" в цикле, пока триплеты не перестанут появляться после прогона.
+
+% Запуск всех "правил SWRL" в цикле, пока после очередного прогона триплеты не перестанут появляться.
   % обёртка рекурсии
 run_swrl :- 
-	rdf_graph_property(user, triples(Count)), 
+	count_triples(Count), 
+	write(Count), writeln(" triples at start."), 
 	statistics(walltime, [_ | [_]]),
 	run_swrl(Count, 1), !.
 
 run_swrl :-   % Когда граф пуст / не создан
-	% statistics(walltime, [_ | [_]]),
+	statistics(walltime, [_ | [_]]),
 	% not(swrl_rule_once), 
 			% statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
 			% format("Run-once-rules finished in ~d ms.", [TimeSinceLastCall]), nl ,
 	run_swrl(0, 1), !.
 
-% run_swrl(Prev3plesCount) :- 
-	% statistics(walltime, [_ | [_]]),
-	% run_swrl(Prev3plesCount, 1).
+
 
 run_swrl(Prev3plesCount, Depth) :- 
-	format("Reasoning started from ~d triples ...", [Prev3plesCount]), nl, 
+	format("Reasoning started from ~d triples (take ~d)...", [Prev3plesCount, Depth]), nl, 
 	not(swrl_rule),  % NOT, as it fails anyway
-	rdf_graph_property(user, triples(Count)),  % получение числа триплетов
+	(
+		count_triples(Count)  % получение числа триплетов
+		;
+		Count = Prev3plesCount  % if still nothing in the graph.
+	),
 	(
 		Count > Prev3plesCount,     % новые триплеты появились, нужно продолжать
 		run_swrl(Count, Depth + 1)  % шаг рекурсии
@@ -56,9 +70,7 @@ run_swrl(Prev3plesCount, Depth) :-
 		statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
 		format("Reasoning finished in ~d iterations, ~d triples in graph total.\n\tTime it took: ~d ms.", [Depth, Count, TimeSinceLastCall]), nl,
 		
-		Out_file = 'test_data/prolog_output.rdf',
-		rdf_save(Out_file),
-		format("Saved all the triples to file:\n\t~s", [Out_file]), nl
+		dump_rdf('test_data/prolog_output.rdf')
 	).
 
 
