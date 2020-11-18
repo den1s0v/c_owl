@@ -16,8 +16,8 @@ import re
 from upd_onto import *
 from transliterate import slugify
 from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
-from explanations import format_explanation
-
+from explanations import format_explanation, get_leaf_classes
+from external_run import run_swiprolog_reasoning
 
 ONTOLOGY_maxID = 1
 
@@ -1106,10 +1106,7 @@ def extact_mistakes(onto, as_objects=False) -> dict:
             d = mistakes.get(inst.name, {})
             d[prop_name] = values
             mistakes[inst.name] = d
-        classes = {class_ for class_ in inst.is_a if class_ in error_classes}
-        base_classes = set([sup for cl in classes for sup in cl.is_a])
-        # print(classes, "-" ,base_classes)
-        classes -= base_classes  # remove less precise bases
+        classes = get_leaf_classes(set(inst.is_a) & error_classes)
         mistakes[inst.name]["classes"] = [class_.name for class_ in classes]
         mistakes[inst.name]["explanations"] = format_explanation(onto, inst)
     
@@ -1120,7 +1117,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
                       mistakes_as_objects=False, extra_act_entries=0, 
                       rules_filter=None, reasoning="stardog", on_done=None) -> "onto, mistakes_list":
     """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found.
-      reasoning: None or "stardog" or "pellet"
+      reasoning: None or "stardog" or "pellet" or "prolog"
     """
     
     global ONTOLOGY_maxID
@@ -1181,6 +1178,17 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         if debug_rdf_fpath:
             onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
             print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
+            
+    if reasoning == "prolog":
+        name_in = "pl_in.rdf"
+        name_out = "pl_out.rdf"
+        onto.save(file=name_in, format='rdfxml')
+        
+        run_swiprolog_reasoning(name_in, name_out, verbose=1)
+        
+        onto = get_ontology("file://" + name_out).load()
+        
+        seconds = 1.12345
             
     if on_done:
         on_done(seconds)

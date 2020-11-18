@@ -7,8 +7,12 @@
 % [my_onto].
 
 % load data
-load_onto :-
-        rdf_load('test_data/test_make_trace_output.rdf', []) ,
+load_onto :- 
+	% the default
+	load_onto('test_data/test_make_trace_output.rdf'). 
+	
+load_onto(Filename) :-
+        rdf_load(Filename, []) ,
 		[my_onto], [polyfill], [from_swrl].
 
 
@@ -26,14 +30,22 @@ count_triples(CountOut) :-
 % %%%%%%%%%%%%%%%  Запуск  %%%%%%%%%%%%%%%
 
 run_onto :- 
-	statistics(walltime, [_ | [_]]),
-	load_onto, fail;  % Не важно, как завершится load_onto - 
-					  % эта ветка выполнится всё равно.
+	run_onto('test_data/test_make_trace_output.rdf', 'test_data/prolog_output.rdf').
 	
-			statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
-			format("Loading the ontology took ~d ms.", [TimeSinceLastCall]), nl ,
-	dump_rdf('test_data/prolog_pre-output.rdf'),
-	run_swrl, !.         
+run_onto(LoadFrom, SaveAs) :- 
+	statistics(walltime, [_ | [_]]),
+	load_onto(LoadFrom), fail;  % Не важно, как завершится load_onto - 
+					  % эта ветка выполнится всё равно.
+	statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
+	format("Loading the ontology took ~d ms.", [TimeSinceLastCall]), nl ,
+	
+	% debug save for inspecting inferences in comparison
+	% dump_rdf('test_data/prolog_pre-output.rdf'),
+	
+	run_swrl, !,
+		
+	dump_rdf(SaveAs),
+	report_TimeSinceStart.         
 
 
 
@@ -68,9 +80,7 @@ run_swrl(Prev3plesCount, Depth) :-
 		;
 		% !, 
 		statistics(walltime, [_TimeSinceStart | [TimeSinceLastCall]]),
-		format("Reasoning finished in ~d iterations, ~d triples in graph total.\n\tTime it took: ~d ms.", [Depth, Count, TimeSinceLastCall]), nl,
-		
-		dump_rdf('test_data/prolog_output.rdf')
+		format("Reasoning finished in ~d iterations, ~d triples in graph total.\n\tTime it took: ~d ms.", [Depth, Count, TimeSinceLastCall]), nl
 	).
 
 
