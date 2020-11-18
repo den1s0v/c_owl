@@ -1186,6 +1186,8 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         
         run_swiprolog_reasoning(name_in, name_out, verbose=1)
         
+        clear_ontology(onto)
+        
         onto = get_ontology("file://" + name_out).load()
         
         seconds = 1.12345
@@ -1200,6 +1202,13 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     
     return onto, list(mistakes.values())
 
+
+def clear_ontology(onto):
+    for cls in onto.classes():
+        destroy_entity(cls)
+    for ind in onto.individuals():
+        destroy_entity(ind)
+        
 
 def plain_list(list_of_lists):
     " -> generator"
