@@ -17,7 +17,7 @@ from upd_onto import *
 from transliterate import slugify
 from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from explanations import format_explanation, get_leaf_classes
-from external_run import run_swiprolog_reasoning
+from external_run import run_swiprolog_reasoning, run_jena_reasoning
 
 ONTOLOGY_maxID = 1
 
@@ -1117,7 +1117,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
                       mistakes_as_objects=False, extra_act_entries=0, 
                       rules_filter=None, reasoning="stardog", on_done=None) -> "onto, mistakes_list":
     """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found.
-      reasoning: None or "stardog" or "pellet" or "prolog"
+      reasoning: None or "stardog" or "pellet" or "prolog" or "jena"
     """
     
     global ONTOLOGY_maxID
@@ -1190,6 +1190,18 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         onto = get_ontology("file://" + name_out).load()
         
         seconds = 1.12345
+            
+    if reasoning == "jena":
+        name_in = "jena_in.rdf"
+        name_out = "jena_out.n3"
+        onto.save(file=name_in, format='rdfxml')
+        
+        run_jena_reasoning(name_in, name_out, verbose=1)
+        
+        clear_ontology(onto)
+        onto = get_ontology("file://" + name_out).load()
+
+        seconds = 2.23456
             
     if on_done:
         on_done(seconds)

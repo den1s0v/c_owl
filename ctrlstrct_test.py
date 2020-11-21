@@ -355,7 +355,8 @@ if __name__ == '__main__':
 	success_all = run_tests(process_kwargs=dict(
 		# reasoning=None, 
 		# reasoning="pellet", 
-		reasoning="prolog", 
+		# reasoning="prolog", 
+		reasoning="jena", 
 		# reasoning="stardog", 
 		extra_act_entries=0
 		)
