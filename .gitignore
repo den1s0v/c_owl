@@ -2,6 +2,8 @@
 *.lnk
 *.pdf
 *.rdf
+*.n3
+*.ttl
 #*.txt
 ~*.*
 test_data/*/*output*
