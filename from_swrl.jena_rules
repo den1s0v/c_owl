@@ -1,0 +1,1453 @@
+
+
+# Rule: Incr_index [correct & helper]
+[
+	(?a my:next_act ?b), (?a my:index ?ia), sum(?ia, 1, ?ib)
+	 -> (?b my:index ?ib)]
+
+# Rule: DepthIncr_rule_s6 [correct & helper]
+[
+	(?a rdf:type my:act_begin), (?a my:next_act ?b), (?b rdf:type my:act_begin)
+	 -> (?a my:parent_of ?b)
+	]
+
+# Rule: student_DepthIncr_rule_s6 [helper & mistake]
+[
+	(?a rdf:type my:act_begin), (?a my:student_next ?b), (?b rdf:type my:act_begin)
+	 -> (?a my:student_parent_of ?b)
+	]
+
+# Rule: DepthSame_b-e_rule_s7 [correct & helper]
+[
+	(?a rdf:type my:act_begin), (?a my:next_act ?b), (?b rdf:type my:act_end), 
+	(?p my:parent_of ?a),
+	 -> (?p my:parent_of ?b), (?a my:corresponding_end ?b)
+	]
+
+# Rule: student_DepthSame_b-e_rule_s7 [helper & mistake]
+[
+	(?a rdf:type my:act_begin), (?a my:student_next ?b), (?b rdf:type my:act_end), 
+	(?p my:student_parent_of ?a),
+	 -> (?p my:student_parent_of ?b), (?a my:student_corresponding_end ?b)
+	]
+
+# Rule: DepthSame_e-b_rule_s8 [correct & helper]
+[
+	(?a rdf:type my:act_end), (?a my:next_act ?b), (?b rdf:type my:act_begin), 
+	(?p my:parent_of ?a)                   
+	 -> (?p my:parent_of ?b)                    
+	]
+
+# Rule: student_DepthSame_e-b_rule_s8 [helper & mistake]
+[
+	(?a rdf:type my:act_end), (?a my:student_next ?b), (?b rdf:type my:act_begin), 
+	(?p my:student_parent_of ?a)
+	 -> (?p my:student_parent_of ?b)
+	]
+
+# Rule: DepthDecr_rule_s9 [correct & helper]
+[
+	(?a rdf:type my:act_end), (?a my:next_act ?b), (?b rdf:type my:act_end), 
+	(?p my:parent_of ?a)
+	 -> (?p my:corresponding_end ?b)
+	]
+
+# Rule: student_DepthDecr_rule_s9 [helper & mistake]
+[
+	(?a rdf:type my:act_end), (?a my:student_next ?b), (?b rdf:type my:act_end), 
+	(?p my:student_parent_of ?a)
+	 -> (?p my:student_corresponding_end ?b)
+	]
+
+# Rule: SameParentOfCorrActs_rule_s10 [correct & helper]
+[
+	(?a my:corresponding_end ?b), (?p my:parent_of ?a)
+	 -> (?p my:parent_of ?b)
+	]
+
+# Rule: student_SameParentOfCorrActs_rule_s10 [helper & mistake]
+[
+	(?a my:corresponding_end ?b), (?p my:student_parent_of ?a)
+	 -> (?p my:student_parent_of ?b)
+	]
+
+# Rule: Earliest_after_act_is_previous_correct_sibling [correct & helper]
+[
+	(?a rdf:type my:correct_act),
+	(?a my:next_sibling ?s),
+	 -> (?s my:after_act ?a)
+]
+
+# Rule: Propagate_after_act [correct & helper]
+[
+	(?s my:after_act ?a),
+	(?a my:next_act ?b),
+	                        
+		(?b my:id ?ib),
+		(?s my:id ?is),
+		notEqual(?ib, ?is),
+	 -> (?s my:after_act ?b)
+]
+
+# Rule: start__to__MainFunctionBegin__rule_g3 [entry & function & correct]
+[
+	(?a rdf:type my:trace),
+	(?a my:executes ?alg),
+	(?alg my:entry_point ?func_),
+	(?func_ rdf:type my:func), 
+	                                                                                                            
+	(?b rdf:type my:act_begin),
+		                                          
+	(?a my:next_sibling ?b),              
+	(?b my:executes ?func_),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), 
+	 (?a my:next_act ?b), 
+	 (?b rdf:type my:FunctionBegin)
+]
+
+# Rule: start__to__GlobalCode__rule_g4 [entry & sequence & correct]
+[
+	(?a rdf:type my:trace),
+	(?a my:executes ?alg),
+	(?alg my:entry_point ?gc),
+	(?gc rdf:type my:sequence), 
+
+	(?b rdf:type my:act_begin),
+		                                          
+	(?a my:next_sibling ?b),              
+	(?b my:executes ?gc),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), 
+	 (?a my:next_act ?b), (?b rdf:type my:GlobalCodeBegin)
+]
+
+# Rule: connect_FunctionBodyBegin_rule_g5 [function & correct]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_begin),
+	(?func_ rdf:type my:func), 
+	(?a my:executes ?func_),
+	(?func_ my:body ?st),
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st),
+	                                                    
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), 
+	 (?a my:next_act ?b), 
+	 (?b rdf:type my:FunctionBodyBegin)
+]
+
+# Rule: connect_FuncBodyEnd_rule_g5-2 [function & correct]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?func_ rdf:type my:func), 
+	(?func_ my:body ?st),
+	(?a my:executes ?st),
+	
+	(?b rdf:type my:act_end),
+	(?b my:executes ?func_),
+	
+	(?b my:after_act ?a),
+	
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:FunctionEnd)
+]
+
+# Rule: connect_SequenceBegin_rule_g2 [sequence & correct]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_begin),
+	(?block rdf:type my:sequence), 
+	(?a my:executes ?block),
+	(?block my:body_item ?st),
+	(?st rdf:type my:first_item),
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st),
+	
+	(?b my:after_act ?a),
+	
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:SequenceBegin)
+]
+
+# Rule: connect_SequenceNext [sequence & correct]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?p my:parent_of ?a),
+	(?block rdf:type my:sequence), 
+	(?p my:executes ?block),
+	(?block my:body_item ?st),
+	(?a my:executes ?st),
+	
+	(?st my:next ?st2),
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st2),
+	
+	(?b my:after_act ?a),	
+	
+	 -> (?b rdf:type my:normal_flow_correct_act), 
+	  (?a my:next_act ?b), 
+	  (?b rdf:type my:SequenceNext)
+]
+
+# Rule: connect_StmtEnd [sequence & correct]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_begin),
+	(?st rdf:type my:stmt), 
+	(?a my:executes ?st),
+	
+	(?b rdf:type my:act_end),
+	(?b my:executes ?st),
+	
+	(?b my:after_act ?a),
+	
+	(?a my:exec_time ?t), (?b my:exec_time ?_t),
+	equal(?t, ?_t),
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:StmtEnd)
+]
+
+# Rule: connect_ExprEnd [sequence & correct]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_begin),
+	(?st rdf:type my:expr), 
+	(?a my:executes ?st),
+	
+	(?b rdf:type my:act_end),
+	(?b my:executes ?st),
+	
+	(?b my:after_act ?a),
+
+	(?a my:exec_time ?t), (?b my:exec_time ?_t),
+	equal(?t, ?_t),
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:ExprEnd)
+]
+
+# Rule: connect_SequenceEnd [sequence & correct]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?a my:executes ?st),
+	(?st rdf:type my:last_item),
+	
+	(?b rdf:type my:act_end),
+	(?p my:parent_of ?a),
+	(?p my:executes ?block),
+                            
+	(?b my:executes ?block),
+	(?block my:body_item ?st),
+	
+	(?b my:after_act ?a),
+	
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:SequenceEnd)
+]
+
+# Rule: connect_AltBegin [correct & alternative]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_begin),
+	(?alt rdf:type my:alternative), 
+	(?a my:executes ?alt),
+
+	(?alt my:branches_item ?br),
+	(?br rdf:type my:first_item),	                             
+	                                          
+	(?br my:cond ?cnd),
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?cnd),        
+	
+	(?b my:after_act ?a),
+
+	                                        
+	                 
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltBegin)
+]
+
+# Rule: connect_AltBranchBegin_CondTrue [correct & alternative]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr), 
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "true"^^xsd:boolean),                    
+
+	(?br my:cond ?cnd),
+	(?br rdf:type my:alt_branch),                             
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?br),
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltBranchBegin)
+]
+
+# Rule: connect_NextAltCondition [correct & alternative]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr), 
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+
+	(?br my:cond ?cnd),
+	(?br rdf:type my:alt_branch),                             
+
+	(?br my:next ?br2),
+	(?br2 my:cond ?cnd2),
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?cnd2),        
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:NextAltCondition)
+]
+
+# Rule: connect_AltElseBranch [correct & alternative]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr), 
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+
+	(?br my:cond ?cnd),
+	(?br rdf:type my:alt_branch),                             
+	(?br my:next ?br2),
+	(?br2 rdf:type my:else),
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?br2),        
+
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltElseBranchBegin)
+]
+
+# Rule: connect_AltEndAllFalse [correct & alternative]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr), 
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+
+	(?br my:cond ?cnd),
+	(?br rdf:type my:alt_branch),                             
+	(?alt my:branches_item ?br),
+	(?br rdf:type my:last_item),                                      
+	(?alt rdf:type my:alternative),
+	
+	(?b rdf:type my:act_end),
+	(?b my:executes ?alt),        
+
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltEndAllFalse)
+]
+
+# Rule: connect_AltEndAfterBranch [correct & alternative]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?a my:executes ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative), 
+
+	(?b rdf:type my:act_end),
+	(?b my:executes ?alt),                          
+	
+	(?b my:after_act ?a),
+	
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltEndAfterBranch)
+]
+
+# Rule: connect_LoopBegin-cond [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_begin),
+	(?loop__ rdf:type my:pre_conditional_loop), 
+	(?a my:executes ?loop__),
+
+	(?loop__ my:cond ?cnd),
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?cnd),        
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:PreCondLoopBegin)
+]
+
+# Rule: connect_LoopBegin-body [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_begin),
+	(?loop__ rdf:type my:post_conditional_loop), 
+	(?a my:executes ?loop__),
+
+	(?loop__ my:body ?st),
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st),
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:PostCondLoopBegin)
+]
+
+# Rule: connect_LoopCond1-BodyBegin [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:cond_then_body), 
+	(?loop__ my:cond ?cnd),
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "true"^^xsd:boolean),                    
+	
+	(?loop__ my:body ?st),
+	                        
+	                  
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st),
+								                           
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:IterationBeginOnTrueCond)
+]
+
+# Rule: connect_LoopCond0-body [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:inverse_conditional_loop), 
+	(?loop__ my:cond ?cnd),
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+	
+	(?loop__ my:body ?st),
+	                        
+	                  
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st),
+								                           
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:IterationBeginOnFalseCond)
+]
+
+# Rule: connect_LoopCond1-update [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:pre_update_loop), 
+	(?loop__ my:cond ?cnd),
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "true"^^xsd:boolean),                    
+	
+	(?loop__ my:update ?upd),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?upd),
+								                           
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:LoopUpdateOnTrueCond)
+]
+
+# Rule: connect_LoopUpdate-body [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:pre_update_loop), 
+	(?loop__ my:update ?upd),
+	(?a my:executes ?upd),
+
+	(?loop__ my:body ?st),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st),
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b),
+	 (?b rdf:type my:LoopBodyAfterUpdate)
+]
+
+# Rule: connect_LoopCond0-LoopEnd [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:conditional_loop), 
+	(?loop__ my:cond ?cnd),
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+	
+	(?b rdf:type my:act_end),
+	(?b my:executes ?loop__),
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:NormalLoopEnd)
+]
+
+# Rule: connect_LoopCond1-LoopEnd [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:inverse_conditional_loop), 
+	(?loop__ my:cond ?cnd),
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "true"^^xsd:boolean),                    
+	
+	(?b rdf:type my:act_end),
+	(?b my:executes ?loop__),
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:NormalLoopEnd)
+]
+
+# Rule: connect_LoopBody-cond [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:body_then_cond), 
+	(?loop__ my:body ?st),
+	(?a my:executes ?st),
+
+	(?loop__ my:cond ?cnd),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?cnd),
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b),
+	 (?b rdf:type my:LoopCondBeginAfterIteration)
+]
+
+# Rule: connect_LoopBegin-init [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?loop__),
+	(?loop__ rdf:type my:loop_with_initialization), 
+
+	(?loop__ my:init ?st),
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st),
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:LoopWithInitBegin)
+]
+
+# Rule: connect_LoopInit-cond [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:loop_with_initialization), 
+	(?loop__ my:init ?st),
+	(?a my:executes ?st),
+
+	(?loop__ my:cond ?cnd),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?cnd),
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b),
+	 (?b rdf:type my:LoopCondBeginAfterInit)
+]
+
+# Rule: connect_LoopBody-update [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:post_update_loop), 
+	(?loop__ my:body ?st),
+	(?a my:executes ?st),
+
+	(?loop__ my:update ?upd),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?upd),
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b),
+	 (?b rdf:type my:LoopUpdateAfterIteration)
+]
+
+# Rule: connect_LoopUpdate-cond [correct & loop]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:post_update_loop), 
+	(?loop__ my:update ?st),
+	(?a my:executes ?st),
+
+	(?loop__ my:cond ?cnd),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?cnd),
+	
+	(?b my:after_act ?a),
+
+	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b),
+	 (?b rdf:type my:LoopCondAfterUpdate)
+]
+
+# Rule: CorrespondingActsMismatch_Error [mistake]
+[
+	(?a my:student_corresponding_end ?b), 
+	(?a my:executes ?s1),
+	(?b my:executes ?s2),
+	                          
+		(?s1 my:id ?ib),
+		(?s2 my:id ?ic),
+		notEqual(?ib, ?ic),
+	 -> (?b rdf:type my:CorrespondingEndMismatched), (?b my:cause ?a)
+]
+
+# Rule: GenericWrongAct_Error [mistake]
+[
+	(?a my:next_act ?b),
+	(?a my:student_next ?c),
+	                        
+		(?b my:id ?ib),
+		(?c my:id ?ic),
+		notEqual(?ib, ?ic),
+	 -> (?c my:should_be ?b), 
+	 (?c my:precursor ?a), 
+	 (?c rdf:type my:Erroneous)
+]
+
+# Rule: GenericWrongParent_Error [mistake]
+[
+	(?p my:parent_of ?a),
+	(?c my:student_parent_of ?a),
+	                        
+		(?p my:id ?ip),
+		(?c my:id ?ic),
+		notEqual(?ip, ?ic),
+	 -> (?a my:context_should_be ?p), 
+	                  
+	 (?a rdf:type my:WrongContext)
+]
+
+# Rule: MisplacedBefore_Error [mistake]
+[
+	(?a rdf:type my:WrongContext),
+	(?a my:corresponding_end ?e),
+	(?p my:parent_of ?a),
+	             
+		(?e my:student_index ?ie),
+		(?p my:student_index ?ip),
+		lessThan(?ie, ?ip),
+	 -> 
+	 (?a rdf:type my:MisplacedBefore),
+	 (?e rdf:type my:MisplacedBefore)
+]
+
+# Rule: MisplacedAfter_Error [mistake]
+[
+	(?a rdf:type my:WrongContext),
+	(?a my:corresponding_end ?e),
+	(?p my:parent_of ?a),
+	(?p my:corresponding_end ?pe),
+	                    
+		(?a my:student_index ?ia),
+		(?pe my:student_index ?ipe),
+		lessThan(?ipe, ?ia),
+	 -> 
+	 (?a rdf:type my:MisplacedAfter),
+	 (?e rdf:type my:MisplacedAfter)
+]
+
+# Rule: MisplacedDeeper_Error [mistake]
+[
+	(?a rdf:type my:WrongContext),
+	(?a my:corresponding_end ?e),
+	(?p my:parent_of ?a),
+	(?p my:corresponding_end ?pe),
+	                  
+		(?a my:student_index ?ia),
+		(?p my:student_index ?ip),
+		lessThan(?ip, ?ia),
+		(?e my:student_index ?ie),
+		(?pe my:student_index ?ipe),
+		lessThan(?ie, ?ipe),
+	 -> 
+	 (?a rdf:type my:MisplacedDeeper),
+	 (?e rdf:type my:MisplacedDeeper)
+]
+
+# Rule: GenericWrongExecTime-b_Error [mistake]
+[
+	(?c rdf:type my:Erroneous),
+	(?c my:should_be ?b),
+	(?b rdf:type my:act_begin),
+	(?c rdf:type my:act_begin),
+	(?c my:executes ?st),
+	(?b my:executes ?st),
+	(?c my:exec_time ?n1),
+	(?b my:exec_time ?n2),
+	notEqual(?n1, ?n2),
+	 -> (?c rdf:type my:WrongExecTime)
+]
+
+# Rule: GenericWrongExecTime-e_Error [mistake]
+[
+	(?c rdf:type my:Erroneous),
+	(?c my:should_be ?b),
+	(?b rdf:type my:act_end),
+	(?c rdf:type my:act_end),
+	(?c my:executes ?st),
+	(?b my:executes ?st),
+	(?c my:exec_time ?n1),
+	(?b my:exec_time ?n2),
+	notEqual(?n1, ?n2),
+	 -> (?c rdf:type my:WrongExecTime)
+]
+
+# Rule: ActStartsAfterItsEnd_Error [mistake]
+[
+	(?a rdf:type my:act_begin),
+	(?b rdf:type my:act_end),
+	(?a my:executes ?st),
+	(?b my:executes ?st),
+	(?a my:exec_time ?n),
+	(?b my:exec_time ?n),
+	(?a my:student_index ?ia),
+	(?b my:student_index ?ib),
+	lessThan(?ib, ?ia),         
+	 -> (?a my:cause ?b), (?b my:cause ?a), 
+	  (?a rdf:type my:ActStartsAfterItsEnd),
+	  (?b rdf:type my:ActEndsWithoutStart)
+]
+
+# Rule: DuplicateOfAct-seq-b_Error [sequence & mistake]
+[
+	(?c1 rdf:type my:ExtraAct), 
+	(?c1 rdf:type my:act_begin),
+	(?p my:student_parent_of ?c1),
+	(?p my:executes ?block),
+	(?block rdf:type my:sequence),
+		(?block my:body_item ?st),                                                                      
+	(?c1 my:executes ?st),
+
+	(?c my:executes ?st),
+	(?p my:student_parent_of ?c),
+	(?c rdf:type my:act_begin),
+
+		(?c1 my:id ?ic1),
+		(?c my:id ?ic),
+		notEqual(?ic1, ?ic),
+	 -> (?c1 my:cause ?c), 
+	 (?c1 rdf:type my:DuplicateOfAct)
+]
+
+# Rule: DuplicateOfAct-seq-e_Error [sequence & mistake]
+[
+	(?c1 rdf:type my:ExtraAct), 
+	(?c1 rdf:type my:act_end),
+	(?p my:student_parent_of ?c1),
+	(?p my:executes ?block),
+	(?block rdf:type my:sequence),
+		(?block my:body_item ?st),                                                                      
+	(?c1 my:executes ?st),
+
+	(?c my:executes ?st),
+	(?p my:student_parent_of ?c),
+	(?c rdf:type my:act_end),
+
+		(?c1 my:id ?ic1),
+		(?c my:id ?ic),
+		notEqual(?ic1, ?ic),
+	 -> (?c1 my:cause ?c), 
+	 (?c1 rdf:type my:DuplicateOfAct)
+]
+
+# Rule: DisplacedAct_Error [sequence & mistake]
+[
+	(?c1 rdf:type my:ExtraAct), 
+	(?c1 rdf:type my:MissingAct), 
+	 -> (?c1 rdf:type my:DisplacedAct)
+]
+
+# Rule: TooEarlyInSequence_Error [sequence & mistake]
+[
+	(?b rdf:type my:TooEarly), 
+	(?sa my:student_parent_of ?b),
+	(?sa my:executes ?seq),
+	(?seq rdf:type my:sequence),
+	(?a my:should_be_before ?b), 
+	(?sa my:student_parent_of ?a),
+	 -> (?b my:should_be_after ?a), 
+	 (?b rdf:type my:TooEarlyInSequence)
+]
+
+# Rule: NoFirstCondition-alt_Error [mistake & alternative]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?alt),
+	(?alt rdf:type my:alternative), 
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous), 
+	 -> (?b my:should_be ?a), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:NoFirstCondition)
+]
+
+# Rule: BranchOfFalseCondition-alt_Error [mistake & alternative]
+[
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr), 
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+
+	(?br my:cond ?cnd),                        
+	(?br rdf:type my:alt_branch),                             
+	
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?br),
+	
+	(?alt_act my:parent_of ?a),                                                                                   
+	(?alt_act my:student_parent_of ?b),
+	
+	                       
+	(?b rdf:type my:Erroneous), 	                                        
+	 -> (?b my:should_be ?a), 
+	 (?b my:precursor ?a),
+	 (?b my:cause ?a),
+	 (?b rdf:type my:BranchOfFalseCondition)
+]
+
+# Rule: WrongBranch-alt_Error [mistake & alternative]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative), 
+
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?br2),
+	(?alt my:branches_item ?br2),
+	
+	                        
+		(?br my:id ?i),
+		(?br2 my:id ?i2),
+		notEqual(?i, ?i2),
+	
+	(?alt_act my:parent_of ?a),
+	(?alt_act my:student_parent_of ?b),
+	 -> (?b my:should_be ?a), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:WrongBranch)
+]
+
+# Rule: ConditionAfterBranch-alt_Error [mistake & alternative]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative), 
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:ExtraAct), 	                                        
+	                
+	(?b my:executes ?cnd),
+	(?cnd rdf:type my:expr), 	             
+	
+	 -> (?b my:should_be ?a), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:ConditionAfterBranch)
+]
+
+# Rule: AnotherExtraBranch-alt_Error [mistake & alternative]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative), 
+
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?br2),
+	(?alt my:branches_item ?br2),
+	
+	(?alt_act my:student_parent_of ?a),
+	(?alt_act my:student_parent_of ?b),
+	
+	(?a my:student_index ?sia),
+	(?b my:student_index ?sib),
+	greaterThan(?sib, ?sia),
+	 -> (?b my:cause ?a),
+	  (?b rdf:type my:AnotherExtraBranch)
+]
+
+# Rule: NoBranchWhenConditionIsTrue-alt_Error [mistake & alternative]
+[
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr), 
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "true"^^xsd:boolean),                    
+
+	(?br my:cond ?cnd),                        
+	(?br rdf:type my:alt_branch),                             
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous), 	                                        
+	
+	 -> (?b my:should_be ?a), 
+	  (?b my:precursor ?a),
+	  (?b rdf:type my:NoBranchWhenConditionIsTrue)
+]
+
+# Rule: AllFalseNoElse-alt_Error [mistake & alternative]
+[
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr), 
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+	(?br my:cond ?cnd),                        
+	(?br my:next ?br2),
+	(?br2 rdf:type my:else), 	                          
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous),
+	
+	 -> (?b my:should_be ?a), 
+	  (?b my:precursor ?a),
+	  (?b rdf:type my:AllFalseNoElse)
+]
+
+# Rule: NoNextCondition-alt_Error [mistake & alternative]
+[
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr), 
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+	(?br my:cond ?cnd),                        
+	(?br my:next ?br2),
+	(?br2 my:cond ?cnd2), 	                               
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous),
+	
+	 -> (?b my:should_be ?a), 
+	  (?b my:precursor ?a),
+	  (?b rdf:type my:NoNextCondition)
+]
+
+# Rule: AllFalseNoEnd-alt_Error [mistake & alternative]
+[
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr), 
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+	(?br my:cond ?cnd),                        
+	(?br rdf:type my:last_item),                                
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous),
+	
+	 -> (?b my:should_be ?a), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:AllFalseNoEnd)
+]
+
+# Rule: MissingIterationAfterSuccessfulCondition-1-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:cond_then_body), 
+	(?loop__ my:cond ?cnd),
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "true"^^xsd:boolean),                    
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous), 
+	 -> (?b my:should_be ?a), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:MissingIterationAfterSuccessfulCondition)
+]
+
+# Rule: MissingIterationAfterSuccessfulCondition-0-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:inverse_conditional_loop), 
+	(?loop__ my:cond ?cnd),
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous), 
+	 -> (?b my:should_be ?a), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:MissingIterationAfterSuccessfulCondition)
+]
+
+# Rule: MissingLoopEndAfterFailedCondition-0-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:cond_then_body), 
+	(?loop__ my:cond ?cnd),
+	(?a my:executes ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),                    
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous), 
+	 -> (?b my:should_be ?a), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:MissingLoopEndAfterFailedCondition)
+]
+
+# Rule: IterationAfterFailedCondition-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:MissingLoopEndAfterFailedCondition),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st),
+	(?L my:body ?st),
+	(?L rdf:type my:loop),
+	 -> (?b my:should_be ?a), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:IterationAfterFailedCondition)
+]
+
+# Rule: ExtraAct_1_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		
+		(?c1 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_1_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		
+		(?c1 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_2_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), 
+		(?c2 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_2_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), 
+		(?c2 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_3_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), 
+		(?c3 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_3_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), 
+		(?c3 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_4_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), (?c3 my:student_next ?c4), 
+		(?c4 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct), (?c4 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_4_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), (?c3 my:next_act ?c4), 
+		(?c4 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),  (?c4 rdf:type my:MissingAct), (?c4 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_5_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), (?c3 my:student_next ?c4), (?c4 my:student_next ?c5), 
+		(?c5 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct), (?c4 rdf:type my:ExtraAct), (?c5 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_5_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), (?c3 my:next_act ?c4), (?c4 my:next_act ?c5), 
+		(?c5 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),  (?c4 rdf:type my:MissingAct), (?c4 my:should_be_before ?b),  (?c5 rdf:type my:MissingAct), (?c5 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_6_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), (?c3 my:student_next ?c4), (?c4 my:student_next ?c5), (?c5 my:student_next ?c6), 
+		(?c6 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct), (?c4 rdf:type my:ExtraAct), (?c5 rdf:type my:ExtraAct), (?c6 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_6_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), (?c3 my:next_act ?c4), (?c4 my:next_act ?c5), (?c5 my:next_act ?c6), 
+		(?c6 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),  (?c4 rdf:type my:MissingAct), (?c4 my:should_be_before ?b),  (?c5 rdf:type my:MissingAct), (?c5 my:should_be_before ?b),  (?c6 rdf:type my:MissingAct), (?c6 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_7_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), (?c3 my:student_next ?c4), (?c4 my:student_next ?c5), (?c5 my:student_next ?c6), (?c6 my:student_next ?c7), 
+		(?c7 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct), (?c4 rdf:type my:ExtraAct), (?c5 rdf:type my:ExtraAct), (?c6 rdf:type my:ExtraAct), (?c7 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_7_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), (?c3 my:next_act ?c4), (?c4 my:next_act ?c5), (?c5 my:next_act ?c6), (?c6 my:next_act ?c7), 
+		(?c7 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),  (?c4 rdf:type my:MissingAct), (?c4 my:should_be_before ?b),  (?c5 rdf:type my:MissingAct), (?c5 my:should_be_before ?b),  (?c6 rdf:type my:MissingAct), (?c6 my:should_be_before ?b),  (?c7 rdf:type my:MissingAct), (?c7 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_8_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), (?c3 my:student_next ?c4), (?c4 my:student_next ?c5), (?c5 my:student_next ?c6), (?c6 my:student_next ?c7), (?c7 my:student_next ?c8), 
+		(?c8 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct), (?c4 rdf:type my:ExtraAct), (?c5 rdf:type my:ExtraAct), (?c6 rdf:type my:ExtraAct), (?c7 rdf:type my:ExtraAct), (?c8 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_8_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), (?c3 my:next_act ?c4), (?c4 my:next_act ?c5), (?c5 my:next_act ?c6), (?c6 my:next_act ?c7), (?c7 my:next_act ?c8), 
+		(?c8 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),  (?c4 rdf:type my:MissingAct), (?c4 my:should_be_before ?b),  (?c5 rdf:type my:MissingAct), (?c5 my:should_be_before ?b),  (?c6 rdf:type my:MissingAct), (?c6 my:should_be_before ?b),  (?c7 rdf:type my:MissingAct), (?c7 my:should_be_before ?b),  (?c8 rdf:type my:MissingAct), (?c8 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_9_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), (?c3 my:student_next ?c4), (?c4 my:student_next ?c5), (?c5 my:student_next ?c6), (?c6 my:student_next ?c7), (?c7 my:student_next ?c8), (?c8 my:student_next ?c9), 
+		(?c9 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct), (?c4 rdf:type my:ExtraAct), (?c5 rdf:type my:ExtraAct), (?c6 rdf:type my:ExtraAct), (?c7 rdf:type my:ExtraAct), (?c8 rdf:type my:ExtraAct), (?c9 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_9_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), (?c3 my:next_act ?c4), (?c4 my:next_act ?c5), (?c5 my:next_act ?c6), (?c6 my:next_act ?c7), (?c7 my:next_act ?c8), (?c8 my:next_act ?c9), 
+		(?c9 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),  (?c4 rdf:type my:MissingAct), (?c4 my:should_be_before ?b),  (?c5 rdf:type my:MissingAct), (?c5 my:should_be_before ?b),  (?c6 rdf:type my:MissingAct), (?c6 my:should_be_before ?b),  (?c7 rdf:type my:MissingAct), (?c7 my:should_be_before ?b),  (?c8 rdf:type my:MissingAct), (?c8 my:should_be_before ?b),  (?c9 rdf:type my:MissingAct), (?c9 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_10_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), (?c3 my:student_next ?c4), (?c4 my:student_next ?c5), (?c5 my:student_next ?c6), (?c6 my:student_next ?c7), (?c7 my:student_next ?c8), (?c8 my:student_next ?c9), (?c9 my:student_next ?c10), 
+		(?c10 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct), (?c4 rdf:type my:ExtraAct), (?c5 rdf:type my:ExtraAct), (?c6 rdf:type my:ExtraAct), (?c7 rdf:type my:ExtraAct), (?c8 rdf:type my:ExtraAct), (?c9 rdf:type my:ExtraAct), (?c10 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_10_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), (?c3 my:next_act ?c4), (?c4 my:next_act ?c5), (?c5 my:next_act ?c6), (?c6 my:next_act ?c7), (?c7 my:next_act ?c8), (?c8 my:next_act ?c9), (?c9 my:next_act ?c10), 
+		(?c10 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),  (?c4 rdf:type my:MissingAct), (?c4 my:should_be_before ?b),  (?c5 rdf:type my:MissingAct), (?c5 my:should_be_before ?b),  (?c6 rdf:type my:MissingAct), (?c6 my:should_be_before ?b),  (?c7 rdf:type my:MissingAct), (?c7 my:should_be_before ?b),  (?c8 rdf:type my:MissingAct), (?c8 my:should_be_before ?b),  (?c9 rdf:type my:MissingAct), (?c9 my:should_be_before ?b),  (?c10 rdf:type my:MissingAct), (?c10 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_11_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), (?c3 my:student_next ?c4), (?c4 my:student_next ?c5), (?c5 my:student_next ?c6), (?c6 my:student_next ?c7), (?c7 my:student_next ?c8), (?c8 my:student_next ?c9), (?c9 my:student_next ?c10), (?c10 my:student_next ?c11), 
+		(?c11 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct), (?c4 rdf:type my:ExtraAct), (?c5 rdf:type my:ExtraAct), (?c6 rdf:type my:ExtraAct), (?c7 rdf:type my:ExtraAct), (?c8 rdf:type my:ExtraAct), (?c9 rdf:type my:ExtraAct), (?c10 rdf:type my:ExtraAct), (?c11 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_11_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), (?c3 my:next_act ?c4), (?c4 my:next_act ?c5), (?c5 my:next_act ?c6), (?c6 my:next_act ?c7), (?c7 my:next_act ?c8), (?c8 my:next_act ?c9), (?c9 my:next_act ?c10), (?c10 my:next_act ?c11), 
+		(?c11 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),  (?c4 rdf:type my:MissingAct), (?c4 my:should_be_before ?b),  (?c5 rdf:type my:MissingAct), (?c5 my:should_be_before ?b),  (?c6 rdf:type my:MissingAct), (?c6 my:should_be_before ?b),  (?c7 rdf:type my:MissingAct), (?c7 my:should_be_before ?b),  (?c8 rdf:type my:MissingAct), (?c8 my:should_be_before ?b),  (?c9 rdf:type my:MissingAct), (?c9 my:should_be_before ?b),  (?c10 rdf:type my:MissingAct), (?c10 my:should_be_before ?b),  (?c11 rdf:type my:MissingAct), (?c11 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: ExtraAct_12_Error [mistake]
+[
+		(?a my:next_act ?b),
+		(?a my:student_next ?c1),
+		                         
+		(?c1 my:student_next ?c2), (?c2 my:student_next ?c3), (?c3 my:student_next ?c4), (?c4 my:student_next ?c5), (?c5 my:student_next ?c6), (?c6 my:student_next ?c7), (?c7 my:student_next ?c8), (?c8 my:student_next ?c9), (?c9 my:student_next ?c10), (?c10 my:student_next ?c11), (?c11 my:student_next ?c12), 
+		(?c12 my:student_next ?b),
+		 -> (?c1 rdf:type my:ExtraAct), (?c2 rdf:type my:ExtraAct), (?c3 rdf:type my:ExtraAct), (?c4 rdf:type my:ExtraAct), (?c5 rdf:type my:ExtraAct), (?c6 rdf:type my:ExtraAct), (?c7 rdf:type my:ExtraAct), (?c8 rdf:type my:ExtraAct), (?c9 rdf:type my:ExtraAct), (?c10 rdf:type my:ExtraAct), (?c11 rdf:type my:ExtraAct), (?c12 rdf:type my:ExtraAct)                 
+	]
+
+# Rule: MissingAct_12_Error [mistake]
+[
+		(?a my:student_next ?b),
+		(?a my:next_act ?c1),
+		                         
+		(?c1 my:next_act ?c2), (?c2 my:next_act ?c3), (?c3 my:next_act ?c4), (?c4 my:next_act ?c5), (?c5 my:next_act ?c6), (?c6 my:next_act ?c7), (?c7 my:next_act ?c8), (?c8 my:next_act ?c9), (?c9 my:next_act ?c10), (?c10 my:next_act ?c11), (?c11 my:next_act ?c12), 
+		(?c12 my:next_act ?b),
+		 -> (?c1 rdf:type my:MissingAct), (?c1 my:should_be_before ?b),  (?c2 rdf:type my:MissingAct), (?c2 my:should_be_before ?b),  (?c3 rdf:type my:MissingAct), (?c3 my:should_be_before ?b),  (?c4 rdf:type my:MissingAct), (?c4 my:should_be_before ?b),  (?c5 rdf:type my:MissingAct), (?c5 my:should_be_before ?b),  (?c6 rdf:type my:MissingAct), (?c6 my:should_be_before ?b),  (?c7 rdf:type my:MissingAct), (?c7 my:should_be_before ?b),  (?c8 rdf:type my:MissingAct), (?c8 my:should_be_before ?b),  (?c9 rdf:type my:MissingAct), (?c9 my:should_be_before ?b),  (?c10 rdf:type my:MissingAct), (?c10 my:should_be_before ?b),  (?c11 rdf:type my:MissingAct), (?c11 my:should_be_before ?b),  (?c12 rdf:type my:MissingAct), (?c12 my:should_be_before ?b),                    
+		 (?b rdf:type my:TooEarly)
+	]
+
+# Rule: LoopIteration1_after_0 [correct & helper & loop]
+[
+		(?a rdf:type my:act_begin),
+		(?a my:executes ?L),
+		(?L rdf:type my:loop),
+		(?L my:body ?st),
+		(?st my:id ?body_i),
+		(?a my:next_act ?c0),
+		 
+		(?c0 my:executes ?st), (?c0 my:corresponding_end ?ce0),                        
+		 -> (?c0 my:iteration_n 1),
+		(?ce0 my:iteration_n 1)
+		
+	]
+
+# Rule: LoopIteration1_after_1 [correct & helper & loop]
+[
+		(?a rdf:type my:act_begin),
+		(?a my:executes ?L),
+		(?L rdf:type my:loop),
+		(?L my:body ?st),
+		(?st my:id ?body_i),
+		(?a my:next_act ?c0),
+		
+		(?c0 my:executes ?st0),
+		(?st0 my:id ?st0_i),
+		notEqual(?st0_i, ?body_i),
+		(?c0 my:corresponding_end ?ce0), 
+		(?ce0 my:next_act ?c1), 
+		 
+		(?c1 my:executes ?st), (?c1 my:corresponding_end ?ce1),                        
+		 -> (?c1 my:iteration_n 1),
+		(?ce1 my:iteration_n 1)
+		
+	]
+
+# Rule: LoopIteration1_after_2 [correct & helper & loop]
+[
+		(?a rdf:type my:act_begin),
+		(?a my:executes ?L),
+		(?L rdf:type my:loop),
+		(?L my:body ?st),
+		(?st my:id ?body_i),
+		(?a my:next_act ?c0),
+		
+		(?c0 my:executes ?st0),
+		(?st0 my:id ?st0_i),
+		notEqual(?st0_i, ?body_i),
+		(?c0 my:corresponding_end ?ce0), 
+		(?ce0 my:next_act ?c1), 
+		
+		(?c1 my:executes ?st1),
+		(?st1 my:id ?st1_i),
+		notEqual(?st1_i, ?body_i),
+		(?c1 my:corresponding_end ?ce1), 
+		(?ce1 my:next_act ?c2), 
+		 
+		(?c2 my:executes ?st), (?c2 my:corresponding_end ?ce2),                        
+		 -> (?c2 my:iteration_n 1),
+		(?ce2 my:iteration_n 1)
+		
+	]
+
+# Rule: LoopIteration1_after_3 [correct & helper & loop]
+[
+		(?a rdf:type my:act_begin),
+		(?a my:executes ?L),
+		(?L rdf:type my:loop),
+		(?L my:body ?st),
+		(?st my:id ?body_i),
+		(?a my:next_act ?c0),
+		
+		(?c0 my:executes ?st0),
+		(?st0 my:id ?st0_i),
+		notEqual(?st0_i, ?body_i),
+		(?c0 my:corresponding_end ?ce0), 
+		(?ce0 my:next_act ?c1), 
+		
+		(?c1 my:executes ?st1),
+		(?st1 my:id ?st1_i),
+		notEqual(?st1_i, ?body_i),
+		(?c1 my:corresponding_end ?ce1), 
+		(?ce1 my:next_act ?c2), 
+		
+		(?c2 my:executes ?st2),
+		(?st2 my:id ?st2_i),
+		notEqual(?st2_i, ?body_i),
+		(?c2 my:corresponding_end ?ce2), 
+		(?ce2 my:next_act ?c3), 
+		 
+		(?c3 my:executes ?st), (?c3 my:corresponding_end ?ce3),                        
+		 -> (?c3 my:iteration_n 1),
+		(?ce3 my:iteration_n 1)
+		
+	]
+
+# Rule: LoopIterationNext_after_0 [correct & helper & loop]
+[
+		(?a rdf:type my:act_end),
+		(?a my:iteration_n ?n),
+		(?a my:executes ?st),
+		(?st my:id ?body_i),
+		(?a my:next_act ?c0),
+		 
+		(?c0 my:executes ?st), (?c0 my:corresponding_end ?ce0),                       
+		sum(?n, 1, ?n_next),
+		 -> (?c0 my:iteration_n ?n_next),
+		(?ce0 my:iteration_n ?n_next)
+		
+	]
+
+# Rule: LoopIterationNext_after_1 [correct & helper & loop]
+[
+		(?a rdf:type my:act_end),
+		(?a my:iteration_n ?n),
+		(?a my:executes ?st),
+		(?st my:id ?body_i),
+		(?a my:next_act ?c0),
+		
+		(?c0 my:executes ?st0),
+		(?st0 my:id ?st0_i),
+		notEqual(?st0_i, ?body_i),
+		(?c0 my:corresponding_end ?ce0), 
+		(?ce0 my:next_act ?c1), 
+		 
+		(?c1 my:executes ?st), (?c1 my:corresponding_end ?ce1),                       
+		sum(?n, 1, ?n_next),
+		 -> (?c1 my:iteration_n ?n_next),
+		(?ce1 my:iteration_n ?n_next)
+		
+	]
+
+# Rule: LoopIterationNext_after_2 [correct & helper & loop]
+[
+		(?a rdf:type my:act_end),
+		(?a my:iteration_n ?n),
+		(?a my:executes ?st),
+		(?st my:id ?body_i),
+		(?a my:next_act ?c0),
+		
+		(?c0 my:executes ?st0),
+		(?st0 my:id ?st0_i),
+		notEqual(?st0_i, ?body_i),
+		(?c0 my:corresponding_end ?ce0), 
+		(?ce0 my:next_act ?c1), 
+		
+		(?c1 my:executes ?st1),
+		(?st1 my:id ?st1_i),
+		notEqual(?st1_i, ?body_i),
+		(?c1 my:corresponding_end ?ce1), 
+		(?ce1 my:next_act ?c2), 
+		 
+		(?c2 my:executes ?st), (?c2 my:corresponding_end ?ce2),                       
+		sum(?n, 1, ?n_next),
+		 -> (?c2 my:iteration_n ?n_next),
+		(?ce2 my:iteration_n ?n_next)
+		
+	]

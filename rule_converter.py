@@ -6,6 +6,8 @@ import re
 import ctrlstrct_swrl
 
 
+### PROLOG ###
+
 RE_q2upper = re.compile(r'\?([\w\d]+)', flags=re.I)
 def q2upper_replace(m):
     s = m[1].upper()
@@ -84,7 +86,6 @@ def swrl2prolog(swrl, name=None):
     return f'''{title}swrl_rule() :- {debug_print_rulename}\n{rule}'''
 
 
-
 def to_prolog(rules, out_path='from_swrl.pl'):
 	with open(out_path, 'w') as file:
 		for rule in rules:
@@ -93,11 +94,94 @@ def to_prolog(rules, out_path='from_swrl.pl'):
 			prolog = swrl2prolog(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
 			file.write('\n')
 			file.write(prolog)
+		
+		
+### JENA ###
+		
+LOCAL_PREFIX = "my:"
+RDF_TYPE = "rdf:type"
+RE_SWRL_builtins = re.compile(r'lessThan|greaterThan|notEqual|equal|add')
+RE_boolean_value = re.compile(r'^(?:true|false)$')
+# varnames conflicting with classnames
+RE_conflicting_varnames = re.compile(r'\b(?:loop|cond|body)\b')
+
+
+def convert_builtin(name: str, args: list):
+    if name == 'add':
+        # change the order (result is first in SWRL but last in Jena)
+        args = [args[1], args[2], args[0]]
+        name = 'sum'
+    args_str = ", ".join(args)
+    return f"{name}({args_str})"
+
+# lessThan(A, B) :- A < B .
+# greaterThan(A, B) :- A > B .
+# notEqual(A, B) :- A =\= B .
+# notEqual(A, B) :- not(equal(A, B)).
+# equal(A, A).
+# equal(A, B) :- rdf_compare(=, A, B).
+# add(C, A, B) :- C is A + B.
+    
+
+def convert_argument(plain: str):
+	plain = fix_conflicting_variable(plain)
+	plain = convert_literal(plain)
+	return plain
+	
+def convert_literal(plain: str):
+	if RE_boolean_value.match(plain):
+		# "true"^^xsd:boolean
+		return f'"{plain}"^^xsd:boolean'
+	return plain
+
+def fix_conflicting_variable(plain: str):
+	if RE_conflicting_varnames.search(plain):
+		# add a couple of underscores
+		return plain + '__'
+	return plain
+	
+
+def predicate2triple_replace(pred_match):
+    name, args_str = pred_match[1], pred_match[2]
+    args = [convert_argument(s.strip()) for s in args_str.split(",")]
+    if len(args) == 1:
+        # type checking
+        return f"({args[0]} {RDF_TYPE} {LOCAL_PREFIX}{name})"
+    
+    # args[1:] = map(convert_argument, args[1:])
+    if RE_SWRL_builtins.match(name):
+        return convert_builtin(name, args)
+    else:
+        assert len(args) == 2, len(args)
+        return f"({args[0]} {LOCAL_PREFIX}{name} {args[1]})"
+
+def convert_predicate_calls(s):
+    return RE_predicate.sub(predicate2triple_replace, s)
+    
+    
+def swrl2jena(swrl, name=None):
+    rule = convert_predicate_calls(swrl)
+    if not name:
+        title = '# Rule'
+    else:
+        title = f'# Rule: {name}'
+    return f'''{title}\n[{rule}]'''
+    
+
+def to_jena(rules, out_path='from_swrl.jena_rules'):
+	with open(out_path, 'w') as file:
+		for rule in rules:
+			# swrl = rule._original_swrl
+			swrl = rule.swrl
+			jena = swrl2jena(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
+			file.write('\n' * 2)
+			file.write(jena)
 
 
 def main():
 	RULES = ctrlstrct_swrl.RULES
-	to_prolog(RULES)
+	# to_prolog(RULES)
+	to_jena(RULES)
 
 
 if __name__ == '__main__':

@@ -1142,7 +1142,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     
 
     # после наложения обёртки можно добавлять SWRL-правила
-    if True:
+    if reasoning == "pellet":  # incorporating of SWRL is only necessary for Pellet
         from ctrlstrct_swrl import filtered_rules
         # hardcode so far >
         tags_enabled = set("""
@@ -1187,7 +1187,6 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         run_swiprolog_reasoning(name_in, name_out, verbose=1)
         
         clear_ontology(onto)
-        
         onto = get_ontology("file://" + name_out).load()
         
         seconds = 1.12345
