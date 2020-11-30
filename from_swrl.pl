@@ -1,5 +1,5 @@
 
-% Rule: Incr_index [correct & helper]
+% Rule: Incr_index [helper & correct]
 swrl_rule() :- 
 	
 	next_act(A, B), index(A, ^^(IA,_)), add(IB, IA, 1),
@@ -7,7 +7,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#index', IB),
 	fail.
 
-% Rule: DepthIncr_rule_s6 [correct & helper]
+% Rule: DepthIncr_rule_s6 [helper & correct]
 swrl_rule() :- 
 	
 	act_begin(A), next_act(A, B), act_begin(B),
@@ -15,7 +15,7 @@ swrl_rule() :-
 	rdf_assert(A, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#parent_of', B),
 	fail.
 
-% Rule: student_DepthIncr_rule_s6 [mistake & helper]
+% Rule: student_DepthIncr_rule_s6 [helper & mistake]
 swrl_rule() :- 
 	
 	act_begin(A), student_next(A, B), act_begin(B),
@@ -23,7 +23,7 @@ swrl_rule() :-
 	rdf_assert(A, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#student_parent_of', B),
 	fail.
 
-% Rule: DepthSame_b-e_rule_s7 [correct & helper]
+% Rule: DepthSame_b-e_rule_s7 [helper & correct]
 swrl_rule() :- 
 	
 	act_begin(A), next_act(A, B), act_end(B), 
@@ -34,7 +34,7 @@ swrl_rule() :-
 	rdf_assert(A, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#corresponding_end', B),
 	fail.
 
-% Rule: student_DepthSame_b-e_rule_s7 [mistake & helper]
+% Rule: student_DepthSame_b-e_rule_s7 [helper & mistake]
 swrl_rule() :- 
 	
 	act_begin(A), student_next(A, B), act_end(B), 
@@ -45,7 +45,7 @@ swrl_rule() :-
 	rdf_assert(A, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#student_corresponding_end', B),
 	fail.
 
-% Rule: DepthSame_e-b_rule_s8 [correct & helper]
+% Rule: DepthSame_e-b_rule_s8 [helper & correct]
 swrl_rule() :- 
 	
 	act_end(A), next_act(A, B), act_begin(B), 
@@ -54,7 +54,7 @@ swrl_rule() :-
 	rdf_assert(P, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#parent_of', B),
 	fail.
 
-% Rule: student_DepthSame_e-b_rule_s8 [mistake & helper]
+% Rule: student_DepthSame_e-b_rule_s8 [helper & mistake]
 swrl_rule() :- 
 	
 	act_end(A), student_next(A, B), act_begin(B), 
@@ -63,7 +63,7 @@ swrl_rule() :-
 	rdf_assert(P, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#student_parent_of', B),
 	fail.
 
-% Rule: DepthDecr_rule_s9 [correct & helper]
+% Rule: DepthDecr_rule_s9 [helper & correct]
 swrl_rule() :- 
 	
 	act_end(A), next_act(A, B), act_end(B), 
@@ -72,7 +72,7 @@ swrl_rule() :-
 	rdf_assert(P, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#corresponding_end', B),
 	fail.
 
-% Rule: student_DepthDecr_rule_s9 [mistake & helper]
+% Rule: student_DepthDecr_rule_s9 [helper & mistake]
 swrl_rule() :- 
 	
 	act_end(A), student_next(A, B), act_end(B), 
@@ -81,7 +81,7 @@ swrl_rule() :-
 	rdf_assert(P, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#student_corresponding_end', B),
 	fail.
 
-% Rule: SameParentOfCorrActs_rule_s10 [correct & helper]
+% Rule: SameParentOfCorrActs_rule_s10 [helper & correct]
 swrl_rule() :- 
 	
 	corresponding_end(A, B), parent_of(P, A),
@@ -89,7 +89,7 @@ swrl_rule() :-
 	rdf_assert(P, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#parent_of', B),
 	fail.
 
-% Rule: student_SameParentOfCorrActs_rule_s10 [mistake & helper]
+% Rule: student_SameParentOfCorrActs_rule_s10 [helper & mistake]
 swrl_rule() :- 
 	
 	corresponding_end(A, B), student_parent_of(P, A),
@@ -97,7 +97,7 @@ swrl_rule() :-
 	rdf_assert(P, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#student_parent_of', B),
 	fail.
 
-% Rule: Earliest_after_act_is_previous_correct_sibling [correct & helper]
+% Rule: Earliest_after_act_is_previous_correct_sibling [helper & correct]
 swrl_rule() :- 
 	
 	correct_act(A),
@@ -106,7 +106,7 @@ swrl_rule() :-
 	rdf_assert(S, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#after_act', A),
 	fail.
 
-% Rule: Propagate_after_act [correct & helper]
+% Rule: Propagate_after_act [helper & correct]
 swrl_rule() :- 
 	
 	after_act(S, A),
@@ -119,7 +119,7 @@ swrl_rule() :-
 	rdf_assert(S, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#after_act', B),
 	fail.
 
-% Rule: start__to__MainFunctionBegin__rule_g3 [correct & entry & function]
+% Rule: start__to__MainFunctionBegin__rule_g3 [correct & function & entry]
 swrl_rule() :- 
 	
 	trace(A),
@@ -319,7 +319,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#SequenceEnd'),
 	fail.
 
-% Rule: connect_AltBegin [correct & alternative]
+% Rule: connect_AltBegin [alternative & correct]
 swrl_rule() :- 
 	
 	normal_flow_correct_act(A),
@@ -344,7 +344,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#AltBegin'),
 	fail.
 
-% Rule: connect_AltBranchBegin_CondTrue [correct & alternative]
+% Rule: connect_AltBranchBegin_CondTrue [alternative & correct]
 swrl_rule() :- 
 	
 	normal_flow_correct_act(A),
@@ -369,7 +369,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#AltBranchBegin'),
 	fail.
 
-% Rule: connect_NextAltCondition [correct & alternative]
+% Rule: connect_NextAltCondition [alternative & correct]
 swrl_rule() :- 
 	
 	normal_flow_correct_act(A),
@@ -397,7 +397,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#NextAltCondition'),
 	fail.
 
-% Rule: connect_AltElseBranch [correct & alternative]
+% Rule: connect_AltElseBranch [alternative & correct]
 swrl_rule() :- 
 	
 	normal_flow_correct_act(A),
@@ -424,7 +424,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#AltElseBranchBegin'),
 	fail.
 
-% Rule: connect_AltEndAllFalse [correct & alternative]
+% Rule: connect_AltEndAllFalse [alternative & correct]
 swrl_rule() :- 
 	
 	normal_flow_correct_act(A),
@@ -452,7 +452,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#AltEndAllFalse'),
 	fail.
 
-% Rule: connect_AltEndAfterBranch [correct & alternative]
+% Rule: connect_AltEndAfterBranch [alternative & correct]
 swrl_rule() :- 
 	
 	normal_flow_correct_act(A),
@@ -907,6 +907,8 @@ swrl_rule() :-
 % Rule: ActStartsAfterItsEnd_Error [mistake]
 swrl_rule() :- 
 	
+	in_trace(A, TR),
+	in_trace(B, TR),
 	act_begin(A),
 	act_end(B),
 	executes(A, ST),
@@ -998,7 +1000,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#TooEarlyInSequence'),
 	fail.
 
-% Rule: NoFirstCondition-alt_Error [mistake & alternative]
+% Rule: NoFirstCondition-alt_Error [alternative & mistake]
 swrl_rule() :- 
 	
 	act_begin(A),
@@ -1015,7 +1017,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#NoFirstCondition'),
 	fail.
 
-% Rule: BranchOfFalseCondition-alt_Error [mistake & alternative]
+% Rule: BranchOfFalseCondition-alt_Error [alternative & mistake]
 swrl_rule() :- 
 	
 	act_end(A),
@@ -1045,7 +1047,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#BranchOfFalseCondition'),
 	fail.
 
-% Rule: WrongBranch-alt_Error [mistake & alternative]
+% Rule: WrongBranch-alt_Error [alternative & mistake]
 swrl_rule() :- 
 	
 	act_begin(A),
@@ -1072,7 +1074,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#WrongBranch'),
 	fail.
 
-% Rule: ConditionAfterBranch-alt_Error [mistake & alternative]
+% Rule: ConditionAfterBranch-alt_Error [alternative & mistake]
 swrl_rule() :- 
 	
 	act_end(A),
@@ -1093,7 +1095,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#ConditionAfterBranch'),
 	fail.
 
-% Rule: AnotherExtraBranch-alt_Error [mistake & alternative]
+% Rule: AnotherExtraBranch-alt_Error [alternative & mistake]
 swrl_rule() :- 
 	
 	act_begin(A),
@@ -1117,7 +1119,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#AnotherExtraBranch'),
 	fail.
 
-% Rule: NoBranchWhenConditionIsTrue-alt_Error [mistake & alternative]
+% Rule: NoBranchWhenConditionIsTrue-alt_Error [alternative & mistake]
 swrl_rule() :- 
 	
 	act_end(A),
@@ -1139,7 +1141,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#NoBranchWhenConditionIsTrue'),
 	fail.
 
-% Rule: AllFalseNoElse-alt_Error [mistake & alternative]
+% Rule: AllFalseNoElse-alt_Error [alternative & mistake]
 swrl_rule() :- 
 	
 	act_end(A),
@@ -1161,7 +1163,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#AllFalseNoElse'),
 	fail.
 
-% Rule: NoNextCondition-alt_Error [mistake & alternative]
+% Rule: NoNextCondition-alt_Error [alternative & mistake]
 swrl_rule() :- 
 	
 	act_end(A),
@@ -1183,7 +1185,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#NoNextCondition'),
 	fail.
 
-% Rule: AllFalseNoEnd-alt_Error [mistake & alternative]
+% Rule: AllFalseNoEnd-alt_Error [alternative & mistake]
 swrl_rule() :- 
 	
 	act_end(A),
@@ -1192,6 +1194,8 @@ swrl_rule() :-
 
 	expr_value(A, false),                    
 	cond(BR, CND),                        
+	branches_item(ALT, BR),
+	alternative(ALT),
 	last_item(BR),                                
 
 	student_next(A, B),
@@ -1204,7 +1208,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#AllFalseNoEnd'),
 	fail.
 
-% Rule: MissingIterationAfterSuccessfulCondition-1-loop_Error [mistake & loop]
+% Rule: MissingIterationAfterSuccessfulCondition-1-loop_Error [loop & mistake]
 swrl_rule() :- 
 	
 	normal_flow_correct_act(A),
@@ -1225,7 +1229,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#MissingIterationAfterSuccessfulCondition'),
 	fail.
 
-% Rule: MissingIterationAfterSuccessfulCondition-0-loop_Error [mistake & loop]
+% Rule: MissingIterationAfterSuccessfulCondition-0-loop_Error [loop & mistake]
 swrl_rule() :- 
 	
 	normal_flow_correct_act(A),
@@ -1246,7 +1250,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#MissingIterationAfterSuccessfulCondition'),
 	fail.
 
-% Rule: MissingLoopEndAfterFailedCondition-0-loop_Error [mistake & loop]
+% Rule: MissingLoopEndAfterFailedCondition-0-loop_Error [loop & mistake]
 swrl_rule() :- 
 	
 	normal_flow_correct_act(A),
@@ -1267,7 +1271,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#MissingLoopEndAfterFailedCondition'),
 	fail.
 
-% Rule: IterationAfterFailedCondition-loop_Error [mistake & loop]
+% Rule: IterationAfterFailedCondition-loop_Error [loop & mistake]
 swrl_rule() :- 
 	
 	missingLoopEndAfterFailedCondition(B),
@@ -2015,7 +2019,7 @@ swrl_rule() :-
 	rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#TooEarly'),
 	fail.
 
-% Rule: LoopIteration1_after_0 [correct & helper & loop]
+% Rule: LoopIteration1_after_0 [helper & correct & loop]
 swrl_rule() :- 
 	
 		act_begin(A),
@@ -2032,7 +2036,7 @@ swrl_rule() :-
 	rdf_assert(CE0, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#iteration_n', 1),
 	fail.
 
-% Rule: LoopIteration1_after_1 [correct & helper & loop]
+% Rule: LoopIteration1_after_1 [helper & correct & loop]
 swrl_rule() :- 
 	
 		act_begin(A),
@@ -2055,7 +2059,7 @@ swrl_rule() :-
 	rdf_assert(CE1, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#iteration_n', 1),
 	fail.
 
-% Rule: LoopIteration1_after_2 [correct & helper & loop]
+% Rule: LoopIteration1_after_2 [helper & correct & loop]
 swrl_rule() :- 
 	
 		act_begin(A),
@@ -2084,7 +2088,7 @@ swrl_rule() :-
 	rdf_assert(CE2, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#iteration_n', 1),
 	fail.
 
-% Rule: LoopIteration1_after_3 [correct & helper & loop]
+% Rule: LoopIteration1_after_3 [helper & correct & loop]
 swrl_rule() :- 
 	
 		act_begin(A),
@@ -2119,7 +2123,7 @@ swrl_rule() :-
 	rdf_assert(CE3, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#iteration_n', 1),
 	fail.
 
-% Rule: LoopIterationNext_after_0 [correct & helper & loop]
+% Rule: LoopIterationNext_after_0 [helper & correct & loop]
 swrl_rule() :- 
 	
 		act_end(A),
@@ -2136,7 +2140,7 @@ swrl_rule() :-
 	rdf_assert(CE0, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#iteration_n', N_NEXT),
 	fail.
 
-% Rule: LoopIterationNext_after_1 [correct & helper & loop]
+% Rule: LoopIterationNext_after_1 [helper & correct & loop]
 swrl_rule() :- 
 	
 		act_end(A),
@@ -2159,7 +2163,7 @@ swrl_rule() :-
 	rdf_assert(CE1, 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#iteration_n', N_NEXT),
 	fail.
 
-% Rule: LoopIterationNext_after_2 [correct & helper & loop]
+% Rule: LoopIterationNext_after_2 [helper & correct & loop]
 swrl_rule() :- 
 	
 		act_end(A),

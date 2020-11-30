@@ -19,6 +19,7 @@ def strip_comments_out(text):
 
 
 class DomainRule:
+	"An SWRL rule wit name and tags"
 	def __init__(self, swrl, name="", tags={}):
 		self.name = str(name)
 		self._original_swrl = swrl
@@ -927,6 +928,8 @@ RULES.append(DomainRule(name="GenericWrongExecTime-e_Error",
 RULES.append(DomainRule(name="ActStartsAfterItsEnd_Error", 
 	tags={'mistake'},
 	swrl="""
+	in_trace(?a, ?tr),
+	in_trace(?b, ?tr),
 	act_begin(?a),
 	act_end(?b),
 	executes(?a, ?st),
@@ -1198,6 +1201,8 @@ RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error",
 
 	expr_value(?a, false),  # condition failed
 	cond(?br, ?cnd),  # corresponding branch
+	branches_item(?alt, ?br),
+	alternative(?alt),
 	last_item(?br),   # no more conditions expected
 
 	student_next(?a, ?b),
@@ -1263,12 +1268,11 @@ RULES.append(DomainRule(name="MissingLoopEndAfterFailedCondition-0-loop_Error",
 
 	student_next(?a, ?b),
 	Erroneous(?b), 
-	 -> should_be(?b, ?a), 
-	 precursor(?b, ?a),
+	 -> precursor(?b, ?a),
 	 MissingLoopEndAfterFailedCondition(?b)
 """))
 
-# IterationAfterFailedCondition is-a MissingLoopEndAfterFailedCondition when act is an iteration [works]
+# IterationAfterFailedCondition is a sort of MissingLoopEndAfterFailedCondition when act is an iteration [works]
 RULES.append(DomainRule(name="IterationAfterFailedCondition-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""
@@ -1277,9 +1281,7 @@ RULES.append(DomainRule(name="IterationAfterFailedCondition-loop_Error",
 	executes(?b, ?st),
 	body(?L, ?st),
 	loop(?L),
-	 -> should_be(?b, ?a), 
-	 precursor(?b, ?a),
-	 IterationAfterFailedCondition(?b)
+	 -> IterationAfterFailedCondition(?b)
 """))
 
 
@@ -1316,7 +1318,7 @@ for i in range(1, 12+1):
 		# DifferentFrom(?b, ?c1),
 		{pattern1}
 		{pattern2}
-		 -> {action}, ## MissingAct(?c1)]
+		 -> {action}, ## MissingAct(?c1),
 		 TooEarly(?b)
 	"""))
 
@@ -1389,7 +1391,7 @@ for r in RULES[:]:
 		# print("skipping SWRL rule due to minus: \t", r)
 		RULES.remove(r)
 
-if 1:  # check correctness of modified rules text
+if 0:  # check correctness of modified rules text
 	with open("swrl_dbg.txt", "w") as f:
 	# 	# f.write(repr(RULES))
 		for r in RULES:
