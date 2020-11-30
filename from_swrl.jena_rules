@@ -1,11 +1,11 @@
 
 
-# Rule: Incr_index [correct & helper]
+# Rule: Incr_index [helper & correct]
 [
 	(?a my:next_act ?b), (?a my:index ?ia), sum(?ia, 1, ?ib)
 	 -> (?b my:index ?ib)]
 
-# Rule: DepthIncr_rule_s6 [correct & helper]
+# Rule: DepthIncr_rule_s6 [helper & correct]
 [
 	(?a rdf:type my:act_begin), (?a my:next_act ?b), (?b rdf:type my:act_begin)
 	 -> (?a my:parent_of ?b)
@@ -17,7 +17,7 @@
 	 -> (?a my:student_parent_of ?b)
 	]
 
-# Rule: DepthSame_b-e_rule_s7 [correct & helper]
+# Rule: DepthSame_b-e_rule_s7 [helper & correct]
 [
 	(?a rdf:type my:act_begin), (?a my:next_act ?b), (?b rdf:type my:act_end), 
 	(?p my:parent_of ?a),
@@ -31,7 +31,7 @@
 	 -> (?p my:student_parent_of ?b), (?a my:student_corresponding_end ?b)
 	]
 
-# Rule: DepthSame_e-b_rule_s8 [correct & helper]
+# Rule: DepthSame_e-b_rule_s8 [helper & correct]
 [
 	(?a rdf:type my:act_end), (?a my:next_act ?b), (?b rdf:type my:act_begin), 
 	(?p my:parent_of ?a)                   
@@ -45,7 +45,7 @@
 	 -> (?p my:student_parent_of ?b)
 	]
 
-# Rule: DepthDecr_rule_s9 [correct & helper]
+# Rule: DepthDecr_rule_s9 [helper & correct]
 [
 	(?a rdf:type my:act_end), (?a my:next_act ?b), (?b rdf:type my:act_end), 
 	(?p my:parent_of ?a)
@@ -59,7 +59,7 @@
 	 -> (?p my:student_corresponding_end ?b)
 	]
 
-# Rule: SameParentOfCorrActs_rule_s10 [correct & helper]
+# Rule: SameParentOfCorrActs_rule_s10 [helper & correct]
 [
 	(?a my:corresponding_end ?b), (?p my:parent_of ?a)
 	 -> (?p my:parent_of ?b)
@@ -71,14 +71,14 @@
 	 -> (?p my:student_parent_of ?b)
 	]
 
-# Rule: Earliest_after_act_is_previous_correct_sibling [correct & helper]
+# Rule: Earliest_after_act_is_previous_correct_sibling [helper & correct]
 [
 	(?a rdf:type my:correct_act),
 	(?a my:next_sibling ?s),
 	 -> (?s my:after_act ?a)
 ]
 
-# Rule: Propagate_after_act [correct & helper]
+# Rule: Propagate_after_act [helper & correct]
 [
 	(?s my:after_act ?a),
 	(?a my:next_act ?b),
@@ -89,7 +89,7 @@
 	 -> (?s my:after_act ?b)
 ]
 
-# Rule: start__to__MainFunctionBegin__rule_g3 [entry & function & correct]
+# Rule: start__to__MainFunctionBegin__rule_g3 [correct & function & entry]
 [
 	(?a rdf:type my:trace),
 	(?a my:executes ?alg),
@@ -106,7 +106,7 @@
 	 (?b rdf:type my:FunctionBegin)
 ]
 
-# Rule: start__to__GlobalCode__rule_g4 [entry & sequence & correct]
+# Rule: start__to__GlobalCode__rule_g4 [correct & entry & sequence]
 [
 	(?a rdf:type my:trace),
 	(?a my:executes ?alg),
@@ -122,7 +122,7 @@
 	 (?a my:next_act ?b), (?b rdf:type my:GlobalCodeBegin)
 ]
 
-# Rule: connect_FunctionBodyBegin_rule_g5 [function & correct]
+# Rule: connect_FunctionBodyBegin_rule_g5 [correct & function]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_begin),
@@ -141,7 +141,7 @@
 	 (?b rdf:type my:FunctionBodyBegin)
 ]
 
-# Rule: connect_FuncBodyEnd_rule_g5-2 [function & correct]
+# Rule: connect_FuncBodyEnd_rule_g5-2 [correct & function]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -157,7 +157,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:FunctionEnd)
 ]
 
-# Rule: connect_SequenceBegin_rule_g2 [sequence & correct]
+# Rule: connect_SequenceBegin_rule_g2 [correct & sequence]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_begin),
@@ -174,7 +174,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:SequenceBegin)
 ]
 
-# Rule: connect_SequenceNext [sequence & correct]
+# Rule: connect_SequenceNext [correct & sequence]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -196,7 +196,7 @@
 	  (?b rdf:type my:SequenceNext)
 ]
 
-# Rule: connect_StmtEnd [sequence & correct]
+# Rule: connect_StmtEnd [correct & sequence]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_begin),
@@ -213,7 +213,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:StmtEnd)
 ]
 
-# Rule: connect_ExprEnd [sequence & correct]
+# Rule: connect_ExprEnd [correct & sequence]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_begin),
@@ -230,7 +230,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:ExprEnd)
 ]
 
-# Rule: connect_SequenceEnd [sequence & correct]
+# Rule: connect_SequenceEnd [correct & sequence]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -249,7 +249,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:SequenceEnd)
 ]
 
-# Rule: connect_AltBegin [correct & alternative]
+# Rule: connect_AltBegin [alternative & correct]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_begin),
@@ -271,7 +271,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltBegin)
 ]
 
-# Rule: connect_AltBranchBegin_CondTrue [correct & alternative]
+# Rule: connect_AltBranchBegin_CondTrue [alternative & correct]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -291,7 +291,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltBranchBegin)
 ]
 
-# Rule: connect_NextAltCondition [correct & alternative]
+# Rule: connect_NextAltCondition [alternative & correct]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -314,7 +314,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:NextAltCondition)
 ]
 
-# Rule: connect_AltElseBranch [correct & alternative]
+# Rule: connect_AltElseBranch [alternative & correct]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -336,7 +336,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltElseBranchBegin)
 ]
 
-# Rule: connect_AltEndAllFalse [correct & alternative]
+# Rule: connect_AltEndAllFalse [alternative & correct]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -359,7 +359,7 @@
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltEndAllFalse)
 ]
 
-# Rule: connect_AltEndAfterBranch [correct & alternative]
+# Rule: connect_AltEndAfterBranch [alternative & correct]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -728,6 +728,8 @@
 
 # Rule: ActStartsAfterItsEnd_Error [mistake]
 [
+	(?a my:in_trace ?tr),
+	(?b my:in_trace ?tr),
 	(?a rdf:type my:act_begin),
 	(?b rdf:type my:act_end),
 	(?a my:executes ?st),
@@ -742,7 +744,7 @@
 	  (?b rdf:type my:ActEndsWithoutStart)
 ]
 
-# Rule: DuplicateOfAct-seq-b_Error [sequence & mistake]
+# Rule: DuplicateOfAct-seq-b_Error [mistake & sequence]
 [
 	(?c1 rdf:type my:ExtraAct), 
 	(?c1 rdf:type my:act_begin),
@@ -763,7 +765,7 @@
 	 (?c1 rdf:type my:DuplicateOfAct)
 ]
 
-# Rule: DuplicateOfAct-seq-e_Error [sequence & mistake]
+# Rule: DuplicateOfAct-seq-e_Error [mistake & sequence]
 [
 	(?c1 rdf:type my:ExtraAct), 
 	(?c1 rdf:type my:act_end),
@@ -784,14 +786,14 @@
 	 (?c1 rdf:type my:DuplicateOfAct)
 ]
 
-# Rule: DisplacedAct_Error [sequence & mistake]
+# Rule: DisplacedAct_Error [mistake & sequence]
 [
 	(?c1 rdf:type my:ExtraAct), 
 	(?c1 rdf:type my:MissingAct), 
 	 -> (?c1 rdf:type my:DisplacedAct)
 ]
 
-# Rule: TooEarlyInSequence_Error [sequence & mistake]
+# Rule: TooEarlyInSequence_Error [mistake & sequence]
 [
 	(?b rdf:type my:TooEarly), 
 	(?sa my:student_parent_of ?b),
@@ -803,7 +805,7 @@
 	 (?b rdf:type my:TooEarlyInSequence)
 ]
 
-# Rule: NoFirstCondition-alt_Error [mistake & alternative]
+# Rule: NoFirstCondition-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_begin),
 	(?a my:executes ?alt),
@@ -816,7 +818,7 @@
 	 (?b rdf:type my:NoFirstCondition)
 ]
 
-# Rule: BranchOfFalseCondition-alt_Error [mistake & alternative]
+# Rule: BranchOfFalseCondition-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_end),
 	(?cnd rdf:type my:expr), 
@@ -841,7 +843,7 @@
 	 (?b rdf:type my:BranchOfFalseCondition)
 ]
 
-# Rule: WrongBranch-alt_Error [mistake & alternative]
+# Rule: WrongBranch-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_begin),
 	(?a my:executes ?br),
@@ -864,7 +866,7 @@
 	 (?b rdf:type my:WrongBranch)
 ]
 
-# Rule: ConditionAfterBranch-alt_Error [mistake & alternative]
+# Rule: ConditionAfterBranch-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_end),
 	(?a my:executes ?br),
@@ -882,7 +884,7 @@
 	 (?b rdf:type my:ConditionAfterBranch)
 ]
 
-# Rule: AnotherExtraBranch-alt_Error [mistake & alternative]
+# Rule: AnotherExtraBranch-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_begin),
 	(?a my:executes ?br),
@@ -903,7 +905,7 @@
 	  (?b rdf:type my:AnotherExtraBranch)
 ]
 
-# Rule: NoBranchWhenConditionIsTrue-alt_Error [mistake & alternative]
+# Rule: NoBranchWhenConditionIsTrue-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_end),
 	(?cnd rdf:type my:expr), 
@@ -922,7 +924,7 @@
 	  (?b rdf:type my:NoBranchWhenConditionIsTrue)
 ]
 
-# Rule: AllFalseNoElse-alt_Error [mistake & alternative]
+# Rule: AllFalseNoElse-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_end),
 	(?cnd rdf:type my:expr), 
@@ -941,7 +943,7 @@
 	  (?b rdf:type my:AllFalseNoElse)
 ]
 
-# Rule: NoNextCondition-alt_Error [mistake & alternative]
+# Rule: NoNextCondition-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_end),
 	(?cnd rdf:type my:expr), 
@@ -960,7 +962,7 @@
 	  (?b rdf:type my:NoNextCondition)
 ]
 
-# Rule: AllFalseNoEnd-alt_Error [mistake & alternative]
+# Rule: AllFalseNoEnd-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_end),
 	(?cnd rdf:type my:expr), 
@@ -968,6 +970,8 @@
 
 	(?a my:expr_value "false"^^xsd:boolean),                    
 	(?br my:cond ?cnd),                        
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
 	(?br rdf:type my:last_item),                                
 
 	(?a my:student_next ?b),
@@ -1293,7 +1297,7 @@
 		 (?b rdf:type my:TooEarly)
 	]
 
-# Rule: LoopIteration1_after_0 [correct & helper & loop]
+# Rule: LoopIteration1_after_0 [helper & correct & loop]
 [
 		(?a rdf:type my:act_begin),
 		(?a my:executes ?L),
@@ -1308,7 +1312,7 @@
 		
 	]
 
-# Rule: LoopIteration1_after_1 [correct & helper & loop]
+# Rule: LoopIteration1_after_1 [helper & correct & loop]
 [
 		(?a rdf:type my:act_begin),
 		(?a my:executes ?L),
@@ -1329,7 +1333,7 @@
 		
 	]
 
-# Rule: LoopIteration1_after_2 [correct & helper & loop]
+# Rule: LoopIteration1_after_2 [helper & correct & loop]
 [
 		(?a rdf:type my:act_begin),
 		(?a my:executes ?L),
@@ -1356,7 +1360,7 @@
 		
 	]
 
-# Rule: LoopIteration1_after_3 [correct & helper & loop]
+# Rule: LoopIteration1_after_3 [helper & correct & loop]
 [
 		(?a rdf:type my:act_begin),
 		(?a my:executes ?L),
@@ -1389,7 +1393,7 @@
 		
 	]
 
-# Rule: LoopIterationNext_after_0 [correct & helper & loop]
+# Rule: LoopIterationNext_after_0 [helper & correct & loop]
 [
 		(?a rdf:type my:act_end),
 		(?a my:iteration_n ?n),
@@ -1404,7 +1408,7 @@
 		
 	]
 
-# Rule: LoopIterationNext_after_1 [correct & helper & loop]
+# Rule: LoopIterationNext_after_1 [helper & correct & loop]
 [
 		(?a rdf:type my:act_end),
 		(?a my:iteration_n ?n),
@@ -1425,7 +1429,7 @@
 		
 	]
 
-# Rule: LoopIterationNext_after_2 [correct & helper & loop]
+# Rule: LoopIterationNext_after_2 [helper & correct & loop]
 [
 		(?a rdf:type my:act_end),
 		(?a my:iteration_n ?n),

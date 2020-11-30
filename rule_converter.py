@@ -45,7 +45,7 @@ def predicate2lowerfirst_replace(pred_match):
         args_str = ", ".join(args)
     return f"{lower_first_char(name)}({args_str})"
 
-def convert_predicate_calls(s):
+def convert_predicate_calls_prolog(s):
     return RE_predicate.sub(predicate2lowerfirst_replace, s)
     
 
@@ -77,7 +77,7 @@ def convert_rulehead(s):
 
     
 def swrl2prolog(swrl, name=None):
-    rule = convert_predicate_calls(convert_rulehead(convert_varnames(swrl))).replace('# ', '% ')
+    rule = convert_predicate_calls_prolog(convert_rulehead(convert_varnames(swrl))).replace('# ', '% ')
     if not name:
         title = '% Rule\n'
     else:
@@ -114,15 +114,6 @@ def convert_builtin(name: str, args: list):
     args_str = ", ".join(args)
     return f"{name}({args_str})"
 
-# lessThan(A, B) :- A < B .
-# greaterThan(A, B) :- A > B .
-# notEqual(A, B) :- A =\= B .
-# notEqual(A, B) :- not(equal(A, B)).
-# equal(A, A).
-# equal(A, B) :- rdf_compare(=, A, B).
-# add(C, A, B) :- C is A + B.
-    
-
 def convert_argument(plain: str):
 	plain = fix_conflicting_variable(plain)
 	plain = convert_literal(plain)
@@ -155,12 +146,12 @@ def predicate2triple_replace(pred_match):
         assert len(args) == 2, len(args)
         return f"({args[0]} {LOCAL_PREFIX}{name} {args[1]})"
 
-def convert_predicate_calls(s):
+def convert_predicate_calls_jena(s):
     return RE_predicate.sub(predicate2triple_replace, s)
     
     
 def swrl2jena(swrl, name=None):
-    rule = convert_predicate_calls(swrl)
+    rule = convert_predicate_calls_jena(swrl)
     if not name:
         title = '# Rule'
     else:
@@ -178,10 +169,72 @@ def to_jena(rules, out_path='from_swrl.jena_rules'):
 			file.write(jena)
 
 
+### SPARQL ###
+		
+RULE_END_PUNCT = " . "
+RE_predicate_with_comma = re.compile(r'([\w\d]+)\(([^)]+?)\)\s*,?\s*')  # 1: name, 2: args in braces
+
+def convert_builtin2sparql(name: str, args: list):
+    if name == 'add':
+        # BIND(?ia + 1 as ?ib)
+        return f"BIND( {args[1]} + {args[2]} as {args[0]} )"
+    op = {
+        'lessThan' : '<',
+        'greaterThan' : '>',
+        'notEqual' : '!=',
+        'equal' : '=',
+         }.get(name, "==!No op!==")
+    return f"FILTER ( {args[0]} {op} {args[1]} )"
+
+def predicate2sparql_triple_replace(pred_match):
+    name, args_str = pred_match[1], pred_match[2]
+    args = [s.strip() for s in args_str.split(",")]
+    if len(args) == 1:
+        # type checking
+        return f"{args[0]} {RDF_TYPE} {LOCAL_PREFIX}{name}" + RULE_END_PUNCT
+    if RE_SWRL_builtins.match(name):
+        return convert_builtin2sparql(name, args) + RULE_END_PUNCT
+    else:
+        assert len(args) == 2, len(args)
+        return f"{args[0]} {LOCAL_PREFIX}{name} {args[1]}" + RULE_END_PUNCT
+
+def convert_predicate_calls_sparql(s):
+    return RE_predicate_with_comma.sub(predicate2sparql_triple_replace, s)
+    
+    
+def swrl2sparql(swrl, name=None):
+    s = convert_predicate_calls_sparql(swrl)
+    body, head = list(s.split("->"))
+    if not name:
+        title = '# Rule'
+    else:
+        title = f'# Rule: {name}'
+    return f'''{title}
+INSERT
+  {{ {head.strip()} }}
+WHERE
+  {{
+    {body.strip()}
+  }}'''
+    
+
+def to_sparql(rules, out_path='sparql_from_swrl.ru', heading_path='sparql/rdfs4core.ru'):
+	with open(out_path, 'w') as file:
+		with open(heading_path) as heading_file:
+			file.write(heading_file.read())
+		for rule in rules:
+			# swrl = rule._original_swrl
+			swrl = rule.swrl
+			sparql = swrl2sparql(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
+			file.write(sparql)
+			file.write(' ;\n\n')  # ';' is a query separator
+
+
 def main():
 	RULES = ctrlstrct_swrl.RULES
-	# to_prolog(RULES)
+	to_prolog(RULES)
 	to_jena(RULES)
+	to_sparql(RULES)
 
 
 if __name__ == '__main__':

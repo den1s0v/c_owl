@@ -17,9 +17,9 @@ from upd_onto import *
 from transliterate import slugify
 from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from explanations import format_explanation, get_leaf_classes
-from external_run import run_swiprolog_reasoning, run_jena_reasoning
+from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning
 
-ONTOLOGY_maxID = 1
+# ONTOLOGY_maxID = 1
 
 def prepare_name(s):
     """Transliterate given word is needed"""
@@ -378,9 +378,9 @@ class TraceTester():
                 
         
         if "entry_point" in self.data["algorithm"]:
-	        alg_node = self.data["algorithm"]["entry_point"]
+            alg_node = self.data["algorithm"]["entry_point"]
         else:
-        	raise "Cannot resolve 'entry_point' from algorithm's keys: " + str(list(self.data["algorithm"].keys()))
+            raise "Cannot resolve 'entry_point' from algorithm's keys: " + str(list(self.data["algorithm"].keys()))
         
         name = "программа"
         phase = "started"
@@ -424,9 +424,9 @@ class TraceTester():
         "Prepares self.id2obj and writes algorithm to ontology if it isn't there."
         
         if "entry_point" not in self.data["algorithm"]:
-	        alg_node = self.data["algorithm"]["global_code"]
-	        # polyfill entry_point to be global_code
-	        self.data["algorithm"]["entry_point"] = alg_node
+            alg_node = self.data["algorithm"]["global_code"]
+            # polyfill entry_point to be global_code
+            self.data["algorithm"]["entry_point"] = alg_node
 
     
         with onto:
@@ -1108,28 +1108,35 @@ def extact_mistakes(onto, as_objects=False) -> dict:
             mistakes[inst.name] = d
         classes = get_leaf_classes(set(inst.is_a) & error_classes)
         mistakes[inst.name]["classes"] = [class_.name for class_ in classes]
-        mistakes[inst.name]["explanations"] = format_explanation(onto, inst)
+        explanations = format_explanation(onto, inst)
+        mistakes[inst.name]["explanations"] = explanations
     
     return mistakes
 
 
-def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, 
-                      mistakes_as_objects=False, extra_act_entries=0, 
-                      rules_filter=None, reasoning="stardog", on_done=None) -> "onto, mistakes_list":
-    """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found.
-      reasoning: None or "stardog" or "pellet" or "prolog" or "jena"
-    """
-    
-    global ONTOLOGY_maxID
+def create_ontology_tbox() -> "onto":
+    # global ONTOLOGY_maxID
     
     # создание онтологии
-    my_iri = ('http://vstu.ru/poas/ctrl_structs_2020-05_v%d' % ONTOLOGY_maxID)
-    ONTOLOGY_maxID += 1
+    my_iri = ('http://vstu.ru/poas/ctrl_structs_2020-05_v%d' % 1)
+    # ONTOLOGY_maxID += 1
     onto = get_ontology(my_iri)
+    clear_ontology(onto, keep_tbox=True)
 
     with onto:
         # каркас онтологии
         init_persistent_structure(onto)
+    return onto
+
+
+def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, 
+                      mistakes_as_objects=False, extra_act_entries=0, 
+                      rules_filter=None, reasoning="jena", on_done=None) -> "onto, mistakes_list":
+    """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found.
+      reasoning: None or "stardog" or "pellet" or "prolog" or "jena" or "sparql"
+    """
+    
+    onto = create_ontology_tbox()
         
     # наполняем онтологию с нуля сущностями с теми именами, которые найдём в загруженных json-словарях
     for tr_data in trace_data_list:
@@ -1154,10 +1161,11 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         onto.save(file=debug_rdf_fpath, format='rdfxml')
         print("Saved RDF file: {} !".format(debug_rdf_fpath))
 
+
     if reasoning == "stardog":
         seconds = sync_stardog(debug_rdf_fpath, ontology_prefix=my_iri + "#")
-        
     # exit()
+        
         
     if reasoning == "pellet":
         # if not verbose:
@@ -1166,9 +1174,19 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         # # расширенное обновление онтологии и сохранение с новыми фактами
         # success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
         
+        print(">_ running Pellet ...")
+        start = timer()
+        
         with onto:
             # запуск Pellet
             sync_reasoner_pellet(infer_property_values=True, infer_data_property_values=True, debug=0)
+            
+        end = timer()
+        seconds = end - start
+        time_report = "   Time elapsed: %.3f s." % seconds
+        print(">_ Pellet finished")
+        print(time_report)
+
         
         seconds = -2
 
@@ -1179,6 +1197,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
             onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
             print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
             
+            
     if reasoning == "prolog":
         name_in = "pl_in.rdf"
         name_out = "pl_out.rdf"
@@ -1188,18 +1207,29 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         
         clear_ontology(onto)
         onto = get_ontology("file://" + name_out).load()
-        
         seconds = 1.12345
+        
             
-    if reasoning == "jena":
-        name_in = "jena_in.rdf"
-        name_out = "jena_out.n3"
+    if reasoning in ('sparql', 'jena'):
+        name_in = f"{reasoning}_in.rdf"
+        name_out = f"{reasoning}_out.n3"
         onto.save(file=name_in, format='rdfxml')
         
-        run_jena_reasoning(name_in, name_out, verbose=1)
+        run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=1)
         
         clear_ontology(onto)
         onto = get_ontology("file://" + name_out).load()
+        
+        if False:  # debugging patch to the ontology
+            print("removing cycles from classes:")        
+            for class_ in onto.classes():
+                if class_ in class_.is_a:
+                    class_.is_a.remove(class_)
+
+            print("removing cycles from properties:")
+            for prop in onto.properties():
+                if prop in prop.is_a:
+                    prop.is_a.remove(prop)
 
         seconds = 2.23456
             
@@ -1214,9 +1244,10 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     return onto, list(mistakes.values())
 
 
-def clear_ontology(onto):
-    for cls in onto.classes():
-        destroy_entity(cls)
+def clear_ontology(onto, keep_tbox=False):
+    if not keep_tbox:
+        for cls in onto.classes():
+            destroy_entity(cls)
     for ind in onto.individuals():
         destroy_entity(ind)
         
