@@ -187,7 +187,7 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 		return False, "\n\t> ".join(["",*differences])
 	return True, "Validation ok."
 
-def process_algorithm_and_trace_from_text(text: str, process_kwargs=dict(reasoning="pellet")):
+def process_algorithm_and_trace_from_text(text: str, process_kwargs=dict(reasoning="jena")):
 	feedback = {"messages": []}
 	
 	try:
@@ -210,7 +210,7 @@ def process_algorithm_and_trace_from_text(text: str, process_kwargs=dict(reasoni
 	
 	return feedback
 
-def process_algorithm_and_trace_from_json(alg_tr: dict, process_kwargs=dict(reasoning="pellet")):
+def process_algorithm_and_trace_from_json(alg_tr: dict, process_kwargs=dict(reasoning="jena")):
 	feedback = {"messages": []}
 	
 	# validate input alg_tr
@@ -252,7 +252,7 @@ def process_algorithm_and_trace_from_json(alg_tr: dict, process_kwargs=dict(reas
 	
 	return feedback
 
-def process_algorithms_and_traces(alg_trs_dict: dict, process_kwargs=dict(reasoning="pellet")) -> ('mistakes', 'error_message: str or None'):
+def process_algorithms_and_traces(alg_trs_dict: dict, process_kwargs=dict(reasoning="jena")) -> ('mistakes', 'error_message: str or None'):
 		
 	try:
 		_onto, mistakes = process_algtraces(alg_trs_dict, verbose=0, mistakes_as_objects=True, **process_kwargs)
@@ -342,21 +342,12 @@ def run_tests(directory="test_data/", process_kwargs={}):
 
 if __name__ == '__main__':
 	
-	success_all = True
-	
-	# for directory,subdirs,files in os.walk(TEST_DIR):
-	# 	if TESTS_FNM in files:
-	# 		print("Running tests in: ", directory)
-	# 		success = run_tests_in_directory(directory)
-	# 		success_all = success_all and success
-	# 		print("Tests passed:", success, " in directory: ", directory)
-			
-	# 	# break
 	success_all = run_tests(process_kwargs=dict(
 		# reasoning=None, 
 		# reasoning="pellet", 
-		# reasoning="prolog", 
 		reasoning="jena", 
+		# reasoning="prolog", 
+		# reasoning="sparql", 
 		# reasoning="stardog", 
 		extra_act_entries=0
 		)
