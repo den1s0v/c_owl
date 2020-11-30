@@ -14,13 +14,13 @@
 }
 
 
-// alg трасса 
+// alg трасса
 {
 началась программа
 начался цикл ожидание 1-й раз
-началась итерация 1 цикла ожидание  // DisplacedAct
-условие цикла (не_зелёный) выполнилось 1-й раз - истина  // MisplacedDeeper, DisplacedAct
-началась развилка по_цвету 1-й раз  // MissingIterationAfterSuccessfulCondition, TooEarly
+началась итерация 1 цикла ожидание  // error: DisplacedAct
+условие цикла (не_зелёный) выполнилось 1-й раз - истина  // error: MisplacedDeeper, DisplacedAct
+началась развилка по_цвету 1-й раз  // error: MissingIterationAfterSuccessfulCondition, TooEarly
 условие развилки (цвет_красный) выполнилось 1-й раз - истина
 ветка условия развилки (цвет_красный) началась 1-й раз
 ждать выполнилось 1-й раз
