@@ -562,7 +562,7 @@ class TraceTester():
             make_triple(act_obj, onto.id, max_act_ID)
 
 
-        # make top-level act representing the trace
+        # make top-level act representing the trace ...
         iri = f'trace_{self.data["trace_name"]}'
         if self.data["header_boolean_chain"]:
             iri += f'_c{"".join(map(str, map(int, self.data["header_boolean_chain"])))}'
@@ -1163,7 +1163,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
 
 
     if reasoning == "stardog":
-        seconds = sync_stardog(debug_rdf_fpath, ontology_prefix=my_iri + "#")
+        seconds = sync_stardog(debug_rdf_fpath, ontology_prefix=onto.iri)
     # exit()
         
         

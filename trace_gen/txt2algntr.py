@@ -61,7 +61,7 @@ def get_ith_expr_value(expr_values: tuple, i: int):
     """Decodes the result of 'parse_expr_values' function.
     Return None if 'i' is out of range
     """
-    print(i, "from expr_values:", expr_values)
+    # print(i, "from expr_values:", expr_values)
     if "(" not in expr_values:
         return expr_values[i] if i < len(expr_values) else None
         
@@ -80,7 +80,6 @@ def get_ith_expr_value(expr_values: tuple, i: int):
     
     return expr_values[b_i + repeat_i % repeat_len]
     
-
 
 
 class AlgorithmParser:
