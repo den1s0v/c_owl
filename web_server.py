@@ -118,8 +118,10 @@ user_alg {boolean_chain}user_trace
 		return i - trace_line_i
 	
 	def convert_line_index_in_str(s):
-		if "line" in s:
-			s = __LINE_IDNEX_RE.sub(lambda s: f"line {convert_line_index(int(s.group(1)))}", s)
+		if "line" in s or "строк" in s:
+			res = __LINE_IDNEX_RE.sub(lambda m: f"{m.group(1)} {convert_line_index(int(m.group(2)))}", s)
+			print("Replaced line index: ", s, "->", res)
+			s = res
 		return s
 	
 	if "messages" in feedback:
@@ -149,7 +151,7 @@ user_alg {boolean_chain}user_trace
 
 
 def process_algorithm_and_trace_as_json_request(json):
-	feedback = process_algorithm_and_trace_from_json(json, process_kwargs={'reasoning': "pellet", 'debug_rdf_fpath': 'test_data/http_task_dump.rdf'})
+	feedback = process_algorithm_and_trace_from_json(json, process_kwargs={'reasoning': "jena", 'debug_rdf_fpath': 'test_data/http_task_dump.rdf'})
 	###
 	# from pprint import pprint
 	# pprint(feedback)
@@ -177,7 +179,7 @@ def process_algorithm_and_trace_as_json_request(json):
 
 
 __CAMELCASE_RE = re.compile(r"([a-z])([A-Z])")
-__LINE_IDNEX_RE = re.compile(r"line\s*(\d+)")
+__LINE_IDNEX_RE = re.compile(r"(line|строк\w+)\s*(\d+)")
 
 def camelcase_to_snakecase(s: str, sep='_') -> str:
 	return __CAMELCASE_RE.sub(lambda m: f"{m.group(1)}{sep}{m.group(2)}", s).lower()

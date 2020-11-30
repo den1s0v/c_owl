@@ -12,7 +12,7 @@ $(document).ready(function(){
 		    
 		    load_fields()  // reset the values to the stored at send
 		    
-		    $("#new").html("New (clear both fields)")
+		    $("#new").html("Очистить оба поля")
 		}
 		else
 		{
@@ -26,35 +26,12 @@ $(document).ready(function(){
     $("#load-correct").click(function(){
         if (cm_alg.isReadOnly())
         {
-		    alert("Cannot insert the example data now.\nPlease enable the fields first by clicking 'Edit' button.")
+		    alert("Невозможно вставить данные примера сейчас.\nСначала активируйте поля, нажав кнопку 'Редактировать'.")
 		}
 		else
 		{
-		    e_alg.setValue(`while not_green  // waiting
-  if color_is_red  // over_color
-    wait
-`);
-		    e_trace.setValue(`program began  // The trace is initially correct. Modify it to introduce mistakes, and then press "Send" button
-  loop waiting began 1st time
-    condition of loop (not_green) evaluated 1st time - true
-    iteration 1 of loop waiting began
-      alternative over_color began 1st time
-        condition (color_is_red) evaluated 1st time - true
-        branch of condition (color_is_red) began 1st time
-          wait executed 1st time
-        branch of condition (color_is_red) ended 1st time
-      alternative over_color ended 1st time
-    iteration 1 of loop waiting ended
-    condition of loop (not_green) evaluated 2nd time - true
-    iteration 2 of loop waiting began
-      alternative over_color began 2nd time
-        condition (color_is_red) evaluated 2nd time - false
-      alternative over_color ended 2nd time
-    iteration 2 of loop waiting ended
-    condition of loop (not_green) evaluated 3rd time - false
-  loop waiting ended 1st time
-program ended  // Don't know where to start? Try deleting rows other than the first and last one ones.
-`)
+		    e_alg.setValue(ALGORITHM);
+		    e_trace.setValue(CORRECT_TRACE)
 		}
 		
     }); 	
@@ -62,28 +39,12 @@ program ended  // Don't know where to start? Try deleting rows other than the fi
     $("#load-incorrect").click(function(){
         if (cm_alg.isReadOnly())
         {
-		    alert("Cannot insert the example data now.\nPlease enable the fields first by clicking 'Edit' button.")
+		    alert("Невозможно вставить данные примера сейчас.\nСначала активируйте поля, нажав кнопку 'Редактировать'.")
 		}
 		else
 		{
-		    e_alg.setValue(`while not_green  // waiting
-  if color_is_red  // over_color
-    wait
-`);
-		    e_trace.setValue(`program began
-  loop waiting began 1st time
-    condition of loop (not_green) evaluated 1st time - true
-    iteration 1 of loop waiting began
-      alternative over_color began 1st time
-        condition (color_is_red) evaluated 1st time - false
-        branch of condition (color_is_red) began 1st time
-          wait executed 1st time
-        branch of condition (color_is_red) ended 1st time
-      alternative over_color ended 1st time
-    iteration 1 of loop waiting ended
-    condition of loop (not_green) evaluated 2nd time - true
-  loop waiting ended 1st time
-program ended`)
+		    e_alg.setValue(ALGORITHM);
+		    e_trace.setValue(INCORRECT_TRACE)
 		}
 		// e_trace.addLineClass(3, "background", "error-line")
     }); 	
@@ -97,7 +58,7 @@ program ended`)
 	    // Заблокировать
 	    set_editors_enabled(false);
 	    
-	    $("#new").html("Edit (enable fields)")
+	    $("#new").html("Редактировать (активировать поля)")
 	     
 	    data = {
 	        alg: e_alg.getValue(),
@@ -170,13 +131,13 @@ function processing_callback(response="wait")
 {
 	if(response == "wait")
 	{
-		$('#status').html("Please wait ...");
+		$('#status').html("Подождите ...");
 		return
 	}
 	
 	if(response == "fail")
 	{
-		$('#status').html("An error occurred while requesting the server (it can fail with the request, be busy or inaccessible). Please try again.<br>(Note that current environment is in debugging mode so can be slow and hang on concurrent requests.)");
+		$('#status').html("Произошла ошибка при запросе к серверу (он мог поймать ошибку, быть занят или недоступен). Пожалуйста, попробуйте еще раз.<br>(обратите внимание, что сервер работает в режиме отладки, поэтому может реагировать медленно и зависать на параллельных запросах.)");
 		return
 	}
 	
@@ -205,7 +166,7 @@ function processing_callback(response="wait")
 					if(m["explanation"])
 					{
 						// explanations = explanations.concat(m["explanations"])
-						explanations.push([line, "Line <b>" + line + "</b>: " + m["explanation"]])
+						explanations.push([line, "Строка <b>" + line + "</b>: " + m["explanation"]])
 					}
 				}
 			}
@@ -233,8 +194,8 @@ function processing_callback(response="wait")
 		
 		messages = (response.messages.concat(explanations)).join("\n<br>")
 		
-		$('#status').html("Server's response:\n" + messages + '\n<br>' 
-			+ mistakes_count + ` mistakes (in internal representation).`
+		$('#status').html("Ответ сервера:\n" + messages + '\n<br>' 
+			+ mistakes_count + ` ошибок (во внутреннем представлении).`
 			// + '\n<br>' + JSON.stringify(response)
 			);
 		
@@ -320,6 +281,64 @@ function define_syntax_mode() {
 	  }
 	});
 }
+
+
+const ALGORITHM = `пока не_зелёный -> истина,истина,ложь  // ожидание
+{
+    если цвет_красный -> истина,ложь  // по_цвету
+	{
+		ждать
+	}
+    иначе если цвет_жёлтый -> ложь
+	{
+        приготовиться
+	}
+}
+`;
+const CORRECT_TRACE = `началась программа
+начался цикл ожидание 1-й раз
+условие цикла (не_зелёный) выполнилось 1-й раз - истина
+началась итерация 1 цикла ожидание
+началась развилка по_цвету 1-й раз
+условие развилки (цвет_красный) выполнилось 1-й раз - истина
+ветка условия развилки (цвет_красный) началась 1-й раз
+ждать выполнилось 1-й раз
+ветка условия развилки (цвет_красный) закончилась 1-й раз
+закончилась развилка по_цвету 1-й раз
+закончилась итерация 1 цикла ожидание
+условие цикла (не_зелёный) выполнилось 2-й раз - истина
+началась итерация 2 цикла ожидание
+началась развилка по_цвету 2-й раз
+условие развилки (цвет_красный) выполнилось 2-й раз - ложь
+условие развилки (цвет_жёлтый) выполнилось 1-й раз - ложь
+закончилась развилка по_цвету 2-й раз
+закончилась итерация 2 цикла ожидание
+условие цикла (не_зелёный) выполнилось 3-й раз - ложь
+закончился цикл ожидание 1-й раз
+закончилась программа
+`;
+const INCORRECT_TRACE = `началась программа
+начался цикл ожидание 1-й раз
+началась итерация 1 цикла ожидание  // error: DisplacedAct
+условие цикла (не_зелёный) выполнилось 1-й раз - истина  // error: MisplacedDeeper, DisplacedAct
+началась развилка по_цвету 1-й раз  // error: MissingIterationAfterSuccessfulCondition, TooEarly
+условие развилки (цвет_красный) выполнилось 1-й раз - истина
+ветка условия развилки (цвет_красный) началась 1-й раз
+ждать выполнилось 1-й раз
+ветка условия развилки (цвет_красный) закончилась 1-й раз
+закончилась развилка по_цвету 1-й раз
+закончилась итерация 1 цикла ожидание
+условие цикла (не_зелёный) выполнилось 2-й раз - истина
+началась итерация 2 цикла ожидание
+началась развилка по_цвету 2-й раз
+условие развилки (цвет_красный) выполнилось 2-й раз - ложь
+условие развилки (цвет_жёлтый) выполнилось 1-й раз - ложь
+закончилась развилка по_цвету 2-й раз
+закончилась итерация 2 цикла ожидание
+условие цикла (не_зелёный) выполнилось 3-й раз - ложь
+закончился цикл ожидание 1-й раз
+закончилась программа
+`;
 
 
 JSON_example = {"algorithm": {"expr_values": {"не_зелёный": [true, true, false],

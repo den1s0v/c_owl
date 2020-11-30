@@ -1,0 +1,40 @@
+<head>
+	<title>ISWC Demo</title>
+	<script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+	
+	<!-- CodeMirror -->
+	<script src="{{ url_for('static', filename='codemirror.js') }}"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='codemirror.css') }}">
+	<!-- <script src="{{ url_for('static', filename='mode/javascript.js') }}"></script> -->
+	<script src="{{ url_for('static', filename='mode/simple.js') }}"></script>
+	
+	<!-- CodeMirror style -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='theme/elegant.css') }}">
+</head>
+
+<body>
+	<h1>Тьютор алгоритмов: тестирование расчётной части</h1>
+	
+	<noscript><h2>Please enable Javascript!</h2></noscript>
+	
+	<button id="new" style="float: left; margin-right: 10px;">Создать</button>
+	<button id="load-correct" style="float: left; margin-right: 10px;">Загрузить корректную трассу (пример)</button>
+	<button id="load-incorrect" style="float: left; margin-right: 10px;">Загрузить некорректную трассу (пример)</button>
+	
+	<a href="{{ url_for('static', filename='Algorithm_and_Trace_syntax_guide.pdf') }}" target="_blank">Краткая справка по синтаксису</a>
+	
+	<!-- <div id="new-tip"><i>Press again to clear the inputs</i></div> -->
+	<br>
+	<!-- <input type="text" name="alg"> -->
+	<p>Алгоритм:<Br>
+    <textarea id="alg" cols="120" rows="7"></textarea></p>
+	
+	<p>Траcса:<Br>
+    <textarea id="trace" cols="120" rows="14"></textarea></p>
+	
+	<button id="send_text">Отослать текстом</button>
+	<button id="send_json">Отослать в json (только для отладки)</button>
+	<div id="status">Статус: готов</div>
+	
+</body>
