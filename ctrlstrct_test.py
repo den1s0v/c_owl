@@ -24,7 +24,10 @@ ALG_FILE_FIELD = "alg_input"
 TRACE_FILE_FIELD = "trace_input"
 REFERENCE_DATA_FIELD = "reference_output"
 
-SAVE_RDF = True
+# SAVE_RDF = True
+SAVE_RDF = False
+EVALUATE = True
+# EVALUATE = False
 
 # global log storage
 LOG = []
@@ -296,7 +299,52 @@ def run_tests(directory="test_data/", process_kwargs={}):
 				
 			else:
 				ontology_fpath = None
-			onto, mistakes = process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True, **process_kwargs)
+				
+			if not EVALUATE:
+				onto, mistakes = process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True, **process_kwargs)
+			else:
+				dataset = os.path.splitext(os.path.split(files[0])[1])[0]
+				eval_results = []
+				# 46
+				for n in range(18, 24 + 1, 1):
+					reasoners = ("pellet", )
+					# reasoners = ("prolog", ); alg_trs = alg_trs[:22]  # !!!
+					# reasoners = ("jena", "sparql")
+					# reasoners = ("jena", "prolog", "sparql")
+					for reasoning_type in reasoners:
+						process_kwargs["reasoning"] = reasoning_type
+						
+						print(' >  >  >  >  >  >  >  >  >  >  >  >  > ')
+						print(f"  Running {n} traces with {reasoning_type}")
+						print(' <  <  <  <  <  <  <  <  <  <  <  <  < ')
+						
+						eval_result = process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=None, mistakes_as_objects=True, _eval_max_traces=n, **process_kwargs)
+						
+						eval_item = {
+							'dataset': dataset,
+							'reasoner': reasoning_type,
+							'count': n,
+						}
+						eval_item.update(eval_result)
+						
+						# dump current result
+						with open('partial_eval.txt', "a") as file:
+							file.write(str(eval_item))
+							file.write('\n')
+						
+						eval_results.append(eval_item)
+						
+					# break
+						
+				# dump full result
+				with open('full_eval.txt', "a") as file:
+					for eval_item in eval_results:
+						file.write(str(eval_item))
+						file.write('\n')
+						
+				print(' ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^ ')	
+				print("Eval finished.")	
+				exit()
 		# else:
 		# 	for i, test_data in enumerate(alg_trs):
 		# 		try:
@@ -344,8 +392,8 @@ if __name__ == '__main__':
 	
 	success_all = run_tests(process_kwargs=dict(
 		# reasoning=None, 
-		# reasoning="pellet", 
-		reasoning="jena", 
+		reasoning="pellet", 
+		# reasoning="jena", 
 		# reasoning="prolog", 
 		# reasoning="sparql", 
 		# reasoning="stardog", 

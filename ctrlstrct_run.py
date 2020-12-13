@@ -17,7 +17,7 @@ from upd_onto import *
 from transliterate import slugify
 from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from explanations import format_explanation, get_leaf_classes
-from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning
+from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, measure_stats_for_pellet_running, get_pellet_run_stats
 
 # ONTOLOGY_maxID = 1
 
@@ -76,8 +76,9 @@ class TraceTester():
         
     def make_correct_trace(self):
         if "correct_trace" in self.data:
-            print("make_correct_trace(): correct_trace already exists, aborting.")
-            return
+            # print("Warning: make_correct_trace(): correct_trace already exists...")
+            pass
+            # return
             
         self.data["correct_trace"] = []
         
@@ -106,7 +107,7 @@ class TraceTester():
             #  (this is less preffered as the trace may contain errors)
             self.values_source = "trace"
             
-        print(f'Trace {self.data["trace_name"]}: values_source detected:', self.values_source)
+        # print(f'Trace {self.data["trace_name"]}: values_source detected:', self.values_source)
         
         def next_cond_value(expr_name=None, executes_id=None, n=None, default=False):
           
@@ -1131,7 +1132,7 @@ def create_ontology_tbox() -> "onto":
 
 def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1, 
                       mistakes_as_objects=False, extra_act_entries=0, 
-                      rules_filter=None, reasoning="jena", on_done=None) -> "onto, mistakes_list":
+                      rules_filter=None, reasoning="jena", on_done=None, _eval_max_traces=None) -> "onto, mistakes_list":
     """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found.
       reasoning: None or "stardog" or "pellet" or "prolog" or "jena" or "sparql"
     """
@@ -1139,9 +1140,23 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     onto = create_ontology_tbox()
         
     # наполняем онтологию с нуля сущностями с теми именами, которые найдём в загруженных json-словарях
+        
+    
+    if _eval_max_traces is not None:
+        # adjust the list size
+        if _eval_max_traces <= len(trace_data_list):
+            trace_data_list = trace_data_list[0:_eval_max_traces+1]
+        else:
+            from itertools import cycle
+            cycled = cycle(trace_data_list)
+            for trace in cycled:
+                trace_data_list.append(trace)
+                if len(trace_data_list) == _eval_max_traces:
+                    break
+        
     for tr_data in trace_data_list:
         tt = TraceTester(tr_data)
-        tt.inject_to_ontology(onto, extra_act_entries=extra_act_entries)
+        tt.inject_to_ontology(onto)
 
     # обёртка для расширенного логического вывода:
      # при создании наполняет базовую онтологию вспомогательными сущностями
@@ -1175,6 +1190,10 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         # success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
         
         print(">_ running Pellet ...")
+        
+        if _eval_max_traces is not None:
+            measure_stats_for_pellet_running()
+            
         start = timer()
         
         with onto:
@@ -1186,9 +1205,11 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         time_report = "   Time elapsed: %.3f s." % seconds
         print(">_ Pellet finished")
         print(time_report)
-
         
-        seconds = -2
+        if _eval_max_traces is not None:
+            run_stats = get_pellet_run_stats()
+            run_stats.update({"wall_time": seconds})
+            return run_stats
 
         # if not verbose:
         #     print("Extended reasoning finished.", f"Success: {success}, Pellet run times: {n_runs}")
@@ -1203,11 +1224,14 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         name_out = "pl_out.rdf"
         onto.save(file=name_in, format='rdfxml')
         
-        run_swiprolog_reasoning(name_in, name_out, verbose=1)
+        eval_stats = run_swiprolog_reasoning(name_in, name_out, verbose=1)
+        
+        if _eval_max_traces is not None:
+            return eval_stats
         
         clear_ontology(onto)
         onto = get_ontology("file://" + name_out).load()
-        seconds = 1.12345
+        seconds = eval_stats['wall_time']
         
             
     if reasoning in ('sparql', 'jena'):
@@ -1215,7 +1239,10 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         name_out = f"{reasoning}_out.n3"
         onto.save(file=name_in, format='rdfxml')
         
-        run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=1)
+        eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=1)
+        
+        if _eval_max_traces is not None:
+            return eval_stats
         
         clear_ontology(onto)
         onto = get_ontology("file://" + name_out).load()
@@ -1231,13 +1258,13 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
                 if prop in prop.is_a:
                     prop.is_a.remove(prop)
 
-        seconds = 2.23456
+        seconds = eval_stats['wall_time']
             
     if on_done:
         on_done(seconds)
         
     # return onto, []  ### Debug exit
-    # exit()
+    exit()
         
     mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
     
