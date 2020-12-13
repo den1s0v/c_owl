@@ -1,0 +1,839 @@
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 0, 'wall_time': 9.448890231}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 0, 'wall_time': 4.435326194}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 0, 'wall_time': 4.689237244}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 0, 'cpu': 78.26461840628507, 'rss': 14950400, 'vms': 10293248, 'uss': 10948608, 'wall_time': 1.385, 'exclusive_time': 0.143}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 0, 'cpu': 0.0, 'rss': 0.0, 'vms': 0.0, 'uss': 0.0, 'wall_time': 2.2680911230000005, 'exclusive_time': 0.193}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 0, 'cpu': 0.0, 'rss': 0.0, 'vms': 0.0, 'uss': 0.0, 'wall_time': 0.9511279429999995, 'exclusive_time': 0.126}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 0, 'cpu': 0.0, 'rss': 0.0, 'vms': 0.0, 'uss': 0.0, 'wall_time': 3.766061035999998, 'exclusive_time': 1.444}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 0, 'wall_time': 4.881115235999999}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 0, 'cpu': 178.8022358132823, 'rss': 107585536, 'vms': 289562624, 'uss': 103272448, 'wall_time': 2.28845452, 'exclusive_time': 0.18}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 0, 'cpu': 89.74400871459697, 'rss': 12795904, 'vms': 8499200, 'uss': 9461760, 'wall_time': 0.9188722580000004, 'exclusive_time': 0.124}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 0, 'cpu': 199.6561058151851, 'rss': 124129280, 'vms': 304152576, 'uss': 119816192, 'wall_time': 3.584108019000002, 'exclusive_time': 1.324}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 0, 'wall_time': 4.7874229889999995}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 0, 'cpu': 173.70859453993924, 'rss': 112451584, 'vms': 268238848, 'uss': 108150784, 'wall_time': 2.2962876109999995, 'exclusive_time': 0.17}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 0, 'cpu': 88.41481481481485, 'rss': 12800000, 'vms': 8503296, 'uss': 9461760, 'wall_time': 0.9346825550000002, 'exclusive_time': 0.122}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 0, 'cpu': 203.56729797979798, 'rss': 127373312, 'vms': 306892800, 'uss': 123052032, 'wall_time': 3.530973537999998, 'exclusive_time': 1.297}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 0, 'wall_time': 5.045467491}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 1, 'cpu': 212.50052189905975, 'rss': 129835008, 'vms': 301654016, 'uss': 125509632, 'wall_time': 3.249764405999997, 'exclusive_time': 0.491}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 1, 'cpu': 94.93544802867382, 'rss': 14995456, 'vms': 10358784, 'uss': 11051008, 'wall_time': 1.5735303680000001, 'exclusive_time': 0.325}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 1, 'cpu': 231.02763211382117, 'rss': 140161024, 'vms': 311742464, 'uss': 135852032, 'wall_time': 4.555313570000003, 'exclusive_time': 1.526}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 1, 'wall_time': 5.871904491000002}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 2, 'cpu': 220.1051269739651, 'rss': 157589504, 'vms': 359395328, 'uss': 153264128, 'wall_time': 4.040204069000012, 'exclusive_time': 0.767}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 2, 'cpu': 96.17465977605508, 'rss': 16474112, 'vms': 11747328, 'uss': 12541952, 'wall_time': 2.235072842000008, 'exclusive_time': 0.498}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 2, 'cpu': 247.2093601295484, 'rss': 162328576, 'vms': 378503168, 'uss': 158015488, 'wall_time': 5.001994179999997, 'exclusive_time': 1.749}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 2, 'wall_time': 7.003188636000004}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 3, 'cpu': 235.29400143125704, 'rss': 188903424, 'vms': 405614592, 'uss': 184627200, 'wall_time': 4.615674389000006, 'exclusive_time': 0.988}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 3, 'cpu': 96.6188311688311, 'rss': 18489344, 'vms': 14213120, 'uss': 14553088, 'wall_time': 2.8246162470000087, 'exclusive_time': 0.647}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 3, 'cpu': 239.42194882064996, 'rss': 171593728, 'vms': 381333504, 'uss': 167301120, 'wall_time': 5.661964076000004, 'exclusive_time': 1.954}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 3, 'wall_time': 8.086644712000009}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 4, 'cpu': 245.19137095986738, 'rss': 211341312, 'vms': 416600064, 'uss': 207015936, 'wall_time': 5.334147712999993, 'exclusive_time': 1.082}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 4, 'cpu': 95.42641765489361, 'rss': 20332544, 'vms': 15740928, 'uss': 16379904, 'wall_time': 3.5521024619999935, 'exclusive_time': 0.82}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 4, 'cpu': 251.8781660571586, 'rss': 186023936, 'vms': 394432512, 'uss': 181710848, 'wall_time': 6.0021407380000085, 'exclusive_time': 2.025}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 4, 'wall_time': 8.996443013000004}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 5, 'cpu': 240.47424836601328, 'rss': 204152832, 'vms': 410300416, 'uss': 199839744, 'wall_time': 5.773949331000011, 'exclusive_time': 1.185}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 5, 'cpu': 97.71745599072234, 'rss': 22265856, 'vms': 17846272, 'uss': 18448384, 'wall_time': 4.159654061999987, 'exclusive_time': 1.023}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 5, 'cpu': 240.7837926230917, 'rss': 206438400, 'vms': 392675328, 'uss': 202088448, 'wall_time': 6.705293761000007, 'exclusive_time': 2.168}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 5, 'wall_time': 10.535066442000016}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 6, 'cpu': 199.00567666083205, 'rss': 132853760, 'vms': 305070080, 'uss': 128569344, 'wall_time': 3.714120522, 'exclusive_time': 0.74}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 6, 'cpu': 93.28907407407405, 'rss': 13783040, 'vms': 9273344, 'uss': 9973760, 'wall_time': 2.3205533870000004, 'exclusive_time': 1.263}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 6, 'cpu': 225.43036987121909, 'rss': 160411648, 'vms': 371879936, 'uss': 156110848, 'wall_time': 6.0117388889999965, 'exclusive_time': 3.001}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 6, 'wall_time': 11.837519303}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 6, 'cpu': 201.73217920864272, 'rss': 141602816, 'vms': 314970112, 'uss': 137334784, 'wall_time': 3.60818278, 'exclusive_time': 0.756}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 6, 'cpu': 95.99057913631083, 'rss': 13787136, 'vms': 9265152, 'uss': 9928704, 'wall_time': 2.3936189190000015, 'exclusive_time': 1.311}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 6, 'cpu': 225.58667360905557, 'rss': 153493504, 'vms': 365514752, 'uss': 149213184, 'wall_time': 6.508126940999997, 'exclusive_time': 3.13}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 6, 'wall_time': 13.798049495}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 7, 'cpu': 210.5923182659607, 'rss': 174182400, 'vms': 361697280, 'uss': 169922560, 'wall_time': 5.493762691999997, 'exclusive_time': 1.252}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 7, 'cpu': 91.52240165180893, 'rss': 15204352, 'vms': 10567680, 'uss': 11325440, 'wall_time': 3.880027279999993, 'exclusive_time': 2.128}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 7, 'cpu': 228.00326414302944, 'rss': 182517760, 'vms': 396001280, 'uss': 178241536, 'wall_time': 8.178003739999994, 'exclusive_time': 4.148}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 7, 'wall_time': 20.565800845000012}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 8, 'cpu': 223.3744417984573, 'rss': 206082048, 'vms': 376422400, 'uss': 201789440, 'wall_time': 6.284228246999987, 'exclusive_time': 1.642}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 8, 'cpu': 97.34156051222276, 'rss': 16961536, 'vms': 12333056, 'uss': 13041664, 'wall_time': 4.859163138000014, 'exclusive_time': 2.537}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 8, 'cpu': 222.02635758167185, 'rss': 235384832, 'vms': 518365184, 'uss': 231100416, 'wall_time': 9.25649390800001, 'exclusive_time': 4.598}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 8, 'wall_time': 22.752489182000005}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 9, 'cpu': 238.00976290552794, 'rss': 224890880, 'vms': 431013888, 'uss': 220622848, 'wall_time': 7.527182543999999, 'exclusive_time': 1.945}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 9, 'cpu': 96.79239444307983, 'rss': 19210240, 'vms': 14663680, 'uss': 15282176, 'wall_time': 5.9425664529999835, 'exclusive_time': 2.967}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 9, 'cpu': 232.43021319848992, 'rss': 228298752, 'vms': 505356288, 'uss': 224018432, 'wall_time': 10.005211638000048, 'exclusive_time': 4.499}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 9, 'wall_time': 24.702587303999962}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 9, 'cpu': 220.5799590669117, 'rss': 156106752, 'vms': 316493824, 'uss': 151818240, 'wall_time': 4.0292502489999995, 'exclusive_time': 0.989}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 9, 'cpu': 96.35457265314074, 'rss': 13824000, 'vms': 9166848, 'uss': 9916416, 'wall_time': 3.5670211930000004, 'exclusive_time': 2.482}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 9, 'cpu': 235.98577001061915, 'rss': 180740096, 'vms': 398270464, 'uss': 176435200, 'wall_time': 6.917057858, 'exclusive_time': 3.911}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 9, 'wall_time': 24.695799179000005}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 10, 'cpu': 230.77201550387602, 'rss': 189689856, 'vms': 381632512, 'uss': 185389056, 'wall_time': 5.023968262000011, 'exclusive_time': 1.352}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 10, 'cpu': 95.78765926883574, 'rss': 15429632, 'vms': 10825728, 'uss': 11526144, 'wall_time': 4.8102515100000005, 'exclusive_time': 3.1}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 10, 'cpu': 241.94249979945232, 'rss': 213504000, 'vms': 494718976, 'uss': 209252352, 'wall_time': 7.485922273999989, 'exclusive_time': 3.91}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 10, 'wall_time': 26.78202570899998}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 11, 'cpu': 246.63170999287186, 'rss': 205484032, 'vms': 413609984, 'uss': 201216000, 'wall_time': 5.5868520930000045, 'exclusive_time': 1.509}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 11, 'cpu': 98.23907801418439, 'rss': 17076224, 'vms': 12464128, 'uss': 13152256, 'wall_time': 5.864757784000005, 'exclusive_time': 3.587}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 11, 'cpu': 253.61071763916846, 'rss': 230445056, 'vms': 514289664, 'uss': 226152448, 'wall_time': 8.810574916000007, 'exclusive_time': 4.499}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 11, 'wall_time': 28.224507890999973}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 12, 'cpu': 256.79870135107905, 'rss': 230641664, 'vms': 437141504, 'uss': 226365440, 'wall_time': 6.470390926999983, 'exclusive_time': 1.707}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 12, 'cpu': 98.46046691140715, 'rss': 19333120, 'vms': 14794752, 'uss': 15409152, 'wall_time': 7.012712040999986, 'exclusive_time': 4.09}
+{'dataset': 'test_one', 'reasoner': 'jena', 'count': 9, 'cpu': 253.099891598916, 'rss': 256679936, 'vms': 492089344, 'uss': 252399616, 'wall_time': 4.648013612, 'exclusive_time': 2.285}
+{'dataset': 'test_one', 'reasoner': 'prolog', 'count': 9, 'cpu': 98.92473048771602, 'rss': 14532608, 'vms': 9883648, 'uss': 10592256, 'wall_time': 16.304640986, 'exclusive_time': 15.252}
+{'dataset': 'test_one', 'reasoner': 'sparql', 'count': 9, 'cpu': 192.8606061236304, 'rss': 349786112, 'vms': 662032384, 'uss': 345489408, 'wall_time': 12.066079551000001, 'exclusive_time': 9.599}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 12, 'cpu': 222.6190909090909, 'rss': 194637824, 'vms': 370515968, 'uss': 190312448, 'wall_time': 3.496521422, 'exclusive_time': 1.079}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 12, 'cpu': 94.81601794101796, 'rss': 14000128, 'vms': 9445376, 'uss': 10096640, 'wall_time': 4.017170365000002, 'exclusive_time': 2.771}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 12, 'cpu': 241.77338280766853, 'rss': 215773184, 'vms': 498655232, 'uss': 211509248, 'wall_time': 5.445096794000001, 'exclusive_time': 3.12}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 13, 'cpu': 225.5426075268817, 'rss': 198025216, 'vms': 375881728, 'uss': 191049728, 'wall_time': 3.628638999000003, 'exclusive_time': 1.21}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 13, 'cpu': 98.7203082029398, 'rss': 13955072, 'vms': 9293824, 'uss': 10059776, 'wall_time': 4.010049063000004, 'exclusive_time': 3.066}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 13, 'cpu': 243.76645385701454, 'rss': 211533824, 'vms': 487464960, 'uss': 197582848, 'wall_time': 5.652535446999991, 'exclusive_time': 3.326}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 14, 'cpu': 238.70860215053764, 'rss': 176152576, 'vms': 317943808, 'uss': 171872256, 'wall_time': 3.484726841000011, 'exclusive_time': 1.206}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 14, 'cpu': 97.90743321718934, 'rss': 14237696, 'vms': 9531392, 'uss': 10297344, 'wall_time': 4.400111483000003, 'exclusive_time': 3.399}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 14, 'cpu': 225.81470984353345, 'rss': 201285632, 'vms': 483557376, 'uss': 196964352, 'wall_time': 5.73873999300001, 'exclusive_time': 3.319}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 15, 'cpu': 239.28385199240986, 'rss': 201555968, 'vms': 379961344, 'uss': 197271552, 'wall_time': 3.531924217000011, 'exclusive_time': 1.157}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 15, 'cpu': 98.4727272727273, 'rss': 14123008, 'vms': 9515008, 'uss': 10264576, 'wall_time': 4.674908657000003, 'exclusive_time': 3.699}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 15, 'cpu': 245.65280944364278, 'rss': 230989824, 'vms': 515268608, 'uss': 226652160, 'wall_time': 5.876383333999996, 'exclusive_time': 3.543}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 16, 'cpu': 241.9351641414141, 'rss': 197853184, 'vms': 376205312, 'uss': 189718528, 'wall_time': 3.5159077600000046, 'exclusive_time': 1.197}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 16, 'cpu': 98.74480576689514, 'rss': 14184448, 'vms': 9633792, 'uss': 10285056, 'wall_time': 4.900488872000011, 'exclusive_time': 3.835}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 16, 'cpu': 239.2519227994228, 'rss': 213372928, 'vms': 495382528, 'uss': 206143488, 'wall_time': 5.99980214499999, 'exclusive_time': 3.586}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 17, 'cpu': 248.9003463990306, 'rss': 231014400, 'vms': 489476096, 'uss': 226721792, 'wall_time': 4.151264046999984, 'exclusive_time': 1.743}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 17, 'cpu': 98.52661111111111, 'rss': 14233600, 'vms': 9535488, 'uss': 10301440, 'wall_time': 5.128296784000014, 'exclusive_time': 4.063}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 17, 'cpu': 237.5081662489557, 'rss': 220573696, 'vms': 504750080, 'uss': 216309760, 'wall_time': 5.850839564000012, 'exclusive_time': 3.448}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 18, 'cpu': 246.14274884640736, 'rss': 228278272, 'vms': 496037888, 'uss': 224002048, 'wall_time': 4.270095072999993, 'exclusive_time': 1.805}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 18, 'cpu': 99.20481895709425, 'rss': 14372864, 'vms': 9682944, 'uss': 10432512, 'wall_time': 5.3929183660000035, 'exclusive_time': 4.326}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 18, 'cpu': 249.9883338289226, 'rss': 234029056, 'vms': 517091328, 'uss': 229728256, 'wall_time': 6.243525878000014, 'exclusive_time': 3.8}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 19, 'cpu': 252.5085256410256, 'rss': 228671488, 'vms': 495443968, 'uss': 224362496, 'wall_time': 4.415590067999972, 'exclusive_time': 2.0}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 19, 'cpu': 98.84587662337664, 'rss': 14438400, 'vms': 9715712, 'uss': 10502144, 'wall_time': 5.814501720999999, 'exclusive_time': 4.743}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 19, 'cpu': 254.18166666666664, 'rss': 234532864, 'vms': 516210688, 'uss': 230227968, 'wall_time': 6.653440203999992, 'exclusive_time': 4.164}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 20, 'cpu': 258.73032199400944, 'rss': 236867584, 'vms': 488640512, 'uss': 232542208, 'wall_time': 4.467788037999981, 'exclusive_time': 2.081}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 20, 'cpu': 98.4392879236861, 'rss': 14364672, 'vms': 9707520, 'uss': 10432512, 'wall_time': 6.014468306000026, 'exclusive_time': 5.002}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 20, 'cpu': 233.95925265140252, 'rss': 212602880, 'vms': 496291840, 'uss': 208191488, 'wall_time': 6.362615823999988, 'exclusive_time': 3.91}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 21, 'cpu': 248.91987179487182, 'rss': 229392384, 'vms': 486825984, 'uss': 225091584, 'wall_time': 4.411958335999998, 'exclusive_time': 1.97}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 21, 'cpu': 98.95347247098157, 'rss': 14368768, 'vms': 9715712, 'uss': 10444800, 'wall_time': 6.291866414000026, 'exclusive_time': 5.217}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 21, 'cpu': 235.32475972232717, 'rss': 234164224, 'vms': 517234688, 'uss': 229863424, 'wall_time': 6.734891352999966, 'exclusive_time': 4.238}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 22, 'cpu': 248.82785074004582, 'rss': 225427456, 'vms': 493006848, 'uss': 221151232, 'wall_time': 4.511971184999993, 'exclusive_time': 2.039}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 22, 'cpu': 99.44066471163245, 'rss': 14389248, 'vms': 9740288, 'uss': 10444800, 'wall_time': 6.665097507999974, 'exclusive_time': 5.61}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 22, 'cpu': 230.08190551736297, 'rss': 215011328, 'vms': 496414720, 'uss': 210714624, 'wall_time': 6.6811989699999685, 'exclusive_time': 4.24}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 23, 'cpu': 249.25976190476192, 'rss': 228593664, 'vms': 487378944, 'uss': 224296960, 'wall_time': 4.6107109240000455, 'exclusive_time': 2.073}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 23, 'cpu': 98.40425722425721, 'rss': 14491648, 'vms': 9875456, 'uss': 10584064, 'wall_time': 6.675868619000084, 'exclusive_time': 5.507}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 23, 'cpu': 233.35805512886157, 'rss': 222654464, 'vms': 499826688, 'uss': 218357760, 'wall_time': 6.6395039080000515, 'exclusive_time': 4.14}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 24, 'cpu': 251.6324390243902, 'rss': 235278336, 'vms': 500518912, 'uss': 230993920, 'wall_time': 4.597662286000059, 'exclusive_time': 2.133}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 24, 'cpu': 98.89509049773756, 'rss': 14520320, 'vms': 9863168, 'uss': 10584064, 'wall_time': 6.965517106999982, 'exclusive_time': 5.863}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 24, 'cpu': 228.23699596774193, 'rss': 215932928, 'vms': 497520640, 'uss': 211640320, 'wall_time': 6.963168254000038, 'exclusive_time': 4.461}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 25, 'cpu': 256.31171204386465, 'rss': 258502656, 'vms': 495812608, 'uss': 254496768, 'wall_time': 4.536211068000057, 'exclusive_time': 1.967}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 25, 'cpu': 98.89033485540335, 'rss': 14577664, 'vms': 9928704, 'uss': 10645504, 'wall_time': 7.394385911000086, 'exclusive_time': 6.307}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 25, 'cpu': 221.41470835828406, 'rss': 218583040, 'vms': 500064256, 'uss': 214061056, 'wall_time': 6.70941939699992, 'exclusive_time': 4.268}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 26, 'cpu': 248.90387596899222, 'rss': 249257984, 'vms': 489066496, 'uss': 245190656, 'wall_time': 4.853439031999983, 'exclusive_time': 2.195}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 26, 'cpu': 99.24646488593858, 'rss': 14520320, 'vms': 9875456, 'uss': 10584064, 'wall_time': 7.918650464999928, 'exclusive_time': 6.652}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 26, 'cpu': 245.44222259239518, 'rss': 227004416, 'vms': 510726144, 'uss': 221233152, 'wall_time': 7.2665830299999925, 'exclusive_time': 4.713}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 27, 'cpu': 256.5416470842449, 'rss': 260075520, 'vms': 494915584, 'uss': 255778816, 'wall_time': 4.740941309999926, 'exclusive_time': 2.21}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 27, 'cpu': 98.73050854700857, 'rss': 14643200, 'vms': 10035200, 'uss': 10723328, 'wall_time': 8.122248293999974, 'exclusive_time': 6.951}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 27, 'cpu': 225.69831258846182, 'rss': 212230144, 'vms': 494104576, 'uss': 207908864, 'wall_time': 7.032772550000004, 'exclusive_time': 4.58}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 28, 'cpu': 259.7727759320783, 'rss': 264675328, 'vms': 500867072, 'uss': 260386816, 'wall_time': 4.841809085000023, 'exclusive_time': 2.337}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 28, 'cpu': 99.42428418803418, 'rss': 14770176, 'vms': 10141696, 'uss': 10838016, 'wall_time': 8.455369116000043, 'exclusive_time': 7.293}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 28, 'cpu': 234.32517094017092, 'rss': 254472192, 'vms': 519991296, 'uss': 250167296, 'wall_time': 7.197151186000042, 'exclusive_time': 4.68}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 29, 'cpu': 257.4281007751938, 'rss': 267948032, 'vms': 493494272, 'uss': 263667712, 'wall_time': 4.562374783999985, 'exclusive_time': 2.12}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 29, 'cpu': 98.68401014109345, 'rss': 14798848, 'vms': 10141696, 'uss': 10850304, 'wall_time': 8.631826658000023, 'exclusive_time': 7.419}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 29, 'cpu': 225.70015724471605, 'rss': 264114176, 'vms': 502841344, 'uss': 259850240, 'wall_time': 7.47934958999997, 'exclusive_time': 4.882}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 30, 'cpu': 254.39811111111112, 'rss': 264552448, 'vms': 439959552, 'uss': 260259840, 'wall_time': 5.605186137000032, 'exclusive_time': 2.759}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 30, 'cpu': 99.36090475985476, 'rss': 14835712, 'vms': 10199040, 'uss': 10903552, 'wall_time': 9.417246184999954, 'exclusive_time': 8.175}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 30, 'cpu': 221.51123727972194, 'rss': 310575104, 'vms': 516468736, 'uss': 306302976, 'wall_time': 8.91341195699988, 'exclusive_time': 6.014}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 31, 'cpu': 258.8225183150184, 'rss': 345305088, 'vms': 631398400, 'uss': 341032960, 'wall_time': 6.0508476729999074, 'exclusive_time': 2.905}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 31, 'cpu': 97.54229865643526, 'rss': 14905344, 'vms': 10252288, 'uss': 10997760, 'wall_time': 9.879700452999941, 'exclusive_time': 8.581}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 31, 'cpu': 225.22756741250723, 'rss': 325529600, 'vms': 515809280, 'uss': 321224704, 'wall_time': 9.397704006999902, 'exclusive_time': 6.536}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 32, 'cpu': 263.1636796391333, 'rss': 327626752, 'vms': 724078592, 'uss': 323321856, 'wall_time': 7.353181331999849, 'exclusive_time': 4.428}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 32, 'cpu': 99.25143945559772, 'rss': 14962688, 'vms': 10379264, 'uss': 11034624, 'wall_time': 10.20568678299992, 'exclusive_time': 8.929}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 32, 'cpu': 229.57738095238096, 'rss': 355713024, 'vms': 755134464, 'uss': 351453184, 'wall_time': 9.532851447999974, 'exclusive_time': 6.596}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 33, 'cpu': 270.4322060214376, 'rss': 340353024, 'vms': 734969856, 'uss': 336060416, 'wall_time': 7.187397683999961, 'exclusive_time': 4.353}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 33, 'cpu': 99.2013915920469, 'rss': 14921728, 'vms': 10280960, 'uss': 10985472, 'wall_time': 10.590064666999979, 'exclusive_time': 9.294}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 33, 'cpu': 231.07544494720972, 'rss': 354942976, 'vms': 760119296, 'uss': 350666752, 'wall_time': 9.796293718000015, 'exclusive_time': 6.826}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 34, 'cpu': 257.85860622352556, 'rss': 350130176, 'vms': 744861696, 'uss': 345837568, 'wall_time': 7.487103540000135, 'exclusive_time': 4.483}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 34, 'cpu': 98.91150793650786, 'rss': 14934016, 'vms': 10362880, 'uss': 11038720, 'wall_time': 11.298654538999926, 'exclusive_time': 9.913}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 34, 'cpu': 216.58753545555416, 'rss': 351547392, 'vms': 756850688, 'uss': 347258880, 'wall_time': 9.945179112000005, 'exclusive_time': 7.028}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 35, 'cpu': 271.09227994227996, 'rss': 346497024, 'vms': 742572032, 'uss': 342200320, 'wall_time': 7.542084665999937, 'exclusive_time': 4.467}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 35, 'cpu': 99.23947647953759, 'rss': 15101952, 'vms': 10465280, 'uss': 11173888, 'wall_time': 11.526457077000032, 'exclusive_time': 10.165}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 35, 'cpu': 206.0669189088466, 'rss': 354869248, 'vms': 762040320, 'uss': 350572544, 'wall_time': 9.624646731000212, 'exclusive_time': 6.697}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 36, 'cpu': 270.06226250836426, 'rss': 342183936, 'vms': 735162368, 'uss': 337858560, 'wall_time': 7.07751164299998, 'exclusive_time': 4.247}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 36, 'cpu': 99.51136779068082, 'rss': 15085568, 'vms': 10493952, 'uss': 11186176, 'wall_time': 12.316484908999882, 'exclusive_time': 11.029}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 36, 'cpu': 215.5087174656619, 'rss': 350806016, 'vms': 749494272, 'uss': 346497024, 'wall_time': 9.19983761200001, 'exclusive_time': 6.485}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 37, 'cpu': 248.77805588520877, 'rss': 330358784, 'vms': 704004096, 'uss': 326062080, 'wall_time': 5.276343371999928, 'exclusive_time': 2.595}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 37, 'cpu': 99.37349873577743, 'rss': 15003648, 'vms': 10293248, 'uss': 11067392, 'wall_time': 11.931223274000104, 'exclusive_time': 10.626}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 37, 'cpu': 216.7514286413948, 'rss': 349319168, 'vms': 745840640, 'uss': 345055232, 'wall_time': 9.061158587999898, 'exclusive_time': 6.415}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 38, 'cpu': 266.16764683167935, 'rss': 388149248, 'vms': 710062080, 'uss': 383848448, 'wall_time': 5.304557447999969, 'exclusive_time': 2.729}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 38, 'cpu': 99.47530533878349, 'rss': 15065088, 'vms': 10432512, 'uss': 11128832, 'wall_time': 12.288501418999886, 'exclusive_time': 10.969}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 38, 'cpu': 205.66291271790305, 'rss': 345157632, 'vms': 750522368, 'uss': 340885504, 'wall_time': 9.26900858199997, 'exclusive_time': 6.668}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 39, 'cpu': 268.3753580246913, 'rss': 344866816, 'vms': 714407936, 'uss': 340557824, 'wall_time': 5.809082457000159, 'exclusive_time': 3.192}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 39, 'cpu': 99.49422222222212, 'rss': 15224832, 'vms': 10551296, 'uss': 11272192, 'wall_time': 12.86597813200001, 'exclusive_time': 11.571}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 39, 'cpu': 217.10581395348837, 'rss': 358395904, 'vms': 762761216, 'uss': 354066432, 'wall_time': 9.58744468000009, 'exclusive_time': 6.907}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 40, 'cpu': 264.4193191489361, 'rss': 349253632, 'vms': 582664192, 'uss': 342310912, 'wall_time': 5.412999883000111, 'exclusive_time': 2.723}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 40, 'cpu': 99.38582978514755, 'rss': 15159296, 'vms': 10534912, 'uss': 11255808, 'wall_time': 13.286771046000013, 'exclusive_time': 11.941}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 40, 'cpu': 203.38469167377102, 'rss': 347279360, 'vms': 752926720, 'uss': 342982656, 'wall_time': 9.616519057000005, 'exclusive_time': 6.968}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 41, 'cpu': 267.0043061802432, 'rss': 335642624, 'vms': 720318464, 'uss': 331350016, 'wall_time': 5.349694205000105, 'exclusive_time': 2.733}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 41, 'cpu': 99.19394699448124, 'rss': 15187968, 'vms': 10498048, 'uss': 11288576, 'wall_time': 13.927055136000035, 'exclusive_time': 12.586}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 41, 'cpu': 212.56708180708176, 'rss': 343846912, 'vms': 656011264, 'uss': 339566592, 'wall_time': 9.874798053999939, 'exclusive_time': 7.185}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 42, 'cpu': 250.890573286052, 'rss': 339226624, 'vms': 570388480, 'uss': 334946304, 'wall_time': 5.229570039000009, 'exclusive_time': 2.598}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 42, 'cpu': 99.29460093896701, 'rss': 15302656, 'vms': 10616832, 'uss': 11345920, 'wall_time': 14.6092301890003, 'exclusive_time': 13.209}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 42, 'cpu': 194.19033409119615, 'rss': 341962752, 'vms': 748105728, 'uss': 337666048, 'wall_time': 9.630840315000114, 'exclusive_time': 7.023}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 43, 'cpu': 264.8963083550391, 'rss': 373391360, 'vms': 717279232, 'uss': 369098752, 'wall_time': 5.274145474999841, 'exclusive_time': 2.675}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 43, 'cpu': 99.61413585724131, 'rss': 15355904, 'vms': 10743808, 'uss': 11419648, 'wall_time': 14.770003473999623, 'exclusive_time': 13.445}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 43, 'cpu': 209.14330841936135, 'rss': 342396928, 'vms': 654270464, 'uss': 338128896, 'wall_time': 9.660740798000006, 'exclusive_time': 6.954}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 44, 'cpu': 259.46682628471336, 'rss': 372088832, 'vms': 699330560, 'uss': 367788032, 'wall_time': 5.262448599999971, 'exclusive_time': 2.609}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 44, 'cpu': 99.77292609351423, 'rss': 15368192, 'vms': 10711040, 'uss': 11423744, 'wall_time': 15.819436852000308, 'exclusive_time': 14.457}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 44, 'cpu': 203.63503680512608, 'rss': 352071680, 'vms': 757211136, 'uss': 347738112, 'wall_time': 10.69713091199992, 'exclusive_time': 8.008}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 45, 'cpu': 265.5085638600157, 'rss': 438292480, 'vms': 730664960, 'uss': 433999872, 'wall_time': 6.702656675000071, 'exclusive_time': 4.023}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 45, 'cpu': 99.29811564274634, 'rss': 15413248, 'vms': 10756096, 'uss': 11497472, 'wall_time': 16.04161543200007, 'exclusive_time': 14.656}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 45, 'cpu': 181.3097438087391, 'rss': 342413312, 'vms': 746094592, 'uss': 338067456, 'wall_time': 10.619835686999977, 'exclusive_time': 7.851}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 1, 'cpu': 193.0294444444444, 'rss': 106254336, 'vms': 293765120, 'uss': 102346752, 'wall_time': 2.181277868, 'exclusive_time': 0.239}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 1, 'cpu': 92.93661616161616, 'rss': 12881920, 'vms': 8613888, 'uss': 9543680, 'wall_time': 1.2128510759999998, 'exclusive_time': 0.375}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 1, 'cpu': 224.52850378787875, 'rss': 146591744, 'vms': 307617792, 'uss': 139575296, 'wall_time': 3.4210371790000007, 'exclusive_time': 1.376}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 2, 'cpu': 208.7170562770563, 'rss': 130347008, 'vms': 301404160, 'uss': 125673472, 'wall_time': 2.2783067740000007, 'exclusive_time': 0.317}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 2, 'cpu': 94.68603174603174, 'rss': 12922880, 'vms': 8777728, 'uss': 9592832, 'wall_time': 1.5142413830000052, 'exclusive_time': 0.642}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 2, 'cpu': 225.16039886039883, 'rss': 132861952, 'vms': 306409472, 'uss': 128557056, 'wall_time': 3.9191463229999997, 'exclusive_time': 1.693}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 3, 'cpu': 205.25108695652173, 'rss': 127954944, 'vms': 299614208, 'uss': 120213504, 'wall_time': 2.475648976000002, 'exclusive_time': 0.382}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 3, 'cpu': 96.23541666666667, 'rss': 12988416, 'vms': 8822784, 'uss': 9637888, 'wall_time': 1.7186858350000023, 'exclusive_time': 0.842}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 3, 'cpu': 232.9061354877144, 'rss': 139804672, 'vms': 313114624, 'uss': 135483392, 'wall_time': 4.097886766000002, 'exclusive_time': 1.908}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 4, 'cpu': 205.17855555555556, 'rss': 134627328, 'vms': 307671040, 'uss': 130338816, 'wall_time': 2.613990426000001, 'exclusive_time': 0.483}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 4, 'cpu': 96.42406417112299, 'rss': 13889536, 'vms': 9297920, 'uss': 9953280, 'wall_time': 1.8780428700000016, 'exclusive_time': 1.08}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 4, 'cpu': 238.60003663003658, 'rss': 162856960, 'vms': 372645888, 'uss': 158474240, 'wall_time': 4.161905696999995, 'exclusive_time': 2.046}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 5, 'cpu': 213.04941987695608, 'rss': 135061504, 'vms': 305799168, 'uss': 130781184, 'wall_time': 2.592079364, 'exclusive_time': 0.497}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 5, 'cpu': 96.03030303030302, 'rss': 13778944, 'vms': 9129984, 'uss': 9867264, 'wall_time': 2.316800987999997, 'exclusive_time': 1.398}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 5, 'cpu': 241.4948373983739, 'rss': 159195136, 'vms': 380383232, 'uss': 154513408, 'wall_time': 4.272683305000001, 'exclusive_time': 2.133}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 6, 'cpu': 213.91838133131236, 'rss': 149327872, 'vms': 309899264, 'uss': 145027072, 'wall_time': 2.7473938139999916, 'exclusive_time': 0.595}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 6, 'cpu': 94.40284869584438, 'rss': 13864960, 'vms': 9261056, 'uss': 9932800, 'wall_time': 2.722906246000008, 'exclusive_time': 1.793}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 6, 'cpu': 235.48506924315612, 'rss': 177934336, 'vms': 384786432, 'uss': 173486080, 'wall_time': 4.8023050799999965, 'exclusive_time': 2.587}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 7, 'cpu': 223.4095785440613, 'rss': 166719488, 'vms': 319721472, 'uss': 162414592, 'wall_time': 3.087460557000014, 'exclusive_time': 0.79}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 7, 'cpu': 97.87820349084717, 'rss': 14036992, 'vms': 9347072, 'uss': 10084352, 'wall_time': 2.8244003169999985, 'exclusive_time': 1.908}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 7, 'cpu': 252.53791666666666, 'rss': 167022592, 'vms': 387227648, 'uss': 162713600, 'wall_time': 5.110978394, 'exclusive_time': 2.829}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 8, 'cpu': 230.68831541218637, 'rss': 200712192, 'vms': 379359232, 'uss': 190849024, 'wall_time': 3.2843264420000082, 'exclusive_time': 1.023}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 8, 'cpu': 97.3247311827957, 'rss': 14016512, 'vms': 9351168, 'uss': 10063872, 'wall_time': 3.2229743959999837, 'exclusive_time': 2.263}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 8, 'cpu': 246.07574950269967, 'rss': 170717184, 'vms': 386424832, 'uss': 166232064, 'wall_time': 4.954382041000002, 'exclusive_time': 2.657}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 9, 'cpu': 235.5645161290322, 'rss': 201662464, 'vms': 380985344, 'uss': 197365760, 'wall_time': 3.3235695719999967, 'exclusive_time': 1.077}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 9, 'cpu': 98.45558937088349, 'rss': 14254080, 'vms': 9588736, 'uss': 10301440, 'wall_time': 3.5264424220000024, 'exclusive_time': 2.601}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 9, 'cpu': 249.15360734037202, 'rss': 202973184, 'vms': 385757184, 'uss': 196546560, 'wall_time': 5.416121588999999, 'exclusive_time': 3.074}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 10, 'cpu': 236.58656586021505, 'rss': 196014080, 'vms': 374706176, 'uss': 191696896, 'wall_time': 3.2137875880000024, 'exclusive_time': 1.05}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 10, 'cpu': 97.69642142142145, 'rss': 14319616, 'vms': 9703424, 'uss': 10366976, 'wall_time': 3.781800497000006, 'exclusive_time': 2.893}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 10, 'cpu': 236.64426322043968, 'rss': 199372800, 'vms': 482791424, 'uss': 195026944, 'wall_time': 5.415768381999953, 'exclusive_time': 3.171}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 11, 'cpu': 229.5869505869506, 'rss': 190767104, 'vms': 369606656, 'uss': 186470400, 'wall_time': 3.602330190000032, 'exclusive_time': 1.151}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 11, 'cpu': 96.92399802078181, 'rss': 14200832, 'vms': 9633792, 'uss': 10260480, 'wall_time': 4.429262558999994, 'exclusive_time': 3.371}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 11, 'cpu': 229.55714089968615, 'rss': 176955392, 'vms': 381911040, 'uss': 170459136, 'wall_time': 5.409061841999971, 'exclusive_time': 2.969}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 12, 'cpu': 238.3009531287487, 'rss': 180793344, 'vms': 316563456, 'uss': 175796224, 'wall_time': 3.1497373910000306, 'exclusive_time': 1.053}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 12, 'cpu': 98.8321332078931, 'rss': 14139392, 'vms': 9506816, 'uss': 10211328, 'wall_time': 4.827534237999998, 'exclusive_time': 3.884}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 12, 'cpu': 239.30685425685428, 'rss': 214499328, 'vms': 497430528, 'uss': 210194432, 'wall_time': 5.831468857999994, 'exclusive_time': 3.622}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 13, 'cpu': 250.67734657734653, 'rss': 226250752, 'vms': 486883328, 'uss': 221933568, 'wall_time': 3.92076091499996, 'exclusive_time': 1.155}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 13, 'cpu': 98.75556583938936, 'rss': 14376960, 'vms': 9637888, 'uss': 10407936, 'wall_time': 5.233219358999975, 'exclusive_time': 4.271}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 13, 'cpu': 234.3666409165547, 'rss': 221478912, 'vms': 503664640, 'uss': 217145344, 'wall_time': 5.785406825999985, 'exclusive_time': 3.527}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 14, 'cpu': 258.410075865339, 'rss': 228659200, 'vms': 482758656, 'uss': 224370688, 'wall_time': 3.9414613980000013, 'exclusive_time': 1.628}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 14, 'cpu': 98.7774414850686, 'rss': 14360576, 'vms': 9637888, 'uss': 10407936, 'wall_time': 5.78604533500004, 'exclusive_time': 4.779}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 14, 'cpu': 238.15354097144976, 'rss': 221958144, 'vms': 504451072, 'uss': 216035328, 'wall_time': 5.968137092999996, 'exclusive_time': 3.704}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 15, 'cpu': 253.19438339438338, 'rss': 237756416, 'vms': 489918464, 'uss': 233693184, 'wall_time': 4.259887236999987, 'exclusive_time': 1.896}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 15, 'cpu': 98.84846535409035, 'rss': 14499840, 'vms': 9846784, 'uss': 10563584, 'wall_time': 6.436443951000001, 'exclusive_time': 5.418}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 15, 'cpu': 221.31343891402716, 'rss': 221679616, 'vms': 504180736, 'uss': 217341952, 'wall_time': 6.904955502000007, 'exclusive_time': 4.448}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 16, 'cpu': 246.36140059127857, 'rss': 234991616, 'vms': 493625344, 'uss': 230699008, 'wall_time': 4.588811097999951, 'exclusive_time': 2.081}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 16, 'cpu': 98.66074074074072, 'rss': 14532608, 'vms': 9895936, 'uss': 10571776, 'wall_time': 6.938308914000004, 'exclusive_time': 5.898}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 16, 'cpu': 235.8606227106227, 'rss': 237563904, 'vms': 519553024, 'uss': 233377792, 'wall_time': 6.901927592999982, 'exclusive_time': 4.493}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 17, 'cpu': 257.2039488966318, 'rss': 232935424, 'vms': 496275456, 'uss': 228642816, 'wall_time': 4.425712899000018, 'exclusive_time': 1.985}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 17, 'cpu': 98.55549188428934, 'rss': 14544896, 'vms': 9846784, 'uss': 10567680, 'wall_time': 7.361628017000044, 'exclusive_time': 6.327}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 17, 'cpu': 224.28111647644133, 'rss': 215359488, 'vms': 497807360, 'uss': 208883712, 'wall_time': 7.074094864000017, 'exclusive_time': 4.622}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 18, 'cpu': 250.109698535745, 'rss': 252551168, 'vms': 488472576, 'uss': 248229888, 'wall_time': 4.619801002000031, 'exclusive_time': 2.203}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 18, 'cpu': 98.21718106995883, 'rss': 14512128, 'vms': 9895936, 'uss': 10559488, 'wall_time': 8.24596168800008, 'exclusive_time': 7.132}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 18, 'cpu': 212.16260301221942, 'rss': 232357888, 'vms': 493867008, 'uss': 228052992, 'wall_time': 7.2743394220000255, 'exclusive_time': 4.827}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 19, 'cpu': 258.63713845774816, 'rss': 253575168, 'vms': 491290624, 'uss': 249274368, 'wall_time': 4.6236276579999185, 'exclusive_time': 2.252}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 19, 'cpu': 98.61238039790693, 'rss': 14761984, 'vms': 10084352, 'uss': 10801152, 'wall_time': 8.560689842999977, 'exclusive_time': 7.499}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 19, 'cpu': 217.36771457574278, 'rss': 222924800, 'vms': 506015744, 'uss': 218591232, 'wall_time': 7.455700340000021, 'exclusive_time': 4.961}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 20, 'cpu': 261.74405369635093, 'rss': 262205440, 'vms': 453742592, 'uss': 257916928, 'wall_time': 4.406714942999997, 'exclusive_time': 2.125}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 20, 'cpu': 98.6405831363278, 'rss': 14737408, 'vms': 10043392, 'uss': 10801152, 'wall_time': 9.143972736000023, 'exclusive_time': 8.014}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 20, 'cpu': 211.38376265634307, 'rss': 232833024, 'vms': 498192384, 'uss': 228499456, 'wall_time': 7.424085605999949, 'exclusive_time': 5.007}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 21, 'cpu': 262.76301758366424, 'rss': 258985984, 'vms': 486932480, 'uss': 254664704, 'wall_time': 4.4609466630000725, 'exclusive_time': 2.169}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 21, 'cpu': 99.33090264903389, 'rss': 14929920, 'vms': 10211328, 'uss': 10952704, 'wall_time': 8.856631088000086, 'exclusive_time': 7.784}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 21, 'cpu': 222.66753518323378, 'rss': 282128384, 'vms': 500994048, 'uss': 277831680, 'wall_time': 7.782993486999999, 'exclusive_time': 5.324}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 22, 'cpu': 256.2606443606949, 'rss': 269594624, 'vms': 490442752, 'uss': 265277440, 'wall_time': 4.678067492999958, 'exclusive_time': 2.284}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 22, 'cpu': 95.17637302300375, 'rss': 14893056, 'vms': 10285056, 'uss': 10940416, 'wall_time': 9.87984896599994, 'exclusive_time': 8.711}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 22, 'cpu': 130.53855421686742, 'rss': 250298368, 'vms': 482807808, 'uss': 246022144, 'wall_time': 9.330833525, 'exclusive_time': 2.432}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 22, 'cpu': 92.60206185567009, 'rss': 14524416, 'vms': 9871360, 'uss': 10616832, 'wall_time': 10.729451083, 'exclusive_time': 9.052}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 22, 'cpu': 193.39367088607594, 'rss': 349184000, 'vms': 754561024, 'uss': 344899584, 'wall_time': 8.588429068, 'exclusive_time': 5.826}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 23, 'cpu': 265.6424999999999, 'rss': 250793984, 'vms': 487686144, 'uss': 246513664, 'wall_time': 4.590537564000002, 'exclusive_time': 2.298}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 23, 'cpu': 98.87608695652172, 'rss': 14716928, 'vms': 10072064, 'uss': 10809344, 'wall_time': 10.141251622999995, 'exclusive_time': 9.054}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 23, 'cpu': 207.68441558441555, 'rss': 327938048, 'vms': 733077504, 'uss': 323665920, 'wall_time': 8.556527079000006, 'exclusive_time': 6.139}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 24, 'cpu': 259.6701754385965, 'rss': 339697664, 'vms': 707981312, 'uss': 335400960, 'wall_time': 6.526825918, 'exclusive_time': 3.908}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 24, 'cpu': 99.5157894736842, 'rss': 14659584, 'vms': 9928704, 'uss': 10731520, 'wall_time': 10.475248381, 'exclusive_time': 9.42}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 24, 'cpu': 206.038961038961, 'rss': 323080192, 'vms': 635494400, 'uss': 318742528, 'wall_time': 8.492851583999993, 'exclusive_time': 6.036}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 25, 'cpu': 256.9644444444444, 'rss': 271425536, 'vms': 494260224, 'uss': 267145216, 'wall_time': 5.106478543000009, 'exclusive_time': 2.663}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 25, 'cpu': 98.82499999999993, 'rss': 14139392, 'vms': 10072064, 'uss': 10833920, 'wall_time': 10.911932689000011, 'exclusive_time': 9.839}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 25, 'cpu': 247.01518987341768, 'rss': 346169344, 'vms': 751583232, 'uss': 341864448, 'wall_time': 8.732905477999992, 'exclusive_time': 6.372}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 26, 'cpu': 270.9181818181818, 'rss': 331640832, 'vms': 715857920, 'uss': 327348224, 'wall_time': 6.166360114, 'exclusive_time': 3.846}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 26, 'cpu': 99.50761904761896, 'rss': 14872576, 'vms': 10182656, 'uss': 10919936, 'wall_time': 11.486316029000008, 'exclusive_time': 10.395}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 26, 'cpu': 212.20533333333324, 'rss': 329052160, 'vms': 734724096, 'uss': 324812800, 'wall_time': 8.242932313000011, 'exclusive_time': 5.828}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 27, 'cpu': 272.9847826086957, 'rss': 336023552, 'vms': 566452224, 'uss': 331735040, 'wall_time': 5.173139933999977, 'exclusive_time': 2.695}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 27, 'cpu': 99.19999999999989, 'rss': 14868480, 'vms': 10182656, 'uss': 10915840, 'wall_time': 12.273402910000016, 'exclusive_time': 11.044}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 27, 'cpu': 206.32962962962964, 'rss': 347533312, 'vms': 752930816, 'uss': 343269376, 'wall_time': 8.873812200999993, 'exclusive_time': 6.357}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 28, 'cpu': 270.3787234042554, 'rss': 353505280, 'vms': 581169152, 'uss': 349200384, 'wall_time': 5.167706502999977, 'exclusive_time': 2.749}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 28, 'cpu': 98.25726495726482, 'rss': 14962688, 'vms': 10289152, 'uss': 11014144, 'wall_time': 12.799912749000015, 'exclusive_time': 11.612}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 28, 'cpu': 197.47619047619048, 'rss': 326373376, 'vms': 642289664, 'uss': 322478080, 'wall_time': 9.180193330000009, 'exclusive_time': 6.727}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 29, 'cpu': 261.72857142857146, 'rss': 340750336, 'vms': 725143552, 'uss': 336441344, 'wall_time': 6.390341858000028, 'exclusive_time': 3.895}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 29, 'cpu': 99.236440677966, 'rss': 15044608, 'vms': 10428416, 'uss': 11108352, 'wall_time': 12.875673011000003, 'exclusive_time': 11.712}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 29, 'cpu': 199.0488095238095, 'rss': 330907648, 'vms': 643432448, 'uss': 326610944, 'wall_time': 9.334537560000001, 'exclusive_time': 6.831}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 30, 'cpu': 252.16363636363639, 'rss': 331542528, 'vms': 563998720, 'uss': 327254016, 'wall_time': 5.0579235419999975, 'exclusive_time': 2.356}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 30, 'cpu': 99.02016806722675, 'rss': 14950400, 'vms': 10350592, 'uss': 11059200, 'wall_time': 12.964975815999992, 'exclusive_time': 11.813}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 30, 'cpu': 199.07926829268283, 'rss': 325279744, 'vms': 634626048, 'uss': 320974848, 'wall_time': 9.109888482999992, 'exclusive_time': 6.632}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 31, 'cpu': 278.1471698113207, 'rss': 338817024, 'vms': 729309184, 'uss': 334520320, 'wall_time': 5.993078018000006, 'exclusive_time': 3.577}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 31, 'cpu': 99.24492753623167, 'rss': 15122432, 'vms': 10555392, 'uss': 11235328, 'wall_time': 15.083180546000051, 'exclusive_time': 13.888}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 31, 'cpu': 201.32068965517243, 'rss': 343752704, 'vms': 747155456, 'uss': 339456000, 'wall_time': 9.590591791000008, 'exclusive_time': 7.093}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 32, 'cpu': 255.33529411764698, 'rss': 359706624, 'vms': 699543552, 'uss': 355414016, 'wall_time': 5.840916051999955, 'exclusive_time': 3.451}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 32, 'cpu': 99.19101796407162, 'rss': 15167488, 'vms': 10559488, 'uss': 11235328, 'wall_time': 18.27020401499999, 'exclusive_time': 17.05}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 32, 'cpu': 184.91717171717167, 'rss': 378150912, 'vms': 736079872, 'uss': 373866496, 'wall_time': 10.859194403999993, 'exclusive_time': 8.332}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 33, 'cpu': 276.7767857142857, 'rss': 383262720, 'vms': 709328896, 'uss': 379060224, 'wall_time': 6.439438639999992, 'exclusive_time': 3.977}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 33, 'cpu': 99.17182320441968, 'rss': 15097856, 'vms': 10366976, 'uss': 11169792, 'wall_time': 19.680674289000024, 'exclusive_time': 18.4}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 33, 'cpu': 187.6774509803921, 'rss': 447815680, 'vms': 745766912, 'uss': 443580416, 'wall_time': 11.211823697, 'exclusive_time': 8.696}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 34, 'cpu': 252.83921568627449, 'rss': 358912000, 'vms': 694104064, 'uss': 354648064, 'wall_time': 5.813156309000021, 'exclusive_time': 3.445}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 34, 'cpu': 99.15284090909067, 'rss': 15261696, 'vms': 10629120, 'uss': 11309056, 'wall_time': 19.296241200999987, 'exclusive_time': 18.05}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 34, 'cpu': 175.97547169811318, 'rss': 457056256, 'vms': 742715392, 'uss': 454074368, 'wall_time': 11.670063416999994, 'exclusive_time': 9.028}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 35, 'cpu': 288.3693548387097, 'rss': 435974144, 'vms': 729677824, 'uss': 431677440, 'wall_time': 6.961405636999984, 'exclusive_time': 4.468}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 35, 'cpu': 99.34239130434761, 'rss': 15228928, 'vms': 10665984, 'uss': 11321344, 'wall_time': 20.171352403000014, 'exclusive_time': 18.927}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 35, 'cpu': 196.33113207547183, 'rss': 469180416, 'vms': 746500096, 'uss': 464982016, 'wall_time': 11.685263539999994, 'exclusive_time': 9.133}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 36, 'cpu': 273.52075471698106, 'rss': 376774656, 'vms': 705437696, 'uss': 371298304, 'wall_time': 6.069824622999988, 'exclusive_time': 3.665}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 36, 'cpu': 99.74676616915404, 'rss': 14819328, 'vms': 10682368, 'uss': 11374592, 'wall_time': 22.04873477999996, 'exclusive_time': 20.732}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 36, 'cpu': 192.0447368421052, 'rss': 462024704, 'vms': 656429056, 'uss': 457789440, 'wall_time': 12.659313312999984, 'exclusive_time': 9.801}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 37, 'cpu': 287.9070175438596, 'rss': 448299008, 'vms': 742522880, 'uss': 444067840, 'wall_time': 6.570443834999992, 'exclusive_time': 4.055}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 37, 'cpu': 99.44717948717933, 'rss': 15421440, 'vms': 10874880, 'uss': 11526144, 'wall_time': 21.112058046000016, 'exclusive_time': 19.817}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 37, 'cpu': 179.1398230088496, 'rss': 325750784, 'vms': 634634240, 'uss': 321851392, 'wall_time': 12.373573554000018, 'exclusive_time': 9.815}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 38, 'cpu': 290.40862068965527, 'rss': 381718528, 'vms': 710258688, 'uss': 377466880, 'wall_time': 6.529611515999932, 'exclusive_time': 4.06}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 38, 'cpu': 99.67611940298487, 'rss': 15507456, 'vms': 10924032, 'uss': 11599872, 'wall_time': 21.77268355000001, 'exclusive_time': 20.526}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 38, 'cpu': 180.79444444444448, 'rss': 558260224, 'vms': 736837632, 'uss': 554004480, 'wall_time': 11.869002621999925, 'exclusive_time': 9.218}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 39, 'cpu': 259.3094339622642, 'rss': 420261888, 'vms': 666333184, 'uss': 416026624, 'wall_time': 6.029195532000017, 'exclusive_time': 3.583}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 39, 'cpu': 99.75560975609739, 'rss': 15491072, 'vms': 10858496, 'uss': 11542528, 'wall_time': 22.35163220300001, 'exclusive_time': 21.131}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 39, 'cpu': 199.91891891891896, 'rss': 545402880, 'vms': 758439936, 'uss': 542224384, 'wall_time': 12.246639769000012, 'exclusive_time': 9.653}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 40, 'cpu': 289.12950819672136, 'rss': 436031488, 'vms': 731103232, 'uss': 431738880, 'wall_time': 7.086582179999937, 'exclusive_time': 4.483}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 40, 'cpu': 99.8962616822428, 'rss': 15491072, 'vms': 10874880, 'uss': 11550720, 'wall_time': 23.419550092999998, 'exclusive_time': 22.133}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 40, 'cpu': 182.37909090909085, 'rss': 471494656, 'vms': 642162688, 'uss': 467185664, 'wall_time': 12.141176879, 'exclusive_time': 9.502}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 41, 'cpu': 285.8155172413793, 'rss': 427089920, 'vms': 715034624, 'uss': 422817792, 'wall_time': 6.687029087000042, 'exclusive_time': 4.284}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 41, 'cpu': 99.49860465116262, 'rss': 15675392, 'vms': 10977280, 'uss': 11726848, 'wall_time': 23.552477654000086, 'exclusive_time': 22.218}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 41, 'cpu': 185.73008849557525, 'rss': 575123456, 'vms': 863887360, 'uss': 571011072, 'wall_time': 12.524009542000044, 'exclusive_time': 9.972}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 42, 'cpu': 264.0796296296296, 'rss': 366419968, 'vms': 700424192, 'uss': 362127360, 'wall_time': 6.153740405999997, 'exclusive_time': 3.621}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 42, 'cpu': 99.7132158590307, 'rss': 15630336, 'vms': 10936320, 'uss': 11706368, 'wall_time': 24.684463815999948, 'exclusive_time': 23.4}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 42, 'cpu': 186.83135593220334, 'rss': 476200960, 'vms': 645771264, 'uss': 471920640, 'wall_time': 12.928992645999983, 'exclusive_time': 10.317}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 43, 'cpu': 257.01509433962264, 'rss': 367906816, 'vms': 707686400, 'uss': 363642880, 'wall_time': 6.0770993230000006, 'exclusive_time': 3.636}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 43, 'cpu': 99.34192139737975, 'rss': 15454208, 'vms': 10866688, 'uss': 11530240, 'wall_time': 25.134538733, 'exclusive_time': 23.785}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 43, 'cpu': 184.4491379310345, 'rss': 570810368, 'vms': 860299264, 'uss': 566550528, 'wall_time': 12.865621993999994, 'exclusive_time': 10.259}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 44, 'cpu': 265.41090909090906, 'rss': 371941376, 'vms': 697901056, 'uss': 367697920, 'wall_time': 6.194556603000002, 'exclusive_time': 3.709}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 44, 'cpu': 99.10970464135006, 'rss': 14811136, 'vms': 10809344, 'uss': 11497472, 'wall_time': 25.893757905, 'exclusive_time': 24.622}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 44, 'cpu': 181.5633333333333, 'rss': 474865664, 'vms': 655028224, 'uss': 470614016, 'wall_time': 13.211442156000004, 'exclusive_time': 10.662}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 45, 'cpu': 280.58983050847445, 'rss': 402698240, 'vms': 707903488, 'uss': 398442496, 'wall_time': 6.6649138200000095, 'exclusive_time': 4.197}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 45, 'cpu': 99.66774193548375, 'rss': 15638528, 'vms': 10989568, 'uss': 11673600, 'wall_time': 27.026885762000006, 'exclusive_time': 25.764}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 45, 'cpu': 183.17, 'rss': 475168768, 'vms': 858251264, 'uss': 470937600, 'wall_time': 13.17301633599999, 'exclusive_time': 10.642}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 1, 'cpu': 193.79312865497076, 'rss': 98549760, 'vms': 277917696, 'uss': 94187520, 'wall_time': 2.006079756, 'exclusive_time': 0.164}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 1, 'cpu': 91.05, 'rss': 12730368, 'vms': 8478720, 'uss': 9392128, 'wall_time': 0.984494056, 'exclusive_time': 0.093}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 1, 'cpu': 220.51166666666666, 'rss': 125968384, 'vms': 306470912, 'uss': 121671680, 'wall_time': 2.7686355890000005, 'exclusive_time': 0.893}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 2, 'cpu': 210.59722222222223, 'rss': 111792128, 'vms': 267743232, 'uss': 107524096, 'wall_time': 2.0729087129999986, 'exclusive_time': 0.188}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 2, 'cpu': 87.43124999999999, 'rss': 12861440, 'vms': 8622080, 'uss': 9523200, 'wall_time': 0.9838330749999997, 'exclusive_time': 0.171}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 2, 'cpu': 227.39444444444442, 'rss': 126545920, 'vms': 307281920, 'uss': 122261504, 'wall_time': 2.9704097350000005, 'exclusive_time': 1.086}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 3, 'cpu': 217.2161842105263, 'rss': 121982976, 'vms': 292511744, 'uss': 117723136, 'wall_time': 2.123380218000001, 'exclusive_time': 0.304}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 3, 'cpu': 95.57692307692307, 'rss': 12963840, 'vms': 8859648, 'uss': 9629696, 'wall_time': 1.5234912119999997, 'exclusive_time': 0.749}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 3, 'cpu': 244.48194444444437, 'rss': 147742720, 'vms': 307466240, 'uss': 143474688, 'wall_time': 3.7822382199999964, 'exclusive_time': 1.796}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 4, 'cpu': 226.58249999999998, 'rss': 130740224, 'vms': 303894528, 'uss': 124035072, 'wall_time': 2.304648802999999, 'exclusive_time': 0.397}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 4, 'cpu': 97.2916666666667, 'rss': 13783040, 'vms': 9109504, 'uss': 9846784, 'wall_time': 2.953169510000002, 'exclusive_time': 2.187}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 4, 'cpu': 254.71733615221981, 'rss': 218087424, 'vms': 499843072, 'uss': 213778432, 'wall_time': 4.7959287859999975, 'exclusive_time': 2.853}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 5, 'cpu': 230.3318181818182, 'rss': 143732736, 'vms': 305451008, 'uss': 139796480, 'wall_time': 2.4979064040000054, 'exclusive_time': 0.48}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 5, 'cpu': 98.6742424242425, 'rss': 13950976, 'vms': 9347072, 'uss': 10002432, 'wall_time': 3.70165665399999, 'exclusive_time': 2.887}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 5, 'cpu': 259.1238601823708, 'rss': 216973312, 'vms': 499552256, 'uss': 212688896, 'wall_time': 5.182039485000004, 'exclusive_time': 3.17}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 6, 'cpu': 229.5086956521739, 'rss': 156483584, 'vms': 308711424, 'uss': 152059904, 'wall_time': 2.616777978000002, 'exclusive_time': 0.59}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 6, 'cpu': 99.27609188882593, 'rss': 13934592, 'vms': 9252864, 'uss': 9998336, 'wall_time': 4.592576688000008, 'exclusive_time': 3.76}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 6, 'cpu': 248.14987770789656, 'rss': 209113088, 'vms': 484392960, 'uss': 199122944, 'wall_time': 5.8672160679999905, 'exclusive_time': 3.812}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 7, 'cpu': 244.75699999999995, 'rss': 174141440, 'vms': 317267968, 'uss': 169873408, 'wall_time': 2.867395357999996, 'exclusive_time': 0.823}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 7, 'cpu': 98.21415094339628, 'rss': 14147584, 'vms': 9453568, 'uss': 10244096, 'wall_time': 5.89467341000001, 'exclusive_time': 4.952}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 7, 'cpu': 235.2842672413793, 'rss': 226074624, 'vms': 507641856, 'uss': 220102656, 'wall_time': 6.152270419000018, 'exclusive_time': 4.116}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 8, 'cpu': 242.0711538461538, 'rss': 193568768, 'vms': 372195328, 'uss': 189300736, 'wall_time': 2.9437716570000134, 'exclusive_time': 0.899}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 8, 'cpu': 99.2145628078818, 'rss': 14118912, 'vms': 9482240, 'uss': 10231808, 'wall_time': 6.218485293000015, 'exclusive_time': 5.359}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 8, 'cpu': 245.65078125, 'rss': 254423040, 'vms': 518369280, 'uss': 250171392, 'wall_time': 7.028619555999995, 'exclusive_time': 4.896}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 9, 'cpu': 241.42863756613752, 'rss': 195313664, 'vms': 374865920, 'uss': 191049728, 'wall_time': 3.028161802999989, 'exclusive_time': 0.964}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 9, 'cpu': 99.42043269230771, 'rss': 14249984, 'vms': 9613312, 'uss': 10330112, 'wall_time': 7.017804477999988, 'exclusive_time': 6.104}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 9, 'cpu': 236.4951331967213, 'rss': 230051840, 'vms': 499372032, 'uss': 225738752, 'wall_time': 6.701480782999994, 'exclusive_time': 4.565}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 10, 'cpu': 247.98916256157634, 'rss': 196653056, 'vms': 376770560, 'uss': 192401408, 'wall_time': 3.158620333000016, 'exclusive_time': 1.06}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 10, 'cpu': 99.11381578947368, 'rss': 14237696, 'vms': 9588736, 'uss': 10301440, 'wall_time': 8.26245641700001, 'exclusive_time': 7.36}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 10, 'cpu': 219.7292226890756, 'rss': 329347072, 'vms': 736718848, 'uss': 325066752, 'wall_time': 7.42496447100001, 'exclusive_time': 5.181}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 11, 'cpu': 264.27575757575755, 'rss': 221675520, 'vms': 483270656, 'uss': 217411584, 'wall_time': 3.703622987999978, 'exclusive_time': 1.589}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 11, 'cpu': 98.84778208441, 'rss': 14389248, 'vms': 9773056, 'uss': 10452992, 'wall_time': 8.855065835999994, 'exclusive_time': 7.932}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 11, 'cpu': 214.6764682539682, 'rss': 329031680, 'vms': 737292288, 'uss': 324722688, 'wall_time': 7.656243877999998, 'exclusive_time': 5.448}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 12, 'cpu': 263.9026315789473, 'rss': 232493056, 'vms': 497180672, 'uss': 228229120, 'wall_time': 4.170745160000024, 'exclusive_time': 1.943}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 12, 'cpu': 99.28845171180372, 'rss': 14385152, 'vms': 9740288, 'uss': 10420224, 'wall_time': 10.424092933999987, 'exclusive_time': 9.423}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 12, 'cpu': 209.55036166365272, 'rss': 337022976, 'vms': 743550976, 'uss': 332742656, 'wall_time': 8.460823065999989, 'exclusive_time': 6.145}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 13, 'cpu': 267.8816541353383, 'rss': 231686144, 'vms': 496713728, 'uss': 227389440, 'wall_time': 3.910685471000022, 'exclusive_time': 1.793}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 13, 'cpu': 99.364477783243, 'rss': 14548992, 'vms': 9891840, 'uss': 10600448, 'wall_time': 11.60355591199999, 'exclusive_time': 10.565}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 13, 'cpu': 204.50588235294111, 'rss': 342044672, 'vms': 749232128, 'uss': 337768448, 'wall_time': 9.309909783000023, 'exclusive_time': 6.95}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 14, 'cpu': 270.4789575289575, 'rss': 246661120, 'vms': 489361408, 'uss': 242364416, 'wall_time': 4.022402034000038, 'exclusive_time': 1.858}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 14, 'cpu': 99.6739037050293, 'rss': 14786560, 'vms': 10104832, 'uss': 10870784, 'wall_time': 16.148743721000017, 'exclusive_time': 15.115}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 14, 'cpu': 187.4120660635388, 'rss': 399028224, 'vms': 739872768, 'uss': 395149312, 'wall_time': 10.693851897999991, 'exclusive_time': 8.348}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 15, 'cpu': 274.7241758241758, 'rss': 336658432, 'vms': 602841088, 'uss': 332361728, 'wall_time': 4.455462425000007, 'exclusive_time': 2.264}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 15, 'cpu': 99.30088305657172, 'rss': 14880768, 'vms': 10260480, 'uss': 10956800, 'wall_time': 22.295539672000018, 'exclusive_time': 21.169}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 15, 'cpu': 192.51054336329983, 'rss': 570241024, 'vms': 763318272, 'uss': 566034432, 'wall_time': 13.53140930699999, 'exclusive_time': 11.131}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 16, 'cpu': 266.8416166466586, 'rss': 335368192, 'vms': 725618688, 'uss': 331108352, 'wall_time': 5.461878290000072, 'exclusive_time': 3.161}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 16, 'cpu': 99.51743318707604, 'rss': 14958592, 'vms': 10366976, 'uss': 11038720, 'wall_time': 23.748931218000052, 'exclusive_time': 22.612}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 16, 'cpu': 169.37210069444438, 'rss': 574578688, 'vms': 737869824, 'uss': 570290176, 'wall_time': 14.078434965000042, 'exclusive_time': 11.682}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 17, 'cpu': 273.03978260869565, 'rss': 340377600, 'vms': 723845120, 'uss': 337195008, 'wall_time': 5.2087645230000135, 'exclusive_time': 2.799}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 17, 'cpu': 99.52527930402923, 'rss': 15155200, 'vms': 10547200, 'uss': 11218944, 'wall_time': 29.67520275200002, 'exclusive_time': 28.562}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 17, 'cpu': 163.5963965718738, 'rss': 576774144, 'vms': 865939456, 'uss': 573542400, 'wall_time': 16.745362018000037, 'exclusive_time': 14.29}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 18, 'cpu': 268.0160317460318, 'rss': 340160512, 'vms': 575315968, 'uss': 335863808, 'wall_time': 4.785329149000063, 'exclusive_time': 2.463}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 18, 'cpu': 99.54451245140268, 'rss': 15286272, 'vms': 10620928, 'uss': 11317248, 'wall_time': 33.39615145799996, 'exclusive_time': 32.114}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 18, 'cpu': 169.87292532581898, 'rss': 579444736, 'vms': 751792128, 'uss': 575111168, 'wall_time': 18.358323599000073, 'exclusive_time': 15.761}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 19, 'cpu': 275.00530844155844, 'rss': 370655232, 'vms': 731529216, 'uss': 366436352, 'wall_time': 6.198469728999953, 'exclusive_time': 3.82}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 19, 'cpu': 99.54669398587217, 'rss': 15458304, 'vms': 10805248, 'uss': 11468800, 'wall_time': 37.986702211999955, 'exclusive_time': 36.775}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 19, 'cpu': 155.12171100164204, 'rss': 479629312, 'vms': 639528960, 'uss': 475320320, 'wall_time': 19.082160982999994, 'exclusive_time': 16.54}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 20, 'cpu': 274.1350071225071, 'rss': 440119296, 'vms': 729726976, 'uss': 435912704, 'wall_time': 5.850348101999998, 'exclusive_time': 3.482}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 20, 'cpu': 99.52674849467361, 'rss': 15577088, 'vms': 10891264, 'uss': 11603968, 'wall_time': 40.631112425999845, 'exclusive_time': 39.349}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 20, 'cpu': 151.73545375597055, 'rss': 474173440, 'vms': 646545408, 'uss': 469843968, 'wall_time': 20.638911319999806, 'exclusive_time': 18.084}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 21, 'cpu': 282.0015355603448, 'rss': 451727360, 'vms': 742150144, 'uss': 447557632, 'wall_time': 6.831790311000077, 'exclusive_time': 4.315}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 21, 'cpu': 99.42070215854277, 'rss': 15732736, 'vms': 11120640, 'uss': 11816960, 'wall_time': 45.463828014, 'exclusive_time': 44.149}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 21, 'cpu': 153.85110114777623, 'rss': 576897024, 'vms': 866967552, 'uss': 572551168, 'wall_time': 22.52631833500004, 'exclusive_time': 19.78}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 22, 'cpu': 280.560303030303, 'rss': 380858368, 'vms': 714563584, 'uss': 376569856, 'wall_time': 6.200115098000197, 'exclusive_time': 3.767}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 22, 'cpu': 99.76664971981259, 'rss': 15998976, 'vms': 11374592, 'uss': 12046336, 'wall_time': 50.105256241000006, 'exclusive_time': 48.798}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 22, 'cpu': 151.6023913000534, 'rss': 578506752, 'vms': 865419264, 'uss': 574210048, 'wall_time': 26.21761570900003, 'exclusive_time': 23.351}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 23, 'cpu': 258.1048806479114, 'rss': 521359360, 'vms': 835006464, 'uss': 517058560, 'wall_time': 7.857051223000099, 'exclusive_time': 4.991}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 23, 'cpu': 99.79903375715182, 'rss': 16175104, 'vms': 11550720, 'uss': 12267520, 'wall_time': 61.37865622000004, 'exclusive_time': 59.937}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 23, 'cpu': 147.63995901639362, 'rss': 579485696, 'vms': 866250752, 'uss': 575512576, 'wall_time': 28.619975408000073, 'exclusive_time': 25.615}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 24, 'cpu': 258.8275804924242, 'rss': 527765504, 'vms': 844025856, 'uss': 523497472, 'wall_time': 7.537706458999992, 'exclusive_time': 4.743}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 24, 'cpu': 99.78281043602502, 'rss': 16248832, 'vms': 11706368, 'uss': 12320768, 'wall_time': 63.94619574300009, 'exclusive_time': 62.362}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 24, 'cpu': 146.9242276879631, 'rss': 578932736, 'vms': 868036608, 'uss': 574660608, 'wall_time': 30.483271509999895, 'exclusive_time': 27.537}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 25, 'cpu': 278.60987824037716, 'rss': 550883328, 'vms': 865488896, 'uss': 546586624, 'wall_time': 8.03468612200004, 'exclusive_time': 5.167}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 25, 'cpu': 99.85038235677389, 'rss': 16449536, 'vms': 11837440, 'uss': 12517376, 'wall_time': 67.80888069399998, 'exclusive_time': 66.243}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 25, 'cpu': 145.90669039145945, 'rss': 579158016, 'vms': 864358400, 'uss': 575709184, 'wall_time': 32.58154177099982, 'exclusive_time': 29.657}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 26, 'cpu': 265.304794520548, 'rss': 540086272, 'vms': 851247104, 'uss': 535793664, 'wall_time': 8.109167901999626, 'exclusive_time': 5.287}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 26, 'cpu': 99.8382181997948, 'rss': 16596992, 'vms': 12005376, 'uss': 12648448, 'wall_time': 74.35970662800037, 'exclusive_time': 72.734}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 26, 'cpu': 144.92223230490072, 'rss': 580886528, 'vms': 862867456, 'uss': 576622592, 'wall_time': 33.92188990800014, 'exclusive_time': 30.964}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 27, 'cpu': 256.5674729536639, 'rss': 528728064, 'vms': 835178496, 'uss': 524484608, 'wall_time': 8.26689373499994, 'exclusive_time': 5.363}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 27, 'cpu': 99.91064503401836, 'rss': 16728064, 'vms': 12107776, 'uss': 12783616, 'wall_time': 76.56447448599965, 'exclusive_time': 74.845}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 27, 'cpu': 138.49304994313678, 'rss': 583516160, 'vms': 862924800, 'uss': 579248128, 'wall_time': 31.641473172000133, 'exclusive_time': 28.702}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 28, 'cpu': 277.62405128205125, 'rss': 624173056, 'vms': 972398592, 'uss': 619917312, 'wall_time': 8.858814817000166, 'exclusive_time': 6.057}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 28, 'cpu': 99.71815947833915, 'rss': 16834560, 'vms': 12156928, 'uss': 12877824, 'wall_time': 69.53076640100016, 'exclusive_time': 67.915}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 28, 'cpu': 141.20998715441377, 'rss': 580751360, 'vms': 865665024, 'uss': 576499712, 'wall_time': 31.742142605000026, 'exclusive_time': 29.155}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 29, 'cpu': 279.32435897435903, 'rss': 734613504, 'vms': 1103708160, 'uss': 730316800, 'wall_time': 9.274321834000148, 'exclusive_time': 6.435}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 29, 'cpu': 99.81473621723784, 'rss': 17035264, 'vms': 12472320, 'uss': 13082624, 'wall_time': 76.77030049999985, 'exclusive_time': 75.175}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 29, 'cpu': 142.61565339689736, 'rss': 576901120, 'vms': 761724928, 'uss': 572592128, 'wall_time': 35.413757593000355, 'exclusive_time': 32.604}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 30, 'cpu': 279.232513368984, 'rss': 765001728, 'vms': 1093246976, 'uss': 760676352, 'wall_time': 9.319670124999902, 'exclusive_time': 6.552}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 30, 'cpu': 99.87525097387723, 'rss': 17088512, 'vms': 12496896, 'uss': 13168640, 'wall_time': 81.37169906400004, 'exclusive_time': 79.778}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 30, 'cpu': 136.6342334421451, 'rss': 584626176, 'vms': 864038912, 'uss': 580345856, 'wall_time': 35.441804591000164, 'exclusive_time': 32.692}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 31, 'cpu': 278.6315336349045, 'rss': 763637760, 'vms': 1096212480, 'uss': 759345152, 'wall_time': 9.266168757000287, 'exclusive_time': 6.438}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 31, 'cpu': 99.78040391841185, 'rss': 17252352, 'vms': 12656640, 'uss': 13312000, 'wall_time': 88.10713610499988, 'exclusive_time': 86.507}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 31, 'cpu': 136.75857405281346, 'rss': 580489216, 'vms': 863485952, 'uss': 576221184, 'wall_time': 35.95453055400003, 'exclusive_time': 33.222}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 32, 'cpu': 272.18878289473685, 'rss': 762982400, 'vms': 1088856064, 'uss': 758722560, 'wall_time': 8.993605631000264, 'exclusive_time': 6.188}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 32, 'cpu': 99.89715217272249, 'rss': 17399808, 'vms': 12779520, 'uss': 13451264, 'wall_time': 91.40208221300009, 'exclusive_time': 89.64}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 32, 'cpu': 134.65193968448312, 'rss': 581689344, 'vms': 870162432, 'uss': 577474560, 'wall_time': 37.60196770099992, 'exclusive_time': 34.94}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 33, 'cpu': 272.15459770114956, 'rss': 774057984, 'vms': 1085898752, 'uss': 769757184, 'wall_time': 9.395673676000115, 'exclusive_time': 6.549}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 33, 'cpu': 99.08141698589765, 'rss': 17584128, 'vms': 12947456, 'uss': 13635584, 'wall_time': 104.9455494179997, 'exclusive_time': 103.114}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 33, 'cpu': 129.64024056400422, 'rss': 580583424, 'vms': 865755136, 'uss': 576593920, 'wall_time': 44.03371248199983, 'exclusive_time': 40.923}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 34, 'cpu': 275.4493979424832, 'rss': 770560000, 'vms': 1097265152, 'uss': 766296064, 'wall_time': 10.902708263999557, 'exclusive_time': 7.97}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 34, 'cpu': 99.43280291417682, 'rss': 17526784, 'vms': 12931072, 'uss': 13606912, 'wall_time': 113.1636258110002, 'exclusive_time': 111.225}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 34, 'cpu': 126.90849584899794, 'rss': 581677056, 'vms': 868114432, 'uss': 577384448, 'wall_time': 44.4548629990004, 'exclusive_time': 41.476}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 35, 'cpu': 277.0041582707456, 'rss': 969367552, 'vms': 1337556992, 'uss': 965103616, 'wall_time': 12.787848009999834, 'exclusive_time': 9.658}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 35, 'cpu': 99.67578897902663, 'rss': 17760256, 'vms': 13180928, 'uss': 13819904, 'wall_time': 112.74803476499983, 'exclusive_time': 110.836}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 35, 'cpu': 131.3496511627914, 'rss': 580268032, 'vms': 866410496, 'uss': 576700416, 'wall_time': 47.27043948699975, 'exclusive_time': 44.485}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 36, 'cpu': 282.54463297341454, 'rss': 957968384, 'vms': 1324232704, 'uss': 953708544, 'wall_time': 12.67756821400053, 'exclusive_time': 9.587}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 36, 'cpu': 99.63550336896624, 'rss': 17842176, 'vms': 13250560, 'uss': 13889536, 'wall_time': 119.19453706200056, 'exclusive_time': 117.253}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 36, 'cpu': 128.6765927876534, 'rss': 579514368, 'vms': 866545664, 'uss': 575201280, 'wall_time': 48.73391185000037, 'exclusive_time': 45.866}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 37, 'cpu': 291.77029291979966, 'rss': 955224064, 'vms': 1320693760, 'uss': 950923264, 'wall_time': 13.341333501000008, 'exclusive_time': 10.272}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 37, 'cpu': 99.37449275480832, 'rss': 18051072, 'vms': 13479936, 'uss': 14098432, 'wall_time': 130.32018063800024, 'exclusive_time': 128.326}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 37, 'cpu': 125.4259944008967, 'rss': 583516160, 'vms': 865988608, 'uss': 575938560, 'wall_time': 51.96967693999977, 'exclusive_time': 48.857}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 38, 'cpu': 280.2534942148761, 'rss': 869736448, 'vms': 1254432768, 'uss': 865423360, 'wall_time': 14.478641710000375, 'exclusive_time': 11.284}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 38, 'cpu': 99.62115910162372, 'rss': 18595840, 'vms': 14020608, 'uss': 14630912, 'wall_time': 135.89449753999997, 'exclusive_time': 133.816}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 38, 'cpu': 126.23053242047902, 'rss': 484421632, 'vms': 866816000, 'uss': 480133120, 'wall_time': 55.312574714999755, 'exclusive_time': 52.302}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 39, 'cpu': 276.33709109730864, 'rss': 1043783680, 'vms': 1332654080, 'uss': 1039486976, 'wall_time': 14.021298933000253, 'exclusive_time': 10.722}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 39, 'cpu': 99.68879311396628, 'rss': 18710528, 'vms': 14180352, 'uss': 14794752, 'wall_time': 140.56110020899996, 'exclusive_time': 138.446}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 39, 'cpu': 125.50422348484943, 'rss': 481099776, 'vms': 655286272, 'uss': 475185152, 'wall_time': 57.802696880999974, 'exclusive_time': 54.57}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 40, 'cpu': 283.78167636171355, 'rss': 1061302272, 'vms': 1326669824, 'uss': 1057165312, 'wall_time': 15.00644371099952, 'exclusive_time': 11.165}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 40, 'cpu': 99.85215142638228, 'rss': 18845696, 'vms': 14319616, 'uss': 14913536, 'wall_time': 166.511985352, 'exclusive_time': 164.321}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 40, 'cpu': 126.45027405567023, 'rss': 701890560, 'vms': 867688448, 'uss': 697606144, 'wall_time': 69.34776304600018, 'exclusive_time': 65.832}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 41, 'cpu': 272.0687500000001, 'rss': 1071493120, 'vms': 1318916096, 'uss': 1067200512, 'wall_time': 16.888536985000428, 'exclusive_time': 13.0}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 41, 'cpu': 99.66161585542349, 'rss': 18780160, 'vms': 14266368, 'uss': 14876672, 'wall_time': 164.3510957970002, 'exclusive_time': 162.211}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 41, 'cpu': 125.05040433400548, 'rss': 588320768, 'vms': 870002688, 'uss': 584085504, 'wall_time': 61.66964914200071, 'exclusive_time': 58.398}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 42, 'cpu': 282.98572567783094, 'rss': 1049772032, 'vms': 1236017152, 'uss': 1045532672, 'wall_time': 16.050585821000823, 'exclusive_time': 12.645}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 42, 'cpu': 99.628469699409, 'rss': 19066880, 'vms': 14532608, 'uss': 15167488, 'wall_time': 173.3036321720001, 'exclusive_time': 171.192}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 42, 'cpu': 121.41028878432952, 'rss': 588845056, 'vms': 867721216, 'uss': 584736768, 'wall_time': 67.45884891599962, 'exclusive_time': 64.28}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 43, 'cpu': 267.35555322165646, 'rss': 1060237312, 'vms': 1305968640, 'uss': 1055973376, 'wall_time': 17.41670342799989, 'exclusive_time': 13.656}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 43, 'cpu': 99.41291854084047, 'rss': 19173376, 'vms': 14626816, 'uss': 15208448, 'wall_time': 180.888755846001, 'exclusive_time': 178.579}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 43, 'cpu': 124.02714175693816, 'rss': 584622080, 'vms': 867082240, 'uss': 580308992, 'wall_time': 68.37150707100045, 'exclusive_time': 65.147}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 44, 'cpu': 278.1533818493151, 'rss': 1122840576, 'vms': 1498263552, 'uss': 1119129600, 'wall_time': 17.777737392001654, 'exclusive_time': 14.117}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 44, 'cpu': 99.00859038326396, 'rss': 19308544, 'vms': 14794752, 'uss': 15388672, 'wall_time': 185.22516594100125, 'exclusive_time': 182.914}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 44, 'cpu': 119.63377843509153, 'rss': 701853696, 'vms': 867323904, 'uss': 697589760, 'wall_time': 73.023222763999, 'exclusive_time': 69.679}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 45, 'cpu': 275.8530530236206, 'rss': 1146466304, 'vms': 1482629120, 'uss': 1142173696, 'wall_time': 22.204856770000333, 'exclusive_time': 18.4}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 45, 'cpu': 99.64511052615981, 'rss': 19443712, 'vms': 14811136, 'uss': 15495168, 'wall_time': 190.6348325830004, 'exclusive_time': 188.404}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 45, 'cpu': 122.97949750440145, 'rss': 706428928, 'vms': 866181120, 'uss': 702251008, 'wall_time': 71.36109161100103, 'exclusive_time': 67.9}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 1, 'cpu': 258.6333333333334, 'rss': 475238400, 'vms': 842412032, 'uss': 470999040, 'wall_time': 6.974151387}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 1, 'cpu': 267.1294117647059, 'rss': 416595968, 'vms': 791412736, 'uss': 412372992, 'wall_time': 6.205484532}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 2, 'cpu': 274.6704918032787, 'rss': 489635840, 'vms': 853450752, 'uss': 485408768, 'wall_time': 7.712029123999999}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 3, 'cpu': 280.71624999999995, 'rss': 670015488, 'vms': 1029967872, 'uss': 665944064, 'wall_time': 10.294971023000002}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 4, 'cpu': 295.97111111111116, 'rss': 747466752, 'vms': 1075687424, 'uss': 744108032, 'wall_time': 11.815743075999997}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 5, 'cpu': 275.6117647058825, 'rss': 756568064, 'vms': 1071251456, 'uss': 752386048, 'wall_time': 13.459060448999999}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 6, 'cpu': 269.937837837838, 'rss': 993148928, 'vms': 1127284736, 'uss': 988950528, 'wall_time': 14.618570394999999}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 7, 'cpu': 283.2023622047245, 'rss': 985444352, 'vms': 1111556096, 'uss': 981241856, 'wall_time': 17.104795557000003}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 8, 'cpu': 292.6816901408451, 'rss': 1179361280, 'vms': 1249996800, 'uss': 1175171072, 'wall_time': 19.539062129}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 9, 'cpu': 267.82484076433155, 'rss': 1231618048, 'vms': 1296687104, 'uss': 1227415552, 'wall_time': 21.399303453000016}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 10, 'cpu': 285.53176470588227, 'rss': 1153130496, 'vms': 1257099264, 'uss': 1150414848, 'wall_time': 23.38396507599998}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 11, 'cpu': 286.5136363636364, 'rss': 1276096512, 'vms': 1474547712, 'uss': 1272004608, 'wall_time': 27.760926584999993}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 1, 'cpu': 249.45681818181822, 'rss': 296431616, 'vms': 565014528, 'uss': 292216832, 'wall_time': 5.798176513}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 2, 'cpu': 263.62000000000006, 'rss': 436822016, 'vms': 794152960, 'uss': 432893952, 'wall_time': 6.663749654}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 3, 'cpu': 270.29152542372884, 'rss': 500785152, 'vms': 894504960, 'uss': 496578560, 'wall_time': 7.996318437999999}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 4, 'cpu': 280.41612903225797, 'rss': 501440512, 'vms': 870391808, 'uss': 496844800, 'wall_time': 8.637403229}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 5, 'cpu': 269.8561643835615, 'rss': 608714752, 'vms': 844746752, 'uss': 605999104, 'wall_time': 9.813753294000001}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 6, 'cpu': 278.9670731707317, 'rss': 709750784, 'vms': 975237120, 'uss': 705572864, 'wall_time': 11.242969442000003}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 7, 'cpu': 269.7756521739131, 'rss': 930471936, 'vms': 1195507712, 'uss': 926265344, 'wall_time': 15.785673563000003}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 8, 'cpu': 264.2913043478261, 'rss': 996884480, 'vms': 1240838144, 'uss': 992681984, 'wall_time': 18.876351091000004}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 9, 'cpu': 238.6286713286714, 'rss': 1038958592, 'vms': 1241972736, 'uss': 1034907648, 'wall_time': 19.997566632}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 10, 'cpu': 251.17639751552824, 'rss': 1062338560, 'vms': 1257959424, 'uss': 1058156544, 'wall_time': 22.359717375000017}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 11, 'cpu': 269.9344444444444, 'rss': 1353633792, 'vms': 1421393920, 'uss': 1349423104, 'wall_time': 25.680288838999985}
+{'dataset': 'correct_branching', 'reasoner': 'pellet', 'count': 0, 'cpu': 248.07837837837837, 'rss': 262672384, 'vms': 535547904, 'uss': 258437120, 'wall_time': 4.661399336}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 0, 'cpu': 238.78571428571433, 'rss': 176742400, 'vms': 371118080, 'uss': 172654592, 'wall_time': 4.930766499}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 1, 'cpu': 247.3897435897436, 'rss': 192581632, 'vms': 374415360, 'uss': 188538880, 'wall_time': 5.425949836999999}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 2, 'cpu': 266.6977777777778, 'rss': 294502400, 'vms': 551985152, 'uss': 290443264, 'wall_time': 6.727772494}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 3, 'cpu': 272.11999999999995, 'rss': 709644288, 'vms': 991432704, 'uss': 705458176, 'wall_time': 11.926297426000001}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 4, 'cpu': 221.68525641025647, 'rss': 952803328, 'vms': 1052176384, 'uss': 948588544, 'wall_time': 22.394794811000004}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 5, 'cpu': 243.85148514851508, 'rss': 977256448, 'vms': 1182720000, 'uss': 973062144, 'wall_time': 29.334605955}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 6, 'cpu': 232.1372180451133, 'rss': 1123282944, 'vms': 1186967552, 'uss': 1119084544, 'wall_time': 39.301503158}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 7, 'cpu': 240.721546961326, 'rss': 1435992064, 'vms': 1616269312, 'uss': 1431789568, 'wall_time': 56.651530052}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 8, 'cpu': 254.86999999999986, 'rss': 1390985216, 'vms': 1658486784, 'uss': 1386790912, 'wall_time': 61.01279020499999}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 9, 'cpu': 268.08752783964326, 'rss': 1554788352, 'vms': 1823035392, 'uss': 1550622720, 'wall_time': 74.600677005}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 10, 'cpu': 246.1227191413237, 'rss': 1678954496, 'vms': 2053754880, 'uss': 1674752000, 'wall_time': 92.02702890199998}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 11, 'cpu': 261.3073333333327, 'rss': 1762836480, 'vms': 2183233536, 'uss': 1758597120, 'wall_time': 99.86930306800002}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 1, 'cpu': 255.22857142857143, 'rss': 259616768, 'vms': 535277568, 'uss': 255414272, 'wall_time': 5.510819230999999}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 2, 'cpu': 274.34024390243906, 'rss': 542109696, 'vms': 856723456, 'uss': 538120192, 'wall_time': 11.335198541}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 3, 'cpu': 243.74387096774194, 'rss': 977883136, 'vms': 1108103168, 'uss': 973684736, 'wall_time': 22.313567896}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 4, 'cpu': 221.60878048780503, 'rss': 945901568, 'vms': 1109307392, 'uss': 941588480, 'wall_time': 29.292676397999998}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 5, 'cpu': 243.63915662650606, 'rss': 1273217024, 'vms': 1391620096, 'uss': 1268977664, 'wall_time': 49.73827735500001}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 6, 'cpu': 234.75033860045124, 'rss': 1381371904, 'vms': 1507307520, 'uss': 1377153024, 'wall_time': 69.06305897}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 7, 'cpu': 232.86024734982345, 'rss': 1553395712, 'vms': 1886359552, 'uss': 1549549568, 'wall_time': 91.43757929400002}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 8, 'cpu': 246.53535999999963, 'rss': 1667522560, 'vms': 2022326272, 'uss': 1663324160, 'wall_time': 103.120230176}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 9, 'cpu': 243.1017994858605, 'rss': 1803816960, 'vms': 2226266112, 'uss': 1800372224, 'wall_time': 128.12231229099996}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 10, 'cpu': 249.83083923154567, 'rss': 2062991360, 'vms': 2248122368, 'uss': 2058764288, 'wall_time': 171.43602576900003}
+{'dataset': 'err_loops', 'reasoner': 'pellet', 'count': 11, 'cpu': 254.32809917355257, 'rss': 2061295616, 'vms': 2254655488, 'uss': 2057072640, 'wall_time': 192.30185050299997}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 0, 'cpu': 164.0348484848485, 'rss': 90660864, 'vms': 276942848, 'uss': 86368256, 'wall_time': 2.4887191079999997, 'exclusive_time': 0.174}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 0, 'cpu': 87.46875, 'rss': 12812288, 'vms': 8617984, 'uss': 9474048, 'wall_time': 0.9839151480000012, 'exclusive_time': 0.062}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 0, 'cpu': 198.0473791973792, 'rss': 118169600, 'vms': 298541056, 'uss': 113868800, 'wall_time': 3.691886053000001, 'exclusive_time': 1.227}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 1, 'cpu': 187.2333333333333, 'rss': 104697856, 'vms': 291069952, 'uss': 100532224, 'wall_time': 2.7084198639999997, 'exclusive_time': 0.23}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 1, 'cpu': 91.345, 'rss': 12922880, 'vms': 8646656, 'uss': 9588736, 'wall_time': 1.2033902030000014, 'exclusive_time': 0.171}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 1, 'cpu': 206.80578655578654, 'rss': 128425984, 'vms': 309153792, 'uss': 122974208, 'wall_time': 4.177398939, 'exclusive_time': 1.503}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 2, 'cpu': 200.81669230769228, 'rss': 111661056, 'vms': 298082304, 'uss': 107311104, 'wall_time': 2.828506411999996, 'exclusive_time': 0.325}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 2, 'cpu': 96.83125, 'rss': 12976128, 'vms': 8814592, 'uss': 9641984, 'wall_time': 1.8591675349999974, 'exclusive_time': 0.843}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 2, 'cpu': 236.58074912891988, 'rss': 154607616, 'vms': 365256704, 'uss': 150310912, 'wall_time': 4.5861217409999995, 'exclusive_time': 2.068}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 3, 'cpu': 217.7637464387464, 'rss': 129613824, 'vms': 302174208, 'uss': 125292544, 'wall_time': 3.0042262730000004, 'exclusive_time': 0.499}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 3, 'cpu': 98.36980846774198, 'rss': 13910016, 'vms': 9293824, 'uss': 9969664, 'wall_time': 3.503737499000003, 'exclusive_time': 2.515}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 3, 'cpu': 255.07269480519477, 'rss': 211980288, 'vms': 374292480, 'uss': 208076800, 'wall_time': 6.13844795, 'exclusive_time': 3.571}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 4, 'cpu': 221.04576719576716, 'rss': 130117632, 'vms': 301842432, 'uss': 125820928, 'wall_time': 3.1537364979999865, 'exclusive_time': 0.594}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 4, 'cpu': 97.52804878048786, 'rss': 13860864, 'vms': 9252864, 'uss': 9912320, 'wall_time': 4.537782669000009, 'exclusive_time': 3.461}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 4, 'cpu': 250.89535595105673, 'rss': 218333184, 'vms': 499597312, 'uss': 214048768, 'wall_time': 6.484877796999996, 'exclusive_time': 3.867}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 5, 'cpu': 221.15406249999995, 'rss': 152895488, 'vms': 305418240, 'uss': 148619264, 'wall_time': 3.4280588210000076, 'exclusive_time': 0.805}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 5, 'cpu': 98.48593304843311, 'rss': 13942784, 'vms': 9261056, 'uss': 9998336, 'wall_time': 5.796886793999988, 'exclusive_time': 4.656}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 5, 'cpu': 245.9672799422799, 'rss': 212570112, 'vms': 494026752, 'uss': 208261120, 'wall_time': 7.046390324999976, 'exclusive_time': 4.336}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 6, 'cpu': 230.68841354723702, 'rss': 201678848, 'vms': 380006400, 'uss': 197406720, 'wall_time': 3.853489350000018, 'exclusive_time': 1.139}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 6, 'cpu': 99.52614236509763, 'rss': 13975552, 'vms': 9265152, 'uss': 10018816, 'wall_time': 7.195834109000003, 'exclusive_time': 6.085}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 6, 'cpu': 259.1722751931613, 'rss': 237002752, 'vms': 520728576, 'uss': 232689664, 'wall_time': 8.574828392, 'exclusive_time': 5.856}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 7, 'cpu': 241.77189075630253, 'rss': 189988864, 'vms': 367763456, 'uss': 185696256, 'wall_time': 3.8734140480000008, 'exclusive_time': 1.177}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 7, 'cpu': 98.80776234567904, 'rss': 14106624, 'vms': 9424896, 'uss': 10170368, 'wall_time': 8.813995116000001, 'exclusive_time': 7.626}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 7, 'cpu': 246.21295260523993, 'rss': 253423616, 'vms': 519229440, 'uss': 249151488, 'wall_time': 8.840327373999997, 'exclusive_time': 5.996}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 8, 'cpu': 237.69873015873011, 'rss': 198901760, 'vms': 378372096, 'uss': 194580480, 'wall_time': 3.992199152000012, 'exclusive_time': 1.267}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 8, 'cpu': 98.83850931677017, 'rss': 14327808, 'vms': 9646080, 'uss': 10354688, 'wall_time': 9.282998617000004, 'exclusive_time': 8.081}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 8, 'cpu': 224.38728162650597, 'rss': 277487616, 'vms': 494776320, 'uss': 273309696, 'wall_time': 8.88009371999999, 'exclusive_time': 6.033}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 9, 'cpu': 253.9658536585365, 'rss': 231305216, 'vms': 438562816, 'uss': 227016704, 'wall_time': 4.744348806000005, 'exclusive_time': 1.929}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 9, 'cpu': 99.11427590266868, 'rss': 14266368, 'vms': 9592832, 'uss': 10326016, 'wall_time': 10.811208051999984, 'exclusive_time': 9.575}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 9, 'cpu': 230.23197208876684, 'rss': 347594752, 'vms': 754393088, 'uss': 343302144, 'wall_time': 10.302739627999983, 'exclusive_time': 7.436}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 10, 'cpu': 261.64402748414375, 'rss': 230146048, 'vms': 443133952, 'uss': 225878016, 'wall_time': 5.071770437999987, 'exclusive_time': 2.193}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 10, 'cpu': 99.02299373040739, 'rss': 14499840, 'vms': 9801728, 'uss': 10543104, 'wall_time': 12.127544935999993, 'exclusive_time': 10.851}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 10, 'cpu': 241.7901041666667, 'rss': 357597184, 'vms': 764264448, 'uss': 353255424, 'wall_time': 10.739540694000027, 'exclusive_time': 7.833}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 11, 'cpu': 259.5553830227743, 'rss': 223965184, 'vms': 436129792, 'uss': 219672576, 'wall_time': 4.843223868999985, 'exclusive_time': 2.066}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 11, 'cpu': 99.77907705455047, 'rss': 14422016, 'vms': 9760768, 'uss': 10481664, 'wall_time': 12.882928171000003, 'exclusive_time': 11.669}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 11, 'cpu': 225.76833599149393, 'rss': 347762688, 'vms': 753852416, 'uss': 343420928, 'wall_time': 10.604764536000005, 'exclusive_time': 7.685}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 12, 'cpu': 256.9912349676225, 'rss': 226873344, 'vms': 440963072, 'uss': 222543872, 'wall_time': 5.3782434120000175, 'exclusive_time': 2.497}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 12, 'cpu': 99.3019230769229, 'rss': 14434304, 'vms': 9773056, 'uss': 10489856, 'wall_time': 14.176235260999988, 'exclusive_time': 12.898}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 12, 'cpu': 205.81658333333343, 'rss': 338493440, 'vms': 744628224, 'uss': 334188544, 'wall_time': 10.570084276000046, 'exclusive_time': 7.579}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 13, 'cpu': 262.21401480111, 'rss': 230371328, 'vms': 443789312, 'uss': 226078720, 'wall_time': 5.315990517000046, 'exclusive_time': 2.42}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 13, 'cpu': 99.31560646250281, 'rss': 14528512, 'vms': 9895936, 'uss': 10567680, 'wall_time': 15.745322447000035, 'exclusive_time': 14.417}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 13, 'cpu': 219.24745811119578, 'rss': 353673216, 'vms': 759279616, 'uss': 349360128, 'wall_time': 11.201895788999991, 'exclusive_time': 8.309}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 14, 'cpu': 258.94767156862736, 'rss': 260943872, 'vms': 496099328, 'uss': 256823296, 'wall_time': 5.504287094999995, 'exclusive_time': 2.583}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 14, 'cpu': 99.04292144530744, 'rss': 14626816, 'vms': 9879552, 'uss': 10678272, 'wall_time': 16.789171926999984, 'exclusive_time': 15.398}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 14, 'cpu': 205.53690026954177, 'rss': 342700032, 'vms': 749301760, 'uss': 338386944, 'wall_time': 11.761560696999936, 'exclusive_time': 8.737}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 15, 'cpu': 266.161045751634, 'rss': 251809792, 'vms': 443863040, 'uss': 248008704, 'wall_time': 5.177631478999956, 'exclusive_time': 2.312}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 15, 'cpu': 99.23769721744095, 'rss': 14893056, 'vms': 10240000, 'uss': 10948608, 'wall_time': 18.236895059999938, 'exclusive_time': 16.904}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 15, 'cpu': 211.1649971071989, 'rss': 350179328, 'vms': 755392512, 'uss': 345870336, 'wall_time': 12.330688919999943, 'exclusive_time': 9.267}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 16, 'cpu': 261.45123076923073, 'rss': 270520320, 'vms': 440066048, 'uss': 266244096, 'wall_time': 5.7840579940000225, 'exclusive_time': 2.87}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 16, 'cpu': 99.62953216374243, 'rss': 14925824, 'vms': 10199040, 'uss': 10952704, 'wall_time': 18.571489778, 'exclusive_time': 17.212}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 16, 'cpu': 202.70052010557367, 'rss': 345354240, 'vms': 750407680, 'uss': 341065728, 'wall_time': 12.668483509999987, 'exclusive_time': 9.569}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 17, 'cpu': 268.5812454212454, 'rss': 338210816, 'vms': 741400576, 'uss': 333889536, 'wall_time': 7.412981806999937, 'exclusive_time': 4.403}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 17, 'cpu': 99.39369279176182, 'rss': 15044608, 'vms': 10387456, 'uss': 11104256, 'wall_time': 20.164401109000096, 'exclusive_time': 18.749}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 17, 'cpu': 208.86584473648554, 'rss': 345075712, 'vms': 750538752, 'uss': 340766720, 'wall_time': 13.437121542, 'exclusive_time': 10.36}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 18, 'cpu': 263.6865959498553, 'rss': 343363584, 'vms': 747307008, 'uss': 339075072, 'wall_time': 7.0662832680000065, 'exclusive_time': 4.066}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 18, 'cpu': 99.43619244017387, 'rss': 14970880, 'vms': 10285056, 'uss': 11071488, 'wall_time': 21.562823741999978, 'exclusive_time': 20.141}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 18, 'cpu': 196.5811265969803, 'rss': 342421504, 'vms': 746946560, 'uss': 338092032, 'wall_time': 13.729510683999933, 'exclusive_time': 10.583}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 19, 'cpu': 269.62400744416874, 'rss': 341377024, 'vms': 743739392, 'uss': 337088512, 'wall_time': 7.191099275999932, 'exclusive_time': 4.227}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 19, 'cpu': 99.65045509708719, 'rss': 15028224, 'vms': 10362880, 'uss': 11063296, 'wall_time': 22.62468044100001, 'exclusive_time': 21.155}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 19, 'cpu': 190.7323479674797, 'rss': 376696832, 'vms': 743825408, 'uss': 372670464, 'wall_time': 13.745991245000141, 'exclusive_time': 10.572}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 20, 'cpu': 264.5210144927536, 'rss': 347504640, 'vms': 745803776, 'uss': 343212032, 'wall_time': 8.122854070999892, 'exclusive_time': 5.058}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 20, 'cpu': 99.63872602168459, 'rss': 15192064, 'vms': 10522624, 'uss': 11251712, 'wall_time': 23.705864364000035, 'exclusive_time': 22.203}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 20, 'cpu': 191.38038461538463, 'rss': 438059008, 'vms': 751636480, 'uss': 434040832, 'wall_time': 14.509822141000086, 'exclusive_time': 11.346}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 21, 'cpu': 272.0276817702845, 'rss': 343142400, 'vms': 744902656, 'uss': 339394560, 'wall_time': 7.42539095799998, 'exclusive_time': 4.31}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 21, 'cpu': 99.71901636612714, 'rss': 15183872, 'vms': 10579968, 'uss': 11251712, 'wall_time': 24.607528639000066, 'exclusive_time': 23.114}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 21, 'cpu': 196.83199977555833, 'rss': 424472576, 'vms': 763883520, 'uss': 420139008, 'wall_time': 14.7225994490002, 'exclusive_time': 11.63}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 22, 'cpu': 269.46105072463763, 'rss': 342167552, 'vms': 742993920, 'uss': 338354176, 'wall_time': 8.081481438000083, 'exclusive_time': 5.073}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 22, 'cpu': 253.64674127715602, 'rss': 347865088, 'vms': 747130880, 'uss': 343572480, 'wall_time': 5.769515921, 'exclusive_time': 3.199}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 22, 'cpu': 258.4647058823529, 'rss': 384540672, 'vms': 690651136, 'uss': 380252160, 'wall_time': 5.891023602, 'exclusive_time': 3.38}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 22, 'cpu': 188.77650947757746, 'rss': 460206080, 'vms': 736190464, 'uss': 455872512, 'wall_time': 11.183227591, 'exclusive_time': 8.808}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 23, 'cpu': 269.8555493895671, 'rss': 333729792, 'vms': 730378240, 'uss': 329416704, 'wall_time': 5.737960299000001, 'exclusive_time': 3.35}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 23, 'cpu': 187.91166257166256, 'rss': 557666304, 'vms': 739934208, 'uss': 553639936, 'wall_time': 12.006657687, 'exclusive_time': 9.616}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 24, 'cpu': 280.59746008708265, 'rss': 389074944, 'vms': 729751552, 'uss': 384786432, 'wall_time': 5.915323575000002, 'exclusive_time': 3.662}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 24, 'cpu': 182.28754537205072, 'rss': 474927104, 'vms': 649138176, 'uss': 470609920, 'wall_time': 12.35512030800001, 'exclusive_time': 9.712}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 25, 'cpu': 275.33413461538464, 'rss': 389300224, 'vms': 674713600, 'uss': 385007616, 'wall_time': 5.241750558999996, 'exclusive_time': 2.833}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 25, 'cpu': 189.84734513274333, 'rss': 571289600, 'vms': 749383680, 'uss': 567123968, 'wall_time': 12.552804968000004, 'exclusive_time': 10.106}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 26, 'cpu': 268.66213027583916, 'rss': 392015872, 'vms': 727289856, 'uss': 387715072, 'wall_time': 5.904975043000007, 'exclusive_time': 3.589}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 26, 'cpu': 178.61126534190532, 'rss': 573427712, 'vms': 745373696, 'uss': 569098240, 'wall_time': 12.809143035000005, 'exclusive_time': 10.319}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 27, 'cpu': 275.8935185185185, 'rss': 435109888, 'vms': 734208000, 'uss': 430784512, 'wall_time': 6.198804370999994, 'exclusive_time': 3.812}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 27, 'cpu': 191.35828493999225, 'rss': 576393216, 'vms': 754118656, 'uss': 572084224, 'wall_time': 13.696716149999986, 'exclusive_time': 11.212}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 28, 'cpu': 272.8485044865403, 'rss': 455200768, 'vms': 749060096, 'uss': 450912256, 'wall_time': 5.922211849000007, 'exclusive_time': 3.524}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 28, 'cpu': 181.97500751337373, 'rss': 476770304, 'vms': 650924032, 'uss': 472469504, 'wall_time': 13.888571671000022, 'exclusive_time': 11.388}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 29, 'cpu': 270.4733465608465, 'rss': 424841216, 'vms': 725250048, 'uss': 420868096, 'wall_time': 6.269218160999969, 'exclusive_time': 3.865}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 29, 'cpu': 178.67231062830297, 'rss': 573857792, 'vms': 749121536, 'uss': 569589760, 'wall_time': 14.427826280999966, 'exclusive_time': 11.975}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 30, 'cpu': 271.9155892360037, 'rss': 448057344, 'vms': 711499776, 'uss': 443748352, 'wall_time': 6.118950226999971, 'exclusive_time': 3.691}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 30, 'cpu': 173.9093322981367, 'rss': 579375104, 'vms': 866160640, 'uss': 575111168, 'wall_time': 15.171184347999997, 'exclusive_time': 12.693}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 31, 'cpu': 271.3817369093231, 'rss': 423989248, 'vms': 724353024, 'uss': 419700736, 'wall_time': 6.251720481000007, 'exclusive_time': 3.831}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 31, 'cpu': 175.68375586854467, 'rss': 479117312, 'vms': 653156352, 'uss': 474808320, 'wall_time': 15.570912334000013, 'exclusive_time': 13.037}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 32, 'cpu': 269.1905172413793, 'rss': 527835136, 'vms': 841474048, 'uss': 523546624, 'wall_time': 6.756292878000011, 'exclusive_time': 4.053}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 32, 'cpu': 165.80534961685817, 'rss': 578646016, 'vms': 861732864, 'uss': 574369792, 'wall_time': 15.810039487999973, 'exclusive_time': 13.275}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 33, 'cpu': 276.3488440860215, 'rss': 531578880, 'vms': 846000128, 'uss': 527269888, 'wall_time': 7.113263737000011, 'exclusive_time': 4.549}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 33, 'cpu': 174.7150337837839, 'rss': 477732864, 'vms': 650137600, 'uss': 473432064, 'wall_time': 16.26899197199998, 'exclusive_time': 13.759}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 34, 'cpu': 279.2966883963494, 'rss': 532574208, 'vms': 845340672, 'uss': 528297984, 'wall_time': 6.904172876999951, 'exclusive_time': 4.314}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 34, 'cpu': 173.0279877072242, 'rss': 478531584, 'vms': 654352384, 'uss': 474214400, 'wall_time': 16.65922195799999, 'exclusive_time': 14.027}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 35, 'cpu': 279.34557276446515, 'rss': 527298560, 'vms': 779939840, 'uss': 522989568, 'wall_time': 6.916565907000063, 'exclusive_time': 4.352}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 35, 'cpu': 171.07948380733197, 'rss': 479989760, 'vms': 649093120, 'uss': 475648000, 'wall_time': 16.935410953999963, 'exclusive_time': 14.429}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 36, 'cpu': 270.042356321839, 'rss': 542736384, 'vms': 855048192, 'uss': 538451968, 'wall_time': 6.826567436999994, 'exclusive_time': 4.298}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 36, 'cpu': 165.38307710225956, 'rss': 475586560, 'vms': 647049216, 'uss': 471244800, 'wall_time': 17.505811797999968, 'exclusive_time': 14.968}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 37, 'cpu': 280.9450757575758, 'rss': 542855168, 'vms': 851369984, 'uss': 538566656, 'wall_time': 7.443929207999986, 'exclusive_time': 4.91}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 37, 'cpu': 162.7751741068319, 'rss': 577441792, 'vms': 754991104, 'uss': 573145088, 'wall_time': 18.34809378, 'exclusive_time': 15.681}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 38, 'cpu': 279.516893939394, 'rss': 632164352, 'vms': 978735104, 'uss': 627867648, 'wall_time': 6.894067144000019, 'exclusive_time': 4.272}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 38, 'cpu': 160.11384135472377, 'rss': 575004672, 'vms': 864952320, 'uss': 570699776, 'wall_time': 18.135283739999977, 'exclusive_time': 15.497}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 39, 'cpu': 279.0994402311304, 'rss': 623091712, 'vms': 969478144, 'uss': 618799104, 'wall_time': 8.488540306000004, 'exclusive_time': 5.658}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 39, 'cpu': 154.55235270049107, 'rss': 574066688, 'vms': 739819520, 'uss': 570081280, 'wall_time': 19.941161441999952, 'exclusive_time': 17.099}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 40, 'cpu': 265.7718269230769, 'rss': 535416832, 'vms': 847298560, 'uss': 531238912, 'wall_time': 7.548848851999992, 'exclusive_time': 4.838}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 40, 'cpu': 170.6395169082126, 'rss': 584474624, 'vms': 866103296, 'uss': 580161536, 'wall_time': 19.78472434899993, 'exclusive_time': 16.929}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 41, 'cpu': 278.65068627450984, 'rss': 626360320, 'vms': 979890176, 'uss': 622088192, 'wall_time': 9.859617959999923, 'exclusive_time': 7.115}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 41, 'cpu': 161.97608941204447, 'rss': 574664704, 'vms': 747720704, 'uss': 570527744, 'wall_time': 19.770712820000085, 'exclusive_time': 17.071}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 42, 'cpu': 292.03173192771095, 'rss': 748597248, 'vms': 1112346624, 'uss': 744292352, 'wall_time': 9.61588885399999, 'exclusive_time': 6.911}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 42, 'cpu': 159.84806471306473, 'rss': 477372416, 'vms': 865591296, 'uss': 473030656, 'wall_time': 19.879042890999926, 'exclusive_time': 17.235}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 43, 'cpu': 257.46990149299677, 'rss': 631599104, 'vms': 981544960, 'uss': 627286016, 'wall_time': 8.877334502000167, 'exclusive_time': 6.095}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 43, 'cpu': 159.24054094741075, 'rss': 576102400, 'vms': 752545792, 'uss': 571793408, 'wall_time': 20.95941390100006, 'exclusive_time': 17.784}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 44, 'cpu': 283.03286858974366, 'rss': 746909696, 'vms': 1111654400, 'uss': 742699008, 'wall_time': 9.45526066299999, 'exclusive_time': 6.532}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 44, 'cpu': 148.11605555555562, 'rss': 580202496, 'vms': 758087680, 'uss': 575324160, 'wall_time': 25.806347177999896, 'exclusive_time': 21.518}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 45, 'cpu': 252.87041039671686, 'rss': 623673344, 'vms': 980037632, 'uss': 619581440, 'wall_time': 10.073785136000197, 'exclusive_time': 6.359}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 45, 'cpu': 156.1893969776229, 'rss': 580472832, 'vms': 868474880, 'uss': 576163840, 'wall_time': 20.504528429999937, 'exclusive_time': 17.791}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 22, 'cpu': 99.20954773869343, 'rss': 14954496, 'vms': 10321920, 'uss': 11010048, 'wall_time': 20.930719111, 'exclusive_time': 19.791}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 23, 'cpu': 99.19019386667327, 'rss': 14962688, 'vms': 10321920, 'uss': 11010048, 'wall_time': 20.237368933, 'exclusive_time': 19.09}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 24, 'cpu': 98.95398003237992, 'rss': 14942208, 'vms': 10289152, 'uss': 10997760, 'wall_time': 22.21080902, 'exclusive_time': 20.971}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 25, 'cpu': 99.45979407950622, 'rss': 15007744, 'vms': 10362880, 'uss': 11067392, 'wall_time': 22.331708481999982, 'exclusive_time': 21.205}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 26, 'cpu': 98.83709474885842, 'rss': 15089664, 'vms': 10452992, 'uss': 11177984, 'wall_time': 23.06865215100001, 'exclusive_time': 21.906}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 27, 'cpu': 99.28190342106265, 'rss': 15036416, 'vms': 10452992, 'uss': 11104256, 'wall_time': 23.883235456999984, 'exclusive_time': 22.643}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 28, 'cpu': 99.02866803278685, 'rss': 15298560, 'vms': 10612736, 'uss': 11337728, 'wall_time': 25.475248869999973, 'exclusive_time': 24.21}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 29, 'cpu': 99.23653319860216, 'rss': 15421440, 'vms': 10797056, 'uss': 11476992, 'wall_time': 27.437854824999988, 'exclusive_time': 26.192}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 30, 'cpu': 99.48298613685226, 'rss': 15503360, 'vms': 10891264, 'uss': 11554816, 'wall_time': 29.595236245000024, 'exclusive_time': 28.302}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 31, 'cpu': 97.1462357581069, 'rss': 15429632, 'vms': 10752000, 'uss': 11513856, 'wall_time': 29.265815549000024, 'exclusive_time': 28.011}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 32, 'cpu': 99.17069536423836, 'rss': 15495168, 'vms': 10850304, 'uss': 11587584, 'wall_time': 32.161302362000015, 'exclusive_time': 30.807}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 33, 'cpu': 99.29910759126906, 'rss': 15527936, 'vms': 10891264, 'uss': 11583488, 'wall_time': 32.73877516799985, 'exclusive_time': 31.364}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 34, 'cpu': 99.34773799570006, 'rss': 15577088, 'vms': 10887168, 'uss': 11636736, 'wall_time': 36.679891174999966, 'exclusive_time': 35.227}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 35, 'cpu': 99.15356929866417, 'rss': 15601664, 'vms': 10936320, 'uss': 11726848, 'wall_time': 38.7035365170002, 'exclusive_time': 37.216}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 36, 'cpu': 99.65563933832425, 'rss': 15929344, 'vms': 11304960, 'uss': 11997184, 'wall_time': 40.68889820300001, 'exclusive_time': 39.248}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 37, 'cpu': 99.48354335130291, 'rss': 15917056, 'vms': 11313152, 'uss': 12009472, 'wall_time': 42.28510857800029, 'exclusive_time': 40.761}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 38, 'cpu': 99.25532071625592, 'rss': 16097280, 'vms': 11489280, 'uss': 12156928, 'wall_time': 45.63604413799976, 'exclusive_time': 44.111}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 39, 'cpu': 99.20046921002347, 'rss': 16035840, 'vms': 11440128, 'uss': 12124160, 'wall_time': 47.40638127700004, 'exclusive_time': 45.863}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 40, 'cpu': 99.40619805791285, 'rss': 16195584, 'vms': 11620352, 'uss': 12333056, 'wall_time': 48.61102798000002, 'exclusive_time': 47.112}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 41, 'cpu': 98.59110082674346, 'rss': 16187392, 'vms': 11591680, 'uss': 12267520, 'wall_time': 52.34770442099989, 'exclusive_time': 50.77}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 42, 'cpu': 98.69733805164611, 'rss': 16101376, 'vms': 11509760, 'uss': 12230656, 'wall_time': 54.618083819000276, 'exclusive_time': 53.045}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 43, 'cpu': 98.85754280141829, 'rss': 16363520, 'vms': 11739136, 'uss': 12455936, 'wall_time': 55.79790440099987, 'exclusive_time': 54.105}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 44, 'cpu': 99.0619179574555, 'rss': 16355328, 'vms': 11706368, 'uss': 12451840, 'wall_time': 55.67723650300013, 'exclusive_time': 54.021}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 45, 'cpu': 98.78650012777932, 'rss': 16375808, 'vms': 11759616, 'uss': 12464128, 'wall_time': 56.18914075800012, 'exclusive_time': 54.426}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 46, 'cpu': 239.65962121212118, 'rss': 422416384, 'vms': 716095488, 'uss': 418131968, 'wall_time': 6.0984090040000005, 'exclusive_time': 3.537}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 46, 'cpu': 98.39498850574708, 'rss': 15073280, 'vms': 10334208, 'uss': 11116544, 'wall_time': 14.710298263000002, 'exclusive_time': 13.076}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 46, 'cpu': 198.3212403100776, 'rss': 336453632, 'vms': 649506816, 'uss': 332156928, 'wall_time': 9.110054583, 'exclusive_time': 6.674}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 49, 'cpu': 273.78365147783245, 'rss': 437854208, 'vms': 731172864, 'uss': 433569792, 'wall_time': 6.241024114999988, 'exclusive_time': 3.785}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 49, 'cpu': 99.67581093605185, 'rss': 15228928, 'vms': 10518528, 'uss': 11251712, 'wall_time': 16.78165980099999, 'exclusive_time': 15.463}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 49, 'cpu': 204.50274140752873, 'rss': 336240640, 'vms': 647790592, 'uss': 332083200, 'wall_time': 9.685022207000003, 'exclusive_time': 7.141}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 52, 'cpu': 273.29237288135596, 'rss': 435761152, 'vms': 731475968, 'uss': 431493120, 'wall_time': 6.518374348000009, 'exclusive_time': 3.894}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 52, 'cpu': 99.44382022471909, 'rss': 15347712, 'vms': 10702848, 'uss': 11390976, 'wall_time': 17.975819228000006, 'exclusive_time': 16.625}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 52, 'cpu': 202.03873381877025, 'rss': 354693120, 'vms': 665673728, 'uss': 350400512, 'wall_time': 10.21348225700001, 'exclusive_time': 7.705}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 55, 'cpu': 283.5139097744361, 'rss': 440594432, 'vms': 718807040, 'uss': 436314112, 'wall_time': 6.251171373000005, 'exclusive_time': 3.734}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 55, 'cpu': 99.49578346631205, 'rss': 15355904, 'vms': 10702848, 'uss': 11399168, 'wall_time': 18.988897665999986, 'exclusive_time': 17.611}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 55, 'cpu': 189.29316831683178, 'rss': 337457152, 'vms': 741937152, 'uss': 333168640, 'wall_time': 10.738353078000046, 'exclusive_time': 8.259}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 58, 'cpu': 278.0289062500001, 'rss': 525156352, 'vms': 831746048, 'uss': 520867840, 'wall_time': 7.2548807819999865, 'exclusive_time': 4.711}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 58, 'cpu': 99.54444444444447, 'rss': 15458304, 'vms': 10743808, 'uss': 11534336, 'wall_time': 20.891447157000016, 'exclusive_time': 19.484}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 58, 'cpu': 185.25834224598938, 'rss': 400523264, 'vms': 736899072, 'uss': 396201984, 'wall_time': 10.920531793999999, 'exclusive_time': 8.338}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 61, 'cpu': 283.4416257166257, 'rss': 519311360, 'vms': 770375680, 'uss': 515031040, 'wall_time': 7.415509950000001, 'exclusive_time': 4.759}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 61, 'cpu': 99.44875721431325, 'rss': 15638528, 'vms': 11034624, 'uss': 11689984, 'wall_time': 22.80962179400001, 'exclusive_time': 21.346}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 61, 'cpu': 182.6923114083985, 'rss': 490029056, 'vms': 753545216, 'uss': 485707776, 'wall_time': 12.346001406000028, 'exclusive_time': 9.752}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 64, 'cpu': 266.02348484848494, 'rss': 511053824, 'vms': 815677440, 'uss': 506781696, 'wall_time': 7.220620168999972, 'exclusive_time': 4.612}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 64, 'cpu': 99.38372940353624, 'rss': 15634432, 'vms': 10969088, 'uss': 11706368, 'wall_time': 24.500652432000038, 'exclusive_time': 22.999}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 64, 'cpu': 174.8084584653534, 'rss': 571195392, 'vms': 737210368, 'uss': 566984704, 'wall_time': 12.828009089000034, 'exclusive_time': 10.186}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 67, 'cpu': 271.59484228474, 'rss': 512208896, 'vms': 775172096, 'uss': 507895808, 'wall_time': 7.474556622000023, 'exclusive_time': 4.8}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 67, 'cpu': 99.62139212028103, 'rss': 15929344, 'vms': 11227136, 'uss': 11984896, 'wall_time': 27.01598616800004, 'exclusive_time': 25.529}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 67, 'cpu': 180.95870901639353, 'rss': 572043264, 'vms': 860917760, 'uss': 567771136, 'wall_time': 13.138049309000053, 'exclusive_time': 10.161}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 70, 'cpu': 284.7599824561404, 'rss': 638906368, 'vms': 827891712, 'uss': 634671104, 'wall_time': 8.466133388000003, 'exclusive_time': 5.769}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 70, 'cpu': 99.3847046982279, 'rss': 16183296, 'vms': 11550720, 'uss': 12226560, 'wall_time': 28.320443467999894, 'exclusive_time': 26.779}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 70, 'cpu': 177.85208233028416, 'rss': 476028928, 'vms': 866263040, 'uss': 471724032, 'wall_time': 13.261273197000037, 'exclusive_time': 10.536}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 73, 'cpu': 281.78650151668364, 'rss': 736276480, 'vms': 1099522048, 'uss': 731959296, 'wall_time': 9.901335006000068, 'exclusive_time': 7.03}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 73, 'cpu': 99.55708069620262, 'rss': 16220160, 'vms': 11603968, 'uss': 12255232, 'wall_time': 31.832912953000005, 'exclusive_time': 30.199}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 73, 'cpu': 171.5369756502492, 'rss': 477810688, 'vms': 867500032, 'uss': 473468928, 'wall_time': 13.979322476999982, 'exclusive_time': 11.25}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 76, 'cpu': 282.72525914634156, 'rss': 726585344, 'vms': 1095188480, 'uss': 722259968, 'wall_time': 9.353689892000034, 'exclusive_time': 6.546}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 76, 'cpu': 99.7945943248873, 'rss': 16330752, 'vms': 11784192, 'uss': 12365824, 'wall_time': 33.74798982100003, 'exclusive_time': 32.134}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 76, 'cpu': 170.25821917808236, 'rss': 482467840, 'vms': 647847936, 'uss': 478130176, 'wall_time': 15.731909365999968, 'exclusive_time': 12.806}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 79, 'cpu': 287.16768199233724, 'rss': 785797120, 'vms': 1003728896, 'uss': 781541376, 'wall_time': 10.175582095999971, 'exclusive_time': 7.317}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 79, 'cpu': 99.02855056669591, 'rss': 16265216, 'vms': 11620352, 'uss': 12328960, 'wall_time': 37.48075704500002, 'exclusive_time': 35.874}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 79, 'cpu': 154.91419817927175, 'rss': 480419840, 'vms': 862949376, 'uss': 476123136, 'wall_time': 16.941763799, 'exclusive_time': 14.16}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 82, 'cpu': 243.36194952222692, 'rss': 768057344, 'vms': 1085497344, 'uss': 763756544, 'wall_time': 9.801392995000015, 'exclusive_time': 6.925}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 82, 'cpu': 99.64467282418437, 'rss': 16543744, 'vms': 11853824, 'uss': 12566528, 'wall_time': 33.872370547999935, 'exclusive_time': 32.33}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 82, 'cpu': 176.39457595526568, 'rss': 478355456, 'vms': 869183488, 'uss': 474308608, 'wall_time': 15.897796582999945, 'exclusive_time': 13.219}
+{'dataset': 'correct_branching', 'reasoner': 'jena', 'count': 85, 'cpu': 279.92742755765835, 'rss': 776884224, 'vms': 993075200, 'uss': 772620288, 'wall_time': 10.383713970999906, 'exclusive_time': 7.57}
+{'dataset': 'correct_branching', 'reasoner': 'prolog', 'count': 85, 'cpu': 99.73252419842713, 'rss': 16715776, 'vms': 12050432, 'uss': 12738560, 'wall_time': 36.53095790500015, 'exclusive_time': 34.97}
+{'dataset': 'correct_branching', 'reasoner': 'sparql', 'count': 85, 'cpu': 167.26993443237177, 'rss': 576376832, 'vms': 862638080, 'uss': 571420672, 'wall_time': 17.298169428999927, 'exclusive_time': 14.501}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 46, 'cpu': 269.7426515151516, 'rss': 512626688, 'vms': 818356224, 'uss': 508358656, 'wall_time': 7.2123356770000004, 'exclusive_time': 4.542}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 46, 'cpu': 98.87862120457939, 'rss': 15671296, 'vms': 10997760, 'uss': 11698176, 'wall_time': 30.11054751, 'exclusive_time': 28.629}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 46, 'cpu': 172.2518294648614, 'rss': 475598848, 'vms': 648806400, 'uss': 471281664, 'wall_time': 14.313319234000005, 'exclusive_time': 11.599}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 49, 'cpu': 269.0613659274194, 'rss': 509198336, 'vms': 816504832, 'uss': 504901632, 'wall_time': 6.881307227999997, 'exclusive_time': 4.329}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 49, 'cpu': 99.7326397515529, 'rss': 15716352, 'vms': 11051008, 'uss': 11739136, 'wall_time': 31.29532520699999, 'exclusive_time': 29.908}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 49, 'cpu': 171.63540630182433, 'rss': 574902272, 'vms': 863797248, 'uss': 570560512, 'wall_time': 14.420708397999988, 'exclusive_time': 11.896}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 52, 'cpu': 265.5545512820513, 'rss': 502284288, 'vms': 809328640, 'uss': 498008064, 'wall_time': 6.619464405000002, 'exclusive_time': 4.118}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 52, 'cpu': 99.64730195126347, 'rss': 16023552, 'vms': 11354112, 'uss': 12054528, 'wall_time': 33.24416829399996, 'exclusive_time': 31.738}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 52, 'cpu': 176.8460974973932, 'rss': 579325952, 'vms': 866729984, 'uss': 575107072, 'wall_time': 14.980653232999998, 'exclusive_time': 12.367}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 55, 'cpu': 268.9970418470419, 'rss': 496553984, 'vms': 755736576, 'uss': 492228608, 'wall_time': 7.012548870999979, 'exclusive_time': 4.447}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 55, 'cpu': 99.69618321828997, 'rss': 16232448, 'vms': 11554816, 'uss': 12247040, 'wall_time': 35.61322831899997, 'exclusive_time': 34.141}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 55, 'cpu': 170.25519636015338, 'rss': 578080768, 'vms': 866271232, 'uss': 573751296, 'wall_time': 15.497164816000009, 'exclusive_time': 12.872}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 58, 'cpu': 278.54653184165244, 'rss': 611684352, 'vms': 965455872, 'uss': 607371264, 'wall_time': 7.839372298000001, 'exclusive_time': 5.193}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 58, 'cpu': 99.71167804388918, 'rss': 16191488, 'vms': 11489280, 'uss': 12242944, 'wall_time': 39.19991626500007, 'exclusive_time': 37.67}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 58, 'cpu': 163.10275546821606, 'rss': 575152128, 'vms': 863645696, 'uss': 570806272, 'wall_time': 16.545428653000045, 'exclusive_time': 13.759}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 61, 'cpu': 291.66038961038976, 'rss': 723648512, 'vms': 1085468672, 'uss': 719335424, 'wall_time': 9.492159336999975, 'exclusive_time': 6.761}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 61, 'cpu': 99.83354804514909, 'rss': 16330752, 'vms': 11669504, 'uss': 12374016, 'wall_time': 43.200655411999946, 'exclusive_time': 41.627}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 61, 'cpu': 163.80367652987195, 'rss': 578117632, 'vms': 865230848, 'uss': 573775872, 'wall_time': 17.048818808000078, 'exclusive_time': 14.347}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 64, 'cpu': 288.24819121447035, 'rss': 730886144, 'vms': 1091362816, 'uss': 726597632, 'wall_time': 9.692962772999977, 'exclusive_time': 6.918}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 64, 'cpu': 99.85257864129015, 'rss': 16429056, 'vms': 11694080, 'uss': 12427264, 'wall_time': 47.356745647000025, 'exclusive_time': 45.848}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 64, 'cpu': 157.75321428571442, 'rss': 479100928, 'vms': 862814208, 'uss': 474775552, 'wall_time': 17.40420243299991, 'exclusive_time': 14.735}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 67, 'cpu': 266.97468354430384, 'rss': 740675584, 'vms': 1074802688, 'uss': 736661504, 'wall_time': 9.122755386999984, 'exclusive_time': 6.346}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 67, 'cpu': 99.73231942263806, 'rss': 16584704, 'vms': 11964416, 'uss': 12611584, 'wall_time': 51.75795632200004, 'exclusive_time': 50.126}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 67, 'cpu': 167.30944552909028, 'rss': 586018816, 'vms': 865935360, 'uss': 581672960, 'wall_time': 22.124228306000077, 'exclusive_time': 19.048}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 70, 'cpu': 280.89115789473703, 'rss': 743723008, 'vms': 1080758272, 'uss': 740106240, 'wall_time': 11.363320772999941, 'exclusive_time': 8.302}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 70, 'cpu': 99.69183307889307, 'rss': 16769024, 'vms': 12017664, 'uss': 12816384, 'wall_time': 57.34304531099997, 'exclusive_time': 55.568}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 70, 'cpu': 156.7706357868022, 'rss': 578338816, 'vms': 866119680, 'uss': 574046208, 'wall_time': 22.176411130999895, 'exclusive_time': 19.103}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 73, 'cpu': 275.3999521531101, 'rss': 751960064, 'vms': 1092542464, 'uss': 747679744, 'wall_time': 11.452984112999957, 'exclusive_time': 8.091}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 73, 'cpu': 99.86011224189389, 'rss': 16855040, 'vms': 12152832, 'uss': 12849152, 'wall_time': 57.630272643000126, 'exclusive_time': 55.922}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 73, 'cpu': 159.29815968743753, 'rss': 587276288, 'vms': 875331584, 'uss': 582975488, 'wall_time': 24.61224197599995, 'exclusive_time': 21.485}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 76, 'cpu': 272.69486734693885, 'rss': 743424000, 'vms': 1084731392, 'uss': 739098624, 'wall_time': 11.55585632799989, 'exclusive_time': 8.431}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 76, 'cpu': 99.68903833913677, 'rss': 17014784, 'vms': 12357632, 'uss': 13058048, 'wall_time': 61.34581967300005, 'exclusive_time': 59.584}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 76, 'cpu': 148.64067790870934, 'rss': 484438016, 'vms': 858918912, 'uss': 480157696, 'wall_time': 22.640194688999827, 'exclusive_time': 19.597}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 79, 'cpu': 290.90387692307706, 'rss': 874307584, 'vms': 1248092160, 'uss': 870010880, 'wall_time': 13.800316274000124, 'exclusive_time': 10.466}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 79, 'cpu': 99.45960852268077, 'rss': 17137664, 'vms': 12464128, 'uss': 13156352, 'wall_time': 66.19329130999995, 'exclusive_time': 64.339}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 79, 'cpu': 148.74672489082982, 'rss': 485629952, 'vms': 862265344, 'uss': 481366016, 'wall_time': 25.02261747600005, 'exclusive_time': 22.158}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 82, 'cpu': 284.06358178053847, 'rss': 964833280, 'vms': 1335898112, 'uss': 960536576, 'wall_time': 14.218142833000002, 'exclusive_time': 11.001}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 82, 'cpu': 98.88480470328082, 'rss': 17276928, 'vms': 12611584, 'uss': 13312000, 'wall_time': 73.6653681539999, 'exclusive_time': 71.706}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 82, 'cpu': 141.02200218368267, 'rss': 485031936, 'vms': 862261248, 'uss': 480706560, 'wall_time': 26.64957202300002, 'exclusive_time': 23.655}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 85, 'cpu': 278.4154633620691, 'rss': 947023872, 'vms': 1324703744, 'uss': 942768128, 'wall_time': 13.788764980999986, 'exclusive_time': 10.67}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 85, 'cpu': 98.54837656575343, 'rss': 17211392, 'vms': 12648448, 'uss': 13307904, 'wall_time': 74.04433165900036, 'exclusive_time': 72.152}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 85, 'cpu': 137.99322541640635, 'rss': 579375104, 'vms': 863084544, 'uss': 575066112, 'wall_time': 27.396944830999928, 'exclusive_time': 24.423}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 88, 'cpu': 208.8455309610536, 'rss': 860631040, 'vms': 1254891520, 'uss': 856350720, 'wall_time': 21.676805131000037, 'exclusive_time': 16.539}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 88, 'cpu': 98.7917007011686, 'rss': 17506304, 'vms': 12906496, 'uss': 13500416, 'wall_time': 81.62057971900003, 'exclusive_time': 79.817}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 88, 'cpu': 143.79550475024797, 'rss': 485658624, 'vms': 859865088, 'uss': 481402880, 'wall_time': 28.270541589999993, 'exclusive_time': 25.007}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 91, 'cpu': 278.1298418459943, 'rss': 1032646656, 'vms': 1324888064, 'uss': 1028358144, 'wall_time': 14.263998218000324, 'exclusive_time': 11.036}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 91, 'cpu': 98.53386040745693, 'rss': 17592320, 'vms': 12939264, 'uss': 13643776, 'wall_time': 92.74419443100032, 'exclusive_time': 90.466}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 91, 'cpu': 134.3690526641317, 'rss': 479432704, 'vms': 862785536, 'uss': 475156480, 'wall_time': 32.080179994000446, 'exclusive_time': 29.036}
+{'dataset': 'err_branching', 'reasoner': 'jena', 'count': 94, 'cpu': 267.56419913419916, 'rss': 1027063808, 'vms': 1237024768, 'uss': 1022832640, 'wall_time': 15.79862644900004, 'exclusive_time': 12.38}
+{'dataset': 'err_branching', 'reasoner': 'prolog', 'count': 94, 'cpu': 98.54502763199419, 'rss': 17633280, 'vms': 13000704, 'uss': 13651968, 'wall_time': 98.9796688450001, 'exclusive_time': 96.969}
+{'dataset': 'err_branching', 'reasoner': 'sparql', 'count': 94, 'cpu': 142.14392513006442, 'rss': 583700480, 'vms': 863301632, 'uss': 579395584, 'wall_time': 30.322786946999713, 'exclusive_time': 27.109}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 46, 'cpu': 281.91459263526826, 'rss': 1145155584, 'vms': 1449197568, 'uss': 1140834304, 'wall_time': 16.326388878999996, 'exclusive_time': 13.083}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 46, 'cpu': 99.85700284739798, 'rss': 19013632, 'vms': 14512128, 'uss': 15130624, 'wall_time': 191.781706211, 'exclusive_time': 189.801}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 46, 'cpu': 118.26659612770575, 'rss': 704167936, 'vms': 865509376, 'uss': 699854848, 'wall_time': 71.05139189499994, 'exclusive_time': 68.054}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 49, 'cpu': 295.8802660098524, 'rss': 1338863616, 'vms': 1601675264, 'uss': 1334935552, 'wall_time': 21.868177005999996, 'exclusive_time': 18.296}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 49, 'cpu': 99.61367923141991, 'rss': 19587072, 'vms': 14979072, 'uss': 15581184, 'wall_time': 217.54290392999997, 'exclusive_time': 215.326}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 49, 'cpu': 117.87889289802342, 'rss': 705773568, 'vms': 870772736, 'uss': 701509632, 'wall_time': 82.6719647750001, 'exclusive_time': 79.619}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 52, 'cpu': 290.6664446635091, 'rss': 1446932480, 'vms': 1788592128, 'uss': 1442611200, 'wall_time': 25.889331333999962, 'exclusive_time': 22.459}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 52, 'cpu': 99.47777738958018, 'rss': 19881984, 'vms': 15360000, 'uss': 15921152, 'wall_time': 243.8997551, 'exclusive_time': 241.389}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 52, 'cpu': 114.70333947138238, 'rss': 591069184, 'vms': 862736384, 'uss': 586756096, 'wall_time': 91.61274662799997, 'exclusive_time': 88.443}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 55, 'cpu': 286.4281137225874, 'rss': 1499602944, 'vms': 1920004096, 'uss': 1495412736, 'wall_time': 26.750956663999887, 'exclusive_time': 23.053}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 55, 'cpu': 284.3584699453554, 'rss': 1307742208, 'vms': 1587625984, 'uss': 1303478272, 'wall_time': 23.637790144, 'exclusive_time': 19.899}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 55, 'cpu': 99.7286744092877, 'rss': 20037632, 'vms': 15360000, 'uss': 16039936, 'wall_time': 270.384324145, 'exclusive_time': 267.981}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 55, 'cpu': 116.68170454545505, 'rss': 588705792, 'vms': 863408128, 'uss': 584359936, 'wall_time': 97.09162674200002, 'exclusive_time': 93.912}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 58, 'cpu': 261.2021551724137, 'rss': 1494827008, 'vms': 1935175680, 'uss': 1490550784, 'wall_time': 32.66304665900003, 'exclusive_time': 28.888}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 58, 'cpu': 99.38259361996924, 'rss': 21340160, 'vms': 16830464, 'uss': 17375232, 'wall_time': 308.685691492, 'exclusive_time': 306.149}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 58, 'cpu': 112.57602283539524, 'rss': 596819968, 'vms': 863756288, 'uss': 592474112, 'wall_time': 116.32345085899999, 'exclusive_time': 113.127}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 61, 'cpu': 286.37900000000025, 'rss': 1498116096, 'vms': 1906192384, 'uss': 1495048192, 'wall_time': 26.174263064, 'exclusive_time': 22.447}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 61, 'cpu': 99.56376963350475, 'rss': 21344256, 'vms': 16703488, 'uss': 17371136, 'wall_time': 309.0486600359999, 'exclusive_time': 306.524}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 61, 'cpu': 116.58982102908338, 'rss': 592326656, 'vms': 864321536, 'uss': 587988992, 'wall_time': 99.09424672799992, 'exclusive_time': 95.778}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 64, 'cpu': 292.45217391304374, 'rss': 1502699520, 'vms': 1918758912, 'uss': 1498439680, 'wall_time': 27.306964435000054, 'exclusive_time': 23.526}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 64, 'cpu': 99.64627899969649, 'rss': 21557248, 'vms': 16969728, 'uss': 17612800, 'wall_time': 356.79423212100005, 'exclusive_time': 354.234}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 64, 'cpu': 115.25690045248903, 'rss': 701210624, 'vms': 865648640, 'uss': 696877056, 'wall_time': 100.59127768600001, 'exclusive_time': 97.309}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 67, 'cpu': 297.5982142857145, 'rss': 1587093504, 'vms': 1921163264, 'uss': 1583747072, 'wall_time': 29.679919020999932, 'exclusive_time': 25.766}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 67, 'cpu': 99.76120952962542, 'rss': 21663744, 'vms': 17072128, 'uss': 17682432, 'wall_time': 349.1999538829998, 'exclusive_time': 346.596}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 67, 'cpu': 113.28147410358598, 'rss': 595828736, 'vms': 866201600, 'uss': 591495168, 'wall_time': 110.63293366700009, 'exclusive_time': 107.296}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 70, 'cpu': 287.1921296296297, 'rss': 1536667648, 'vms': 1949179904, 'uss': 1532563456, 'wall_time': 28.534512938000262, 'exclusive_time': 24.682}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 70, 'cpu': 99.80883402736298, 'rss': 22003712, 'vms': 17412096, 'uss': 18018304, 'wall_time': 357.48825158499994, 'exclusive_time': 354.685}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 70, 'cpu': 114.50714285714334, 'rss': 704147456, 'vms': 869421056, 'uss': 699813888, 'wall_time': 126.20071452399998, 'exclusive_time': 122.519}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 73, 'cpu': 274.2108, 'rss': 1611337728, 'vms': 1931567104, 'uss': 1607536640, 'wall_time': 35.5279959479999, 'exclusive_time': 30.966}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 73, 'cpu': 99.82872258064431, 'rss': 22028288, 'vms': 17448960, 'uss': 18018304, 'wall_time': 411.13352600999997, 'exclusive_time': 408.116}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 73, 'cpu': 117.05819366852896, 'rss': 706850816, 'vms': 862351360, 'uss': 702521344, 'wall_time': 130.45939069500037, 'exclusive_time': 126.633}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 76, 'cpu': 278.94420600858405, 'rss': 1626345472, 'vms': 1904197632, 'uss': 1622024192, 'wall_time': 32.82758944199986, 'exclusive_time': 28.565}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 76, 'cpu': 99.86083086053313, 'rss': 22155264, 'vms': 17567744, 'uss': 18153472, 'wall_time': 429.26482236799984, 'exclusive_time': 426.177}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 76, 'cpu': 111.55957446808512, 'rss': 699490304, 'vms': 875102208, 'uss': 695177216, 'wall_time': 154.77530206999973, 'exclusive_time': 150.817}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 79, 'cpu': 280.5721311475412, 'rss': 1619030016, 'vms': 1891995648, 'uss': 1614733312, 'wall_time': 34.17683712899998, 'exclusive_time': 29.747}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 79, 'cpu': 99.78611683848753, 'rss': 22405120, 'vms': 17883136, 'uss': 18464768, 'wall_time': 461.5648916909995, 'exclusive_time': 458.377}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 79, 'cpu': 112.9095681625742, 'rss': 703881216, 'vms': 875569152, 'uss': 697806848, 'wall_time': 135.90986913799952, 'exclusive_time': 132.049}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 82, 'cpu': 296.84961538461533, 'rss': 1823006720, 'vms': 2082308096, 'uss': 1819009024, 'wall_time': 35.19819615100005, 'exclusive_time': 31.09}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 82, 'cpu': 99.61374825824397, 'rss': 22671360, 'vms': 18038784, 'uss': 18681856, 'wall_time': 449.01652745999945, 'exclusive_time': 445.915}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 82, 'cpu': 114.2311246730599, 'rss': 710897664, 'vms': 864935936, 'uss': 706617344, 'wall_time': 130.18229254500056, 'exclusive_time': 126.407}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 85, 'cpu': 295.16791044776124, 'rss': 1874530304, 'vms': 2076516352, 'uss': 1870557184, 'wall_time': 37.16163309700005, 'exclusive_time': 33.201}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 85, 'cpu': 99.72782005371462, 'rss': 22740992, 'vms': 18202624, 'uss': 18800640, 'wall_time': 472.797986474, 'exclusive_time': 469.681}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 85, 'cpu': 110.78226950354524, 'rss': 510742528, 'vms': 865439744, 'uss': 506429440, 'wall_time': 140.3437551449997, 'exclusive_time': 136.311}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 88, 'cpu': 293.71917293233054, 'rss': 1885958144, 'vms': 2079064064, 'uss': 1882976256, 'wall_time': 36.9317122930006, 'exclusive_time': 32.934}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 88, 'cpu': 99.78202622169101, 'rss': 22753280, 'vms': 18243584, 'uss': 18812928, 'wall_time': 453.2117020529995, 'exclusive_time': 450.177}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 88, 'cpu': 111.00365957446832, 'rss': 711102464, 'vms': 866729984, 'uss': 706768896, 'wall_time': 133.0022159729997, 'exclusive_time': 129.493}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 91, 'cpu': 290.13463035019436, 'rss': 1742270464, 'vms': 2078220288, 'uss': 1738625024, 'wall_time': 34.50294119499995, 'exclusive_time': 30.508}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 91, 'cpu': 99.29760390161078, 'rss': 22790144, 'vms': 18219008, 'uss': 18821120, 'wall_time': 501.6103797000005, 'exclusive_time': 498.436}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 91, 'cpu': 110.74307692307646, 'rss': 708308992, 'vms': 865001472, 'uss': 703979520, 'wall_time': 149.64276777600026, 'exclusive_time': 145.714}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 94, 'cpu': 257.9863501483678, 'rss': 1912553472, 'vms': 2083508224, 'uss': 1908293632, 'wall_time': 49.16599176300042, 'exclusive_time': 44.754}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 94, 'cpu': 99.03620043401045, 'rss': 23015424, 'vms': 18464768, 'uss': 19025920, 'wall_time': 529.985062705, 'exclusive_time': 526.707}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 94, 'cpu': 112.04814814814775, 'rss': 709988352, 'vms': 866680832, 'uss': 705679360, 'wall_time': 142.72352521299945, 'exclusive_time': 138.722}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 46, 'cpu': 276.44523809523827, 'rss': 791801856, 'vms': 1007198208, 'uss': 787525632, 'wall_time': 10.071011751, 'exclusive_time': 7.241}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 46, 'cpu': 147.26824644549768, 'rss': 480260096, 'vms': 647368704, 'uss': 475947008, 'wall_time': 23.158842125999996, 'exclusive_time': 20.231}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 49, 'cpu': 277.18117647058835, 'rss': 774815744, 'vms': 987951104, 'uss': 770519040, 'wall_time': 10.031417855999997, 'exclusive_time': 7.225}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 49, 'cpu': 148.04000000000005, 'rss': 478842880, 'vms': 638001152, 'uss': 474501120, 'wall_time': 23.048108485, 'exclusive_time': 20.261}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 52, 'cpu': 280.6821052631581, 'rss': 763232256, 'vms': 978022400, 'uss': 759078912, 'wall_time': 11.290323147999999, 'exclusive_time': 8.24}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 52, 'cpu': 165.92456896551758, 'rss': 577556480, 'vms': 866451456, 'uss': 573841408, 'wall_time': 25.411048692999998, 'exclusive_time': 22.562}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 55, 'cpu': 270.45000000000005, 'rss': 780042240, 'vms': 994885632, 'uss': 775749632, 'wall_time': 11.068975557000016, 'exclusive_time': 8.12}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 55, 'cpu': 144.77629310344832, 'rss': 479666176, 'vms': 644665344, 'uss': 475369472, 'wall_time': 25.330455403000002, 'exclusive_time': 22.524}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 58, 'cpu': 282.964077669903, 'rss': 748879872, 'vms': 1032921088, 'uss': 744579072, 'wall_time': 12.217417366000006, 'exclusive_time': 9.297}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 58, 'cpu': 143.26456692913408, 'rss': 479473664, 'vms': 861315072, 'uss': 475168768, 'wall_time': 27.819957136, 'exclusive_time': 24.955}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 61, 'cpu': 282.59587628865995, 'rss': 774897664, 'vms': 989859840, 'uss': 770572288, 'wall_time': 11.412375051999987, 'exclusive_time': 8.365}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 61, 'cpu': 147.76235294117674, 'rss': 581918720, 'vms': 866750464, 'uss': 577634304, 'wall_time': 28.280444581999973, 'exclusive_time': 25.258}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 64, 'cpu': 263.5649484536082, 'rss': 775200768, 'vms': 1125294080, 'uss': 771235840, 'wall_time': 11.95393943299996, 'exclusive_time': 8.648}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 64, 'cpu': 142.05823754789293, 'rss': 577527808, 'vms': 752263168, 'uss': 573214720, 'wall_time': 28.837067413, 'exclusive_time': 25.814}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 67, 'cpu': 299.06173913043483, 'rss': 983302144, 'vms': 1323905024, 'uss': 979509248, 'wall_time': 14.08647861199995, 'exclusive_time': 7.762}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 67, 'cpu': 144.85543478260905, 'rss': 484397056, 'vms': 861921280, 'uss': 480092160, 'wall_time': 30.22252299400003, 'exclusive_time': 27.077}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 70, 'cpu': 280.3588235294117, 'rss': 880001024, 'vms': 1252634624, 'uss': 875732992, 'wall_time': 14.182439104000025, 'exclusive_time': 11.093}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 70, 'cpu': 136.6148148148153, 'rss': 577613824, 'vms': 745967616, 'uss': 573321216, 'wall_time': 32.96881321799998, 'exclusive_time': 30.011}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 73, 'cpu': 290.9272000000001, 'rss': 1009963008, 'vms': 1341001728, 'uss': 1005674496, 'wall_time': 14.99503751200001, 'exclusive_time': 11.673}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 73, 'cpu': 135.83672839506232, 'rss': 578498560, 'vms': 747130880, 'uss': 574197760, 'wall_time': 36.470068497, 'exclusive_time': 33.301}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 76, 'cpu': 256.17391304347825, 'rss': 873738240, 'vms': 1245122560, 'uss': 869416960, 'wall_time': 17.125180940000007, 'exclusive_time': 13.551}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 76, 'cpu': 129.592082111437, 'rss': 485322752, 'vms': 637415424, 'uss': 480997376, 'wall_time': 38.487862715000006, 'exclusive_time': 33.4}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 79, 'cpu': 258.37122302158275, 'rss': 995696640, 'vms': 1330053120, 'uss': 991514624, 'wall_time': 17.281523745000072, 'exclusive_time': 13.617}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 79, 'cpu': 136.21019283746563, 'rss': 480522240, 'vms': 645066752, 'uss': 476225536, 'wall_time': 41.537806118999924, 'exclusive_time': 36.547}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 82, 'cpu': 277.92338709677426, 'rss': 964325376, 'vms': 1324843008, 'uss': 960135168, 'wall_time': 14.955290707000017, 'exclusive_time': 11.601}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 82, 'cpu': 132.68489010989026, 'rss': 484851712, 'vms': 864854016, 'uss': 480522240, 'wall_time': 39.905758158000026, 'exclusive_time': 36.823}
+{'dataset': 'err_loops', 'reasoner': 'jena', 'count': 85, 'cpu': 262.3204225352113, 'rss': 1035759616, 'vms': 1253462016, 'uss': 1032126464, 'wall_time': 17.353798834999907, 'exclusive_time': 13.945}
+{'dataset': 'err_loops', 'reasoner': 'sparql', 'count': 85, 'cpu': 129.59360613810753, 'rss': 581054464, 'vms': 864878592, 'uss': 576741376, 'wall_time': 44.98223655900006, 'exclusive_time': 40.905}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 46, 'cpu': 99.69177215189933, 'rss': 16367616, 'vms': 11788288, 'uss': 12447744, 'wall_time': 51.432578701, 'exclusive_time': 49.952}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 49, 'cpu': 99.60306513410035, 'rss': 16629760, 'vms': 12001280, 'uss': 12664832, 'wall_time': 56.716803528, 'exclusive_time': 55.154}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 52, 'cpu': 99.73622047244181, 'rss': 16908288, 'vms': 12255232, 'uss': 12939264, 'wall_time': 68.657432471, 'exclusive_time': 66.928}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 55, 'cpu': 99.71690821256132, 'rss': 17068032, 'vms': 12398592, 'uss': 13074432, 'wall_time': 67.44802895199999, 'exclusive_time': 65.857}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 58, 'cpu': 99.5896142433244, 'rss': 17149952, 'vms': 12521472, 'uss': 13201408, 'wall_time': 73.35603190400002, 'exclusive_time': 71.679}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 61, 'cpu': 99.72541436464171, 'rss': 17403904, 'vms': 12701696, 'uss': 13381632, 'wall_time': 78.53832738099999, 'exclusive_time': 76.801}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 64, 'cpu': 99.35607940446715, 'rss': 17477632, 'vms': 12881920, 'uss': 13524992, 'wall_time': 87.349607247, 'exclusive_time': 85.389}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 67, 'cpu': 99.65666266506663, 'rss': 17620992, 'vms': 12898304, 'uss': 13611008, 'wall_time': 90.33826699900004, 'exclusive_time': 88.482}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 70, 'cpu': 99.47062706270678, 'rss': 17780736, 'vms': 13148160, 'uss': 13799424, 'wall_time': 98.72478122399991, 'exclusive_time': 96.756}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 73, 'cpu': 99.57485436893248, 'rss': 17846272, 'vms': 13139968, 'uss': 13893632, 'wall_time': 111.24899155100002, 'exclusive_time': 109.204}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 76, 'cpu': 99.38083560399669, 'rss': 18554880, 'vms': 13897728, 'uss': 14598144, 'wall_time': 119.24500856700001, 'exclusive_time': 117.241}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 79, 'cpu': 98.46388036809823, 'rss': 18595840, 'vms': 13938688, 'uss': 14651392, 'wall_time': 137.89705841399996, 'exclusive_time': 135.691}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 82, 'cpu': 97.23110367892956, 'rss': 18825216, 'vms': 14217216, 'uss': 14843904, 'wall_time': 153.99146293700005, 'exclusive_time': 151.441}
+{'dataset': 'err_loops', 'reasoner': 'prolog', 'count': 85, 'cpu': 97.40816831683128, 'rss': 19156992, 'vms': 14508032, 'uss': 15183872, 'wall_time': 167.32004824699993, 'exclusive_time': 164.818}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 12, 'cpu': 224.33891402714946, 'rss': 1293606912, 'vms': 1452208128, 'uss': 1289375744, 'wall_time': 31.108551376}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 15, 'cpu': 270.9655555555557, 'rss': 1339625472, 'vms': 1636052992, 'uss': 1335422976, 'wall_time': 38.42580474299999}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 18, 'cpu': 265.19514285714257, 'rss': 1582944256, 'vms': 1804742656, 'uss': 1578721280, 'wall_time': 50.805319799}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 21, 'cpu': 260.4198630136983, 'rss': 1771110400, 'vms': 2043744256, 'uss': 1766879232, 'wall_time': 67.05173826400001}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 13, 'cpu': 247.5502183406115, 'rss': 1311088640, 'vms': 1470476288, 'uss': 1306861568, 'wall_time': 32.730468691}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 16, 'cpu': 248.4423913043478, 'rss': 1447669760, 'vms': 1701347328, 'uss': 1443430400, 'wall_time': 40.052987923}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 19, 'cpu': 259.24250681198885, 'rss': 1681694720, 'vms': 1847275520, 'uss': 1677627392, 'wall_time': 54.75591329000001}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 22, 'cpu': 265.4132250580039, 'rss': 1797689344, 'vms': 2074193920, 'uss': 1793433600, 'wall_time': 62.843813523999984}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 14, 'cpu': 265.4828703703706, 'rss': 1350897664, 'vms': 1468436480, 'uss': 1346682880, 'wall_time': 30.341314937000003}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 17, 'cpu': 282.3718644067795, 'rss': 1578180608, 'vms': 1796435968, 'uss': 1573937152, 'wall_time': 41.875808822}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 20, 'cpu': 254.29034090909053, 'rss': 1679904768, 'vms': 1903665152, 'uss': 1675644928, 'wall_time': 51.37121786099999}
+{'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 23, 'cpu': 271.9265882352937, 'rss': 1823834112, 'vms': 2115289088, 'uss': 1819607040, 'wall_time': 63.402167706}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 12, 'cpu': 253.33204508856625, 'rss': 1962139648, 'vms': 2248994816, 'uss': 1957961728, 'wall_time': 94.134570487}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 13, 'cpu': 272.34696296296244, 'rss': 2079490048, 'vms': 2252402688, 'uss': 2075897856, 'wall_time': 101.39484464}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 14, 'cpu': 274.9293577981659, 'rss': 2112589824, 'vms': 2252627968, 'uss': 2105548800, 'wall_time': 185.786322331}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 15, 'cpu': 282.1756992205449, 'rss': 2107490304, 'vms': 2259611648, 'uss': 2103267328, 'wall_time': 348.182888063}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 16, 'cpu': 287.1456570997012, 'rss': 2178215936, 'vms': 2246000640, 'uss': 2174009344, 'wall_time': 423.79857955}
+{'dataset': 'correct_loops', 'reasoner': 'pellet', 'count': 17, 'cpu': 310.3973524220337, 'rss': 2224504832, 'vms': 2255101952, 'uss': 2220249088, 'wall_time': 857.1257681519999}
