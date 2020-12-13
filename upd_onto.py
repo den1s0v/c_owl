@@ -39,78 +39,6 @@ import types
 from owlready2 import *
 
 
-class AugmentingOntology(object):
-	"""A wrapper for OwlReadу2 ontology"""
-	def __init__(self, src_onto, no_init=False):
-		super(AugmentingOntology, self).__init__()
-		self.onto = src_onto
-		if not no_init:
-			self.init()
-
-
-	def init(self, **kwargs):
-		# _patch_ontology(onto, ignore_properties=None)
-		_patch_ontology(self.onto, **kwargs)
-
-	def sync(self, **kwargs):
-		"Perform full sync of the ontology with Pellet reasoner & augmentation mechanism allowing powerful means to change the ontology via SWRL"
-		# sync_pellet_cycle(onto, runs_limit=15)
-		success,n_runs = sync_pellet_cycle(self.onto, **kwargs)
-		
-		return success,n_runs
-
-# make wrapping methods
-# if False and AugmentingOntology:
-# 	_src_class = namespace.Ontology
-# 	_dst_class = AugmentingOntology
-# 	mtds = "__contains__ __getattr__ __getitem__  __getslice__ __iter__ __len__ __setattr__ __setitem__ __setslice__ __setslice__".split()
-# 	for m in mtds:
-# 		if hasattr(_src_class, m):
-# 			mtd = getattr(_src_class, m)
-# 			wr_mtd = lambda self,*args,**kw: (getattr(self.onto, m).__call__(self.onto, *args,**kw))
-# 			setattr(_dst_class, m, wr_mtd)
-
-
-
-
-""" How to cause ontology agmentation: Examples
-
-# create on ontology
-onto1 = get_ontology("my-test-onto")
-
-# ...
-
-# mark to remove an instance ("a1" here)
-onto1["a1"].is_a.append(onto1.DESTROY_INSTANCE)
-
-# mark to create new ClsA instance with two properties assigned (note passing other instances as ontology name strings)
-create_instance(onto1, "ClsA{hasProp=instB; hasFuncProp=instA}")
-
-
-# mark to assert a relation
-with onto1:
-	make_triple(a, onto1.LINK_hasProp, b)
-
-# mark to retract a relation
-with onto1:
-	make_triple(a, onto1.UNLINK_hasProp, b)
-
-
-# ...
-
-# run automatic augmentation which removing all the tool artifacts:
-augment_ontology(onto1)
-
-
-"""
-
-
-# injected property prefices
-_special_prefixes =  [
-	"LINK_", "UNLINK_",  # prefixes for properties replicated existiong properties
-	"CREATE", "IRI", # "CountableProperty",  # full names of properties
-	"COUNT_", "N_"  # prefix for name of property that holds the count of links
-]
 
 
 def make_triple(subj, prop, obj):
@@ -160,6 +88,78 @@ def get_relation_subject(prop, obj):
 	d = dict((b,a) for a,b in prop.get_relations())
 	return d.get(obj, None)
 
+
+
+# make wrapping methods
+# if False and AugmentingOntology:
+# 	_src_class = namespace.Ontology
+# 	_dst_class = AugmentingOntology
+# 	mtds = "__contains__ __getattr__ __getitem__  __getslice__ __iter__ __len__ __setattr__ __setitem__ __setslice__ __setslice__".split()
+# 	for m in mtds:
+# 		if hasattr(_src_class, m):
+# 			mtd = getattr(_src_class, m)
+# 			wr_mtd = lambda self,*args,**kw: (getattr(self.onto, m).__call__(self.onto, *args,**kw))
+# 			setattr(_dst_class, m, wr_mtd)
+
+
+
+""" How to cause ontology augmentation: Examples
+
+# create on ontology
+onto1 = get_ontology("my-test-onto")
+
+# ...
+
+# mark to remove an instance ("a1" here)
+onto1["a1"].is_a.append(onto1.DESTROY_INSTANCE)
+
+# mark to create new ClsA instance with two properties assigned (note passing other instances as ontology name strings)
+create_instance(onto1, "ClsA{hasProp=instB; hasFuncProp=instA}")
+
+
+# mark to assert a relation
+with onto1:
+	make_triple(a, onto1.LINK_hasProp, b)
+
+# mark to retract a relation
+with onto1:
+	make_triple(a, onto1.UNLINK_hasProp, b)
+
+
+# ...
+
+# run automatic augmentation which removing all the tool artifacts:
+augment_ontology(onto1)
+
+"""
+
+class AugmentingOntology(object):
+	"""A wrapper for OwlReadу2 ontology"""
+	def __init__(self, src_onto, no_init=False):
+		super(AugmentingOntology, self).__init__()
+		self.onto = src_onto
+		if not no_init:
+			self.init()
+
+
+	def init(self, **kwargs):
+		# _patch_ontology(onto, ignore_properties=None)
+		_patch_ontology(self.onto, **kwargs)
+
+	def sync(self, **kwargs):
+		"Perform full sync of the ontology with Pellet reasoner & augmentation mechanism allowing powerful means to change the ontology via SWRL"
+		# sync_pellet_cycle(onto, runs_limit=15)
+		success,n_runs = sync_pellet_cycle(self.onto, **kwargs)
+		
+		return success,n_runs
+
+
+# injected property prefices
+_special_prefixes =  [
+	"LINK_", "UNLINK_",  # prefixes for properties replicated existiong properties
+	"CREATE", "IRI", # "CountableProperty",  # full names of properties
+	"COUNT_", "N_"  # prefix for name of property that holds the count of links
+]
 
 
 def _patch_ontology(onto, ignore_properties=None, verbose=False):
