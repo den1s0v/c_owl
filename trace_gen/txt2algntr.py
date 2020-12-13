@@ -459,7 +459,7 @@ class AlgorithmParser:
             m = re.match(r"""
                 (?:for\s*each|для\s+каждого)
                 \s+ (\S+)             # 1 var
-                \s+ (?:in|в)\s+(\S+)  # 2 in (container name)
+                \s+ (?:in|в)\s+((?:array\s+|массив\w*\s+)?\S+)  # 2 in (container name)
                 (?:
                     \s+ - >?    # - or ->   
                     \s+ (\S+)   # 3 optional values
