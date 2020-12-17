@@ -274,10 +274,10 @@ def get_pellet_run_stats():
 	return stats
 	
 
-def run_swiprolog_reasoning(rdf_path_in:str, rdf_path_out:str, verbose=True):
+def run_swiprolog_reasoning(rdf_path_in:str, rdf_path_out:str, verbose=True, command_name="run_ontology"):
 	# C:\D\Work\YDev\CompPr\c_owl>swipl -s run_ontology "test_data/test_make_trace_output.rdf" "test_data/prolog_output.rdf"
 	global OUTPUT_TYPE; OUTPUT_TYPE = 'prolog'
-	cmd = f'swipl -s run_ontology "{rdf_path_in}" "{rdf_path_out}"'
+	cmd = f'swipl -s {command_name} "{rdf_path_in}" "{rdf_path_out}"'
 	# if verbose: print(">_ running cmd:", cmd)
 	run_cmd(cmd, verbose=verbose)
 	# process = subprocess.Popen(cmd, stdout=subprocess.PIPE, creationflags=0x08000000)
@@ -287,7 +287,7 @@ def run_swiprolog_reasoning(rdf_path_in:str, rdf_path_out:str, verbose=True):
 	return get_run_stats()
 
 
-def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena', verbose=True):
+def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena', verbose=True, rules_path=None):
 	# java -jar Jena.jar "test_data/test_make_trace_output.rdf" "jena/all.rules" "test_data/jena_output.rdf"
 	# How to specify working directory:
 	# subprocess.Popen(r'c:\mytool\tool.exe', cwd=r'd:\test\local')
@@ -299,10 +299,11 @@ def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena',
 		reasoning_mode = 'jena'
 		print(' Defaulting to mode:', reasoning_mode)
 	
-	rules_path = {
-		'jena': "jena/all.rules",
-		'sparql': "sparql_from_swrl.ru", 
-	}[reasoning_mode]
+	if not rules_path:
+		rules_path = {  # set defaults
+			'jena': "jena/all.rules",
+			'sparql': "sparql_from_swrl.ru", 
+		}[reasoning_mode]
 	
 	cmd = f'java -jar jena/Jena.jar {reasoning_mode} "{rdf_path_in}" "{rules_path}" "{rdf_path_out}"'
 	run_cmd(cmd, verbose=verbose)
