@@ -306,11 +306,11 @@ def run_tests(directory="test_data/", process_kwargs={}):
 				dataset = os.path.splitext(os.path.split(files[0])[1])[0]
 				eval_results = []
 				# 46
-				for n in range(18, 24 + 1, 1):
-					reasoners = ("pellet", )
+				for n in range(70, 70 + 1, 1):
+					# reasoners = ("pellet", )
 					# reasoners = ("prolog", ); alg_trs = alg_trs[:22]  # !!!
 					# reasoners = ("jena", "sparql")
-					# reasoners = ("jena", "prolog", "sparql")
+					reasoners = ("jena", "prolog", "sparql")
 					for reasoning_type in reasoners:
 						process_kwargs["reasoning"] = reasoning_type
 						
@@ -392,8 +392,8 @@ if __name__ == '__main__':
 	
 	success_all = run_tests(process_kwargs=dict(
 		# reasoning=None, 
-		reasoning="pellet", 
-		# reasoning="jena", 
+		# reasoning="pellet", 
+		reasoning="jena", 
 		# reasoning="prolog", 
 		# reasoning="sparql", 
 		# reasoning="stardog", 

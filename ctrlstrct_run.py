@@ -1264,7 +1264,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         on_done(seconds)
         
     # return onto, []  ### Debug exit
-    exit()
+    # exit()
         
     mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
     

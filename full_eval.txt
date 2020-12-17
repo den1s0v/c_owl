@@ -611,3 +611,9 @@
 {'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 17, 'cpu': 282.3718644067795, 'rss': 1578180608, 'vms': 1796435968, 'uss': 1573937152, 'wall_time': 41.875808822}
 {'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 20, 'cpu': 254.29034090909053, 'rss': 1679904768, 'vms': 1903665152, 'uss': 1675644928, 'wall_time': 51.37121786099999}
 {'dataset': 'err_branching', 'reasoner': 'pellet', 'count': 23, 'cpu': 271.9265882352937, 'rss': 1823834112, 'vms': 2115289088, 'uss': 1819607040, 'wall_time': 63.402167706}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 10, 'cpu': 237.87674418604644, 'rss': 195612672, 'vms': 373710848, 'uss': 191307776, 'wall_time': 4.882780635, 'exclusive_time': 1.754}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 10, 'cpu': 87.65132743362825, 'rss': 13615104, 'vms': 9605120, 'uss': 10301440, 'wall_time': 13.192038719, 'exclusive_time': 9.743}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 10, 'cpu': 206.56161616161617, 'rss': 292302848, 'vms': 495083520, 'uss': 288030720, 'wall_time': 10.949186524999998, 'exclusive_time': 7.878}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 70, 'cpu': 261.40566801619457, 'rss': 1509605376, 'vms': 1854545920, 'uss': 1507012608, 'wall_time': 32.522215659, 'exclusive_time': 27.195}
+{'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 70, 'cpu': 99.67416137805705, 'rss': 21848064, 'vms': 17252352, 'uss': 17891328, 'wall_time': 359.263334794, 'exclusive_time': 356.573}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 70, 'cpu': 111.4205326460484, 'rss': 509075456, 'vms': 870629376, 'uss': 504803328, 'wall_time': 127.45767204700002, 'exclusive_time': 124.007}
