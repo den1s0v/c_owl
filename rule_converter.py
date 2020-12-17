@@ -19,7 +19,7 @@ def convert_varnames(s):
     return RE_q2upper.sub(q2upper_replace, s)
     
     
-RE_predicate = re.compile(r'([\w\d]+)\(([^)]+?)\)')  # 1: name, 2: args in braces
+RE_predicate = re.compile(r'([\w\d]+)\(((?:[^)]|"\)|\)")+)\)')  # 1: name, 2: args in braces
 
 def lower_first_char(s):
     return f"{s[0].lower()}{s[1:]}" if s else s
@@ -28,27 +28,32 @@ def getting_datatype_property(varname):
     #     ^^(IB,_)
     return f'^^({varname},_)'
 
-RE_DatatypeProp = re.compile(r'id|\w*index|exec_time|\w*iteration_n|text_line')
+RE_DatatypeProp = re.compile(r'id|\w*index|exec_time|\w*iteration_n|text_line|step|text|precedence')
 
+def using_boolean_literal(literal):
+    if literal in ('true', 'false'):
+        return f'"{literal}"^^xsd:boolean'
+    return literal
+        
 def getting_property(propname, varname):
     if RE_DatatypeProp.match(propname):
         return getting_datatype_property(varname)
     else:
-        return varname
+        return (varname)
 
 
 def predicate2lowerfirst_replace(pred_match):
     name, args_str = pred_match[1], pred_match[2]
-    args = [s.strip() for s in args_str.split(",")]
+    args = [s.strip() for s in args_str.split(", ")]
     if len(args) == 2:
         args[1] = getting_property(name, args[1])
         args_str = ", ".join(args)
     return f"{lower_first_char(name)}({args_str})"
 
+
 def convert_predicate_calls_prolog(s):
     return RE_predicate.sub(predicate2lowerfirst_replace, s)
     
-
 
 IRI_type = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
 IRI_prefix = 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#'
@@ -57,15 +62,16 @@ IRI_prefix = 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#'
 # rdf_assert(B, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://vstu.ru/poas/ctrl_structs_2020-05_v1#SequenceBegin') ,
 
 def convert_rulehead(s):
-    body, head = list(s.split("->"))
+    body, head = list(s.split(" -> "))
     body = body.rstrip(' \t\n,')
     new_head = []
     head_predicates = RE_predicate.finditer(head)
     for pred_match in head_predicates:
-        new_head.append(f"% -> {pred_match[0].strip()}")
+        # new_head.append(f"% -> {pred_match[0].strip()}")
         name, args_str = pred_match[1], pred_match[2]
         args = [s.strip() for s in args_str.split(",")]
         if len(args) == 2:
+            args[1] = using_boolean_literal(args[1])
             prolog_call = f"rdf_assert({args[0]}, '{IRI_prefix}{name}', {args[1]})"
         elif len(args) == 1:
             prolog_call = f"rdf_assert({args[0]}, '{IRI_type}', '{IRI_prefix}{name}')"
@@ -86,18 +92,24 @@ def swrl2prolog(swrl, name=None):
     return f'''{title}swrl_rule() :- {debug_print_rulename}\n{rule}'''
 
 
-def to_prolog(rules, out_path='from_swrl.pl'):
-	with open(out_path, 'w') as file:
-		for rule in rules:
-			# swrl = rule._original_swrl
-			swrl = rule.swrl
-			prolog = swrl2prolog(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
-			file.write('\n')
-			file.write(prolog)
-		
-		
+def to_prolog(rules, out_path='from_swrl.pl', iri_prefix=None):
+    if iri_prefix:
+        set_IRI_prefix(iri_prefix)
+        
+    with open(out_path, 'w') as file:
+        for rule in rules:
+            # swrl = rule._original_swrl
+            swrl = rule.swrl
+            prolog = swrl2prolog(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
+            file.write('\n')
+            file.write(prolog)
+    
+def set_IRI_prefix(iri_prefix):
+    global IRI_prefix
+    IRI_prefix = iri_prefix
+        
 ### JENA ###
-		
+        
 LOCAL_PREFIX = "my:"
 RDF_TYPE = "rdf:type"
 RE_SWRL_builtins = re.compile(r'lessThan|greaterThan|notEqual|equal|add')
@@ -115,26 +127,26 @@ def convert_builtin(name: str, args: list):
     return f"{name}({args_str})"
 
 def convert_argument(plain: str):
-	plain = fix_conflicting_variable(plain)
-	plain = convert_literal(plain)
-	return plain
-	
+    plain = fix_conflicting_variable(plain)
+    plain = convert_literal(plain)
+    return plain
+    
 def convert_literal(plain: str):
-	if RE_boolean_value.match(plain):
-		# "true"^^xsd:boolean
-		return f'"{plain}"^^xsd:boolean'
-	return plain
+    if RE_boolean_value.match(plain):
+        # "true"^^xsd:boolean
+        return f'"{plain}"^^xsd:boolean'
+    return plain
 
 def fix_conflicting_variable(plain: str):
-	if RE_conflicting_varnames.search(plain):
-		# add a couple of underscores
-		return plain + '__'
-	return plain
-	
+    if RE_conflicting_varnames.search(plain):
+        # add a couple of underscores
+        return plain + '__'
+    return plain
+    
 
 def predicate2triple_replace(pred_match):
     name, args_str = pred_match[1], pred_match[2]
-    args = [convert_argument(s.strip()) for s in args_str.split(",")]
+    args = [convert_argument(s.strip()) for s in args_str.split(", ")]
     if len(args) == 1:
         # type checking
         return f"({args[0]} {RDF_TYPE} {LOCAL_PREFIX}{name})"
@@ -143,7 +155,7 @@ def predicate2triple_replace(pred_match):
     if RE_SWRL_builtins.match(name):
         return convert_builtin(name, args)
     else:
-        assert len(args) == 2, len(args)
+        assert len(args) == 2, f"{len(args)}, in {name}"
         return f"({args[0]} {LOCAL_PREFIX}{name} {args[1]})"
 
 def convert_predicate_calls_jena(s):
@@ -160,17 +172,17 @@ def swrl2jena(swrl, name=None):
     
 
 def to_jena(rules, out_path='from_swrl.jena_rules'):
-	with open(out_path, 'w') as file:
-		for rule in rules:
-			# swrl = rule._original_swrl
-			swrl = rule.swrl
-			jena = swrl2jena(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
-			file.write('\n' * 2)
-			file.write(jena)
+    with open(out_path, 'w') as file:
+        for rule in rules:
+            # swrl = rule._original_swrl
+            swrl = rule.swrl
+            jena = swrl2jena(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
+            file.write('\n' * 2)
+            file.write(jena)
 
 
 ### SPARQL ###
-		
+        
 RULE_END_PUNCT = " . "
 RE_predicate_with_comma = re.compile(r'([\w\d]+)\(([^)]+?)\)\s*,?\s*')  # 1: name, 2: args in braces
 
@@ -188,7 +200,7 @@ def convert_builtin2sparql(name: str, args: list):
 
 def predicate2sparql_triple_replace(pred_match):
     name, args_str = pred_match[1], pred_match[2]
-    args = [s.strip() for s in args_str.split(",")]
+    args = [s.strip() for s in args_str.split(", ")]
     if len(args) == 1:
         # type checking
         return f"{args[0]} {RDF_TYPE} {LOCAL_PREFIX}{name}" + RULE_END_PUNCT
@@ -204,7 +216,7 @@ def convert_predicate_calls_sparql(s):
     
 def swrl2sparql(swrl, name=None):
     s = convert_predicate_calls_sparql(swrl)
-    body, head = list(s.split("->"))
+    body, head = list(s.split(" -> "))
     if not name:
         title = '# Rule'
     else:
@@ -219,24 +231,24 @@ WHERE
     
 
 def to_sparql(rules, out_path='sparql_from_swrl.ru', heading_path='sparql/rdfs4core.ru'):
-	with open(out_path, 'w') as file:
-		with open(heading_path) as heading_file:
-			file.write(heading_file.read())
-		for rule in rules:
-			# swrl = rule._original_swrl
-			swrl = rule.swrl
-			sparql = swrl2sparql(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
-			file.write(sparql)
-			file.write(' ;\n\n')  # ';' is a query separator
+    with open(out_path, 'w') as file:
+        with open(heading_path) as heading_file:
+            file.write(heading_file.read())
+        for rule in rules:
+            # swrl = rule._original_swrl
+            swrl = rule.swrl
+            sparql = swrl2sparql(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
+            file.write(sparql)
+            file.write(' ;\n\n')  # ';' is a query separator
 
 
 def main():
-	RULES = ctrlstrct_swrl.RULES
-	to_prolog(RULES)
-	to_jena(RULES)
-	to_sparql(RULES)
+    RULES = ctrlstrct_swrl.RULES
+    to_prolog(RULES)
+    to_jena(RULES)
+    to_sparql(RULES)
 
 
 if __name__ == '__main__':
-	main()
+    main()
 
