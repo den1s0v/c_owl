@@ -299,7 +299,7 @@ if True:
         ));
         laws.add(getSWRLLawFormulation(
                 "equal_priority_L_assoc",
-                "swrlb:equal(?a_prior, ?b_prior) ^ swrlb:equal(?a_assoc, ?b_assoc) ^ index(?b, ?b_index) ^ precedence(?a, ?a_prior) ^ associativity(?b, ?b_assoc) ^ precedence(?b, ?b_prior) ^ associativity(?a, ?a_assoc) ^ swrlb:equal(?a_assoc, \"L\") ^ swrlb:lessThan(?a_index, ?b_index) ^ index(?a, ?a_index) ^ same_step(?a, ?b) -> high_priority_left_assoc(?a, ?b) ^ high_priority(?a, ?b)"
+                "swrlb:equal(?a_prior, ?b_prior) ^ swrlb:equal(?a_assoc, ?b_assoc) ^ index(?b, ?b_index) ^ precedence(?a, ?a_prior) ^ associativity(?b, ?b_assoc) ^ precedence(?b, ?b_prior) ^ associativity(?a, ?a_assoc) ^ swrlb:equal(?a_assoc, \"L\") ^ index(?a, ?a_index) ^ swrlb:lessThan(?a_index, ?b_index) ^ same_step(?a, ?b) -> high_priority_left_assoc(?a, ?b) ^ high_priority(?a, ?b)"
         ));
         laws.add(getSWRLLawFormulation(
                 "equal_priority_R_assoc",
@@ -323,23 +323,23 @@ if True:
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_complex_operation_copy_inner_app",
-                "next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ swrlb:lessThan(?a_index, ?other_index) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ app(?other, true) ^ init(?a, true) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ not_index(?c, ?other) ^ index(?other, ?other_index) ^ swrlb:lessThan(?other_index, ?c_index) ^ same_step(?a, ?c) ^ index(?a, ?a_index) -> copy_without_marks(?other, ?other_next) ^ app(?other_next, true)"
+                "next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ app(?other, true) ^ init(?a, true) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ not_index(?c, ?other) ^ index(?other, ?other_index) ^ swrlb:lessThan(?other_index, ?c_index) ^ same_step(?a, ?c) ^ index(?a, ?a_index) ^ swrlb:lessThan(?a_index, ?other_index) -> copy_without_marks(?other, ?other_next) ^ app(?other_next, true)"
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_complex_operation_copy_inner_eval",
-                "next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ swrlb:lessThan(?a_index, ?other_index) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ init(?a, true) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ not_index(?c, ?other) ^ index(?other, ?other_index) ^ swrlb:lessThan(?other_index, ?c_index) ^ same_step(?a, ?c) ^ index(?a, ?a_index) ^ eval(?other, true) -> copy_without_marks(?other, ?other_next) ^ app(?other_next, true) ^ has_operand(?a, ?other)"
+                "next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ init(?a, true) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ not_index(?c, ?other) ^ index(?other, ?other_index) ^ swrlb:lessThan(?other_index, ?c_index) ^ same_step(?a, ?c) ^ index(?a, ?a_index) ^ swrlb:lessThan(?a_index, ?other_index) ^ eval(?other, true) -> copy_without_marks(?other, ?other_next) ^ app(?other_next, true) ^ has_operand(?a, ?other)"
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_complex_operation_copy_other_left",
-                "next_step(?c, ?c_next) ^ next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ init(?a, true) ^ swrlb:lessThan(?other_index, ?a_index) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ next_step(?a, ?a_next) ^ not_index(?c, ?other) ^ is_function_call(?a, false) ^ same_step(?a, ?c) ^ index(?other, ?other_index) ^ index(?a, ?a_index) -> copy(?other, ?other_next)"
+                "next_step(?c, ?c_next) ^ next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ init(?a, true) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ next_step(?a, ?a_next) ^ not_index(?c, ?other) ^ is_function_call(?a, false) ^ same_step(?a, ?c) ^ index(?other, ?other_index) ^ index(?a, ?a_index) ^ swrlb:lessThan(?other_index, ?a_index) -> copy(?other, ?other_next)"
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_complex_operation_copy_other_right",
-                "next_step(?c, ?c_next) ^ swrlb:greaterThan(?other_index, ?c_index) ^ next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ init(?a, true) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ next_step(?a, ?a_next) ^ not_index(?c, ?other) ^ same_step(?a, ?c) ^ index(?other, ?other_index) ^ index(?a, ?a_index) -> copy(?other, ?other_next)"
+                "next_step(?c, ?c_next) ^ next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ init(?a, true) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ next_step(?a, ?a_next) ^ not_index(?c, ?other) ^ same_step(?a, ?c) ^ index(?other, ?other_index) ^ index(?a, ?a_index) ^ swrlb:greaterThan(?other_index, ?c_index) -> copy(?other, ?other_next)"
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_complex_operation_copy_others_left_no_function_name",
-                "next_step(?c, ?c_next) ^ next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ find_left_operand(?a, ?d) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ init(?a, true) ^ swrlb:lessThan(?other_index, ?a_index) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ next_step(?a, ?a_next) ^ is_function_call(?a, true) ^ not_index(?d, ?other) ^ not_index(?c, ?other) ^ same_step(?a, ?c) ^ index(?other, ?other_index) ^ index(?a, ?a_index) -> copy(?other, ?other_next)"
+                "next_step(?c, ?c_next) ^ next_index(?b, ?c) ^ has_highest_priority_to_right(?a, true) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ index(?c, ?c_index) ^ find_left_operand(?a, ?d) ^ all_eval_to_right(?a, ?b) ^ arity(?a, \"complex\") ^ init(?a, true) ^ has_highest_priority_to_left(?a, true) ^ not_index(?a, ?other) ^ next_step(?a, ?a_next) ^ is_function_call(?a, true) ^ not_index(?d, ?other) ^ not_index(?c, ?other) ^ same_step(?a, ?c) ^ index(?other, ?other_index) ^ index(?a, ?a_index) ^ swrlb:lessThan(?other_index, ?a_index) -> copy(?other, ?other_next)"
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_function_name",
@@ -371,19 +371,19 @@ if True:
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_ternary_operation_copy_inner_app",
-                "index(?c, ?c_index) ^ arity(?a, \"ternary\") ^ step(?a, ?a_step) ^ swrlb:lessThan(?a_index, ?other_index) ^ step(?other, ?a_step) ^ eval_step(?a, ?a_step) ^ app(?other, true) ^ next_step(?other, ?other_next) ^ index(?other, ?other_index) ^ swrlb:lessThan(?other_index, ?c_index) ^ complex_boundaries(?a, ?c) ^ index(?a, ?a_index) -> copy_without_marks(?other, ?other_next) ^ app(?other_next, true)"
+                "index(?c, ?c_index) ^ arity(?a, \"ternary\") ^ step(?a, ?a_step) ^ step(?other, ?a_step) ^ eval_step(?a, ?a_step) ^ app(?other, true) ^ next_step(?other, ?other_next) ^ index(?other, ?other_index) ^ swrlb:lessThan(?other_index, ?c_index) ^ complex_boundaries(?a, ?c) ^ index(?a, ?a_index) ^ swrlb:lessThan(?a_index, ?other_index) -> copy_without_marks(?other, ?other_next) ^ app(?other_next, true)"
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_ternary_operation_copy_inner_eval",
-                "index(?c, ?c_index) ^ arity(?a, \"ternary\") ^ step(?a, ?a_step) ^ swrlb:lessThan(?a_index, ?other_index) ^ step(?other, ?a_step) ^ eval_step(?a, ?a_step) ^ next_step(?other, ?other_next) ^ index(?other, ?other_index) ^ swrlb:lessThan(?other_index, ?c_index) ^ complex_boundaries(?a, ?c) ^ index(?a, ?a_index) ^ eval(?other, true) -> copy_without_marks(?other, ?other_next) ^ app(?other_next, true) ^ has_operand(?a, ?other)"
+                "index(?c, ?c_index) ^ arity(?a, \"ternary\") ^ step(?a, ?a_step) ^ step(?other, ?a_step) ^ eval_step(?a, ?a_step) ^ next_step(?other, ?other_next) ^ index(?other, ?other_index) ^ swrlb:lessThan(?other_index, ?c_index) ^ complex_boundaries(?a, ?c) ^ index(?a, ?a_index) ^ swrlb:lessThan(?a_index, ?other_index) ^ eval(?other, true) -> copy_without_marks(?other, ?other_next) ^ app(?other_next, true) ^ has_operand(?a, ?other)"
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_ternary_operation_copy_other_left",
-                "arity(?a, \"ternary\") ^ eval_step(?a, ?a_step) ^ step(?a, ?a_step) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ find_left_operand(?a, ?d) ^ swrlb:lessThan(?other_index, ?a_index) ^ not_index(?d, ?other) ^ index(?other, ?other_index) ^ index(?a, ?a_index) -> copy(?other, ?other_next)"
+                "arity(?a, \"ternary\") ^ eval_step(?a, ?a_step) ^ step(?a, ?a_step) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ find_left_operand(?a, ?d) ^ not_index(?d, ?other) ^ index(?other, ?other_index) ^ index(?a, ?a_index) ^ swrlb:lessThan(?other_index, ?a_index) -> copy(?other, ?other_next)"
         ));
         laws.add(getSWRLLawFormulation(
                 "eval_ternary_operation_copy_other_right",
-                "arity(?a, \"ternary\") ^ eval_step(?a, ?a_step) ^ step(?a, ?a_step) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ find_right_operand(?c, ?d) ^ swrlb:lessThan(?c_index, ?other_index) ^ not_index(?d, ?other) ^ index(?other, ?other_index) ^ index(?c, ?c_index) -> copy(?other, ?other_next)"
+                "arity(?a, \"ternary\") ^ eval_step(?a, ?a_step) ^ step(?a, ?a_step) ^ next_step(?other, ?other_next) ^ same_step(?a, ?other) ^ complex_boundaries(?a, ?c) ^ find_right_operand(?c, ?d) ^ not_index(?d, ?other) ^ index(?other, ?other_index) ^ index(?c, ?c_index) ^ swrlb:lessThan(?c_index, ?other_index) -> copy(?other, ?other_next)"
         ));
         laws.add(getSWRLLawFormulation(
                 "find_left_operand_eval",
