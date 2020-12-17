@@ -13,7 +13,16 @@ load_onto :-
 	
 load_onto(Filename) :-
         rdf_load(Filename, []) ,
-		[my_onto], [polyfill], [from_swrl].
+
+		% [my_onto],  % definitions for "Control flow statements"
+		[expr_onto_definitions],  % definitions for "priorities in expressions"
+
+		[polyfill],
+
+		% [from_swrl]  % rules for "Control flow statements"
+		[expr_penskoy]  % rules for "priorities in expressions"
+		.
+
 
 
 dump_rdf(Filename)  :-
