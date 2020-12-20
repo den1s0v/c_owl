@@ -112,7 +112,7 @@ def set_IRI_prefix(iri_prefix):
         
 LOCAL_PREFIX = "my:"
 RDF_TYPE = "rdf:type"
-RE_SWRL_builtins = re.compile(r'lessThan|greaterThan|notEqual|equal|add')
+RE_SWRL_builtins = re.compile(r'lessThan|greaterThan|notEqual|equal|add|matches')
 RE_boolean_value = re.compile(r'^(?:true|false)$')
 # varnames conflicting with classnames
 RE_conflicting_varnames = re.compile(r'\b(?:loop|cond|body)\b')
@@ -123,6 +123,8 @@ def convert_builtin(name: str, args: list):
         # change the order (result is first in SWRL but last in Jena)
         args = [args[1], args[2], args[0]]
         name = 'sum'
+    if name == 'matches':
+        name = 'regex'
     args_str = ", ".join(args)
     return f"{name}({args_str})"
 
@@ -156,6 +158,7 @@ def predicate2triple_replace(pred_match):
         return convert_builtin(name, args)
     else:
         assert len(args) == 2, f"{len(args)}, in {name}"
+        # args[1] = args[1].replace('"', "'")  # " -> ' (Jena accepts single-quoted strings by docs, both types actually)
         return f"({args[0]} {LOCAL_PREFIX}{name} {args[1]})"
 
 def convert_predicate_calls_jena(s):
@@ -184,12 +187,15 @@ def to_jena(rules, out_path='from_swrl.jena_rules'):
 ### SPARQL ###
         
 RULE_END_PUNCT = " . "
-RE_predicate_with_comma = re.compile(r'([\w\d]+)\(([^)]+?)\)\s*,?\s*')  # 1: name, 2: args in braces
+RE_predicate_with_comma = re.compile(r'([\w\d]+)\(((?:[^)]|"\)|\)")+)\)\s*,?\s*')  # 1: name, 2: args in braces
 
 def convert_builtin2sparql(name: str, args: list):
     if name == 'add':
         # BIND(?ia + 1 as ?ib)
         return f"BIND( {args[1]} + {args[2]} as {args[0]} )"
+    if name == 'matches':
+        # FILTER (regex(?var, 'regex-patern'))
+        return f"FILTER (regex ( {args[0]}, {args[1]} ))"
     op = {
         'lessThan' : '<',
         'greaterThan' : '>',
@@ -230,10 +236,18 @@ WHERE
   }}'''
     
 
-def to_sparql(rules, out_path='sparql_from_swrl.ru', heading_path='sparql/rdfs4core.ru'):
+def to_sparql(rules, out_path='sparql_from_swrl.ru', heading_path='sparql/rdfs4core.ru', base_iri=None):
     with open(out_path, 'w') as file:
         with open(heading_path) as heading_file:
-            file.write(heading_file.read())
+            heading_text = heading_file.read()
+            
+            if base_iri:
+                # ensure it ends with '#'
+                base_iri = base_iri.rstrip('#') + '#'
+                # replace PREFIX my:  <IRI>
+                heading_text = re.sub(r'PREFIX my: .+?\n', 'PREFIX my:  <%s>\n' % base_iri, heading_text)
+                
+            file.write(heading_text)
         for rule in rules:
             # swrl = rule._original_swrl
             swrl = rule.swrl

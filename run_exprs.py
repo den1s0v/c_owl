@@ -81,9 +81,9 @@ def proccess_onto_with_reasoner(reasoning, count=30):
         
             
     if reasoning in ('sparql', 'jena'):
-        name_in = f"{reasoning}_in_expr.rdf"
+        name_in = f"{reasoning}_in_expr.n3"
         name_out = f"{reasoning}_out_expr.n3"
-        onto.save(file=name_in, format='rdfxml')
+        onto.save(file=name_in, format='ntriples')
         
         rules_path = {
             'jena': "jena/all_for_exprs.rules",
@@ -108,7 +108,8 @@ def eval_expressions():
     for n in range(7, 10 + 1, 6):
         # reasoners = ("pellet", )
         # reasoners = ("prolog", ); alg_trs = alg_trs[:22]  # !!!
-        reasoners = ("prolog", )
+        # reasoners = ("prolog", )
+        reasoners = ("sparql", )
         # reasoners = ("jena", "sparql")
         # reasoners = ("jena", "prolog", "sparql")
             
@@ -155,7 +156,7 @@ def convert_rules():
     _owl, swrl = get_owl_swrl_laws()
     to_prolog(swrl, out_path='expr_penskoy.pl', iri_prefix="http://penskoy.n/expressions#")
     # to_jena(swrl, out_path='expr_penskoy.jena_rules')
-    # to_sparql(swrl, out_path='expr_penskoy.ru')
+    to_sparql(swrl, out_path='expr_penskoy.ru', base_iri="http://penskoy.n/expressions#")
 
 
 def main():

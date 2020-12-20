@@ -499,11 +499,11 @@ if True:
         ));
         laws.add(getSWRLLawFormulation(
                 "next_prev",
-                "index(?a, ?a_index) ^ index(?b, ?b_index) ^ swrlb:add(?b_index, ?a_index, 1) ^ same_step(?a, ?b) -> next_index(?a, ?b) ^ prev_index(?b, ?a)"
+                "index(?a, ?a_index) ^ swrlb:add(?b_index, ?a_index, 1) ^ index(?b, ?b_index) ^ same_step(?a, ?b) -> next_index(?a, ?b) ^ prev_index(?b, ?a)"
         ));
         laws.add(getSWRLLawFormulation(
                 "next_step",
-                "index(?a, ?a_index) ^ index(?b, ?a_index) ^ step(?a, ?a_step) ^ step(?b, ?b_step) ^ swrlb:add(?b_step, ?a_step, 1) -> next_step(?a, ?b)"
+                "index(?a, ?a_index) ^ index(?b, ?a_index) ^ step(?a, ?a_step) ^ swrlb:add(?b_step, ?a_step, 1) ^ step(?b, ?b_step) -> next_step(?a, ?b)"
         ));
         laws.add(getSWRLLawFormulation(
                 "not_index",

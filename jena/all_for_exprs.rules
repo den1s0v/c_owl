@@ -1,0 +1,17 @@
+@prefix my: <http://test/expressions#> .
+
+# Rule including string "("
+[(?a my:text "\(") -> ]
+
+
+# An important RDF rules subset
+# @include <jena/rdfs4core.rules>.
+
+# @include <RDFS>.
+
+# Converted from SWRL
+# @include <expr_penskoy.jena_rules> .
+
+
+
+

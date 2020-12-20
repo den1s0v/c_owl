@@ -1,0 +1,475 @@
+
+
+# Rule: all_app_to_left []
+[(?a my:all_app_to_left ?b), (?b my:prev_index ?c), (?c my:app 'true'^^xsd:boolean) -> (?a my:all_app_to_left ?c)]
+
+# Rule: operator += []
+[(?a my:step 1), (?a my:text '+=') -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: more_priority_left_by_step_eval []
+[(?a my:more_priority_left_by_step ?b), (?b my:prev_index ?c), (?c my:eval 'true'^^xsd:boolean) -> (?a my:more_priority_left_by_step ?c)]
+
+# Rule: before_direct []
+[(?a my:before_direct ?b) -> (?a my:before ?b)]
+
+# Rule: more_priority_left_by_step_first []
+[(?a my:precedence ?a_prior), (?a my:init 'true'^^xsd:boolean) -> (?a my:more_priority_left_by_step ?a)]
+
+# Rule: more_priority_left_by_step_operand []
+[(?a my:more_priority_left_by_step ?b), (?b my:prev_index ?c), (?c my:is_operand 'true'^^xsd:boolean) -> (?a my:more_priority_left_by_step ?c)]
+
+# Rule: more_priority_right_by_step []
+[(?a my:more_priority_right_by_step ?b), (?b my:next_index ?c), (?a my:high_priority ?c) -> (?a my:more_priority_right_by_step ?c)]
+
+# Rule: more_priority_right_by_step_app []
+[(?a my:more_priority_right_by_step ?b), (?b my:next_index ?c), (?c my:app 'true'^^xsd:boolean) -> (?a my:more_priority_right_by_step ?c)]
+
+# Rule: more_priority_right_by_step_eval []
+[(?a my:more_priority_right_by_step ?b), (?b my:next_index ?c), (?c my:eval 'true'^^xsd:boolean) -> (?a my:more_priority_right_by_step ?c)]
+
+# Rule: more_priority_right_by_step_first []
+[(?a my:precedence ?a_prior), (?a my:init 'true'^^xsd:boolean) -> (?a my:more_priority_right_by_step ?a)]
+
+# Rule: more_priority_right_by_step_operand []
+[(?a my:more_priority_right_by_step ?b), (?b my:next_index ?c), (?c my:is_operand 'true'^^xsd:boolean) -> (?a my:more_priority_right_by_step ?c)]
+
+# Rule: next_prev []
+[(?a my:index ?a_index), (?b my:index ?b_index), sum(?a_index, 1, ?b_index), (?a my:same_step ?b) -> (?a my:next_index ?b), (?b my:prev_index ?a)]
+
+# Rule: next_step []
+[(?a my:index ?a_index), (?b my:index ?a_index), (?a my:step ?a_step), (?b my:step ?b_step), sum(?a_step, 1, ?b_step) -> (?a my:next_step ?b)]
+
+# Rule: not_index []
+[(?a my:index ?a_index), (?b my:index ?b_index), notEqual(?a_index, ?b_index), (?a my:same_step ?b) -> (?b my:not_index ?a), (?a my:not_index ?b)]
+
+# Rule: operator! []
+[(?a my:step 1), (?a my:text '!') -> (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'prefix'), (?a my:precedence 3), (?a my:associativity 'R')]
+
+# Rule: operator!= []
+[(?a my:step 1), (?a my:text '!=') -> (?a my:precedence 10), (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: operator% []
+[(?a my:text '%'), (?a my:step 1) -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:precedence 5), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: operator%= []
+[(?a my:text '%='), (?a my:step 1) -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operator& []
+[(?a my:text '&'), (?a my:step 1), (?a my:prev_operation ?b) -> (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'prefix'), (?a my:precedence 3), (?a my:associativity 'R')]
+
+# Rule: operator&& []
+[(?a my:step 1), (?a my:text '&&') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:is_operator_with_strict_operands_order 'true'^^xsd:boolean), (?a my:precedence 14), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: operator&= []
+[(?a my:text '&='), (?a my:step 1) -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operator( []
+[(?a my:text'(' ), (?a my:step 1), (?a my:prev_operation ?b) -> (?a my:associativity 'L'), (?a my:precedence 0), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:complex_beginning 'true'^^xsd:boolean), (?a my:is_function_call 'false'^^xsd:boolean)]
+
+# Rule: complex_boundaries []
+[(?a my:in_complex ?c), (?a my:next_index ?b), (?a my:complex_beginning 'false'^^xsd:boolean), (?b my:complex_ending 'true'^^xsd:boolean), (?a my:step 0) -> (?c my:complex_boundaries ?b)]
+
+# Rule: operator*= []
+[(?a my:step 1), (?a my:text '*=') -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: before_strict_order_operands_ternary []
+[(?a my:text '?'), (?a my:has_operand ?b), (?a my:has_operand ?c), (?a my:has_operand ?d), (?b my:index ?b_index), (?c my:index ?c_index), (?d my:index ?d_index), (?c my:not_index ?d), lessThan(?b_index, ?c_index), lessThan(?b_index, ?d_index) -> (?b my:before_direct ?c), (?b my:before_all_operands ?c), (?b my:before_by_third_operator ?c), (?b my:before_third_operator ?a)]
+
+# Rule: operator, []
+[(?a my:step 1), (?a my:text ',') -> (?a my:associativity 'L'), (?a my:precedence 17), (?a my:arity 'binary'), (?a my:is_operator_with_strict_operands_order 'true'^^xsd:boolean), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: copy_eval_step_to_zero_step []
+[(?a my:eval_step ?a_step), (?a my:zero_step ?a0) -> (?a0 my:eval_step ?a_step)]
+
+# Rule: operator-= []
+[(?a my:step 1), (?a my:text '-=') -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operator_unary* []
+[(?a my:text '*'), (?a my:step 1), (?a my:prev_operation ?b) -> (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'prefix'), (?a my:precedence 3), (?a my:associativity 'R')]
+
+# Rule: copy_has_complex_operator_part_to_zero_step []
+[(?a my:has_complex_operator_part ?b), (?a my:zero_step ?a0), (?b my:zero_step ?b0) -> (?a0 my:has_complex_operator_part ?b0)]
+
+# Rule: operator-gt []
+[(?a my:step 1), (?a my:text '->') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 2)]
+
+# Rule: operator. []
+[(?a my:step 1), (?a my:text '.') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 2)]
+
+# Rule: operator/ []
+[(?a my:step 1), (?a my:text '/') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:precedence 5), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: operator/= []
+[(?a my:step 1), (?a my:text '/=') -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operator: []
+[(?a my:text ':'), (?a my:step 1) -> (?a my:arity 'ternary'), (?a my:precedence 16), (?a my:init 'true'^^xsd:boolean), (?a my:complex_ending 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operator:: []
+[(?a my:step 1), (?a my:text '::') -> (?a my:associativity 'L'), (?a my:precedence 1), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: all_app_to_left_begin []
+[(?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean) -> (?a my:all_app_to_left ?a)]
+
+# Rule: operatorlt []
+[(?a my:step 1), (?a my:text '<') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 9)]
+
+# Rule: operatorltlt []
+[(?a my:step 1), (?a my:text '<<') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 7)]
+
+# Rule: operatorltlt= []
+[(?a my:step 1), (?a my:text '<<=') -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operatorlt= []
+[(?a my:step 1), (?a my:text '<=') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 9)]
+
+# Rule: operator= []
+[(?a my:step 1), (?a my:text '=') -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operator== []
+[(?a my:step 1), (?a my:text '==') -> (?a my:precedence 10), (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: operatorgt []
+[(?a my:step 1), (?a my:text '>') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 9)]
+
+# Rule: operatorgt= []
+[(?a my:step 1), (?a my:text '>=') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 9)]
+
+# Rule: operatorgtgt []
+[(?a my:step 1), (?a my:text '>>') -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 7)]
+
+# Rule: operator_binary& []
+[(?a my:text '&'), (?a my:step 1), (?a my:prev_operand ?b) -> (?a my:precedence 11), (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: all_app_to_right_begin []
+[(?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:init 'true'^^xsd:boolean) -> (?a my:all_app_to_right ?a)]
+
+# Rule: operatorgtgt= []
+[(?a my:step 1), (?a my:text '>>=') -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operator? []
+[(?a my:step 1), (?a my:text '?') -> (?a my:arity 'ternary'), (?a my:precedence 16), (?a my:is_operator_with_strict_operands_order 'true'^^xsd:boolean), (?a my:init 'true'^^xsd:boolean), (?a my:complex_beginning 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operator^ []
+[(?a my:step 1), (?a my:text '^') -> (?a my:precedence 12), (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: operator^= []
+[(?a my:step 1), (?a my:text '^=') -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: operator_binary* []
+[(?a my:text '*'), (?a my:step 1), (?a my:prev_operand ?b) -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:precedence 5), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: operator_binary+ []
+[(?a my:text '+'), (?a my:step 1), (?a my:prev_operand ?b) -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 6)]
+
+# Rule: operator_binary- []
+[(?a my:step 1), (?a my:text '-'), (?a my:prev_operand ?b) -> (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:precedence 6)]
+
+# Rule: complex_boundaries_empty []
+[(?a my:next_index ?b), (?a my:step 0), (?a my:complex_beginning 'true'^^xsd:boolean), (?b my:complex_ending 'true'^^xsd:boolean) -> (?a my:complex_boundaries ?b)]
+
+# Rule: operator_function_call []
+[(?a my:text '('), (?a my:prev_operand ?b) -> (?a my:associativity 'L'), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:is_function_call 'true'^^xsd:boolean), (?a my:precedence 2)]
+
+# Rule: copy_app []
+[(?a my:copy ?to), (?a my:app 'true'^^xsd:boolean) -> (?to my:app 'true'^^xsd:boolean)]
+
+# Rule: operator_postfix++ []
+[(?a my:step 1), (?a my:text '++'), (?a my:prev_operand ?b) -> (?a my:associativity 'L'), (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'postfix'), (?a my:precedence 2)]
+
+# Rule: operator_postfix-- []
+[(?a my:step 1), (?a my:text '--'), (?a my:prev_operand ?b) -> (?a my:associativity 'L'), (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'postfix'), (?a my:precedence 2)]
+
+# Rule: operator_prefix++ []
+[(?a my:step 1), (?a my:text '++'), (?a my:prev_operation ?b) -> (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'prefix'), (?a my:precedence 3), (?a my:associativity 'R')]
+
+# Rule: operator_prefix-- []
+[(?a my:step 1), (?a my:text '--'), (?a my:prev_operation ?b) -> (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'prefix'), (?a my:precedence 3), (?a my:associativity 'R')]
+
+# Rule: copy_eval []
+[(?a my:copy ?to), (?a my:eval 'true'^^xsd:boolean) -> (?to my:eval 'true'^^xsd:boolean)]
+
+# Rule: operator_subscript []
+[(?a my:text '['), (?a my:step 1) -> (?a my:associativity 'L'), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:complex_beginning 'true'^^xsd:boolean), (?a my:is_function_call 'true'^^xsd:boolean), (?a my:precedence 2)]
+
+# Rule: prev_operation_beggining []
+[(?a my:step 1), (?a my:index 1) -> (?a my:prev_operation ?a)]
+
+# Rule: copy_to_zero_step []
+[(?a my:step 0), (?b my:step 1), (?b my:zero_step ?a) -> (?b my:copy_without_marks ?a)]
+
+# Rule: prev_operand_unary_postfix []
+[(?a my:prev_index ?b), (?b my:arity 'unary'), (?b my:prefix_postfix 'postfix'), (?b my:step 1) -> (?a my:prev_operand ?b)]
+
+# Rule: copy_has_operand_to_zero_step []
+[(?a my:has_operand ?b), (?a my:zero_step ?a0), (?b my:zero_step ?b0) -> (?a0 my:has_operand ?b0)]
+
+# Rule: operator_unary+ []
+[(?a my:text '+'), (?a my:step 1), (?a my:prev_operation ?b) -> (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'prefix'), (?a my:precedence 3), (?a my:associativity 'R')]
+
+# Rule: copy_without_marks []
+[(?a my:copy ?to) -> (?a my:copy_without_marks ?to)]
+
+# Rule: operator_unary- []
+[(?a my:step 1), (?a my:text '-'), (?a my:prev_operation ?b) -> (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'prefix'), (?a my:precedence 3), (?a my:associativity 'R')]
+
+# Rule: copy_init []
+[(?a my:copy ?to), (?a my:init 'true'^^xsd:boolean) -> (?to my:init 'true'^^xsd:boolean)]
+
+# Rule: operator| []
+[(?a my:step 1), (?a my:text '|') -> (?a my:precedence 13), (?a my:associativity 'L'), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: in_complex_begin []
+[(?a my:next_index ?b), (?a my:complex_beginning 'true'^^xsd:boolean), (?b my:complex_ending 'false'^^xsd:boolean), (?a my:step 0) -> (?b my:in_complex ?a)]
+
+# Rule: operator|= []
+[(?a my:step 1), (?a my:text '|=') -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
+
+# Rule: copy_to_1_step []
+[(?a my:step 0), (?b my:step 1), (?b my:zero_step ?a) -> (?a my:copy ?b)]
+
+# Rule: operator|| []
+[(?a my:step 1), (?a my:text '||') -> (?a my:associativity 'L'), (?a my:precedence 15), (?a my:arity 'binary'), (?a my:is_operator_with_strict_operands_order 'true'^^xsd:boolean), (?a my:init 'true'^^xsd:boolean)]
+
+# Rule: all_eval_to_right_begin []
+[(?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:init 'true'^^xsd:boolean), (?a my:complex_beginning 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean) -> (?a my:all_eval_to_right ?a)]
+
+# Rule: copy_without_marks_arity []
+[(?a my:arity ?a_arity), (?a my:copy_without_marks ?to) -> (?to my:arity ?a_arity)]
+
+# Rule: operator~ []
+[(?a my:step 1), (?a my:text '~') -> (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:prefix_postfix 'prefix'), (?a my:precedence 3), (?a my:associativity 'R')]
+
+# Rule: copy_without_marks_associativity []
+[(?a my:associativity ?a_associativity), (?a my:copy_without_marks ?to) -> (?to my:associativity ?a_associativity)]
+
+# Rule: prev_operand []
+[(?a my:prev_index ?b), (?b my:text ?b_text), (?b my:is_operand 'true'^^xsd:boolean), (?b my:step 1) -> (?a my:prev_operand ?b)]
+
+# Rule: copy_without_marks_complex_beginning []
+[(?a my:complex_beginning ?b), (?a my:copy_without_marks ?to) -> (?to my:complex_beginning ?b)]
+
+# Rule: copy_without_marks_complex_boundaries []
+[(?c my:same_step ?to), (?a my:copy_without_marks ?to), (?a my:complex_boundaries ?b), (?c my:zero_step ?b0), (?b my:zero_step ?b0) -> (?to my:complex_boundaries ?c)]
+
+# Rule: prev_operation []
+[(?a my:prev_index ?b), (?b my:arity ?b_arity), notEqual(?b_arity, "unary"), (?b my:step 1) -> (?a my:prev_operation ?b)]
+
+# Rule: copy_without_marks_complex_ending []
+[(?a my:complex_ending ?b), (?a my:copy_without_marks ?to) -> (?to my:complex_ending ?b)]
+
+# Rule: prev_operation_unary_prefix []
+[(?a my:prev_index ?b), (?b my:arity 'unary'), (?b my:prefix_postfix 'prefix'), (?b my:step 1) -> (?a my:prev_operation ?b)]
+
+# Rule: all_app_to_right []
+[(?a my:all_app_to_right ?b), (?b my:next_index ?c), (?c my:app 'true'^^xsd:boolean) -> (?a my:all_app_to_right ?c)]
+
+# Rule: copy_without_marks_in_complex []
+[(?c my:same_step ?to), (?a my:copy_without_marks ?to), (?a my:in_complex ?b), (?c my:zero_step ?b0), (?b my:zero_step ?b0) -> (?to my:in_complex ?c)]
+
+# Rule: before_before []
+[(?a my:before ?b), (?b my:before ?c) -> (?a my:before ?c)]
+
+# Rule: ast_edge_has_complex_operator_part []
+[(?a my:has_complex_operator_part ?b) -> (?a my:ast_edge ?b)]
+
+# Rule: before_function_call []
+[(?a my:has_operand ?b), (?b my:text '('), (?b my:is_function_call 'true'^^xsd:boolean) -> (?b my:before_direct ?a), (?b my:before_as_operand ?a)]
+
+# Rule: copy_without_marks_is_function_call []
+[(?a my:is_function_call ?a_fc), (?a my:copy_without_marks ?to) -> (?to my:is_function_call ?a_fc)]
+
+# Rule: copy_without_marks_is_operand []
+[(?a my:copy_without_marks ?to), (?a my:is_operand ?is_op) -> (?to my:is_operand ?is_op)]
+
+# Rule: copy_without_marks_is_operator_with_strict_operands_order []
+[(?a my:copy_without_marks ?to), (?a my:is_operator_with_strict_operands_order ?is_op) -> (?to my:is_operator_with_strict_operands_order ?is_op)]
+
+# Rule: same_step []
+[(?a my:step ?a_step), (?b my:step ?a_step) -> (?a my:same_step ?b)]
+
+# Rule: copy_without_marks_last []
+[(?a my:last ?a_last), (?a my:copy_without_marks ?to) -> (?to my:last ?a_last)]
+
+# Rule: copy_without_marks_prefix_postfix []
+[(?a my:prefix_postfix ?a_pr), (?a my:copy_without_marks ?to) -> (?to my:prefix_postfix ?a_pr)]
+
+# Rule: copy_without_marks_priority []
+[(?a my:precedence ?a_priority), (?a my:copy_without_marks ?to) -> (?to my:precedence ?a_priority)]
+
+# Rule: copy_without_marks_real_pos []
+[(?a my:real_pos ?a_rp), (?a my:copy_without_marks ?to) -> (?to my:real_pos ?a_rp)]
+
+# Rule: copy_without_marks_student_pos []
+[(?a my:copy_without_marks ?to), (?a my:student_pos ?a_sp) -> (?to my:student_pos ?a_sp)]
+
+# Rule: copy_without_marks_text []
+[(?a my:copy_without_marks ?to), (?a my:text ?a_text) -> (?to my:text ?a_text)]
+
+# Rule: equal_priority_L_assoc []
+[equal(?a_prior, ?b_prior), equal(?a_assoc, ?b_assoc), (?b my:index ?b_index), (?a my:precedence ?a_prior), (?b my:associativity ?b_assoc), (?b my:precedence ?b_prior), (?a my:associativity ?a_assoc), equal(?a_assoc, "L"), (?a my:index ?a_index), lessThan(?a_index, ?b_index), (?a my:same_step ?b) -> (?a my:high_priority_left_assoc ?b), (?a my:high_priority ?b)]
+
+# Rule: equal_priority_R_assoc []
+[equal(?a_prior, ?b_prior), equal(?a_assoc, ?b_assoc), (?b my:index ?b_index), (?a my:precedence ?a_prior), (?b my:associativity ?b_assoc), (?b my:precedence ?b_prior), (?a my:associativity ?a_assoc), equal(?a_assoc, "R"), (?a my:index ?a_index), (?a my:same_step ?b), greaterThan(?a_index, ?b_index) -> (?a my:high_priority ?b), (?a my:high_priority_right_assoc ?b)]
+
+# Rule: eval_,_in_function_call []
+[(?a my:text ','), (?a my:init 'true'^^xsd:boolean), (?a my:in_complex ?b), (?b my:is_function_call 'true'^^xsd:boolean) -> (?a my:app 'true'^^xsd:boolean)]
+
+# Rule: all_eval_to_right []
+[(?a my:all_eval_to_right ?b), (?b my:next_index ?c), (?c my:eval 'true'^^xsd:boolean) -> (?a my:all_eval_to_right ?c)]
+
+# Rule: eval_binary_operation []
+[(?b my:next_step ?b_next), (?c my:next_step ?c_next), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:find_left_operand ?b), (?a my:step ?a_step), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:find_right_operand ?c), (?a my:next_step ?a_next), (?a my:same_step ?c), (?a my:same_step ?b) -> (?a my:has_operand ?c), (?a my:copy_without_marks ?a_next), (?c my:copy_without_marks ?c_next), (?b_next my:app 'true'^^xsd:boolean), (?a my:eval_step ?a_step), (?c_next my:app 'true'^^xsd:boolean), (?a_next my:eval 'true'^^xsd:boolean), (?b my:copy_without_marks ?b_next), (?a my:has_operand ?b)]
+
+# Rule: eval_binary_operation_copy_other []
+[(?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:arity 'binary'), (?other my:next_step ?other_next), (?a my:same_step ?other), (?a my:find_right_operand ?c), (?a my:find_left_operand ?b), (?a my:init 'true'^^xsd:boolean), (?b my:not_index ?other), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:not_index ?other), (?c my:not_index ?other), (?a my:same_step ?c), (?a my:same_step ?b) -> (?other my:copy ?other_next)]
+
+# Rule: eval_complex_operation []
+[(?c my:next_step ?c_next), (?b my:next_index ?c), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:all_eval_to_right ?b), (?a my:step ?a_step), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:next_step ?a_next), (?a my:same_step ?c), (?a my:complex_boundaries ?c) -> (?a my:copy_without_marks ?a_next), (?c my:copy_without_marks ?c_next), (?a my:eval_step ?a_step), (?a my:has_complex_operator_part ?c), (?c_next my:app 'true'^^xsd:boolean), (?a_next my:eval 'true'^^xsd:boolean)]
+
+# Rule: eval_complex_operation_copy_inner_app []
+[(?b my:next_index ?c), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?other my:next_step ?other_next), (?a my:same_step ?other), (?a my:complex_boundaries ?c), (?c my:index ?c_index), (?a my:all_eval_to_right ?b), (?a my:arity 'complex'), (?other my:app 'true'^^xsd:boolean), (?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:not_index ?other), (?c my:not_index ?other), (?other my:index ?other_index), lessThan(?other_index, ?c_index), (?a my:same_step ?c), (?a my:index ?a_index), lessThan(?a_index, ?other_index) -> (?other my:copy_without_marks ?other_next), (?other_next my:app 'true'^^xsd:boolean)]
+
+# Rule: before_strict_order_operands []
+[(?a my:is_operator_with_strict_operands_order 'true'^^xsd:boolean), (?a my:text ?a_text), notEqual(?a_text, "?"), (?a my:has_operand ?b), (?a my:has_operand ?c), (?b my:index ?b_index), (?c my:index ?c_index), lessThan(?b_index, ?c_index) -> (?b my:before_direct ?c), (?b my:before_all_operands ?c), (?b my:before_by_third_operator ?c), (?b my:before_third_operator ?a)]
+
+# Rule: eval_complex_operation_copy_inner_eval []
+[(?b my:next_index ?c), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?other my:next_step ?other_next), (?a my:same_step ?other), (?a my:complex_boundaries ?c), (?c my:index ?c_index), (?a my:all_eval_to_right ?b), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:not_index ?other), (?c my:not_index ?other), (?other my:index ?other_index), lessThan(?other_index, ?c_index), (?a my:same_step ?c), (?a my:index ?a_index), lessThan(?a_index, ?other_index), (?other my:eval 'true'^^xsd:boolean) -> (?other my:copy_without_marks ?other_next), (?other_next my:app 'true'^^xsd:boolean), (?a my:has_operand ?other)]
+
+# Rule: eval_complex_operation_copy_other_left []
+[(?c my:next_step ?c_next), (?b my:next_index ?c), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?other my:next_step ?other_next), (?a my:same_step ?other), (?a my:complex_boundaries ?c), (?c my:index ?c_index), (?a my:all_eval_to_right ?b), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:not_index ?other), (?a my:next_step ?a_next), (?c my:not_index ?other), (?a my:is_function_call 'false'^^xsd:boolean), (?a my:same_step ?c), (?other my:index ?other_index), (?a my:index ?a_index), lessThan(?other_index, ?a_index) -> (?other my:copy ?other_next)]
+
+# Rule: eval_complex_operation_copy_other_right []
+[(?c my:next_step ?c_next), (?b my:next_index ?c), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?other my:next_step ?other_next), (?a my:same_step ?other), (?a my:complex_boundaries ?c), (?c my:index ?c_index), (?a my:all_eval_to_right ?b), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:not_index ?other), (?a my:next_step ?a_next), (?c my:not_index ?other), (?a my:same_step ?c), (?other my:index ?other_index), (?a my:index ?a_index), greaterThan(?other_index, ?c_index) -> (?other my:copy ?other_next)]
+
+# Rule: eval_complex_operation_copy_others_left_no_function_name []
+[(?c my:next_step ?c_next), (?b my:next_index ?c), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?other my:next_step ?other_next), (?a my:same_step ?other), (?a my:complex_boundaries ?c), (?c my:index ?c_index), (?a my:find_left_operand ?d), (?a my:all_eval_to_right ?b), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:not_index ?other), (?a my:next_step ?a_next), (?a my:is_function_call 'true'^^xsd:boolean), (?d my:not_index ?other), (?c my:not_index ?other), (?a my:same_step ?c), (?other my:index ?other_index), (?a my:index ?a_index), lessThan(?other_index, ?a_index) -> (?other my:copy ?other_next)]
+
+# Rule: student_error_in_complex []
+[(?a my:before_by_third_operator ?b), (?a my:before_third_operator ?c), (?c my:text '('), (?a my:describe_error ?b) -> (?b my:student_error_in_complex ?a)]
+
+# Rule: eval_function_name []
+[(?function_name my:next_step ?function_name_next), (?b my:next_index ?c), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:all_eval_to_right ?b), (?a my:find_left_operand ?function_name), (?a my:same_step ?function_name), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:is_function_call 'true'^^xsd:boolean), (?a my:same_step ?c), (?a my:complex_boundaries ?c) -> (?function_name my:copy_without_marks ?function_name_next), (?function_name_next my:app 'true'^^xsd:boolean), (?a my:has_complex_operator_part ?function_name)]
+
+# Rule: describe_error []
+[(?b my:student_pos_less ?a), (?a my:before_direct ?b) -> (?a my:describe_error ?b)]
+
+# Rule: eval_operand_in_complex []
+[(?a my:init 'true'^^xsd:boolean), (?a my:in_complex ?b), (?a my:is_operand 'true'^^xsd:boolean) -> (?a my:eval 'true'^^xsd:boolean)]
+
+# Rule: eval_postfix_operation []
+[(?b my:next_step ?b_next), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:find_left_operand ?b), (?a my:step ?a_step), (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:prefix_postfix 'postfix'), (?a my:next_step ?a_next), (?a my:same_step ?b) -> (?a my:copy_without_marks ?a_next), (?b_next my:app 'true'^^xsd:boolean), (?a my:eval_step ?a_step), (?a_next my:eval 'true'^^xsd:boolean), (?b my:copy_without_marks ?b_next), (?a my:has_operand ?b)]
+
+# Rule: student_error_in_complex_bound []
+[(?a my:before_as_operand ?b), (?b my:complex_beginning 'true'^^xsd:boolean), (?a my:describe_error ?b) -> (?b my:student_error_in_complex ?a)]
+
+# Rule: eval_postfix_operation_copy_others []
+[(?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:find_left_operand ?b), (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?b my:not_index ?other), (?other my:next_step ?other_next), (?a my:same_step ?other), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:not_index ?other), (?a my:prefix_postfix 'postfix'), (?a my:same_step ?b) -> (?other my:copy ?other_next)]
+
+# Rule: student_error_left_assoc []
+[(?a my:before_as_operand ?b), (?a my:describe_error ?b), (?a my:high_priority_left_assoc ?b) -> (?b my:student_error_left_assoc ?a)]
+
+# Rule: zero_step []
+[(?a my:index ?a_index), (?b my:index ?a_index), (?b my:step 0) -> (?a my:zero_step ?b)]
+
+# Rule: ast_edge_has_operand []
+[(?a my:has_operand ?b) -> (?a my:ast_edge ?b)]
+
+# Rule: eval_prefix_operation []
+[(?b my:next_step ?b_next), (?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:step ?a_step), (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?b my:not_index ?other), (?a my:prefix_postfix 'prefix'), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:next_step ?a_next), (?a my:find_right_operand ?b), (?a my:same_step ?b) -> (?a my:copy_without_marks ?a_next), (?b_next my:app 'true'^^xsd:boolean), (?a my:eval_step ?a_step), (?a_next my:eval 'true'^^xsd:boolean), (?b my:copy_without_marks ?b_next), (?a my:has_operand ?b)]
+
+# Rule: all_eval_to_right_app []
+[(?a my:all_eval_to_right ?b), (?b my:next_index ?c), (?c my:app 'true'^^xsd:boolean) -> (?a my:all_eval_to_right ?c)]
+
+# Rule: eval_prefix_operation_copy_others []
+[(?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:arity 'unary'), (?a my:init 'true'^^xsd:boolean), (?b my:not_index ?other), (?other my:next_step ?other_next), (?a my:prefix_postfix 'prefix'), (?a my:same_step ?other), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:not_index ?other), (?a my:find_right_operand ?b), (?a my:same_step ?b) -> (?other my:copy ?other_next)]
+
+# Rule: student_error_more_priority []
+[(?a my:before_as_operand ?b), (?a my:describe_error ?b), (?a my:high_priority_diff_priority ?b) -> (?b my:student_error_more_priority ?a)]
+
+# Rule: eval_ternary_operation []
+[(?a my:arity 'ternary'), (?c my:next_step ?c_next), (?b my:next_index ?c), (?a my:step ?a_step), (?c my:has_highest_priority_to_right 'true'^^xsd:boolean), (?c my:find_right_operand ?e), (?a my:complex_boundaries ?c), (?a my:find_left_operand ?d), (?a my:all_eval_to_right ?b), (?e my:next_step ?e_next), (?a my:init 'true'^^xsd:boolean), (?d my:next_step ?d_next), (?a my:next_step ?a_next), (?c my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:same_step ?c) -> (?a my:has_operand ?e), (?d my:copy_without_marks ?d_next), (?a my:has_operand ?d), (?a my:copy_without_marks ?a_next), (?c my:copy_without_marks ?c_next), (?e my:copy_without_marks ?e_next), (?a my:eval_step ?a_step), (?a my:has_complex_operator_part ?c), (?c_next my:app 'true'^^xsd:boolean), (?d_next my:app 'true'^^xsd:boolean), (?e_next my:app 'true'^^xsd:boolean), (?a_next my:eval 'true'^^xsd:boolean)]
+
+# Rule: student_error_right_assoc []
+[(?a my:before_as_operand ?b), (?a my:describe_error ?b), (?a my:high_priority_right_assoc ?b) -> (?b my:student_error_right_assoc ?a)]
+
+# Rule: eval_ternary_operation_copy_inner_app []
+[(?c my:index ?c_index), (?a my:arity 'ternary'), (?a my:step ?a_step), (?other my:step ?a_step), (?a my:eval_step ?a_step), (?other my:app 'true'^^xsd:boolean), (?other my:next_step ?other_next), (?other my:index ?other_index), lessThan(?other_index, ?c_index), (?a my:complex_boundaries ?c), (?a my:index ?a_index), lessThan(?a_index, ?other_index) -> (?other my:copy_without_marks ?other_next), (?other_next my:app 'true'^^xsd:boolean)]
+
+# Rule: student_error_strict_operands_order []
+[(?a my:before_by_third_operator ?b), (?a my:before_third_operator ?c), (?c my:is_operator_with_strict_operands_order 'true'^^xsd:boolean), (?a my:describe_error ?b) -> (?b my:student_error_strict_operands_order ?a)]
+
+# Rule: before_all_operands []
+[(?a my:before_all_operands ?b), (?b my:has_operand ?c) -> (?a my:before_direct ?c), (?a my:before_by_third_operator ?c), (?a my:before_all_operands ?c)]
+
+# Rule: eval_ternary_operation_copy_inner_eval []
+[(?c my:index ?c_index), (?a my:arity 'ternary'), (?a my:step ?a_step), (?other my:step ?a_step), (?a my:eval_step ?a_step), (?other my:next_step ?other_next), (?other my:index ?other_index), lessThan(?other_index, ?c_index), (?a my:complex_boundaries ?c), (?a my:index ?a_index), lessThan(?a_index, ?other_index), (?other my:eval 'true'^^xsd:boolean) -> (?other my:copy_without_marks ?other_next), (?other_next my:app 'true'^^xsd:boolean), (?a my:has_operand ?other)]
+
+# Rule: eval_ternary_operation_copy_other_left []
+[(?a my:arity 'ternary'), (?a my:eval_step ?a_step), (?a my:step ?a_step), (?other my:next_step ?other_next), (?a my:same_step ?other), (?a my:find_left_operand ?d), (?d my:not_index ?other), (?other my:index ?other_index), (?a my:index ?a_index), lessThan(?other_index, ?a_index) -> (?other my:copy ?other_next)]
+
+# Rule: before []
+[(?a my:has_operand ?b), (?b my:text ?b_text), notEqual(?b_text, "(") -> (?b my:before_direct ?a), (?b my:before_as_operand ?a)]
+
+# Rule: before_in_complex []
+[(?a my:has_operand ?b), (?b my:text '('), (?b my:has_operand ?c) -> (?c my:before_direct ?a), (?c my:before_by_third_operator ?a), (?c my:before_third_operator ?b)]
+
+# Rule: eval_ternary_operation_copy_other_right []
+[(?a my:arity 'ternary'), (?a my:eval_step ?a_step), (?a my:step ?a_step), (?other my:next_step ?other_next), (?a my:same_step ?other), (?a my:complex_boundaries ?c), (?c my:find_right_operand ?d), (?d my:not_index ?other), (?other my:index ?other_index), (?c my:index ?c_index), lessThan(?c_index, ?other_index) -> (?other my:copy ?other_next)]
+
+# Rule: find_left_operand_eval []
+[(?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?b my:prev_index ?c), (?c my:eval 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?a my:all_app_to_left ?b) -> (?a my:find_left_operand ?c)]
+
+# Rule: find_left_operand_init []
+[(?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?b my:prev_index ?c), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?c my:init 'true'^^xsd:boolean), (?a my:all_app_to_left ?b) -> (?a my:find_left_operand ?c)]
+
+# Rule: find_right_operand_eval []
+[(?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?b my:next_index ?c), (?a my:all_app_to_right ?b), (?c my:eval 'true'^^xsd:boolean), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean) -> (?a my:find_right_operand ?c)]
+
+# Rule: find_right_operand_init []
+[(?a my:has_highest_priority_to_right 'true'^^xsd:boolean), (?b my:next_index ?c), (?a my:all_app_to_right ?b), (?a my:has_highest_priority_to_left 'true'^^xsd:boolean), (?c my:init 'true'^^xsd:boolean) -> (?a my:find_right_operand ?c)]
+
+# Rule: has_highest_priority_to_left []
+[(?a my:more_priority_left_by_step ?b), (?b my:index 1) -> (?a my:has_highest_priority_to_left 'true'^^xsd:boolean)]
+
+# Rule: has_highest_priority_to_left_in_complex_, []
+[(?b my:prev_index ?c), (?a my:in_complex ?c), (?a my:text ','), (?c my:is_function_call 'false'^^xsd:boolean), (?a my:more_priority_left_by_step ?b), (?c my:has_highest_priority_to_left 'true'^^xsd:boolean), (?c my:complex_boundaries ?d) -> (?a my:has_highest_priority_to_left 'true'^^xsd:boolean)]
+
+# Rule: has_highest_priority_to_left_in_complex_not_, []
+[(?a my:text ?a_text), notEqual(?a_text, ","), (?b my:prev_index ?c), (?a my:in_complex ?c), (?a my:more_priority_left_by_step ?b), (?c my:has_highest_priority_to_left 'true'^^xsd:boolean) -> (?a my:has_highest_priority_to_left 'true'^^xsd:boolean)]
+
+# Rule: has_highest_priority_to_left_ternary []
+[(?c my:has_highest_priority_to_left 'true'^^xsd:boolean), (?c my:complex_boundaries ?d) -> (?d my:has_highest_priority_to_left 'true'^^xsd:boolean)]
+
+# Rule: has_highest_priority_to_right []
+[(?a my:more_priority_right_by_step ?b), (?b my:last 'true'^^xsd:boolean) -> (?a my:has_highest_priority_to_right 'true'^^xsd:boolean)]
+
+# Rule: has_highest_priority_to_right_in_complex []
+[(?b my:next_index ?d), (?c my:has_highest_priority_to_right 'true'^^xsd:boolean), (?a my:in_complex ?c), (?a my:more_priority_right_by_step ?b), (?c my:complex_boundaries ?d) -> (?a my:has_highest_priority_to_right 'true'^^xsd:boolean)]
+
+# Rule: has_highest_priority_to_right_ternary []
+[(?d my:has_highest_priority_to_right 'true'^^xsd:boolean), (?c my:complex_boundaries ?d) -> (?c my:has_highest_priority_to_right 'true'^^xsd:boolean)]
+
+# Rule: in_complex_step_skip_inner_complex []
+[(?a my:in_complex ?c), (?a my:complex_boundaries ?d), (?a my:step 0) -> (?d my:in_complex ?c)]
+
+# Rule: high_priority []
+[(?a my:precedence ?a_prior), (?b my:precedence ?b_prior), lessThan(?a_prior, ?b_prior), (?a my:same_step ?b) -> (?a my:high_priority ?b), (?a my:high_priority_diff_priority ?b)]
+
+# Rule: is_operand_close_bracket []
+[(?a my:step 1), (?a my:text ']') -> (?a my:init 'true'^^xsd:boolean), (?a my:is_operand 'true'^^xsd:boolean)]
+
+# Rule: in_complex_step []
+[(?a my:next_index ?b), (?a my:step 0), (?a my:complex_beginning 'false'^^xsd:boolean), (?a my:in_complex ?c), (?b my:complex_ending 'false'^^xsd:boolean) -> (?b my:in_complex ?c)]
+
+# Rule: more_priority_left_by_step_app []
+[(?a my:more_priority_left_by_step ?b), (?b my:prev_index ?c), (?c my:app 'true'^^xsd:boolean) -> (?a my:more_priority_left_by_step ?c)]
+
+# Rule: is_operand []
+[(?a my:text ?a_text), notEqual(?a_text, "sizeof"), (?a_text my:matches '[a-zA-Z_0-9]+'), (?a my:step 1) -> (?a my:init 'true'^^xsd:boolean), (?a my:is_operand 'true'^^xsd:boolean)]
+
+# Rule: is_operand_close_parenthesis []
+[(?a my:text ')'), (?a my:step 1) -> (?a my:init 'true'^^xsd:boolean), (?a my:is_operand 'true'^^xsd:boolean)]
+
+# Rule: more_priority_left_by_step []
+[(?a my:more_priority_left_by_step ?b), (?b my:prev_index ?c), (?a my:high_priority ?c) -> (?a my:more_priority_left_by_step ?c)]
