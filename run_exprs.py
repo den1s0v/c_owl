@@ -105,7 +105,7 @@ def proccess_onto_with_reasoner(reasoning, count=30):
 def eval_expressions():
     eval_results = []
     # 46
-    for n in range(7, 10 + 1, 6):
+    for n in range(7, 11 + 1, 6):
         # reasoners = ("pellet", )
         # reasoners = ("prolog", ); alg_trs = alg_trs[:22]  # !!!
         # reasoners = ("prolog", )
@@ -154,14 +154,14 @@ def convert_rules():
     from rule_converter import to_prolog, to_jena, to_sparql
     from __eval.expression_laws import get_owl_swrl_laws
     _owl, swrl = get_owl_swrl_laws()
-    to_prolog(swrl, out_path='expr_penskoy.pl', iri_prefix="http://penskoy.n/expressions#")
+    # to_prolog(swrl, out_path='expr_penskoy.pl', iri_prefix="http://penskoy.n/expressions#")
     # to_jena(swrl, out_path='expr_penskoy.jena_rules')
     to_sparql(swrl, out_path='expr_penskoy.ru', base_iri="http://penskoy.n/expressions#")
 
 
 def main():
-    eval_expressions()
     # convert_rules()
+    eval_expressions()  # ! jena base iri: retrieve/provide
 
 if __name__ == '__main__':
     main()

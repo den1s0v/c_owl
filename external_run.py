@@ -64,7 +64,7 @@ def ext_stdout_handler(stdout, stderr):
 			dur_s = float(m[1])
 			OUTPUT_TIME_LIST.append(dur_s)
 		else:
-			print("An error occured examiming the output of Jena...")
+			print("An error occured examiming the output of Jena/Sparql...")
 			
 	elif SHOW_PRINTOUT:
 		print('The printout of the process (%s):' % OUTPUT_TYPE)
@@ -142,6 +142,7 @@ def invoke_shell(cmd, gather_stats=False, *args):
 			stat = cpu_mem(process, interval)  # blocks over 'interval' seconds
 			if stat:
 				stat_list.append(stat)
+				
 		PROC_STAT_LIST.append(summarize_process_stat(stat_list))
 	
 	printout = process.communicate()
@@ -162,10 +163,8 @@ def cpu_mem(p: psutil.Process, interval=0.1):
             metrics["uss"] = mem.uss
             metrics["rss_peak"] = mem.peak_wset
             metrics["vms_peak"] = mem.peak_pagefile
-    except psutil.NoSuchProcess:
-        pass
-    except psutil.AccessDenied:
-        pass
+    except psutil.NoSuchProcess: pass
+    except psutil.AccessDenied: pass
     return metrics
 
     
@@ -197,17 +196,6 @@ def summarize_process_stat(stat_list: list) -> dict:
 		
 # from threading import Thread
 import threading
-
-# class PelletStatsGatherer(Thread):
-#     def __init__(self, max_wait=3):
-#         """Инициализация потока"""
-#         super().__init__()
-#         self.max_wait = max_wait
-    
-#     def run(self):
-#         """Запуск потока"""
-#         gather_pellet_stats(self.max_wait)
-
 
 def gather_pellet_stats(max_wait=3):
 	# print('Tread Start!')
@@ -251,11 +239,8 @@ def measure_stats_for_pellet_running(max_wait=3):
 	# '''java -Xmx2000M -cp C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\antlr-3.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\antlr-runtime-3.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\aterm-java-1.6.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\commons-codec-1.6.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\httpclient-4.2.3.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\httpcore-4.2.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jcl-over-slf4j-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-arq-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-core-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-iri-0.9.5.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-tdb-0.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jgrapht-jdk1.5.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\log4j-1.2.16.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\owlapi-distribution-3.4.3-bin.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\pellet-2.3.1.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\slf4j-api-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\slf4j-log4j12-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\xercesImpl-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\xml-apis-1.4.01.jar pellet.Pellet realize --loader Jena --input-format N-Triples --infer-prop-values --infer-data-prop-values --ignore-imports {path}'''
 	
 	PROC_STAT_LIST.clear()
-	# global _MAX_WAIT; _MAX_WAIT = max_wait
 	global _WATCHING_THREAD
 	
-	from multiprocessing import Process
-	# PelletStatsGatherer(max_wait)
 	_WATCHING_THREAD = threading.Thread(target=gather_pellet_stats)
 	_WATCHING_THREAD.start()
 	
