@@ -9,7 +9,7 @@ from flask_caching import Cache
 
 from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json
 
-from options import DEBUG
+from options import DEBUG, RUN_LOCALLY
 
 
 def create_app():
@@ -221,10 +221,10 @@ SKIP____10_while 10 (с.3) проверка условия (While_Loop)
 
 
 if __name__ == "__main__":
-	app = create_app()
-	if DEBUG:
+	app = create_app()  # Flask app
+	if RUN_LOCALLY:
 		# debug()
-		app.run(debug = 1, port=2020)
+		app.run(debug = DEBUG, port=2020)
 		# app.run(debug = 1, host="109.206.169.214", port=2020)
 	else:	
 		from waitress import serve
