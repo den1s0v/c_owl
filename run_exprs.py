@@ -105,11 +105,13 @@ def proccess_onto_with_reasoner(reasoning, count=30):
 def eval_expressions():
     eval_results = []
     # 46
-    for n in range(7, 11 + 1, 6):
+    for n in range(2, 3 + 1, 8):
         # reasoners = ("pellet", )
         # reasoners = ("prolog", ); alg_trs = alg_trs[:22]  # !!!
         # reasoners = ("prolog", )
-        reasoners = ("sparql", )
+        # reasoners = ("sparql", )
+        # reasoners = ("jena", )
+        # reasoners = ("prolog", "sparql")
         # reasoners = ("jena", "sparql")
         # reasoners = ("jena", "prolog", "sparql")
             

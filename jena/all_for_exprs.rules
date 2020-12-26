@@ -1,8 +1,11 @@
 @prefix my: <http://test/expressions#> .
 
 # Rule including string "("
-[(?a my:text "\(") -> ]
-
+[(?a my:text "(") -> ]
+# [ -> print('test jena!') ]
+# -> print(')') .
+# [ -> print('(') ]
+# -> print('(').
 
 # An important RDF rules subset
 # @include <jena/rdfs4core.rules>.
