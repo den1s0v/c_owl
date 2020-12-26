@@ -4,8 +4,8 @@ import re
 
 from flask import Flask, request, render_template, jsonify, url_for, redirect
 
-# import the flask extension
-from flask_caching import Cache  
+# # import the flask extension
+# from flask_caching import Cache  
 
 from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json
 
@@ -14,19 +14,22 @@ from options import DEBUG, RUN_LOCALLY
 
 def create_app():
 
-	cache = Cache(config={'CACHE_TYPE': 'simple'})
+	# cache = Cache(config={'CACHE_TYPE': 'simple'})
 
 	app = Flask(__name__, template_folder='web_exp/views', static_folder='web_exp/static',)
 
 	# bind the cache instance on to the app 
-	cache.init_app(app)
+	# cache.init_app(app)
 
-	# @app.route('/index.html')
-	# @app.route('/index/')
-	# @app.route('/')
+	@app.route('/index.html')
+	@app.route('/index/')
+	@app.route('/')
+	def index():
+		return render_template('index.html')
+		
 	# @app.route('/demo/')
 	@app.route('/iswc/demo/')
-	def index():
+	def demo():
 		return render_template('demo.html')
 		
 	@app.route('/favicon.ico')
@@ -39,10 +42,6 @@ def create_app():
 	def http_404_handler(error):
 		# return "<p>HTTP 404 Error Encountered</p>", 404
 		if not 'static' in request.url:
-			# print()
-			# print(vars(request))
-			# print(request.path)
-			# print()
 			url = url_for('static', filename=request.path)
 			return redirect(url)
 		

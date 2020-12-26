@@ -1,0 +1,39 @@
+<head>
+	<title>Создание задачи | AlgTutor</title>
+	<script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='create_task_script.js') }}"></script>
+	
+	<!-- CodeMirror -->
+	<script src="{{ url_for('static', filename='codemirror.js') }}"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='codemirror.css') }}">
+	<!-- <script src="{{ url_for('static', filename='mode/javascript.js') }}"></script> -->
+	
+	<!-- CodeMirror mode: language highlighting specification -->
+	<script src="{{ url_for('static', filename='mode/simple.js') }}"></script>
+	
+	<!-- CodeMirror style -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='theme/elegant.css') }}">
+</head>
+
+<body>
+	<h1>Создание задачи <small>(Алгоритм со значениями управляющих условий)</small></h1>
+	
+	<noscript><h2>Please enable Javascript!</h2></noscript>
+	
+	<button id="load-correct" style="float: right; margin-right: 10px;">Пример кода</button>
+	
+	<a href="{{ url_for('static', filename='Algorithm_and_Trace_syntax_guide.pdf') }}" target="_blank">Справка по синтаксису (впоследствии это будет не нужно)</a>
+	
+	<br>
+	<p>Алгоритм [webpage-js-редактор-кода: <a href="https://codemirror.net/" target="_blank">CodeMirror</a>]:<br>
+    <textarea id="code_editor" cols="120" rows="7"></textarea></p>
+	<div id="syntax_error_description">Ошибок нет</div>
+	
+	<p>Траcса (сделать нередактируемыми блоками c возможностью делать выделение с начиная первого):<br>
+    <textarea id="trace_preview" cols="120" rows="14"></textarea></p>
+	
+	<button id="make_static_url">Сгенерировать статический URL задачи</button> [поле для ссылки (+ кнопка <i>скопировать</i> ?)]
+	<br>
+	<button id="preview_task">Предпросмотр задачи</button>
+	
+</body>
