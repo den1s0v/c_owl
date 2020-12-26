@@ -64,7 +64,7 @@
 [(?a my:text '&='), (?a my:step 1) -> (?a my:precedence 16), (?a my:arity 'binary'), (?a my:init 'true'^^xsd:boolean), (?a my:associativity 'R')]
 
 # Rule: operator( []
-[(?a my:text'(' ), (?a my:step 1), (?a my:prev_operation ?b) -> (?a my:associativity 'L'), (?a my:precedence 0), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:complex_beginning 'true'^^xsd:boolean), (?a my:is_function_call 'false'^^xsd:boolean)]
+[(?a my:text '(' ), (?a my:step 1), (?a my:prev_operation ?b) -> (?a my:associativity 'L'), (?a my:precedence 0), (?a my:arity 'complex'), (?a my:init 'true'^^xsd:boolean), (?a my:complex_beginning 'true'^^xsd:boolean), (?a my:is_function_call 'false'^^xsd:boolean)]
 
 # Rule: complex_boundaries []
 [(?a my:in_complex ?c), (?a my:next_index ?b), (?a my:complex_beginning 'false'^^xsd:boolean), (?b my:complex_ending 'true'^^xsd:boolean), (?a my:step 0) -> (?c my:complex_boundaries ?b)]

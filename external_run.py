@@ -2,7 +2,6 @@
 
 import re
 import subprocess
-import sys
 import time
 import timeit
 from timeit import default_timer as timer
@@ -14,29 +13,29 @@ import psutil
 MEASURE_TIME = True
 REPEAT_COUNT = 1  # 0 is normal mode, ex. 5 mean repeat 5 times and report
 
-# OUT_STREAM = io.StringIO()
-# OUT_STREAM.getvalue()  # retrieve the data written to stream
-
 MIN_WALL_TIME = None
 MIN_EXCLUSIVE_TIME = None
 OUTPUT_TYPE = None
 OUTPUT_TIME_LIST = []  # exclusive reasoning time measured by the reasoner process itself
 PROC_STAT_LIST = []  # measurements of CPU and memory usage
+REASONING_STAT_DICT = {}  # triples_before triples_after iterations (for prolog,sparql modes)
 
 SHOW_PRINTOUT = False
 
 _WATCHING_THREAD = None
 
 def set_repeat_count(count: int):
+	'Set REPEAT_COUNT globally for the module'
 	global REPEAT_COUNT
 	REPEAT_COUNT = count
 
 def get_run_stats():
-	stats_dict = PROC_STAT_LIST[0] if PROC_STAT_LIST else {};
+	stats_dict = PROC_STAT_LIST[0] if PROC_STAT_LIST else {}
 	stats_dict.update({
 		"wall_time": MIN_WALL_TIME,
 		"exclusive_time": MIN_EXCLUSIVE_TIME,
 		})
+	stats_dict.update(REASONING_STAT_DICT)
 	### print(stats_dict)
 	return stats_dict
 
@@ -49,6 +48,8 @@ def ext_stdout_handler(stdout, stderr):
 		stderr = stderr.decode('utf8')
 		# print(stderr)
 		
+	REASONING_STAT_DICT.clear()
+		
 	if OUTPUT_TYPE == 'prolog':
 		# m_0 = re.search(r"Loading the ontology took (\d+) ms\.", stdout)  # reasoning started
 		m = re.search(r"Time it took: (\d+) ms\.", stdout)  # reasoning time
@@ -57,6 +58,13 @@ def ext_stdout_handler(stdout, stderr):
 			OUTPUT_TIME_LIST.append(dur_s)
 		else:
 			print("An error occured examiming the output of Prolog...")
+		ms = re.findall(r"\d+(?=\striples)", stdout)  # triples count
+		if ms:
+			REASONING_STAT_DICT["triples_before"] = int(ms[0])
+			REASONING_STAT_DICT["triples_after"] = int(ms[-1])
+		m = re.search(r"\d+(?=\siterations)", stdout)  # iterations count
+		if m:
+			REASONING_STAT_DICT["iterations"] = int(m[0])
 			
 	elif OUTPUT_TYPE in ('jena', 'sparql'):
 		m = re.search(r"Time spent on reasoning: ([\d.]+) seconds\.", stdout)  # reasoning started
@@ -65,6 +73,14 @@ def ext_stdout_handler(stdout, stderr):
 			OUTPUT_TIME_LIST.append(dur_s)
 		else:
 			print("An error occured examiming the output of Jena/Sparql...")
+		# Starting reasoning from NTriples: 99
+		ms = re.findall(r"(?<=NTriples:\s)\d+", stdout)  # triples count
+		if ms:
+			REASONING_STAT_DICT["triples_before"] = int(ms[0])
+			REASONING_STAT_DICT["triples_after"] = int(ms[-1])
+		ms = re.findall(r"(?<=Iteration:\s)\d+", stdout)  # iterations count
+		if ms:
+			REASONING_STAT_DICT["iterations"] = int(ms[-1])
 			
 	elif SHOW_PRINTOUT:
 		print('The printout of the process (%s):' % OUTPUT_TYPE)
@@ -215,7 +231,7 @@ def gather_pellet_stats(max_wait=3):
 				continue
 		except psutil.Error:
 			print('failed searching for the Pellet process...')
-			return
+			return 'failed to read process data...'
 		break  # found!
 	else:
 		# still not found
@@ -233,6 +249,8 @@ def gather_pellet_stats(max_wait=3):
 		else:
 			break
 	PROC_STAT_LIST.append(summarize_process_stat(stat_list))
+	
+	return 'success'
 
 
 def measure_stats_for_pellet_running(max_wait=3):
@@ -241,7 +259,7 @@ def measure_stats_for_pellet_running(max_wait=3):
 	PROC_STAT_LIST.clear()
 	global _WATCHING_THREAD
 	
-	_WATCHING_THREAD = threading.Thread(target=gather_pellet_stats)
+	_WATCHING_THREAD = threading.Thread(target=gather_pellet_stats)  # pass max_wait ?
 	_WATCHING_THREAD.start()
 	
 	return 'wait and call get_pellet_run_stats()'
