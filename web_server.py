@@ -27,11 +27,11 @@ def create_app():
 	# @app.route('/demo/')
 	@app.route('/iswc/demo/')
 	def index():
-		return render_template('index.html')
+		return render_template('demo.html')
 		
 	@app.route('/favicon.ico')
 	def icon():
-		url = url_for('static', filename='ISWC2020_logo_v.png')
+		url = url_for('static', filename='fireball.png')
 		return redirect(url)
 		# return render_template('index.html')
 		
