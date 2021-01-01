@@ -29,6 +29,8 @@ def proccess_onto_with_reasoner(reasoning, count=30):
             debug_rdf_fpath = 'exprs_dump.n3'
             onto.save(file=debug_rdf_fpath, format='ntriples')
             print(f"Saved RDF file: {debug_rdf_fpath} !")
+        else:
+            debug_rdf_fpath = None
 
 
         print(">_ running Pellet ...")
@@ -55,14 +57,14 @@ def proccess_onto_with_reasoner(reasoning, count=30):
         run_stats = get_pellet_run_stats()
         run_stats.update({"wall_time": seconds})
         run_stats.update({"count": len(expr_chain)})
-        return run_stats
 
-        # if debug_rdf_fpath:
-        #     onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
-        #     print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
+        if debug_rdf_fpath:
+            onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
+            print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
+        return run_stats
             
-    onto = prepare_ontology(expr_chain, inject_swrl=False)
     
+    onto = prepare_ontology(expr_chain, inject_swrl=False)
             
     if reasoning == "prolog":
         name_in = "pl_in_expr.rdf"
@@ -105,11 +107,11 @@ def proccess_onto_with_reasoner(reasoning, count=30):
 def eval_expressions():
     eval_results = []
     # 46
-    for n in range(2, 3 + 1, 8):
+    for n in range(50, 52 + 1, 6):
         # reasoners = ("pellet", )
         # reasoners = ("prolog", ); alg_trs = alg_trs[:22]  # !!!
         # reasoners = ("prolog", )
-        # reasoners = ("sparql", )
+        reasoners = ("sparql", )
         # reasoners = ("jena", )
         # reasoners = ("prolog", "sparql")
         # reasoners = ("jena", "sparql")
@@ -156,14 +158,14 @@ def convert_rules():
     from rule_converter import to_prolog, to_jena, to_sparql
     from __eval.expression_laws import get_owl_swrl_laws
     _owl, swrl = get_owl_swrl_laws()
-    # to_prolog(swrl, out_path='expr_penskoy.pl', iri_prefix="http://penskoy.n/expressions#")
+    to_prolog(swrl, out_path='expr_penskoy.pl', iri_prefix="http://penskoy.n/expressions#")
     # to_jena(swrl, out_path='expr_penskoy.jena_rules')
     to_sparql(swrl, out_path='expr_penskoy.ru', base_iri="http://penskoy.n/expressions#")
 
 
 def main():
     # convert_rules()
-    eval_expressions()  # ! jena base iri: retrieve/provide
+    eval_expressions()
 
 if __name__ == '__main__':
     main()

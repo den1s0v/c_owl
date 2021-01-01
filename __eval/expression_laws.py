@@ -13,11 +13,15 @@ if True:
         return tuple(args)
     
     def getSWRLLawFormulation(name, swrl):
+        # Jena "(" workaround
+        swrl = swrl.replace('"("', '"<(>"')
+        swrl = swrl.replace('","', '"<,>"')
+
         swrl = swrl.replace(' ^ ', ', ')
         swrl = swrl.replace('swrlb:', '')
         name = name.replace('>', 'gt')
         name = name.replace('<', 'lt')
-        # name = 'rule_' + name
+        name = 'rule_' + name
         return DomainRule(name=prepare_name(name), swrl=swrl)
 
 # '''

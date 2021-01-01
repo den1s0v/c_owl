@@ -843,3 +843,4 @@
 {'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 70, 'cpu': 261.40566801619457, 'rss': 1509605376, 'vms': 1854545920, 'uss': 1507012608, 'wall_time': 32.522215659, 'exclusive_time': 27.195}
 {'dataset': 'correct_loops', 'reasoner': 'prolog', 'count': 70, 'cpu': 99.67416137805705, 'rss': 21848064, 'vms': 17252352, 'uss': 17891328, 'wall_time': 359.263334794, 'exclusive_time': 356.573}
 {'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 70, 'cpu': 111.4205326460484, 'rss': 509075456, 'vms': 870629376, 'uss': 504803328, 'wall_time': 127.45767204700002, 'exclusive_time': 124.007}
+{'dataset': 'correct_loops', 'reasoner': 'jena', 'count': 7, 'cpu': 232.63939393939395, 'rss': 168701952, 'vms': 316268544, 'uss': 157663232, 'wall_time': 3.728257073, 'exclusive_time': 1.285}

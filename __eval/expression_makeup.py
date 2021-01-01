@@ -68,6 +68,13 @@ def write_expression(onto, expression: list):
         # facts.add(new BackendFact("owl:NamedIndividual", getName(0, index), "last", "xsd:boolean", "true"));
         make_triple(last_obj_with_step_0, onto["last"], True)
     
+    
+def transform_expression_item(s: str) -> str:
+    # Jena "(" workaround
+    s = s.replace('(', '<(>')
+    s = s.replace(',', '<,>')
+    return s
+    
         
 def test_items_to_expressions(test_items: list) -> list:
     field = 'expression'
@@ -75,10 +82,13 @@ def test_items_to_expressions(test_items: list) -> list:
     for d in test_items:
         if field in d and d[field]:
             data = d[field]
+            # Jena "(" workaround
+            data = list(map(transform_expression_item, data))
+            
             # in_list = False
             for old_data in exprs:
                 if data == old_data:
-                    # print('filtered:', data)
+                    # print('filtered out:', data)
                     break
             else:
                 exprs.append(data)
@@ -111,8 +121,6 @@ def iterate_over_expr_chains(expressions: 'iterable of lists', preferred_step=20
             joined_exprs.extend(expressions[i])
     
     yield joined_exprs
-            
-            
     
 
 def load_all_test_items() -> list:
@@ -130,22 +138,13 @@ def load_all_test_items() -> list:
 def load_test_items_from_file(filepath) -> list:
     with open(filepath) as file:
         return json.load(file)
+    #     text = file.read()
 
+    # # Jena "(" workaround
+    # text = text.replace('"("', '"<(>"')
+    # text = text.replace('","', '"<,>"')
+    # return json.loads(text)
 
-def bad_func__iterate_over_test_expr_ontologies(max_size=None, inject_swrl=False):
-    data = test_items_to_expressions(load_all_test_items())
-    
-    for chain in iterate_over_expr_chains(data):
-        if len(chain) > max_size:
-            break  # and thus return
-        
-        onto = get_ontology('penskoy/expressions')
-        clear_ontology(onto, keep_tbox=False)
-        
-        inject_laws(onto, omit_swrl=not inject_swrl)
-        write_expression(onto, chain)
-        
-        yield onto
 
 def prepare_ontology(expr_chain, inject_swrl=False, iri='http://penskoy.n/expressions'):
         onto = get_ontology(iri)
@@ -153,7 +152,6 @@ def prepare_ontology(expr_chain, inject_swrl=False, iri='http://penskoy.n/expres
         inject_laws(onto, omit_swrl=not inject_swrl)
         write_expression(onto, expr_chain)
         return onto
-    
 
 
 def main():

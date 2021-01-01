@@ -1,19 +1,20 @@
-@prefix my: <http://test/expressions#> .
+@prefix my: <http://penskoy.n/expressions#> .
+# @prefix my: <http://test/expressions#> .
 
 # Rule including string "("
-[(?a my:text "(") -> ]
+# [(?a my:text "(") -> ]
 # [ -> print('test jena!') ]
 # -> print(')') .
 # [ -> print('(') ]
 # -> print('(').
 
 # An important RDF rules subset
-# @include <jena/rdfs4core.rules>.
+@include <jena/rdfs4core.rules>.
 
 # @include <RDFS>.
 
 # Converted from SWRL
-# @include <expr_penskoy.jena_rules> .
+@include <expr_penskoy.jena_rules> .
 
 
 
