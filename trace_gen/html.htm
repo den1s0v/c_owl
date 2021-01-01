@@ -1,0 +1,90 @@
+<pre>
+while not_green  // waiting
+{
+    if red  // over_color
+    {
+        wait
+    }
+    else if yellow
+    {
+        get_ready
+    }
+}
+</pre>
+
+
+<br>
+	<span onclick="console.log('begin while loop')" class='clickable' id="loop_begin">
+		while
+	</span>
+	&nbsp;
+	<span onclick="console.log('evaluate not_green condition')" class='clickable' id="loop_cond">
+		not_green
+	</span>
+	&nbsp;
+	// waiting
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+	<span onclick="console.log('begin loop iteration')" class='clickable' id="iter_begin">
+		{
+	</span>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+	<span onclick="console.log('begin alt')" class='clickable' id="alt_begin">
+		if
+	</span>
+	&nbsp;
+	<span onclick="console.log('evaluate red condition')" class='clickable' id="alt_if-cond">
+		red
+	</span>
+	&nbsp;
+	// over_color
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+	<span onclick="console.log('begin alt if-branch')" class='clickable' id="if-branch_begin">
+		{
+	</span>
+<br>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+	<span onclick="console.log('execute wait statement')" class='clickable' id="wait statement">
+		wait
+	</span>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+	<span onclick="console.log('end alt if-branch')" class='clickable' id="if-branch_end">
+		}
+	</span>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+	else if
+	<span onclick="console.log('evaluate yellow condition')" class='clickable' id="alt_else-if_cond">
+		yellow
+	</span>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+	<span onclick="console.log('begin alt else-if-branch')" class='clickable' id="else-if-branch_begin">
+		{
+	</span>
+<br>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+	<span onclick="console.log('execute get_ready statement')" class='clickable' id="get_ready statement">
+		get_ready
+	</span>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+	<span onclick="console.log('end alt else-if-branch')" class='clickable' id="else-if-branch_end">
+		}
+	</span>
+	&nbsp;
+	<span onclick="console.log('end alt')" class='clickable' id="alt_end">
+		•
+	</span>
+<br>
+	<span onclick="console.log('end loop iteration')" class='clickable' id="iter_end">
+		}
+	</span>
+	&nbsp;
+	<span onclick="console.log('end while loop')" class='clickable' id="loop_end">
+		•
+	</span>
+<br>
+
+
+<style>
+	    .clickable {
+        background-color: lightgrey;
+        # color: darkorange;
+        font-weight: bold;
+    }
+</style>
