@@ -185,7 +185,7 @@ def to_jena(rules, out_path='from_swrl.jena_rules'):
 
 
 ### SPARQL ###
-        
+
 RULE_END_PUNCT = " . "
 RE_predicate_with_comma = re.compile(r'([\w\d]+)\(((?:[^)]|"\)|\)")+)\)\s*,?\s*')  # 1: name, 2: args in braces
 
@@ -218,8 +218,8 @@ def predicate2sparql_triple_replace(pred_match):
 
 def convert_predicate_calls_sparql(s):
     return RE_predicate_with_comma.sub(predicate2sparql_triple_replace, s)
-    
-    
+
+
 def swrl2sparql(swrl, name=None):
     s = convert_predicate_calls_sparql(swrl)
     body, head = list(s.split(" -> "))
@@ -234,7 +234,7 @@ WHERE
   {{
     {body.strip()}
   }}'''
-    
+
 
 def to_sparql(rules, out_path='sparql_from_swrl.ru', heading_path='sparql/rdfs4core.ru', base_iri=None):
     with open(out_path, 'w') as file:
@@ -256,11 +256,84 @@ def to_sparql(rules, out_path='sparql_from_swrl.ru', heading_path='sparql/rdfs4c
             file.write(' ;\n\n')  # ';' is a query separator
 
 
+
+
+### CWM ###
+
+CWM_LOCAL_PREFIX = ":"
+RULE_END_PUNCT = " . "
+RE_predicate_with_comma = re.compile(r'([\w\d]+)\(((?:[^)]|"\)|\)")+)\)\s*,?\s*')  # 1: name, 2: args in braces
+
+def convert_builtin2cwm(name: str, args: list):
+    if name == 'add':
+        # (?ia 1) math:sum ?ib
+        return f"({args[1]} {args[2]}) math:sum {args[0]}"
+    if name == 'matches':
+        # ?var string:matches 'regex-patern'
+        return f"{args[0]} string:matches {args[1]}"
+    op = {
+        'lessThan' : 'lessThan',
+        'greaterThan' : 'greaterThan',
+        'notEqual' : 'notEqualTo',
+        'equal' : 'equalTo',
+         }.get(name, "==!No op!==")
+    return f"{args[0]} math:{op} {args[1]}"
+
+def predicate2cwm_triple_replace(pred_match):
+    name, args_str = pred_match[1], pred_match[2]
+    args = [s.strip() for s in args_str.split(", ")]
+    if len(args) == 1:
+        # type checking
+        return f"{args[0]} a {CWM_LOCAL_PREFIX}{name}" + RULE_END_PUNCT
+    if RE_SWRL_builtins.match(name):
+        return convert_builtin2cwm(name, args) + RULE_END_PUNCT
+    else:
+        assert len(args) == 2, len(args)
+        return f"{args[0]} {CWM_LOCAL_PREFIX}{name} {args[1]}" + RULE_END_PUNCT
+
+def convert_predicate_calls_cwm(s):
+    return RE_predicate_with_comma.sub(predicate2cwm_triple_replace, s)
+    
+    
+def swrl2cwm(swrl, name=None):
+    s = convert_predicate_calls_cwm(swrl)
+    body, head = list(s.split(" -> "))
+    if not name:
+        title = '# Rule'
+    else:
+        title = f'# Rule: {name}'
+    return f'''{title}
+  {{
+    {body.strip()}
+  }} => {{ {head.strip()} }}'''
+    
+
+def to_cwm(rules, out_path='cwm_from_swrl.n3', heading_path='cwm/cwm_rules_header.n3', base_iri=None):
+    with open(out_path, 'w') as file:
+        with open(heading_path) as heading_file:
+            heading_text = heading_file.read()
+            
+            if base_iri:
+                # ensure it ends with '#'
+                base_iri = base_iri.rstrip('#') + '#'
+                # replace @prefix my:  <IRI>.
+                heading_text = re.sub(r'@prefix (?:my)?\: .+?.\n', '@prefix my:  <%s>.\n' % base_iri, heading_text)
+                
+            file.write(heading_text)
+        for rule in rules:
+            # swrl = rule._original_swrl
+            swrl = rule.swrl
+            cwm = swrl2cwm(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
+            file.write(cwm)
+            file.write(' .\n\n')  # '.' is a rule separator
+
+
 def main():
     RULES = ctrlstrct_swrl.RULES
-    to_prolog(RULES)
-    to_jena(RULES)
-    to_sparql(RULES)
+    # to_prolog(RULES)
+    # to_jena(RULES)
+    # to_sparql(RULES)
+    to_cwm(RULES)
 
 
 if __name__ == '__main__':
