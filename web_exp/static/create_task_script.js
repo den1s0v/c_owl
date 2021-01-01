@@ -20,9 +20,56 @@ $(document).ready(function(){
     e_alg = cm_alg.getDoc();
     e_trace = cm_trace.getDoc();
     
-  
+    var change_timer = null;
     
-    $("#load-correct").click(function(){
+    cm_alg.on('changes', function(...args) {
+      // debug log
+      // console.log(args)
+      plan_task_creation(1000);  // дать время на несколько операций редактирования
+    })
+    
+    // запланировать send_task_creation через указанное время
+    function plan_task_creation(delay=0) {
+      if (change_timer) {
+        clearTimeout(change_timer);
+      }
+      change_timer = setTimeout(send_task_creation, delay);
+    }
+    
+    function send_task_creation() {
+      change_timer = null;
+      console.log('send_task_creation() !')
+      
+      data = {
+        alg: e_alg.getValue(),
+        trace_lines: 0,  // [пока константа]  N - число выбранных для инициализации решения строк трассы
+      }
+      
+      $.ajax({
+        url: '/creating_task', 
+        method: 'post',
+        dataType: 'json',
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        beforeSend: function(data){
+            $('#syntax_error_description').html('Проверка алгоритма...')
+        },
+        success: function(data){
+          console.log("feedback from /creating_task:")
+          console.log(data)
+          if (data.errors !== undefined) {
+            const err_msg = data.errors ? data.errors.join(",") : "Алгоритм корректен";
+            $('#syntax_error_description').html(err_msg)
+          }
+        },
+        error: function(data){
+          $('#syntax_error_description').html('Ошибка на сервере ... :-\\')
+        }
+      });
+    }
+
+    
+    $("#load-correct").click(function() {
         if (cm_alg.isReadOnly())
         {
         alert("Невозможно вставить данные примера сейчас.\nПоля вода деактивированы.")

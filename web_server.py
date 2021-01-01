@@ -8,6 +8,7 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect
 # from flask_caching import Cache  
 
 from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json
+from trace_gen.txt2algntr import AlgorithmParser, create_algorithm_from_text
 
 from options import DEBUG, RUN_LOCALLY
 
@@ -27,7 +28,7 @@ def create_app():
 	def index():
 		return render_template('index.html')
 		
-	# @app.route('/demo/')
+	@app.route('/demo/')
 	@app.route('/iswc/demo/')
 	def demo():
 		return render_template('demo.html')
@@ -48,7 +49,20 @@ def create_app():
 		url = url_for('index')
 		return redirect(url)
 
-	@app.route('/process_as_text', methods = ['POST'])
+	@app.route('/creating_task', methods=['POST'])
+	def creating_task():
+		print(request.json)
+		assert 'alg' in request.json
+		res = create_algorithm_from_text(request.json['alg'].splitlines())
+		if isinstance(res, AlgorithmParser):
+			return dict(errors=(), changes=())
+		if isinstance(res, str):
+			return dict(errors=(res,), changes=())
+			
+		return dict(msg="/creating_task is not implemented")
+	
+
+	@app.route('/process_as_text', methods=['POST'])
 	# caching is for debug only! Disable when is in public access!
 	# @cache.cached(timeout=100)  # time seconds
 	def process_data_as_text():
@@ -59,7 +73,7 @@ def create_app():
 			raise ex
 			return dict(messages=[f"Error processing the request - {ex.__class__.__name__}: {str(ex)}"])
 
-	@app.route('/process_as_json', methods = ['POST'])
+	@app.route('/process_as_json', methods=['POST'])
 	def process_data_as_json():
 		try:
 			feedback = process_algorithm_and_trace_as_json_request(request.json)

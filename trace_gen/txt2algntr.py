@@ -519,6 +519,19 @@ class AlgorithmParser:
 
         return result
 
+
+def create_algorithm_from_text(lines: list) -> AlgorithmParser:
+    'just a wrapper for AlgorithmParser constructor'
+    try:
+        return AlgorithmParser(lines)
+    except Exception as e:
+        print("Error !")
+        print("Error parsing algorithm:")
+        print(" ", e)
+        # raise e  # useful for debugging
+        return str(e)
+
+
 # ap = AlgorithmParser(test_lines)
 # ap.algorithm
 
@@ -1173,7 +1186,7 @@ def parse_algorithms_and_traces_from_text(text: str):
             if not re.search(r"\{|функция|function", lines[i+1]):
                 print("Ignored (no alg. begin): line", i, lines[i])
                 continue
-            # найти конец алгоритма
+            # найти конец алгоритма: не ранее 3-х строк ниже названия и далее
             for j in range(i + 3, last_line):
                 next_line = lines[j+1].strip()
                 if not next_line or re.match(r"/\*|//|#", next_line):  # следующая - пустая или комментарий
@@ -1195,10 +1208,10 @@ def parse_algorithms_and_traces_from_text(text: str):
                     
     last_line = len(lines)-1
     
-    # регулярка для всех имён алгоритмов: одно целое слово (имя одного из алгоритмов) должно быть найдено в заголовке трассы
     
     print("Algorithm names:", *list(alg_data.keys()))
     
+    # регулярка для всех имён алгоритмов: одно целое слово (имя одного из алгоритмов) должно быть найдено в заголовке трассы
     alg_names_rgx = "|".join([r"\b%s\b" % re.escape(w) for w in alg_data.keys()])
     alg_names_rgx = re.compile(alg_names_rgx)
     
