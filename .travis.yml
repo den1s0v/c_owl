@@ -1,11 +1,2 @@
   language: python
   
-  script:
-    - python3 ctrlstrct_test.py
-    
-  before_install:
-    - sudo apt-get update
-    - sudo apt-get -y install python3-pip
-    
-  install:
-    - pip3 install -r requirements.txt
