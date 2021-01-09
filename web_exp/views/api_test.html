@@ -1,0 +1,137 @@
+<head>
+    <title>Создание задачи | AlgTutor</title>
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script type="text/javascript">
+        console.log('Welcome to API test!')
+        
+        function send_to(url, textarea_id, result_id) {
+            text = $('#' + textarea_id).val()
+            // console.log(text)
+            data = JSON.parse(text)
+            
+            $.ajax({
+                url: url, 
+                method: 'post',
+                dataType: 'json',
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                beforeSend: function(data){
+                    processing_callback(result_id, "wait")
+                },
+                success: function(data){
+                    processing_callback(result_id, JSON.stringify(data, null, 2))
+                },
+                error: function(data){
+                    processing_callback(result_id, "fail")
+                }
+            });
+
+        }
+        
+        function processing_callback(result_id, response="wait")
+        {
+            status_id = '#' + result_id
+            if(response == "wait")
+            {
+                $(status_id).html("Please wait ...");
+                return
+            }
+            if(response == "fail")
+            {
+                $(status_id).html("An ajax error occurred...)");
+                return
+            }
+            
+            $(status_id).html("<pre>" + response + "</pre>");
+        }
+            
+    $(document).ready(function(){
+        
+        // $("#send_creating_task").click(function(){
+        $('button').click(function(){
+            console.log(this)
+            send_to(
+                this.getAttribute('url'),
+                this.getAttribute('payload_id'),
+                this.getAttribute('result_id'),
+            )
+        })
+
+    })
+
+    </script>
+    
+
+</head>
+
+<body>
+    <h1>API test</h1>
+    
+    <noscript><h2>Please enable Javascript!</h2></noscript>
+    
+<h2> На странице преподавателя </h2>
+
+<h3> Parse Algorithm as text </h3>
+    <pre>
+request to 'localhost:2020/creating_task' [method:POST] : json {
+    algorithm_text:         "some multiline text"  // содержимое поля ввода алгоритма
+    user_language:          "string"  // 'ru' или 'en'
+}
+
+response: json {
+    syntax_errors:          ["message string"],  // ошибка в алгоритме или пустой массив
+    algorithm_json:         {json},  // сохранить для создания задачи
+    algorithm_update_lines: {json},  // внести изменения в editor алгоритма
+    trace_json:             [array],  // отрендерить проверочную трассу
+    </pre>
+    
+    <p><button 
+        id="send_creating_task" 
+        url="/creating_task" 
+        payload_id="payload_creating_task"
+        result_id="result_creating_task"
+    >Test /creating_task [POST]</button>
+    with following JSON payload:
+    <p><textarea id="payload_creating_task" cols="80" rows="7" placeholder="JSON string">{{ '''{"user_language": "ru", "algorithm_text": "пока не_зелёный -> истина,истина,ложь  // ожидание
+    если цвет_красный -> истина,ложь  // по_цвету
+        ждать
+    иначе если цвет_жёлтый -> ложь
+        приготовиться
+"}'''.replace('\n', '\\n') }}
+    </textarea></p>  <!-- { { some python code } } - шаблонизация в Flask -->
+    Response:
+    <div id="result_creating_task" style="background-color: #eeffff;"></div>
+    
+    
+<h2> На странице ученика </h2>
+<h3> Verify new act </h3>
+    <pre>
+request to 'localhost:2020/verify_trace_act' [method:POST] : json {
+    user_language:          "string"  // 'ru' или 'en'
+    algorithm_json:         {json},
+    algorithm_element_id:   int,      // поле 'id' из кликнутого элемента
+    act_type:               "string"  // начало ('begin') или конец ('end')
+    trace_json:             [array],  // вся имеющаяся правильная трасса
+}
+
+response: json {
+    trace_line_json:        {json},  // строка как один элемент трассы
+    is_trace_line_ok:       boolean,  // true, если всё хорошо, иначе false
+    trace_errors:           ["message string"],  // ошибка в трассе с учётом указаного акта (пустой массив, если is_trace_line_ok == true)
+}
+    </pre>
+
+    <p><button 
+        id="send_verify_trace_act" 
+        url="/verify_trace_act" 
+        payload_id="payload_verify_trace_act"
+        result_id="result_verify_trace_act"
+    >Test /verify_trace_act [POST]</button>
+    with following JSON payload:
+    <p><textarea id="payload_verify_trace_act" cols="80" rows="7">{"user_language": "ru", "algorithm_json": {}, 
+"algorithm_element_id": 7, "act_type": "begin"}</textarea></p>
+    Response:
+    <div id="result_verify_trace_act" style="background-color: #eeffff;"></div>
+    
+    
+</body>

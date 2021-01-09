@@ -26,8 +26,8 @@ REFERENCE_DATA_FIELD = "reference_output"
 
 # SAVE_RDF = True
 SAVE_RDF = False
-EVALUATE = True
-# EVALUATE = False
+# EVALUATE = True
+EVALUATE = False
 
 # global log storage
 LOG = []

@@ -33,6 +33,11 @@ def create_app():
 	def demo():
 		return render_template('demo.html')
 		
+	@app.route('/api_test/')
+	@app.route('/test/')
+	def api_test():
+		return render_template('api_test.html')
+		
 	@app.route('/favicon.ico')
 	def icon():
 		url = url_for('static', filename='fireball.png')
@@ -49,18 +54,59 @@ def create_app():
 		url = url_for('index')
 		return redirect(url)
 
+
 	@app.route('/creating_task', methods=['POST'])
 	def creating_task():
 		print(request.json)
-		assert 'alg' in request.json
-		res = create_algorithm_from_text(request.json['alg'].splitlines())
+		assert 'algorithm_text' in request.json, 'Bad json!'
+		res = create_algorithm_from_text(request.json['algorithm_text'].splitlines())
 		if isinstance(res, AlgorithmParser):
-			return dict(errors=(), changes=())
+			return dict(
+				syntax_errors=(), 
+				algorithm_json=res.algorithm,
+				algorithm_update_lines={},
+				trace_json=()
+			)
 		if isinstance(res, str):
-			return dict(errors=(res,), changes=())
+			return dict(
+				syntax_errors=(res,), 
+				algorithm_json=None,
+				algorithm_update_lines={},
+				trace_json=()
+			)
 			
-		return dict(msg="/creating_task is not implemented")
+		return dict(syntax_errors=("Server error: /creating_task command is not implemented",))
 	
+
+
+	@app.route('/verify_trace_act', methods=['POST'])
+	def make_trace_act():
+		print(request.json)
+		assert 'algorithm_json' in request.json, 'Bad json!'
+		# res = create_algorithm_from_text(request.json['algorithm_json'].splitlines())
+		# if isinstance(res, AlgorithmParser):
+		# 	return dict(
+		# 		syntax_errors=(), 
+		# 		algorithm_json=res.algorithm,
+		# 		algorithm_update_lines={},
+		# 		trace_json=()
+		# 	)
+		# if isinstance(res, str):
+		# 	return dict(
+		# 		syntax_errors=(res,), 
+		# 		algorithm_json=None,
+		# 		algorithm_update_lines={},
+		# 		trace_json=()
+		# 	)
+			
+		# return dict(trace_line_json={"message":"Server error: /make_trace_act command is not implemented"})
+	
+		return dict(trace_line_json={"as_string": "Dummy act line!", "id": 49, "loop": "waiting", "executes": 7, "gen": "he", "phase": "started", "_n": 4})
+
+
+
+
+
 
 	@app.route('/process_as_text', methods=['POST'])
 	# caching is for debug only! Disable when is in public access!

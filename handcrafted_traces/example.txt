@@ -312,6 +312,15 @@ program ended
 }
 }
 
+// алгоритм alg_ru2
+{
+пока не_зелёный -> истина,истина,ложь  // ожидание
+    если цвет_красный -> истина,ложь  // по_цвету
+		ждать
+    иначе если цвет_жёлтый -> ложь
+        приготовиться
+}
+
 // alg_ru трасса
 {
 началась программа
@@ -406,6 +415,37 @@ program began
  loop waiting ended 1st time
 program ended
 }
+
+####################
+while not_green -> false  // waiting
+    if red -> true // over_color
+        wait
+    else if yellow -> true
+        get_ready
+
+
+program began
+ loop waiting began 1st time
+  condition of loop (not_green) evaluated 1st time - false		# < здесь причина ошибки (жёлтый фон)
+  iteration 1 of loop waiting began								# < здесь будет ошибка (красный фон)
+   alternative over_color began 1st time
+    condition of alternative (red) evaluated 1st time - true
+    branch of condition (red) began 1st time
+     wait executed 1st time
+    branch of condition (red) ended 1st time
+   alternative over_color ended 1st time
+  iteration 1 of loop waiting ended
+  condition of loop (not_green) evaluated 2nd time - true
+  iteration 2 of loop waiting began
+   alternative over_color began 2nd time
+    condition of alternative (red) evaluated 2nd time - false
+    condition of alternative (yellow) evaluated 1st time - false
+   alternative over_color ended 2nd time
+  iteration 2 of loop waiting ended
+  condition of loop (not_green) evaluated 3rd time - false
+ loop waiting ended 1st time
+program ended
+##################################
 
 
 // алгоритм example_alt2
