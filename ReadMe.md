@@ -11,6 +11,8 @@ Status: proof-of-concept prototype.
 
 (**Task**: find all mistakes using this algorithm and a trace fragment and generate explanations for each of them that are clear to people.)
 
+- note that all the examples (see `handcrafted_traces/\*.txt`) designed in Russian language.
+
 ## Технологии (Technologies)
 
 - OWL 2 + SWRL ([tutorial](http://dior.ics.muni.cz/~makub/owl))
@@ -43,4 +45,9 @@ Status: proof-of-concept prototype.
 
 Порт по умолчанию задан как `2020` и не вынесен в настройки; подробнее - см. конец файла `web_server.py`.
 
-- note that all the examples (see handcrafted_traces/\*.txt) designed in Russian language.
+### Использование
+
+После запуска веб-сервера на `localhost:2020` становятся доступны несколько страниц:
+
+- `/demo` - Демонстрационная страница, подготовленная для ISWC2020 (может уже не работать корректно)
+- `/api_test` - Описание API (пока что 2 запроса) и кнопки для их тестирования
