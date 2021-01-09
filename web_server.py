@@ -281,11 +281,11 @@ SKIP____10_while 10 (с.3) проверка условия (While_Loop)
 
 if __name__ == "__main__":
 	app = create_app()  # Flask app
-	if RUN_LOCALLY:
-		# debug()
-		app.run(debug = DEBUG, port=2020)
-		# app.run(debug = 1, host="109.206.169.214", port=2020)
+	
+	host = 'localhost' if RUN_LOCALLY else "109.206.169.214"
+	
+	if DEBUG:
+		app.run(debug = DEBUG, host=host, port=2020)
 	else:	
 		from waitress import serve
-		# serve(app, port=2020)
-		serve(app, host="109.206.169.214", port=2020)
+		serve(app, host=host, port=2020)
