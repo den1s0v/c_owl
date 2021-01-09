@@ -64,6 +64,7 @@ def filtered_rules(tags):
 # RULES.append(DomainRule(name=, tags={}, swrl=))
 # if not dr.name.startswith("-"): RULES.append(dr)
 	
+# Акты должны нумероваться по порядку
 RULES.append(DomainRule(name="Incr_index", 
 	tags={'correct', 'helper'}, 
 	swrl="""
@@ -75,7 +76,7 @@ RULES.append(DomainRule(name="-hardcoded- student_Incr_index",
 	student_next(?a, ?b), student_index(?a, ?ia), add(?ib, ?ia, 1)
 	 -> student_index(?b, ?ib)"""))
 
-# (s6)
+# (s6)  Если составной акт не заканчивается сразу же после начала, то он является объемлющим для первого же после его начала акта
 RULES.append(DomainRule(name="DepthIncr_rule_s6", 
 	tags={'correct', 'helper'}, 
 	swrl="""
@@ -89,7 +90,7 @@ RULES.append(DomainRule(name="student_DepthIncr_rule_s6",
 	 -> student_parent_of(?a, ?b)
 	"""))
 
-# (s7)
+# (s7)  Если сразу за начальным актом следует завершающий акт, то они являются началом и концом одного составного акта и имеют обший объемлющий акт
 RULES.append(DomainRule(name="DepthSame_b-e_rule_s7", 
 	tags={'correct', 'helper'},
 	swrl="""
@@ -105,14 +106,14 @@ RULES.append(DomainRule(name="student_DepthSame_b-e_rule_s7",
 	 -> student_parent_of(?p, ?b), student_corresponding_end(?a, ?b)
 	"""))
 	
-# (s8)
- # проверка на Начало А - Конец Б (должен был быть Конец А) - CorrespondingActsMismatch_Error
+# (s8)  Если сразу за конечным актом следует начальный акт, то они имеют обший объемлющий акт
+ # проверка на Начало А - Конец Б (должен был быть Конец А) - см. CorrespondingActsMismatch_Error
 RULES.append(DomainRule(name="DepthSame_e-b_rule_s8", 
 	tags={'correct', 'helper'},
 	swrl="""
 	act_end(?a), next_act(?a, ?b), act_begin(?b), 
-	parent_of(?p, ?a)  # depth(?a, ?da),
-	 -> parent_of(?p, ?b)  # depth(?b, ?da), 
+	parent_of(?p, ?a)
+	 -> parent_of(?p, ?b)
 	"""))
 RULES.append(DomainRule(name="student_DepthSame_e-b_rule_s8", 
 	tags={'mistake', 'helper'},
@@ -122,7 +123,7 @@ RULES.append(DomainRule(name="student_DepthSame_e-b_rule_s8",
 	 -> student_parent_of(?p, ?b)
 	"""))
 
-# (s9)
+# (s9)  Если сразу за конечным актом А следует конечный акт Б, то Б - это конец составного акта, объемлющего акт А
 RULES.append(DomainRule(name="DepthDecr_rule_s9", 
 	tags={'correct', 'helper'},
 	swrl="""
@@ -138,7 +139,7 @@ RULES.append(DomainRule(name="student_DepthDecr_rule_s9",
 	 -> student_corresponding_end(?p, ?b)
 	"""))
 
-# (s10)
+# (s10)  Начало и конец составного акта должны иметь обший объемлющий акт
 RULES.append(DomainRule(name="SameParentOfCorrActs_rule_s10", 
 	tags={'correct', 'helper'},
 	swrl="""
@@ -153,12 +154,15 @@ RULES.append(DomainRule(name="student_SameParentOfCorrActs_rule_s10",
 	"""))
 
 
+# Акты одного действия ("братья") должны выполняться в порядке возрастания номера выполнения (1, 2, 3, ...). (Для этого соседние "братья" заранее связаны свойством next_sibling.)
+# Помечаем, какой "брат" ожидается далее, при помощи свойства after_act
+
 # Disambiguating siblings (1): init on previous correct sibling
 RULES.append(DomainRule(name="Earliest_after_act_is_previous_correct_sibling", 
 	tags={'correct', 'helper'},
 	swrl="""
-	correct_act(?a),
-	next_sibling(?a, ?s),
+	correct_act(?a),   # inferred
+	next_sibling(?a, ?s),  # given (pre-computed)
 	 -> after_act(?s, ?a)
 """))
 # Disambiguating siblings (2): propagate till itself
@@ -183,6 +187,7 @@ RULES.append(DomainRule(name="Propagate_after_act",
 				######################
 
 # Точка входа в трассу - функция  [works with Pellet] [works with Stardog]
+# Если точкой входа в алгоритм является функция, то первым актом трассы, которая исполняет алгоритм, будет акт начала функции
 RULES.append(DomainRule(name="start__to__MainFunctionBegin__rule_g3", 
 	tags={'correct', 'entry', 'function'},
 	swrl="""
@@ -190,10 +195,8 @@ RULES.append(DomainRule(name="start__to__MainFunctionBegin__rule_g3",
 	executes(?a, ?alg),
 	entry_point(?alg, ?func_),
 	func(?func_), 
-	# DifferentFrom(?a, ?b),  # здесь не нужно, но правило от этого ломается (хотя и не ломает остальной вывод)!
 	act_begin(?b),
-		# next_sibling(?pr, ?b), correct_act(?pr),
-	next_sibling(?a, ?b),  # ?pr === ?a
+	next_sibling(?a, ?b),
 	executes(?b, ?func_),
 
 	 -> normal_flow_correct_act(?b), 
@@ -202,6 +205,7 @@ RULES.append(DomainRule(name="start__to__MainFunctionBegin__rule_g3",
 """))
 
 # Точка входа в трассу - глобальный код  [works with Pellet]
+# Если точкой входа в алгоритм является следование (глобальный код), то первым актом трассы, которая исполняет алгоритм, будет акт начала следования
 RULES.append(DomainRule(name="start__to__GlobalCode__rule_g4", 
 	tags={'correct', 'entry', 'sequence'},
 	swrl="""
@@ -211,8 +215,7 @@ RULES.append(DomainRule(name="start__to__GlobalCode__rule_g4",
 	sequence(?gc), 
 
 	act_begin(?b),
-		# next_sibling(?pr, ?b), correct_act(?pr),
-	next_sibling(?a, ?b),  # ?pr === ?a
+	next_sibling(?a, ?b),
 	executes(?b, ?gc),
 
 	 -> normal_flow_correct_act(?b), 
@@ -220,8 +223,11 @@ RULES.append(DomainRule(name="start__to__GlobalCode__rule_g4",
 """))
 
 
-# OK !
+# ===== Seq ===== #
+
+
 # Начало тела функции  [works with Pellet] [works with Stardog]
+# Вслед за актом начала функции должен начаться акт тела функции
 RULES.append(DomainRule(name="connect_FunctionBodyBegin_rule_g5", 
 	tags={'correct', 'function'},
 	swrl="""
@@ -242,6 +248,7 @@ RULES.append(DomainRule(name="connect_FunctionBodyBegin_rule_g5",
 	 FunctionBodyBegin(?b)
 """))
 # Конец тела функции
+# Вслед за актом конца тела функции должен закончиться акт функции
 RULES.append(DomainRule(name="connect_FuncBodyEnd_rule_g5-2", 
 	tags={'correct', 'function'},
 	swrl="""
@@ -261,6 +268,7 @@ RULES.append(DomainRule(name="connect_FuncBodyEnd_rule_g5-2",
 
 # Первый акт следования [works with Pellet] [FAILS with Stardog...]
 # Пустые следования (без действий) не поддерживаются!
+# Вслед за актом начала следования должен начаться акт первого действия в следовании
 RULES.append(DomainRule(name="connect_SequenceBegin_rule_g2", 
 	tags={'correct', 'sequence'},
 	swrl="""
@@ -280,6 +288,7 @@ RULES.append(DomainRule(name="connect_SequenceBegin_rule_g2",
 """))
 
 # Следующий акт следования [works with Pellet]
+# Вслед за концом акта некоторого действия в следовании, и если в следовании есть следующее действие, должен начаться акт следующего действия в следовании
 RULES.append(DomainRule(name="connect_SequenceNext", 
 	tags={'correct', 'sequence'},
 	swrl="""
@@ -304,6 +313,7 @@ RULES.append(DomainRule(name="connect_SequenceNext",
 """))
 
 # Начало и конец простого акта [works with Pellet]
+# Вслед за началом акта простого действия (statement) должен идти акт конца того же действия с тем же номером исполнения
 RULES.append(DomainRule(name="connect_StmtEnd", 
 	tags={'correct', 'sequence'},
 	swrl="""
@@ -323,6 +333,7 @@ RULES.append(DomainRule(name="connect_StmtEnd",
 """))
 
 # Начало и конец акта выражения [works with Pellet]
+# Вслед за началом акта выражения (expression) должен идти акт конца того же выражения с тем же номером исполнения
 RULES.append(DomainRule(name="connect_ExprEnd", 
 	tags={'correct', 'sequence'},
 	swrl="""
@@ -342,6 +353,7 @@ RULES.append(DomainRule(name="connect_ExprEnd",
 """))
 
 #  [works with Pellet]
+# Вслед за концом акта некоторого действия в следовании, и если оно является в следовании последним, должен закончиться и весь объемлющий акт следования
 RULES.append(DomainRule(name="connect_SequenceEnd", 
 	tags={'correct', 'sequence'},
 	swrl="""
@@ -367,6 +379,7 @@ RULES.append(DomainRule(name="connect_SequenceEnd",
 
 
 # Проверка первого условия развилки (if) [works with Pellet]
+# Если А - начало акта альтернативы, Б - это начало акта условия первой ветки альтернативы, то после А должен следовать Б
 RULES.append(DomainRule(name="connect_AltBegin", 
 	tags={'correct', 'alternative'},
 	swrl="""
@@ -384,13 +397,11 @@ RULES.append(DomainRule(name="connect_AltBegin",
 	executes(?b, ?cnd),  # expr
 	
 	after_act(?b, ?a),
-
-	# exec_time(?a, ?t), exec_time(?b, ?_t),
-	# equal(?t, ?_t),
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), AltBegin(?b)
 """))
 
 # Начало ветки истинного условия развилки [works with Pellet]
+# Если А - это конец акта условия ветки альтернативы и его значение - true, Б - это акт начала ветки, то после А должен следовать Б
 RULES.append(DomainRule(name="connect_AltBranchBegin_CondTrue", 
 	tags={'correct', 'alternative'},
 	swrl="""
@@ -413,6 +424,7 @@ RULES.append(DomainRule(name="connect_AltBranchBegin_CondTrue",
 """))
 
 # Проверка следующего условия развилки (else-if) [works with Pellet]
+# Если А - это конец акта условия ветки альтернативы и его значение - false, следующая ветка с условием существует, Б - это акт начала условия следующей ветки, то после А должен следовать Б
 RULES.append(DomainRule(name="connect_NextAltCondition", 
 	tags={'correct', 'alternative'},
 	swrl="""
@@ -438,6 +450,7 @@ RULES.append(DomainRule(name="connect_NextAltCondition",
 """))
 
 # Переход к ветке ИНАЧЕ (else)  [works with Pellet]
+# Если А - это конец акта условия ветки альтернативы и его значение - false, следующая ветка в альтернативе - это ветка ИНАЧЕ, Б - это акт начала ветки ИНАЧЕ, то после А должен следовать Б
 RULES.append(DomainRule(name="connect_AltElseBranch", 
 	tags={'correct', 'alternative'},
 	swrl="""
@@ -462,6 +475,7 @@ RULES.append(DomainRule(name="connect_AltElseBranch",
 """))
 
 # Конец развилки, т.к. все условия ложны [works with Pellet]
+# Если А - это конец акта условия ветки альтернативы и его значение - false, эта ветка в альтернативе последняя, то после А должен следовать конец альтернативы
 RULES.append(DomainRule(name="connect_AltEndAllFalse", 
 	tags={'correct', 'alternative'},
 	swrl="""
@@ -487,6 +501,7 @@ RULES.append(DomainRule(name="connect_AltEndAllFalse",
 """))
 
 # Окончание развилки по завершению ветки [works with Pellet]
+# Если А - это конец акта ветки альтернативы, то после А должен следовать конец альтернативы
 RULES.append(DomainRule(name="connect_AltEndAfterBranch", 
 	tags={'correct', 'alternative'},
 	swrl="""
@@ -511,6 +526,7 @@ RULES.append(DomainRule(name="connect_AltEndAfterBranch",
 
 
 # Начало цикла с предусловием (while) [works with Pellet]
+# Если А - это начало акта цикла с предусловием, то после А должно следовать начало акта условия цикла
 RULES.append(DomainRule(name="connect_LoopBegin-cond", 
 	tags={'correct', 'loop'},
 	swrl="""
@@ -530,6 +546,7 @@ RULES.append(DomainRule(name="connect_LoopBegin-cond",
 """))
 
 # Начало цикла с постусловием (do-while, do-until) [works]
+# Если А - это начало акта цикла с постусловием, то после А должно следовать начало акта тела цикла
 RULES.append(DomainRule(name="connect_LoopBegin-body", 
 	tags={'correct', 'loop'},
 	swrl="""
@@ -647,7 +664,7 @@ RULES.append(DomainRule(name="connect_LoopCond0-LoopEnd",
 	cond(?loop, ?cnd),
 	executes(?a, ?cnd),
 
-	expr_value(?a, false),  # condition passed
+	expr_value(?a, false),  # condition failed
 	
 	act_end(?b),
 	executes(?b, ?loop),
@@ -776,6 +793,7 @@ RULES.append(DomainRule(name="connect_LoopUpdate-cond",
 """))
 
 
+# 13 rules for loops
 
 
 		 # dont forget to add suffix '_rule_#' if continue testing the rules.
@@ -788,6 +806,9 @@ RULES.append(DomainRule(name="connect_LoopUpdate-cond",
 				###################
 
 
+# ============ General mistakes ============ #
+
+# Начало и конец одного акта (соответствующие) должны выполнять одно и то же действие алгоритма
 RULES.append(DomainRule(name="CorrespondingActsMismatch_Error", 
 	tags={'mistake'},
 	swrl="""
@@ -801,22 +822,23 @@ RULES.append(DomainRule(name="CorrespondingActsMismatch_Error",
 	 -> CorrespondingEndMismatched(?b), cause(?b, ?a)
 """))
 
-RULES.append(DomainRule(name="-ErrOff- CorrespondingActsHaveDifferentExecTime_Error", 
-	tags={'mistake'},
-	swrl="""
-	student_corresponding_end(?a, ?b), 
-	executes(?a, ?st),
-	executes(?b, ?st),
-		# executes(?a, ?s1),
-		# executes(?b, ?s2),
-		# SameAs(?s1, ?s2),
-	exec_time(?a, ?n1),
-	exec_time(?b, ?n2),
-	notEqual(?n1, ?n2),
-	 -> CorrespondingEndPerformedDifferentTime(?b), cause(?b, ?a)
-"""))
+# RULES.append(DomainRule(name="-ErrOff- CorrespondingActsHaveDifferentExecTime_Error", 
+# 	tags={'mistake'},
+# 	swrl="""
+# 	student_corresponding_end(?a, ?b), 
+# 	executes(?a, ?st),
+# 	executes(?b, ?st),
+# 		# executes(?a, ?s1),
+# 		# executes(?b, ?s2),
+# 		# SameAs(?s1, ?s2),
+# 	exec_time(?a, ?n1),
+# 	exec_time(?b, ?n2),
+# 	notEqual(?n1, ?n2),
+# 	 -> CorrespondingEndPerformedDifferentTime(?b), cause(?b, ?a)
+# """))
 
 
+# Если за корректным актом А должен следовать акт Б, но студент считает, что за актом А идёт акт С, отличный от Б, то акт С ошибочный
 RULES.append(DomainRule(name="GenericWrongAct_Error", 
 	tags={'mistake'},
 	swrl="""
@@ -831,6 +853,8 @@ RULES.append(DomainRule(name="GenericWrongAct_Error",
 	 Erroneous(?c)
 """))
 
+
+# Если акт А должен находиться в рамках непосредственно объемлющего акта Р, но студент считает, что акт А должен находиться в контексте акта С, отличного от Р, то акт А ошибочный
 RULES.append(DomainRule(name="GenericWrongParent_Error", 
 	tags={'mistake'},
 	swrl="""
@@ -841,7 +865,6 @@ RULES.append(DomainRule(name="GenericWrongParent_Error",
 		id(?c, ?ic),
 		notEqual(?ip, ?ic),
 	 -> context_should_be(?a, ?p), 
-	 # cause(?a, ?c), 
 	 WrongContext(?a)
 """))
 # when act of right context (?p) is present
@@ -951,6 +974,7 @@ RULES.append(DomainRule(name="ActStartsAfterItsEnd_Error",
 
 # Дубликат акта в следовании [works with Pellet]
 # Базируется на ExtraAct
+# Если начало акта С1 является лишним, находится в пределах акта следования и выполняет одно из действий следования, при этом существует отличное от С1 начало акта С, выполняющее то же действие, то С1 является ошибочным, и дубликатом С.
 RULES.append(DomainRule(name="DuplicateOfAct-seq-b_Error", 
 	tags={'mistake', 'sequence'},
 	swrl="""
@@ -959,13 +983,12 @@ RULES.append(DomainRule(name="DuplicateOfAct-seq-b_Error",
 	student_parent_of(?p, ?c1),
 	executes(?p, ?block),
 	sequence(?block),
-		body_item(?block, ?st),  # // just to ensure the sequence is real (and thus has "body_item"s)
+	body_item(?block, ?st),
 	executes(?c1, ?st),
 
 	executes(?c, ?st),
 	student_parent_of(?p, ?c),
 	act_begin(?c),
-
 		id(?c1, ?ic1),
 		id(?c, ?ic),
 		notEqual(?ic1, ?ic),

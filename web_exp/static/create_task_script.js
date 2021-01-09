@@ -58,7 +58,7 @@ $(document).ready(function(){
           console.log("feedback from /creating_task:")
           console.log(data)
           if (data.errors !== undefined) {
-            const err_msg = data.errors ? data.errors.join(",") : "Алгоритм корректен";
+            const err_msg = data.errors.join(",");
             $('#syntax_error_description').html(err_msg)
           }
         },
