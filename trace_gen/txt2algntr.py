@@ -169,13 +169,12 @@ class AlgorithmParser:
             }
 
         result = []
-        line_list = line_list[start_line:end_line]
         line_indents = [len(s) - len(s.lstrip()) for s in line_list]
 
         current_level_stmt_line_idx = []
         current_level = None  # отступ текущего уровня (найдём в цикле как отступ первой строки кода, но не { }. )
 
-        for i,idt in enumerate(line_indents):
+        for i, idt in enumerate(line_indents):
             if line_indents[i] == current_level  or  current_level is None:  # элемент текущего уровня
                 if line_list[i].strip() in ("", "{", "}"):  # пропускаем { } и пустые
                     continue
@@ -188,7 +187,7 @@ class AlgorithmParser:
 
         # print(current_level_stmt_line_idx)
 
-        ci = 0  # current line index
+        ci = 0  # current line index over line_list
 
         for entry_i in range(len(current_level_stmt_line_idx) - 1):
             i = current_level_stmt_line_idx[entry_i]
@@ -216,7 +215,7 @@ class AlgorithmParser:
                             "id": self.newID(body_name),
                             "type": "sequence",
                             "name": body_name,
-                            "body": parse_algorithm(line_list[i+2:e])  # исключая скобки { } вокруг тела
+                            "body": parse_algorithm(line_list[i+2:e], start_line=start_line + i+2)  # исключая скобки { } вокруг тела
                         },
                 })
                 ci = e + 1
@@ -255,7 +254,7 @@ class AlgorithmParser:
                         "type": "if",
                         "name": branch_name,
                         "cond":  self.parse_expr(cond_name, values=values),
-                        "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                        "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 })
                 ci = e + 1
@@ -291,7 +290,7 @@ class AlgorithmParser:
                         "type": "else-if",
                         "name": branch_name,
                         "cond":  self.parse_expr(cond_name, values=values),
-                        "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                        "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -307,7 +306,7 @@ class AlgorithmParser:
                         "id": self.newID(branch_name),
                         "type": "else",
                         "name": branch_name,
-                        "body": parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                        "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -338,7 +337,7 @@ class AlgorithmParser:
                     "cond": self.parse_expr(cond_name, values=values),
                     "body":  make_loop_body(
                                 name,
-                                parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                             )
                 })
                 ci = e + 1
@@ -374,7 +373,7 @@ class AlgorithmParser:
                     "cond": self.parse_expr(cond_name, values=values),
                     "body": make_loop_body(
                                 name,
-                                parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                             )
                 })
                 ci = e + 2
@@ -410,7 +409,7 @@ class AlgorithmParser:
                     "cond": self.parse_expr(cond_name, values=values),
                     "body": make_loop_body(
                                 name,
-                                parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                             )
                 })
                 ci = e + 2
@@ -447,7 +446,7 @@ class AlgorithmParser:
                     "update": self.parse_stmt("{v}={v}{:+d}".format(int(s_step), v=s_var)),
                     "body":  make_loop_body(
                                 name,
-                                parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                             )
                 })
                 ci = e + 1
@@ -483,7 +482,7 @@ class AlgorithmParser:
                     "update": self.parse_stmt("{v}=next({},{v})".format(s_container, v=s_var)),
                     "body":  make_loop_body(
                                 name,
-                                parse_algorithm(line_list[i+1:e+1])  # скобки { } вокруг тела могут отсутствовать
+                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                             )
                 })
                 ci = e + 1
@@ -499,7 +498,7 @@ class AlgorithmParser:
                     "id": self.newID(name),
                     "type": "sequence",
                     "name": name,
-                    "body": parse_algorithm(line_list[i+1:e]),  # учитывая скобки { } вокруг тела
+                    "body": parse_algorithm(line_list[i+1:e], start_line=start_line + i+1),  # учитывая скобки { } вокруг тела
                 })
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -514,7 +513,7 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # print("Warning: unknown control structure: ")
-            raise ValueError("AlgorithmError: unknown control structure at line %d: '%s'"%(ci, line_list[ci].strip()))
+            raise ValueError("AlgorithmError: unknown control structure at line %d: '%s'"%(1 + ci + start_line, line_list[ci].strip()))
 
 
         return result
