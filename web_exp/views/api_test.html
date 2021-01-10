@@ -6,6 +6,8 @@
         
         function send_to(url, textarea_id, result_id) {
             text = $('#' + textarea_id).val()
+            // looking good text to JSON-readable
+            text = text.trim().replaceAll('\n', '\\n')
             // console.log(text)
             data = JSON.parse(text)
             
@@ -97,7 +99,7 @@ response: json {
         ждать
     иначе если цвет_жёлтый -> ложь
         приготовиться
-"}'''.replace('\n', '\\n') }}
+"}'''  }}
     </textarea></p>  <!-- { { some python code } } - шаблонизация в Flask -->
     Response:
     <div id="result_creating_task" style="background-color: #eeffff;"></div>
@@ -128,8 +130,7 @@ response: json {
         result_id="result_verify_trace_act"
     >Test /verify_trace_act [POST]</button>
     with following JSON payload:
-    <p><textarea id="payload_verify_trace_act" cols="80" rows="7">{"user_language": "ru", "algorithm_json": {}, 
-"algorithm_element_id": 7, "act_type": "begin"}</textarea></p>
+    <p><textarea id="payload_verify_trace_act" cols="80" rows="7">{"user_language": "ru", "algorithm_json": {}, "algorithm_element_id": 7, "act_type": "begin"}</textarea></p>
     Response:
     <div id="result_verify_trace_act" style="background-color: #eeffff;"></div>
     
