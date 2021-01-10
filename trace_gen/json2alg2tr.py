@@ -10,6 +10,11 @@ SUPPORTED_LANGS = ("ru","en")
 # TARGET_LANG = "ru"
 TARGET_LANG = "en"
 
+def set_target_lang(lang_code: str):
+	global TARGET_LANG
+	TARGET_LANG = lang_code
+
+
 def tr(word_en, case='nomn'):
 	""" Перевод на русский язык, если TARGET_LANG=="ru" """
 	if TARGET_LANG == "en":
@@ -24,7 +29,7 @@ def tr(word_en, case='nomn'):
 				.replace("started", 'began')
 				.replace("finished", 'ended')
 				.replace("performed", 'executed')
-				.replace("cond", 'condition of')
+				.replace("cond", 'condition')   # 'condition of'
 				.lstrip()
 		)
 	if TARGET_LANG != "ru":
@@ -1944,6 +1949,46 @@ def boolean_line_usage_report(boolean_line, visitor_obj):
 	else:  # if c > L:
 		return "%s (auto-expanded from %s)" % (actual_line, (boolean_line or "''"))
 
+
+def patch_trace(trace: str) -> str:
+	# apply patches
+	trace = trace.replace(
+			"1th", "1st"
+		).replace(
+			"2th", "2nd"
+		).replace(
+			"3th", "3rd"
+		).replace(
+			"branch condition of alternative", "branch of condition"
+		).replace(
+			"began program", "program began"
+		).replace(
+			"ended program", "program ended"
+		)
+
+	# move <phase word> right before <ith>
+	trace = re.sub(r"^(\s*)(began\s+|ended\s+|executed\s+)(.+?\s+)(\d+\w+)", r"\1\3\2\4", trace, flags=re.M)
+
+	# remove "sequence global_code" lines
+	trace = re.sub(r"^\s*sequence\s+global_code.*?\s*^", "", trace, flags=re.M)
+		
+	# move <phase word> to the end of line on iteration line 
+	trace = re.sub(r"(began|ended|executed)\s+(iteration)(.+?)loop(.+?)$", r"\2\3of loop\4 \1", trace, flags=re.M)
+
+	# replace "executed" to "evaluated" (for condition lines only)
+	trace = re.sub(r"(condition[^\n\r]+)executed", r"\1evaluated", trace, flags=re.M)
+
+	return trace
+	
+
+def get_text_trace(alg_root_node, boolean_line) -> (str, TraceTextVisitor):
+	tr_v = TraceTextVisitor(boolean_line)
+	alg_root_node.accept(tr_v)
+	trace = str(tr_v)
+	
+	return patch_trace(trace), tr_v
+
+
 if __name__ == "__main__":
 
 	# exit()  # DEBUG
@@ -1999,7 +2044,7 @@ if __name__ == "__main__":
 			with open(speak_lang_file, encoding='utf-8') as f:
 				lang = f.read().strip().lower()
 				if lang in SUPPORTED_LANGS:
-					TARGET_LANG = lang
+					set_target_lang(lang)
 					print("Switched to language `%s`." % lang)
 				else:
 					print("Warning: invalid content of language-target file `%s` (one of %s is expected). Defaulting to `%s`." % (speak_lang_file,str(SUPPORTED_LANGS),TARGET_LANG))
@@ -2029,39 +2074,7 @@ if __name__ == "__main__":
 
 			for boolean_line in tr_boolean_lines:
 				boolean_line = boolean_line.strip()
-				tr_v = TraceTextVisitor(boolean_line)
-				r.accept(tr_v)
-				trace = str(tr_v)
-				
-				# apply patches
-				trace = trace.replace(
-						"1th", "1st"
-					).replace(
-						"2th", "2nd"
-					).replace(
-						"3th", "3rd"
-					).replace(
-						"branch condition of alternative", "branch of condition"
-					).replace(
-						"began program", "program began"
-					).replace(
-						"ended program", "program ended"
-					)
-					
-				###
-				# print(trace)
-					
-				# move <phase word> right before <ith>
-				trace = re.sub(r"^(\s*)(began\s+|ended\s+|executed\s+)(.+?\s+)(\d+\w+)", r"\1\3\2\4", trace, flags=re.M)
-
-				# remove "sequence global_code" lines
-				trace = re.sub(r"^\s*sequence\s+global_code.*?\s*^", "", trace, flags=re.M)
-					
-				# move <phase word> to the end of line on iteration line 
-				trace = re.sub(r"(began|ended|executed)\s+(iteration)(.+?)loop(.+?)$", r"\2\3of loop\4 \1", trace, flags=re.M)
-
-				# replace "executed" to "evaluated" (for condition lines only)
-				trace = re.sub(r"(condition[^\n\r]+)executed", r"\1evaluated", trace, flags=re.M)
+				trace, tr_v = get_text_trace(boolean_line)
 					
 				f.write("\n\n// " + boolean_line_usage_report(boolean_line,tr_v) + '\n' + trace)
 
