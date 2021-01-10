@@ -421,6 +421,17 @@ class TraceTester():
         # self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
         # self.merge_traces(onto, self.data["student_act_iri_list"], self.data["correct_act_iri_list"])
         
+    def prepare_id2obj(self):
+        alg_objects = list(find_by_type(self.data["algorithm"]))
+        if not self.id2obj:
+            # fill it once
+            for d in alg_objects:
+                if "id" in d:
+                    self.id2obj[ d["id"] ] = d
+            # store to original algorithm dict
+            self.data["algorithm"]["id2obj"] = self.id2obj
+        
+        
     def inject_algorithm_to_ontology(self, onto):
         "Prepares self.id2obj and writes algorithm to ontology if it isn't there."
         
@@ -429,20 +440,14 @@ class TraceTester():
             # polyfill entry_point to be global_code
             self.data["algorithm"]["entry_point"] = alg_node
 
-    
-        with onto:
-            alg_objects = list(find_by_type(self.data["algorithm"]))
-            if not self.id2obj:
-                # fill it once
-                for d in alg_objects:
-                    if "id" in d:
-                        self.id2obj[ d["id"] ] = d
-                # store to original algorithm dict
-                self.data["algorithm"]["id2obj"] = self.id2obj
+        self.prepare_id2obj()
             
+        with onto:
             if onto.algorithm_name and self.data["algorithm_name"] in [s for _,s in onto.algorithm_name.get_relations()]:
                 # do nothing as the algorithm is in the ontology
                 return
+            
+            alg_objects = list(find_by_type(self.data["algorithm"]))
             
             # make algorithm classes and individuals
             for d in alg_objects:
@@ -762,6 +767,32 @@ class TraceTester():
     def test_with_ontology_results(self, onto):
         pass
     
+        
+def make_trace_for_algorithm(alg_dict):
+    'just a wrapper for TraceTester.make_correct_trace() method'
+    try:
+        trace_data = {
+            "algorithm": alg_dict,
+            "header_boolean_chain": None,
+        }
+        tt = TraceTester(trace_data)
+        tt.prepare_id2obj()
+        tt.make_correct_trace()
+        
+        # Очистить словарь alg_dict["id2obj"] от рекурсивной ссылки на сам alg_dict
+        for key in alg_dict["id2obj"]:
+            if alg_dict["id2obj"][key] is alg_dict:
+                del alg_dict["id2obj"][key]
+                break
+        
+        return tt.data["correct_trace"]
+    except Exception as e:
+        print("Error !")
+        print("Error making correct_trace:")
+        print(" ", e)
+        # raise e  # useful for debugging
+        return str(e)
+
     
 
 def init_persistent_structure(onto):

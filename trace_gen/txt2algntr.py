@@ -91,6 +91,7 @@ class AlgorithmParser:
         if line_list:
             self.parse(line_list)
 
+
     def clear(self):
         self.name2id = {}
         
@@ -109,8 +110,7 @@ class AlgorithmParser:
               "expr_values": {},
         }
 
-            
-            
+
     def newID(self, what=None):
         self._maxID += 1
         global _maxAlgID; _maxAlgID = self._maxID
@@ -121,6 +121,7 @@ class AlgorithmParser:
             self.name2id[what] = self._maxID
         return self._maxID
 
+
     def parse(self, line_list: "list(str)"):
         self.algorithm["global_code"]["body"] += self.parse_algorithm_ids(line_list)
         # найдём точку входа
@@ -130,9 +131,8 @@ class AlgorithmParser:
                 break
         else:  # нет функции
             self.algorithm["entry_point"] = self.algorithm["global_code"]  # надеемся с id
-                
-                
-        
+
+
     def parse_expr(self, name: str, values=None) -> dict:
         "Нововведение: самостоятельный объект для выражений (пока - только условия)"
         if values:

@@ -8,6 +8,7 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect
 # from flask_caching import Cache  
 
 from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json
+from ctrlstrct_run import make_trace_for_algorithm
 from trace_gen.txt2algntr import AlgorithmParser, create_algorithm_from_text
 
 from options import DEBUG, RUN_LOCALLY
@@ -57,22 +58,35 @@ def create_app():
 
 	@app.route('/creating_task', methods=['POST'])
 	def creating_task():
-		print(request.json)
+		# print(request.json)
 		assert 'algorithm_text' in request.json, 'Bad json!'
 		res = create_algorithm_from_text(request.json['algorithm_text'].splitlines())
-		if isinstance(res, AlgorithmParser):
-			return dict(
-				syntax_errors=(), 
-				algorithm_json=res.algorithm,
-				algorithm_update_lines={},
-				trace_json=()
-			)
+		
+		# if error
 		if isinstance(res, str):
 			return dict(
 				syntax_errors=(res,), 
 				algorithm_json=None,
 				algorithm_update_lines={},
 				trace_json=()
+			)
+		if isinstance(res, AlgorithmParser):
+			
+			trace_json = make_trace_for_algorithm(res.algorithm)
+			# if error
+			if isinstance(res, str):
+				return dict(
+					syntax_errors=(res,), 
+					algorithm_json=None,
+					algorithm_update_lines={},
+					trace_json=()
+				)
+			
+			return dict(
+				syntax_errors=(), 
+				algorithm_json=res.algorithm,
+				algorithm_update_lines={},
+				trace_json=trace_json
 			)
 			
 		return dict(syntax_errors=("Server error: /creating_task command is not implemented",))
