@@ -112,7 +112,7 @@ request to 'localhost:2020/verify_trace_act' [method:POST] : json {
     user_language:          "string"  // 'ru' или 'en'
     algorithm_json:         {json},
     algorithm_element_id:   int,      // поле 'id' из кликнутого элемента
-    act_type:               "string"  // начало ('begin') или конец ('end')
+    act_type:               "string"  // начало ('started') или конец ('finished') - для составных, 'performed' - для простых (атомарных)
     trace_json:             [array],  // вся имеющаяся правильная трасса
 }
 
