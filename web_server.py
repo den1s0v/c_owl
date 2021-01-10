@@ -72,15 +72,24 @@ def create_app():
 			)
 		if isinstance(res, AlgorithmParser):
 			
+			###
+			# from pprint import pprint
+			# pprint(res.algorithm)
+			
+			# trace_json = ()
 			trace_json = make_trace_for_algorithm(res.algorithm)
+	
 			# if error
-			if isinstance(res, str):
+			if isinstance(trace_json, str):
 				return dict(
-					syntax_errors=(res,), 
+					syntax_errors=(trace_json,), 
 					algorithm_json=None,
 					algorithm_update_lines={},
 					trace_json=()
 				)
+			###
+			# print('LENGTH(trace_json):', len(trace_json))
+			# pprint(res.algorithm)
 			
 			return dict(
 				syntax_errors=(), 

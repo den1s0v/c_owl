@@ -54,6 +54,8 @@ def parse_expr_values(s: str) -> list:
                 values.insert(repetition_start_i, "(")
                 values.append(s[0])
                 break
+            elif s[0] != ",":
+                raise ValueError("Expression values (after '->') error: unknown char: '%s'" % s)
         s = s[nchars:]  # strip some chars from left
     return tuple(values)
 
@@ -169,6 +171,7 @@ class AlgorithmParser:
             }
 
         result = []
+        suggest_corrections = []
         line_indents = [len(s) - len(s.lstrip()) for s in line_list]
 
         current_level_stmt_line_idx = []
@@ -196,11 +199,12 @@ class AlgorithmParser:
                 continue
 
             ci = i
+            current_line = line_list[ci].strip()
             # print(ci, e)
             # print(*line_list[ci:e+1])
 
             # функция main
-            m = re.match(r"(?:function|функция)\s+(\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"(?:function|функция)\s+(\S+)", current_line, re.I)
             if m:
                 if self.verbose: print("function")
                 name = m.group(1)  # имя функции
@@ -222,7 +226,7 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # если цвет==зелёный  // my-alt-1
-            # if color==green  -> true,false,true // my-alt-1
+            # if color==green -> true,false,true // my-alt-1
             # если условие (цвет==зелёный) -> 101 // my-alt-1
             # if condition (color==green) -> 1(01) // my-alt-1
             m = re.match(r"""
@@ -235,7 +239,12 @@ class AlgorithmParser:
                     \s+ (\S+)   # 2 optional values
                 )?
                 \s* (?://|\#)\s*(\S+)  # 3 name
-                """, line_list[ci].strip(), re.I|re.VERBOSE)
+                """, current_line, re.I|re.VERBOSE)
+            if not m:
+                if 'if' in current_line: suggest_corrections.append(
+                    'if color==green -> true,false,true // my-alt-1') 
+                elif 'если' in current_line: suggest_corrections.append(
+                    'если цвет==зелёный ->  да,нет,да // моя-развилка-1')
             if m:
                 if self.verbose: print("alt if")
                 name = m.group(3)  # имя альтернативы (пишется в комментарии)
@@ -275,7 +284,12 @@ class AlgorithmParser:
                     \s+ - >?    # - or ->   
                     \s+ (\S+)   # 2 optional values
                 )?
-                """, line_list[ci].strip(), re.I|re.VERBOSE)
+                """, current_line, re.I|re.VERBOSE)
+            if not m:
+                if 'else' in current_line and 'if' in current_line: suggest_corrections.append(
+                    'else if color==green -> true,false,true') 
+                elif 'иначе' in current_line and 'если' in current_line: suggest_corrections.append(
+                    'иначе если цвет==зелёный ->  да,нет,да')
             if m:
                 if self.verbose: print("alt elseif")
                 cond_name = m.group(1)  # условие else if (условие может быть в скобках)
@@ -283,7 +297,7 @@ class AlgorithmParser:
                     cond_name = cond_name[1:-1]      # удалить скобки
                 values = m.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 branch_name = "elseif-"+cond_name  # имя ветки должно отличаться от имени условия
-                assert len(result)>0 and result[-1]["type"] == "alternative", "Algorithm Error: 'иначе если' does not follow 'если' :\n\t"+line_list[ci].strip()
+                assert len(result)>0 and result[-1]["type"] == "alternative", "Algorithm Error: 'иначе если' does not follow 'если' :\n\t"+current_line
                 alt_obj = result[-1]
                 alt_obj["branches"] += [ {
                         "id": self.newID(branch_name),
@@ -296,10 +310,16 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # иначе
-            m = re.match(r"(?:else|иначе)", line_list[ci].strip(), re.I)
+            # else
+            m = re.match(r"(?:else|иначе)", current_line, re.I)
+            if not m:
+                if 'else' in current_line and not suggest_corrections: suggest_corrections.append(
+                    'else') 
+                elif 'иначе' in current_line and not suggest_corrections: suggest_corrections.append(
+                    'иначе')
             if m:
                 if self.verbose: print("alt else")
-                assert len(result)>0 and result[-1]["type"] == "alternative", "Algorithm Error: 'иначе' does not follow 'если' :\n\t"+line_list[ci].strip()
+                assert len(result)>0 and result[-1]["type"] == "alternative", "Algorithm Error: 'иначе' does not follow 'если' :\n\t"+current_line
                 alt_obj = result[-1]
                 branch_name = alt_obj["name"]+"-else"  # имя ветки должно отличаться от имени ветвления
                 alt_obj["branches"] += [ {
@@ -324,7 +344,12 @@ class AlgorithmParser:
                 )?
                 \s* (?://|\#)
                 \s* (\S+)       # 3 loop name
-                """, line_list[ci].strip(), re.I|re.VERBOSE)
+                """, current_line, re.I|re.VERBOSE)
+            if not m:
+                if 'while' in current_line: suggest_corrections.append(
+                    'while my-condition-2   -> 101 // my-while-2') 
+                elif 'пока' in current_line: suggest_corrections.append(
+                    'пока условие-цикла-1  // мой-цикл-1')
             if m:
                 if self.verbose: print("while")
                 name = m.group(3)  # имя цикла (пишется в комментарии)
@@ -351,7 +376,7 @@ class AlgorithmParser:
             # do   // my-dowhile-3
             #    ...
             # while dowhile-cond-3  -> 100011100
-            m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", current_line, re.I)
             m2 = e+1 < len(line_list)  and  re.match(r"""
                 (?:while|пока)
                 \s+
@@ -361,6 +386,11 @@ class AlgorithmParser:
                     \s+ (\S+)   # 2 optional values
                 )?
                 """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
+            if not m  or  m and not m2:
+                if 'do' in current_line: suggest_corrections.append(
+                    'do  // my-dowhile-2\n\t...\nwhile (condition) -> 11100') 
+                elif 'делать' in current_line: suggest_corrections.append(
+                    'делать условие-цикла-1  // мой-цикл-пока-с-постусловием-1\n\t...\nпока (условие) -> 11100')
             if m and m2:
                 if self.verbose: print("do while")
                 name = m.group(1)  # имя цикла (пишется в комментарии)
@@ -387,7 +417,7 @@ class AlgorithmParser:
             # do   // my-dountil-3
             #    ...
             # until dountil-cond-3  -> 100011100
-            m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", current_line, re.I)
             m2 = e+1 < len(line_list)  and  re.match(r"""
                 (?:until|до)
                 \s+
@@ -397,6 +427,11 @@ class AlgorithmParser:
                     \s+ (\S+)   # 2 optional values
                 )?
                 """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
+            if not m  or  m and not m2:
+                if 'do' in current_line: suggest_corrections.append(
+                    'do  // my-dountil-2\n\t...\nuntil (condition) -> 00111') 
+                elif 'делать' in current_line: suggest_corrections.append(
+                    'делать условие-цикла-1  // мой-цикл-до-тех-пор-1\n\t...\nдо (условие) -> 00011')
             if m and m2:
                 if self.verbose: print("do until")
                 name = m.group(1)  # имя цикла (пишется в комментарии)
@@ -427,7 +462,7 @@ class AlgorithmParser:
                                 \s+ (\S+)   # 5 optional values
                             )?
                             \s* (?://|\#)\s*(\S+)         # 6 name
-                        """, line_list[ci].strip(), re.I|re.VERBOSE)
+                        """, current_line, re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("for")
                 s_var =  m.group(1)  # переменная цикла
@@ -464,7 +499,7 @@ class AlgorithmParser:
                     \s+ (\S+)   # 3 optional values
                 )?
                 \s* (?://|\#)\s*(\S+)  # 4 name
-                """, line_list[ci].strip(), re.I|re.VERBOSE)
+                """, current_line, re.I|re.VERBOSE)
             if m:
                 if self.verbose: print("foreach")
                 s_var = m.group(1)  # переменная цикла
@@ -490,7 +525,7 @@ class AlgorithmParser:
 
 
             # {  // myseq-5  -  начало именованного следования
-            m = re.match(r"\{\s*(?://|#)\s*(\S+)", line_list[ci].strip(), re.I)
+            m = re.match(r"\{\s*(?://|#)\s*(\S+)", current_line, re.I)
             if m:
                 if self.verbose: print("named sequence:", m.group(1))
                 name =   m.group(1)  # имя следования (пишется в комментарии)
@@ -504,7 +539,12 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # одно слово - имя действия: "бежать"
-            m = re.match(r"(\S+)$", line_list[ci].strip(), re.I)
+            m = re.match(r"(\S+)$", current_line, re.I)
+            if not m:
+                if not suggest_corrections and re.search('[a-z]+', current_line, re.I): suggest_corrections.append(
+                    'one-word-name-of-some-action') 
+                elif not suggest_corrections and re.search('[а-яё]+', current_line, re.I): suggest_corrections.append(
+                    'имя-действия-из-одного-слова') 
             if m:
                 if self.verbose: print("action")
                 name = m.group(1)
@@ -513,7 +553,10 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # print("Warning: unknown control structure: ")
-            raise ValueError("AlgorithmError: unknown control structure at line %d: '%s'"%(1 + ci + start_line, line_list[ci].strip()))
+            suggest = ""
+            if suggest_corrections:
+                suggest = "\nThis syntax constructs may help:\n\t" + ('\n\t'.join(suggest_corrections))
+            raise ValueError("AlgorithmError: unknown control structure at line %d: '%s'%s"%(1 + ci + start_line, current_line, suggest))
 
 
         return result
