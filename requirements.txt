@@ -1,6 +1,4 @@
 owlready2
 transliterate
-pystardog
 Flask
-Flask-Caching
 waitress
