@@ -83,7 +83,8 @@ request to 'localhost:2020/creating_task' [method:POST] : json {
 response: json {
     syntax_errors:          ["message string"],  // ошибка в алгоритме или пустой массив
     algorithm_json:         {json},  // сохранить для создания задачи
-    algorithm_update_lines: {json},  // внести изменения в editor алгоритма
+    algorithm_update_lines: {json},  // внести изменения в editor алгоритма (построчно, не сбив параллельный ввод пользователя) - ещё не используется, т.е. всегда пустой
+    new_algorithm_text:     "some multiline text",  // новый текст в editor алгоритма (если пуст, то заменять не нужно)
     trace_json:             [array],  // отрендерить проверочную трассу
     </pre>
     
@@ -93,7 +94,7 @@ response: json {
         payload_id="payload_creating_task"
         result_id="result_creating_task"
     >Test /creating_task [POST]</button>
-    with following JSON payload:
+    with following JSON payload ['<code>\n</code>'s are expanded for readability, please escape them if copy&paste this as JSON]:
     <p><textarea id="payload_creating_task" cols="80" rows="7" placeholder="JSON string">{{ '''{"user_language": "ru", "algorithm_text": "пока не_зелёный -> истина,истина,ложь  // ожидание
     если цвет_красный -> истина,ложь  // по_цвету
         ждать
