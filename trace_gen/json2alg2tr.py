@@ -45,6 +45,7 @@ def tr(word_en, case='nomn'):
 		"alternative" : ("развилка", "развилки"),
 		"branch" 	: ("ветка", "ветки"),
 		"cond" 		: ("условие", "условия"),
+		"cond of" 		: ("условие", "условия"),
 		"if" 		: ("если", ),
 		"else if" 	: ("иначе если", ),
 		"else" 		: ("иначе", ),
@@ -231,10 +232,14 @@ class TraceTextVisitor(TextVisitor):
 		v = bool(v)
 		self.last_cond_tuple = (i+1, v)
 		return v
+	@classmethod
+	def format_nth_str(self, n=-1):
+		""" if n <= 0, return empty string """
+		return (" %d%s" % (n, tr("nth time"))) if n > 0 else ''
 	def append_nth_str(self, n=-1):
 		""" if n <= 0, do nothing  """
 		if n > 0:
-			self.append_at_line(" %d%s" % (n, tr("nth time")))
+			self.append_at_line(self.format_nth_str(n))
 		return self
 
 
@@ -437,6 +442,8 @@ class GenericAlgorithmJsonNode(JsonNode, WithID):
 		super().__init__(*args, **kw)
 		self.expand_act = expand_act
 		self.noexpand_act = noexpand_act
+		self.gen = 'she'  # род (м., ж., ср.) для акта элемента в трассе на рус. яз. (can be redifined)
+		self.act_line_format_str = "{name} {phase_str}{nth_str}"  # can be redifined
 	def list_expand_strs2Stmts(self, seq):
 		return [ StatementAtomJN("stmt", json_node) if isinstance(json_node, str) else json_node
 			for json_node in seq
@@ -469,6 +476,15 @@ class GenericAlgorithmJsonNode(JsonNode, WithID):
 		return {}
 	def children_to_dict(self):
 		return {}
+	def make_act_line(self, phase='performed', n=0, format_str=None, **kwargs):
+		if 'name' not in kwargs:
+			name = self.display_name()
+		if 'phase_str' not in kwargs:
+			if '(' not in phase:  # 'performed' but not '(she) performed'
+				phase = '(%s) %s' % (self.gen, phase)
+			phase_str = tr(phase)
+		nth_str = TraceTextVisitor.format_nth_str(n)
+		return (format_str or self.act_line_format_str).format(**locals(), **kwargs)
 
 	def accept(self, visitor):
 		return visitor.visit_GenericAlgorithmJsonNode(self)
@@ -525,6 +541,8 @@ class AlgorithmRootJN(GenericAlgorithmJsonNode):
 
 		# операторов верхнего уровня тоже нет
 		return None
+	def display_name(self, case='nomn'):
+		return tr("program")
 	def accept(self, visitor):
 		return visitor.visit_AlgorithmRootJN(self)
 if AlgTextVisitor:
@@ -544,7 +562,8 @@ if TraceTextVisitor:
 		# self.register_act(node.display_name())
 		self.add_line(tr("comment") + tr("trace") + " ")
 		self.add_line("{")
-		self.add_line("%s %s" % (tr("(she) started"), tr("program")))
+		# self.add_line("%s %s" % (tr("(she) started"), tr("program")))
+		self.add_line(node.make_act_line("started", n=0))
 		inner = node.get_entry_node()
 		if inner:
 			if isinstance(inner, list):
@@ -553,7 +572,8 @@ if TraceTextVisitor:
 				self.unindent()
 			else:
 				self.visit(inner)
-		self.add_line("%s %s" % (tr("(she) finished"), tr("program")))
+		# self.add_line("%s %s" % (tr("(she) finished"), tr("program")))
+		self.add_line(node.make_act_line("finished", n=0))
 		self.add_line("}")
 		return self
 	TraceTextVisitor.visit_AlgorithmRootJN = _
@@ -577,6 +597,7 @@ class StatementAtomJN(GenericAlgorithmJsonNode):
 	def __init__(self, jn_type="unkn", name='noname', **kw):
 		super().__init__(jn_type, name=name, **kw)
 		assert jn_type == "stmt", jn_type
+		self.gen = 'it'
 	def to_dict(self):
 		return self.name
 	def accept(self, visitor):
@@ -590,7 +611,8 @@ if TraceTextVisitor:
 	def _(self, node):
 		# Пример:    печатать_минус выполнилось 1-й раз
 		i = self.register_act(node.name)
-		self.add_line("%s %s %d%s" % (node.name, tr("(it) performed"), i, tr("nth time")))
+		# self.add_line("%s %s %d%s" % (node.name, tr("(it) performed"), i, tr("nth time")))
+		self.add_line(node.make_act_line(name=node.name, phase="performed", n=i))
 		return self
 	TraceTextVisitor.visit_StatementAtomJN = _
 if TraceJsonVisitor:
@@ -674,6 +696,7 @@ class AlternativeJN(GenericAlgorithmJsonNode):
 		super(AlternativeJN, self).__init__(jn_type, name=alternative or alt, **kw)
 		assert jn_type == "alternative", jn_type
 		self.branches = branches
+		self.act_line_format_str = "{phase_str} {name}{nth_str}"
 	def setup(self, parent_node, setup_children=True):
 		super().setup(parent_node, setup_children=False)
 		root = self.search_up()
@@ -704,7 +727,8 @@ if AlgTextVisitor:
 if TraceTextVisitor:
 	def _(self, node):
 		i = self.register_act(node.display_name())
-		self.add_line("%s %s" % (tr("(she) started"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(she) started"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("started", i))
 		if node.branches:
 			self.indent()
 
@@ -714,7 +738,8 @@ if TraceTextVisitor:
 					break
 
 			self.unindent()
-		self.add_line("%s %s" % (tr("(she) finished"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(she) finished"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("finished", i))
 		return self
 	TraceTextVisitor.visit_AlternativeJN = _
 if TraceJsonVisitor:
@@ -757,6 +782,7 @@ if AlgTextVisitor:
 	AlgTextVisitor.visit_GenericAlternativeBranch = _
 if TraceTextVisitor:
 	def _(self, node):
+		# make indented block of the branch's body
 		if node.stmts:
 			self.indent()
 			self.accept_line_list(node.stmts)
@@ -769,6 +795,8 @@ class GenericCondition(GenericAlgorithmJsonNode):
 		super(GenericCondition, self).__init__("cond", name=name, **kw)
 		self.cond = cond
 		self.owner = owner
+		self.gen = 'it'
+		self.act_line_format_str = "{name} {phase_str}{nth_str} - {value}"
 	def setup(self, parent_node, setup_children=True):
 		super(GenericCondition, self).setup(parent_node, setup_children=False)
 		assert self.owner
@@ -777,7 +805,7 @@ class GenericCondition(GenericAlgorithmJsonNode):
 		if setup_children: self.setup_children()  # может впоследствии понадобиться при разборе внутренностей выражений
 	def display_name(self, case='nomn'):
 		if self.cond:
-			return "%s %s (%s)" % (tr("cond", case), self.owner.display_name('gent', include_type_only=True), self.cond)
+			return "%s %s (%s)" % (tr("cond of", case), self.owner.display_name('gent', include_type_only=True), self.cond)
 		else:
 			return "%s %s" % (tr("cond", case), self.name)
 		# return "%s %s%s %s" % (tr("cond", case), self.name, insert_cond, self.owner.display_name('gent'))
@@ -793,7 +821,9 @@ if TraceTextVisitor:
 	def _(self, node):
 		i = self.register_act(node.display_name())
 		v = self.next_cond_value()
-		self.add_line("%s %s" % (node.display_name(), tr("(it) performed"))).append_nth_str(i).append_at_line(" - " + tr(v))
+		# self.add_line("%s %s" % (node.display_name(), tr("(it) performed"))).append_nth_str(i).append_at_line(" - " + tr(v))
+		self.add_line(node.make_act_line("performed", i, value=tr(v)))
+
 		return self
 	TraceTextVisitor.visit_GenericCondition = _
 if TraceJsonVisitor:
@@ -848,9 +878,11 @@ if TraceTextVisitor:
 		_,cond_v = self.last_cond_tuple
 		if cond_v:
 			i = self.register_act(node.display_name())
-			self.add_line("%s %s" % (node.display_name(), tr("(she) started"))).append_nth_str(i)
+			# self.add_line("%s %s" % (node.display_name(), tr("(she) started"))).append_nth_str(i)
+			self.add_line(node.make_act_line("started", i))
 			super(ConditionalAlternativeBranch, node).accept(self)  # show branch contents
-			self.add_line("%s %s" % (node.display_name(), tr("(she) finished"))).append_nth_str(i)
+			# self.add_line("%s %s" % (node.display_name(), tr("(she) finished"))).append_nth_str(i)
+			self.add_line(node.make_act_line("finished", i))
 		return self
 	TraceTextVisitor.visit_ConditionalAlternativeBranch = _
 if TraceJsonVisitor:
@@ -902,9 +934,11 @@ if AlgTextVisitor:
 if TraceTextVisitor:
 	def _(self, node):
 		i = self.register_act(node.display_name())
-		self.add_line("%s %s" % (node.display_name(), tr("(she) started"))).append_nth_str(i)
+		# self.add_line("%s %s" % (node.display_name(), tr("(she) started"))).append_nth_str(i)
+		self.add_line(node.make_act_line("started", i))
 		super(ElseBranchJN, node).accept(self)  # show branch contents
-		self.add_line("%s %s" % (node.display_name(), tr("(she) finished"))).append_nth_str(i)
+		# self.add_line("%s %s" % (node.display_name(), tr("(she) finished"))).append_nth_str(i)
+		self.add_line(node.make_act_line("finished", i))
 		return self
 	TraceTextVisitor.visit_ElseBranchJN = _
 if TraceJsonVisitor:
@@ -928,6 +962,8 @@ class GenericLoop(GenericAlgorithmJsonNode):
 		assert jn_type in ("while", "do while", "for", "foreach"), jn_type
 		assert body
 		self.body = self.list_expand_strs2Stmts(body)
+		self.gen = 'he'
+		self.act_line_format_str = "{phase_str} {name}{nth_str}"
 	def to_dict(self):
 		return {"name": self.name,
 			"body": [to_dict_or_self(ch) for ch in self.body]}
@@ -942,6 +978,8 @@ class GenericLoop(GenericAlgorithmJsonNode):
 			return tr("loop", case) + " " + self.name # + super().display_name()
 	def iteration_name(self, n=0):
 		return tr("iteration") + (" %d " % n) + self.display_name('gent')
+	def make_iteration_act_line(self, phase, n=1):
+		return self.make_act_line("(she) " + phase, name=self.iteration_name(n), format_str=None)
 	def accept(self, visitor):
 		return visitor.visit_GenericLoop(self)
 if AlgTextVisitor:
@@ -968,12 +1006,14 @@ if TraceTextVisitor:
 	TraceTextVisitor.loop_reset_iterations_count = _
 	def _(self, node):
 		i = self.register_act(node.iteration_name())
-		self.add_line("%s %s" % (tr("(she) started"), node.iteration_name(i)))
+		# self.add_line("%s %s" % (tr("(she) started"), node.iteration_name(i)))
+		self.add_line(node.make_iteration_act_line("started", n=i))
 		if node.body:
 			self.indent()
 			self.accept_line_list(node.body)
 			self.unindent()
-		self.add_line("%s %s" % (tr("(she) finished"), node.iteration_name(i)))
+		# self.add_line("%s %s" % (tr("(she) finished"), node.iteration_name(i)))
+		self.add_line(node.make_iteration_act_line("finished", n=i))
 		return self
 	TraceTextVisitor.loop_make_iteration = _
 
@@ -1011,7 +1051,8 @@ if AlgTextVisitor:
 if TraceTextVisitor:
 	def _(self, node):
 		i = self.register_act(node.display_name())
-		self.add_line("%s %s" % (tr("(he) started"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(he) started"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("started", i))
 		if node.body:
 			self.loop_reset_iterations_count(node)
 			self.indent()
@@ -1023,7 +1064,8 @@ if TraceTextVisitor:
 				self.loop_make_iteration(node)
 
 			self.unindent()
-		self.add_line("%s %s" % (tr("(he) finished"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(he) finished"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("finished", i))
 		return self
 	TraceTextVisitor.visit_WhileJN = _
 if TraceJsonVisitor:
@@ -1067,7 +1109,8 @@ if AlgTextVisitor:
 if TraceTextVisitor:
 	def _(self, node):
 		i = self.register_act(node.display_name())
-		self.add_line("%s %s" % (tr("(he) started"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(he) started"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("started", i))
 		if node.body:
 			self.loop_reset_iterations_count(node)
 			self.indent()
@@ -1079,7 +1122,8 @@ if TraceTextVisitor:
 					break
 
 			self.unindent()
-		self.add_line("%s %s" % (tr("(he) finished"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(he) finished"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("finished", i))
 		return self
 	TraceTextVisitor.visit_DoWhileJN = _
 if TraceJsonVisitor:
@@ -1180,7 +1224,8 @@ if AlgTextVisitor:
 if TraceTextVisitor:  # visit
 	def _(self, node):
 		i = self.register_act(node.display_name())
-		self.add_line("%s %s" % (tr("(he) started"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(he) started"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("started", i))
 		if node.body:
 			self.loop_reset_iterations_count(node)
 			self.indent()
@@ -1197,18 +1242,21 @@ if TraceTextVisitor:  # visit
 				self.forloop_make_iteration(node)
 
 			self.unindent()
-		self.add_line("%s %s" % (tr("(he) finished"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(he) finished"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("finished", i))
 		return self
 	TraceTextVisitor.visit_ForJN = _
 
 	def _(self, node):  # make_iteration
 		i = self.register_act(node.iteration_name())
-		self.add_line("%s %s" % (tr("(she) started"), node.iteration_name(i)))
+		# self.add_line("%s %s" % (tr("(she) started"), node.iteration_name(i)))
+		self.add_line(node.make_iteration_act_line("started", n=i))
 		if node.body:
 			self.indent()
 			self.accept_line_list(node.body)
 			self.unindent()
-		self.add_line("%s %s" % (tr("(she) finished"), node.iteration_name(i)))
+		# self.add_line("%s %s" % (tr("(she) finished"), node.iteration_name(i)))
+		self.add_line(node.make_iteration_act_line("finished", n=i))
 
 		update_name = tr("update") + " " + node.display_name('gent')
 		upd_i = self.register_act(update_name)
@@ -1285,7 +1333,8 @@ if TraceTextVisitor:
 		i = self.register_act(node.display_name() + node.owner.display_name('gent'))
 		v = self.next_cond_value()
 
-		self.add_line("%s %s" % (node.display_name(), tr("(it) performed"))).append_nth_str(i).append_at_line(" - " + tr(v))
+		# self.add_line("%s %s" % (node.display_name(), tr("(it) performed"))).append_nth_str(i).append_at_line(" - " + tr(v))
+		self.add_line(node.make_act_line("performed", i, value=tr(v)))
 		return self
 	TraceTextVisitor.visit_ForEachLoopCondition = _
 if TraceJsonVisitor:
@@ -1324,6 +1373,7 @@ if TraceTextVisitor:
 	def _(self, node):  # visit
 		i = self.register_act(node.display_name())
 		self.add_line("%s %s" % (tr("(he) started"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("started", i))
 		if node.body:
 			self.loop_reset_iterations_count(node)
 			self.indent()
@@ -1340,6 +1390,7 @@ if TraceTextVisitor:
 
 			self.unindent()
 		self.add_line("%s %s" % (tr("(he) finished"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("finished", i))
 		return self
 	TraceTextVisitor.visit_ForEachJN = _
 	def _(self, node):  # make_iteration
@@ -1353,13 +1404,15 @@ if TraceTextVisitor:
 		self.add_line("%s %s (" % (tr("(he) performed"), tr("update"))).visit(update_command, same_line=True).append_at_line(")").append_nth_str(upd_i)
 
 		i = self.register_act(node.iteration_name())
-		self.add_line("%s %s" % (tr("(she) started"), node.iteration_name(i)))
+		# self.add_line("%s %s" % (tr("(she) started"), node.iteration_name(i)))
+		self.add_line(node.make_iteration_act_line("started", n=i))
 
 		if node.body:
 			self.indent()
 			self.accept_line_list(node.body)
 			self.unindent()
-		self.add_line("%s %s" % (tr("(she) finished"), node.iteration_name(i)))
+		# self.add_line("%s %s" % (tr("(she) finished"), node.iteration_name(i)))
+		self.add_line(node.make_iteration_act_line("finished", n=i))
 
 		return self
 	TraceTextVisitor.foreachloop_make_iteration = _
@@ -1416,6 +1469,9 @@ class SequenceJN(GenericAlgorithmJsonNode):
 		super(SequenceJN, self).__init__(jn_type="sequence", **{k:kw[k] for k in kw if k!="jn_type"})
 		assert self.jn_type == "sequence", self.jn_type
 		self.stmts = self.list_expand_strs2Stmts(stmts)
+		self.gen = 'it'
+		self.act_line_format_str = "{name} {phase_str}{nth_str}"
+
 	def to_dict(self):
 		return {self.jn_type: [to_dict_or_self(ch) for ch in self.stmts],
 			"name": self.name}
@@ -1448,12 +1504,14 @@ if AlgTextVisitor:
 if TraceTextVisitor:
 	def _(self, node):
 		i = self.register_act(node.display_name())
-		self.add_line("%s %s" % (tr("(it) started"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(it) started"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("started", i))
 		if node.stmts:
 			self.indent()
 			self.accept_line_list(node.stmts)
 			self.unindent()
-		self.add_line("%s %s" % (tr("(it) finished"), node.display_name())).append_nth_str(i)
+		# self.add_line("%s %s" % (tr("(it) finished"), node.display_name())).append_nth_str(i)
+		self.add_line(node.make_act_line("finished", i))
 		return self
 	TraceTextVisitor.visit_SequenceJN = _
 
@@ -1949,6 +2007,124 @@ def boolean_line_usage_report(boolean_line, visitor_obj):
 	else:  # if c > L:
 		return "%s (auto-expanded from %s)" % (actual_line, (boolean_line or "''"))
 
+		
+def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, use_exec_time=0, lang=None) -> dict:
+	''' Produce trace acts strings separately with minimum of config (no whole algorithm tree is required). We tried to maintain maximum flexibility.
+	Not all algorithm structures are covered, but only the most frequently used ones.
+	'''
+	if lang:
+		set_target_lang(lang)
+	
+	elem_type = alg_element["type"]
+	elem_type = elem_type.replace('-', ' ')
+	suffix = '_loop'
+	if elem_type.endswith(suffix):
+		elem_type = elem_type.replace(suffix, '')
+		
+	node = None
+	parent = None
+	is_iteration = False
+	# в случае с простыми действиями (stmt, expr) phase не имеет значения - создаётся с фазой performed
+	if elem_type == "stmt":
+		node = StatementAtomJN(elem_type, name=alg_element["name"])
+	if elem_type == "expr":
+		node = GenericCondition(cond=None, name=alg_element["name"])
+	# в случае со сложными действиями создаётся акт целиком, со всеми вложенными действиями?..  phase указывает, еачало или конец нам нужно взять
+	if not node:  # elem_type in ("if", "else if"):
+		tro = find_tro_for_act_type(elem_type)
+		assert tro, "act_line_for_alg_element(): node type not found: alg_element['type'] == " + alg_element["type"]
+		
+		class_ = tro.callback
+		kwargs = {}
+		if 'then' in tro.mandatory:  # "if", "else if"
+			kwargs[elem_type] = alg_element["cond"]["name"]
+			kwargs['then'] = "dummy"
+			
+		if 'alternative' in tro.mandatory:
+			kwargs[elem_type] = alg_element["name"]
+			# kwargs['branches'] = ["dummy"]
+			
+		if 'body' in tro.mandatory:
+			kwargs[elem_type] = alg_element["cond"]["name"]
+			kwargs['name'] = alg_element["name"]
+			kwargs['body'] = "dummy"
+			
+		if 'sequence' == elem_type:  # in tro.mandatory:
+			name = alg_element["name"]
+			if not name.endswith('_loop_body'):
+				kwargs[elem_type] = ["dummy"]
+				kwargs['name'] = name
+			else:
+				is_iteration = True
+				# parent = AlternativeJN("alternative", branches=[node])
+				class_ = WhileJN
+				elem_type = "while"
+				kwargs["while"] = "dummy"
+				kwargs['name'] = name.replace('_loop_body', '')
+				kwargs['body'] = "dummy"
+				pass
+			
+		if 'algorithm' == elem_type:
+			kwargs[elem_type] = ["dummy"]
+		
+			
+		# print("### creating element of type:", class_)
+		node = class_(jn_type=elem_type, **kwargs)
+		
+		if isinstance(node, ConditionalAlternativeBranch):
+			parent = AlternativeJN("alternative", branches=[node])
+			
+		if parent:
+			node.setup(parent)
+	
+	assert node, "act_line_for_alg_element(): Not implemented for: alg_element['type'] == " + elem_type
+	
+	if is_iteration:
+		text_trace = node.make_iteration_act_line(phase, n=use_exec_time)
+	else:
+		# universal way to make strimg of trace line (except sequences *_loop_body)
+		text_trace = node.make_act_line(phase, n=use_exec_time, value=tr(expr_value))
+	
+	# boolean_line = [expr_value]
+	
+	# tr_v = TraceTextVisitor(boolean_line)
+	# node.accept(tr_v)
+	
+	# if phase != 'performed':
+	# 	# limit generated lines to desired one only
+	# 	index = {
+	# 		'started': 0,
+	# 		'finished': -1,
+	# 	}.get(phase)
+	# 	tr_v.lines = [tr_v.lines[index]]
+	
+	# assert len(tr_v.lines) == 1, tr_v.lines
+	# text_trace = str(tr_v)
+	
+	text_trace = text_trace.strip()
+	
+	# # set exec_time
+	# if use_exec_time > 1:
+	# 	text_trace = text_trace.replace('1th time', '%sth time' % use_exec_time)
+	# 	text_trace = text_trace.replace('1-й раз', '%s-й раз' % use_exec_time)
+	
+	return patch_trace(text_trace)
+
+	# tr_v = TraceJsonVisitor(boolean_line)
+	# node.accept(tr_v)
+	# json_trace = tr_v.root.to_dict()
+	
+	# json_trace['as_string'] = text_trace
+
+	# return json_trace
+	# return "Not implemented: act_line_to_string(act_json) -> str"
+
+def find_tro_for_act_type(act_type: str):
+	for tro in _alg_node_map:
+		if tro.args["jn_type"] == act_type:
+			return tro
+	return None
+	
 
 def patch_trace(trace: str) -> str:
 	# apply patches
@@ -2074,7 +2250,7 @@ if __name__ == "__main__":
 
 			for boolean_line in tr_boolean_lines:
 				boolean_line = boolean_line.strip()
-				trace, tr_v = get_text_trace(boolean_line)
+				trace, tr_v = get_text_trace(r, boolean_line)
 					
 				f.write("\n\n// " + boolean_line_usage_report(boolean_line,tr_v) + '\n' + trace)
 
