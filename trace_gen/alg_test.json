@@ -1,0 +1,423 @@
+{
+    "entry_point": {
+      "body": [
+        {
+          "body": {
+            "body": [
+              {
+                "branches": [
+                  {
+                    "body": [
+                      {
+                        "id": 21,
+                        "name": "ждать",
+                        "type": "stmt"
+                      }
+                    ],
+                    "cond": {
+                      "id": 20,
+                      "name": "цвет_красный",
+                      "type": "expr"
+                    },
+                    "id": 19,
+                    "name": "if-цвет_красный",
+                    "type": "if"
+                  },
+                  {
+                    "body": [
+                      {
+                        "id": 24,
+                        "name": "приготовиться",
+                        "type": "stmt"
+                      }
+                    ],
+                    "cond": {
+                      "id": 23,
+                      "name": "цвет_жёлтый",
+                      "type": "expr"
+                    },
+                    "id": 22,
+                    "name": "elseif-цвет_жёлтый",
+                    "type": "else-if"
+                  }
+                ],
+                "id": 18,
+                "name": "по_цвету",
+                "type": "alternative"
+              }
+            ],
+            "id": 25,
+            "name": "ожидание_loop_body",
+            "type": "sequence"
+          },
+          "cond": {
+            "id": 17,
+            "name": "не_зелёный",
+            "type": "expr"
+          },
+          "id": 16,
+          "name": "ожидание",
+          "type": "while_loop"
+        }
+      ],
+      "id": 15,
+      "name": "global_code",
+      "type": "sequence"
+    },
+    "expr_values": {
+      "не_зелёный": [
+        true,
+        true,
+        false
+      ],
+      "цвет_жёлтый": [
+        false
+      ],
+      "цвет_красный": [
+        true,
+        false
+      ]
+    },
+    "functions": [],
+    "global_code": {
+      "body": [
+        {
+          "body": {
+            "body": [
+              {
+                "branches": [
+                  {
+                    "body": [
+                      {
+                        "id": 21,
+                        "name": "ждать",
+                        "type": "stmt"
+                      }
+                    ],
+                    "cond": {
+                      "id": 20,
+                      "name": "цвет_красный",
+                      "type": "expr"
+                    },
+                    "id": 19,
+                    "name": "if-цвет_красный",
+                    "type": "if"
+                  },
+                  {
+                    "body": [
+                      {
+                        "id": 24,
+                        "name": "приготовиться",
+                        "type": "stmt"
+                      }
+                    ],
+                    "cond": {
+                      "id": 23,
+                      "name": "цвет_жёлтый",
+                      "type": "expr"
+                    },
+                    "id": 22,
+                    "name": "elseif-цвет_жёлтый",
+                    "type": "else-if"
+                  }
+                ],
+                "id": 18,
+                "name": "по_цвету",
+                "type": "alternative"
+              }
+            ],
+            "id": 25,
+            "name": "ожидание_loop_body",
+            "type": "sequence"
+          },
+          "cond": {
+            "id": 17,
+            "name": "не_зелёный",
+            "type": "expr"
+          },
+          "id": 16,
+          "name": "ожидание",
+          "type": "while_loop"
+        }
+      ],
+      "id": 15,
+      "name": "global_code",
+      "type": "sequence"
+    },
+    "id": 14,
+    "id2obj": {
+      "15": {
+        "body": [
+          {
+            "body": {
+              "body": [
+                {
+                  "branches": [
+                    {
+                      "body": [
+                        {
+                          "id": 21,
+                          "name": "ждать",
+                          "type": "stmt"
+                        }
+                      ],
+                      "cond": {
+                        "id": 20,
+                        "name": "цвет_красный",
+                        "type": "expr"
+                      },
+                      "id": 19,
+                      "name": "if-цвет_красный",
+                      "type": "if"
+                    },
+                    {
+                      "body": [
+                        {
+                          "id": 24,
+                          "name": "приготовиться",
+                          "type": "stmt"
+                        }
+                      ],
+                      "cond": {
+                        "id": 23,
+                        "name": "цвет_жёлтый",
+                        "type": "expr"
+                      },
+                      "id": 22,
+                      "name": "elseif-цвет_жёлтый",
+                      "type": "else-if"
+                    }
+                  ],
+                  "id": 18,
+                  "name": "по_цвету",
+                  "type": "alternative"
+                }
+              ],
+              "id": 25,
+              "name": "ожидание_loop_body",
+              "type": "sequence"
+            },
+            "cond": {
+              "id": 17,
+              "name": "не_зелёный",
+              "type": "expr"
+            },
+            "id": 16,
+            "name": "ожидание",
+            "type": "while_loop"
+          }
+        ],
+        "id": 15,
+        "name": "global_code",
+        "type": "sequence"
+      },
+      "16": {
+        "body": {
+          "body": [
+            {
+              "branches": [
+                {
+                  "body": [
+                    {
+                      "id": 21,
+                      "name": "ждать",
+                      "type": "stmt"
+                    }
+                  ],
+                  "cond": {
+                    "id": 20,
+                    "name": "цвет_красный",
+                    "type": "expr"
+                  },
+                  "id": 19,
+                  "name": "if-цвет_красный",
+                  "type": "if"
+                },
+                {
+                  "body": [
+                    {
+                      "id": 24,
+                      "name": "приготовиться",
+                      "type": "stmt"
+                    }
+                  ],
+                  "cond": {
+                    "id": 23,
+                    "name": "цвет_жёлтый",
+                    "type": "expr"
+                  },
+                  "id": 22,
+                  "name": "elseif-цвет_жёлтый",
+                  "type": "else-if"
+                }
+              ],
+              "id": 18,
+              "name": "по_цвету",
+              "type": "alternative"
+            }
+          ],
+          "id": 25,
+          "name": "ожидание_loop_body",
+          "type": "sequence"
+        },
+        "cond": {
+          "id": 17,
+          "name": "не_зелёный",
+          "type": "expr"
+        },
+        "id": 16,
+        "name": "ожидание",
+        "type": "while_loop"
+      },
+      "17": {
+        "id": 17,
+        "name": "не_зелёный",
+        "type": "expr"
+      },
+      "18": {
+        "branches": [
+          {
+            "body": [
+              {
+                "id": 21,
+                "name": "ждать",
+                "type": "stmt"
+              }
+            ],
+            "cond": {
+              "id": 20,
+              "name": "цвет_красный",
+              "type": "expr"
+            },
+            "id": 19,
+            "name": "if-цвет_красный",
+            "type": "if"
+          },
+          {
+            "body": [
+              {
+                "id": 24,
+                "name": "приготовиться",
+                "type": "stmt"
+              }
+            ],
+            "cond": {
+              "id": 23,
+              "name": "цвет_жёлтый",
+              "type": "expr"
+            },
+            "id": 22,
+            "name": "elseif-цвет_жёлтый",
+            "type": "else-if"
+          }
+        ],
+        "id": 18,
+        "name": "по_цвету",
+        "type": "alternative"
+      },
+      "19": {
+        "body": [
+          {
+            "id": 21,
+            "name": "ждать",
+            "type": "stmt"
+          }
+        ],
+        "cond": {
+          "id": 20,
+          "name": "цвет_красный",
+          "type": "expr"
+        },
+        "id": 19,
+        "name": "if-цвет_красный",
+        "type": "if"
+      },
+      "20": {
+        "id": 20,
+        "name": "цвет_красный",
+        "type": "expr"
+      },
+      "21": {
+        "id": 21,
+        "name": "ждать",
+        "type": "stmt"
+      },
+      "22": {
+        "body": [
+          {
+            "id": 24,
+            "name": "приготовиться",
+            "type": "stmt"
+          }
+        ],
+        "cond": {
+          "id": 23,
+          "name": "цвет_жёлтый",
+          "type": "expr"
+        },
+        "id": 22,
+        "name": "elseif-цвет_жёлтый",
+        "type": "else-if"
+      },
+      "23": {
+        "id": 23,
+        "name": "цвет_жёлтый",
+        "type": "expr"
+      },
+      "24": {
+        "id": 24,
+        "name": "приготовиться",
+        "type": "stmt"
+      },
+      "25": {
+        "body": [
+          {
+            "branches": [
+              {
+                "body": [
+                  {
+                    "id": 21,
+                    "name": "ждать",
+                    "type": "stmt"
+                  }
+                ],
+                "cond": {
+                  "id": 20,
+                  "name": "цвет_красный",
+                  "type": "expr"
+                },
+                "id": 19,
+                "name": "if-цвет_красный",
+                "type": "if"
+              },
+              {
+                "body": [
+                  {
+                    "id": 24,
+                    "name": "приготовиться",
+                    "type": "stmt"
+                  }
+                ],
+                "cond": {
+                  "id": 23,
+                  "name": "цвет_жёлтый",
+                  "type": "expr"
+                },
+                "id": 22,
+                "name": "elseif-цвет_жёлтый",
+                "type": "else-if"
+              }
+            ],
+            "id": 18,
+            "name": "по_цвету",
+            "type": "alternative"
+          }
+        ],
+        "id": 25,
+        "name": "ожидание_loop_body",
+        "type": "sequence"
+      }
+    },
+    "name": "algorithm",
+    "type": "algorithm"
+  }
