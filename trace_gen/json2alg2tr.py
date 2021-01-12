@@ -61,6 +61,8 @@ def tr(word_en, case='nomn'):
 		"False" 	: ("ложь", ),
 		True 		: ("истина", ),
 		False 		: ("ложь", ),
+		"None"		: ("ничего!", ),
+		None		: ("ничего!", ),
 		"(she) started" 	: ("началась", ),
 		"(she) finished"	: ("закончилась", ),
 		"(he) started" 		: ("начался", ),

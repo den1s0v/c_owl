@@ -7,7 +7,7 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect
 # # import the flask extension
 # from flask_caching import Cache  
 
-from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json
+from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json, make_act_json
 from ctrlstrct_run import make_trace_for_algorithm
 from trace_gen.txt2algntr import AlgorithmParser, create_algorithm_from_text
 
@@ -98,36 +98,27 @@ def create_app():
 				trace_json=trace_json
 			)
 			
-		return dict(syntax_errors=("Server error: /creating_task command is not implemented",))
+		return dict(syntax_errors=("Server error: /creating_task command is not implemented",))  # debug
 	
 
 
 	@app.route('/verify_trace_act', methods=['POST'])
 	def make_trace_act():
-		print(request.json)
+		# print(request.json)
 		assert 'algorithm_json' in request.json, 'Bad json!'
-		# res = create_algorithm_from_text(request.json['algorithm_json'].splitlines())
-		# if isinstance(res, AlgorithmParser):
-		# 	return dict(
-		# 		syntax_errors=(), 
-		# 		algorithm_json=res.algorithm,
-		# 		algorithm_update_lines={},
-		# 		trace_json=()
-		# 	)
-		# if isinstance(res, str):
-		# 	return dict(
-		# 		syntax_errors=(res,), 
-		# 		algorithm_json=None,
-		# 		algorithm_update_lines={},
-		# 		trace_json=()
-		# 	)
+		res = make_act_json(**request.json)
+		if isinstance(res, list):
+			return dict(
+				trace_lines_json=res,
+				processing_errors=(), 
+			)
+		if isinstance(res, str):
+			return dict(
+				processing_errors=(res,), 
+				trace_lines_json=[],
+			)
 			
-		# return dict(trace_line_json={"message":"Server error: /make_trace_act command is not implemented"})
-	
-		return dict(trace_line_json={"as_string": "Dummy act line!", "id": 49, "loop": "waiting", "executes": 7, "gen": "he", "phase": "started", "_n": 4})
-
-
-
+		return dict(trace_line_json={"as_string": "Dummy act line!", "id": 49, "loop": "waiting", "executes": 7, "gen": "he", "phase": "started", "_n": 4})  # debug
 
 
 
