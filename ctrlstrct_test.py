@@ -12,6 +12,7 @@ import re
 
 from ctrlstrct_run import process_algtraces
 from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, find_by_key_in
+from trace_gen.json2alg2tr import act_line_for_alg_element
 from upd_onto import get_relation_object
 
 
@@ -255,6 +256,61 @@ def process_algorithm_and_trace_from_json(alg_tr: dict, process_kwargs=dict(reas
 	
 	return feedback
 
+
+def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, existing_trace_list, lang=None) -> list:
+	'''
+	act_type: начало ('started') или конец ('finished') - для составных, 'performed' - для простых (атомарных)
+	Returns list of dicts, each dict represents act object; usually list is 1 in length, but gets two elements if given trace is empty - put begin of trace and requested act.
+	'''
+	
+	elem = algorithm_json["id2obj"].get(str(algorithm_element_id), None)
+	
+	assert elem, f"No element with id={algorithm_element_id} in given algorithm."
+	# print(elem)
+	
+	result_acts = []
+	if len(existing_trace_list) == 0:
+		# создать строку 
+		act_text = act_line_for_alg_element(algorithm_json, phase='started', lang=lang, )  # pass algorithm root itself as it has type='algorithm'
+		result_acts.append({
+			'executes': algorithm_json["entry_point"]['id'],  # ! а привязываем к глобальному коду (или функции main)
+			'phase': 'started',
+			'as_string': act_text,
+			})
+	
+	exec_time = 1 + len([a for a in existing_trace_list if a['executes'] == algorithm_element_id and a['phase'] == act_type])
+	
+	expr_value = None
+	if elem['type'] == "expr" and act_type in ('finished', 'performed'):
+		name = elem['name']
+		expr_list = algorithm_json['expr_values'].get(name, None)
+		
+		assert expr_list is not None, f"No expression values provided for expression '{name}' in given algorithm."
+		assert len(expr_list) >= exec_time, f"Not enough expression values provided for expression '{name}': {len(expr_list)} provided, {exec_time} requested."
+		
+		expr_value = expr_list[exec_time - 1]
+	
+	act_text = act_line_for_alg_element(
+		elem, 
+		phase=act_type, 
+		lang=lang,
+		expr_value=expr_value,
+		use_exec_time=exec_time,
+		)
+	act_json = {
+			'executes': elem['id'],
+			'phase': act_type,
+			'as_string': act_text,
+	}
+	if expr_value is not None:
+		act_json['value'] = expr_value
+		
+	result_acts.append(act_json)
+	
+	# print(result_acts)
+	return result_acts
+	
+
 def process_algorithms_and_traces(alg_trs_dict: dict, process_kwargs=dict(reasoning="jena")) -> ('mistakes', 'error_message: str or None'):
 		
 	try:
@@ -389,7 +445,38 @@ def run_tests(directory="test_data/", process_kwargs={}):
 	return success_all
 
 
+def test_make_act_line():
+	import json
+	with open('trace_gen/alg_test.json') as file:
+		alg_data = json.load(file)
+		
+	result = make_act_json(algorithm_json=alg_data, algorithm_element_id=23, 
+		act_type='performed', 
+		# act_type='started', 
+		# act_type='finished', 
+		existing_trace_list=[],
+		lang='en',
+		# lang='ru',
+		)
+	result = make_act_json(algorithm_json=alg_data, algorithm_element_id=23, 
+		act_type='performed', 
+		# act_type='started', 
+		# act_type='finished', 
+		existing_trace_list=result,
+		lang='en',
+		# lang='ru',
+		)
+	print(result)
+	
+
 if __name__ == '__main__':
+
+	test_make_act_line()
+	###
+	print()
+	print('Exit as in custom debug mode.')
+	exit()
+	###
 	
 	success_all = run_tests(process_kwargs=dict(
 		# reasoning=None, 

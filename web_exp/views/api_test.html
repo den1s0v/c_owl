@@ -4,10 +4,13 @@
     <script type="text/javascript">
         console.log('Welcome to API test!')
         
-        function send_to(url, textarea_id, result_id) {
+        function send_to(url, textarea_id, result_id, escape_nl=false) {
             text = $('#' + textarea_id).val()
             // looking good text to JSON-readable
-            text = text.trim().replaceAll('\n', '\\n')
+            text = text.trim()
+            if (escape_nl) {
+                text = text.replaceAll('\n', '\\n')
+            }
             // console.log(text)
             data = JSON.parse(text)
             
@@ -56,20 +59,19 @@
                 this.getAttribute('url'),
                 this.getAttribute('payload_id'),
                 this.getAttribute('result_id'),
+                this.hasAttribute('escape_nl'),
             )
         })
 
     })
 
     </script>
-    
-
 </head>
 
+
 <body>
-    <h1>API test</h1>
-    
-    <noscript><h2>Please enable Javascript!</h2></noscript>
+<h1>API test</h1>
+<noscript><h2>Please enable Javascript!</h2></noscript>
     
 <h2> На странице преподавателя </h2>
 
@@ -93,6 +95,7 @@ response: json {
         url="/creating_task" 
         payload_id="payload_creating_task"
         result_id="result_creating_task"
+        escape_nl
     >Test /creating_task [POST]</button>
     with following JSON payload ['<code>\n</code>'s are expanded for readability, please escape them if copy&paste this as JSON]:
     <p><textarea id="payload_creating_task" cols="80" rows="7" placeholder="JSON string">{{ '''{"user_language": "ru", "algorithm_text": "пока не_зелёный -> истина,истина,ложь  // ожидание

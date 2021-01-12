@@ -517,6 +517,7 @@ class AlgorithmRootJN(GenericAlgorithmJsonNode):
 			self.data["functions"] = []
 		stmts = [st for st in self.funcs_and_stmts if st.jn_type != 'func']
 		self.data["stmts"] = SequenceJN(stmts, name="global_code")
+		self.act_line_format_str = "{phase_str} {name}"
 
 	def to_dict(self):
 		return {self.jn_type: [to_dict_or_self(ch) for ch in self.funcs_and_stmts]}
