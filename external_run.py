@@ -10,8 +10,12 @@ from timeit import default_timer as timer
 import psutil
 
 
-MEASURE_TIME = True
-REPEAT_COUNT = 1  # 0 is normal mode, ex. 5 mean repeat 5 times and report
+# MEASURE_TIME = True
+MEASURE_TIME = False
+
+# 0 is normal mode, ex. 5 means repeat 5 times and report
+# REPEAT_COUNT = 1
+REPEAT_COUNT = 0
 
 MIN_WALL_TIME = None
 MIN_EXCLUSIVE_TIME = None
