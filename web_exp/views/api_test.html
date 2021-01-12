@@ -110,20 +110,33 @@ response: json {
     
     
 <h2> На странице ученика </h2>
-<h3> Verify new act </h3>
+<h3> Verify new trace act </h3>
     <pre>
 request to 'localhost:2020/verify_trace_act' [method:POST] : json {
     user_language:          "string"  // 'ru' или 'en'
     algorithm_json:         {json},
     algorithm_element_id:   int,      // поле 'id' из кликнутого элемента
     act_type:               "string"  // начало ('started') или конец ('finished') - для составных, 'performed' - для простых (атомарных)
-    trace_json:             [array],  // вся имеющаяся правильная трасса
+    existing_trace_json:             [array],  // вся имеющаяся ПРАВИЛЬНАЯ трасса
 }
 
 response: json {
-    trace_line_json:        {json},  // строка как один элемент трассы
-    is_trace_line_ok:       boolean,  // true, если всё хорошо, иначе false
-    trace_errors:           ["message string"],  // ошибка в трассе с учётом указаного акта (пустой массив, если is_trace_line_ok == true)
+    trace_lines_json:       [array of {json}],  // строка как один элемент трассы - обычно одна, но может быть несколько строк сразу (автоматическое добавление)
+    processing_errors:      ["message string"],  // описание исключений, произошедших в процессе обработки запроса (пустой массив, если их не было); в нормальном режиме исключений быть не должно, в противном случае проблемы с заданием или с сервером.
+<!-- ////!   is_trace_line_ok:       boolean,  // true, если всё хорошо, иначе false
+////!   trace_errors:           ["message string"],  // ошибка в трассе с учётом указаного акта (пустой массив, если is_trace_line_ok == true) -->
+}
+
+Содержимое {json} для одного элемента (акта) трассы в response:
+{
+    "is_valid": bool,  // информация о корректности акта (если true, то сразу добавить в правильную трассу, иначе - false - этот выбор затрётся следующим выбором акта студентом) <!-- (null, если неизвестно, но этот вариант не должен попасть наружу, к вам) -->
+    "executes": int,  // ID элемента алгоритма, который выполняется этим актом
+    "phase":    "string",  // "started"/"finished"/"performed" (равен параметру запроса act_type)
+    "value":    "string",  // [optional] результат вычисления выражения, если это условие цикла/развилки (может потребоваться на стороне Python)
+    "id":       int,  // ID самого акта (может потребоваться на стороне Python)
+    "as_string": "string",  // текстовый вид акта (одна строка) - plain text, без всякого оформления (например, 'condition цвет_жёлтый evaluated 1st time - false')
+    "-styled?-": {???},
+    "-mistake_explanation?-": "string",  // текстовое пояснение к ошибке
 }
     </pre>
 
@@ -134,7 +147,429 @@ response: json {
         result_id="result_verify_trace_act"
     >Test /verify_trace_act [POST]</button>
     with following JSON payload:
-    <p><textarea id="payload_verify_trace_act" cols="80" rows="7">{"user_language": "ru", "algorithm_json": {}, "algorithm_element_id": 7, "act_type": "begin"}</textarea></p>
+    <p><textarea id="payload_verify_trace_act" cols="80" rows="7">{"user_language": "ru", "algorithm_element_id": 17, "act_type": "performed", "existing_trace_json": [], "algorithm_json": {
+        "entry_point": {
+          "body": [
+            {
+              "body": {
+                "body": [
+                  {
+                    "branches": [
+                      {
+                        "body": [
+                          {
+                            "id": 21,
+                            "name": "ждать",
+                            "type": "stmt"
+                          }
+                        ],
+                        "cond": {
+                          "id": 20,
+                          "name": "цвет_красный",
+                          "type": "expr"
+                        },
+                        "id": 19,
+                        "name": "if-цвет_красный",
+                        "type": "if"
+                      },
+                      {
+                        "body": [
+                          {
+                            "id": 24,
+                            "name": "приготовиться",
+                            "type": "stmt"
+                          }
+                        ],
+                        "cond": {
+                          "id": 23,
+                          "name": "цвет_жёлтый",
+                          "type": "expr"
+                        },
+                        "id": 22,
+                        "name": "elseif-цвет_жёлтый",
+                        "type": "else-if"
+                      }
+                    ],
+                    "id": 18,
+                    "name": "по_цвету",
+                    "type": "alternative"
+                  }
+                ],
+                "id": 25,
+                "name": "ожидание_loop_body",
+                "type": "sequence"
+              },
+              "cond": {
+                "id": 17,
+                "name": "не_зелёный",
+                "type": "expr"
+              },
+              "id": 16,
+              "name": "ожидание",
+              "type": "while_loop"
+            }
+          ],
+          "id": 15,
+          "name": "global_code",
+          "type": "sequence"
+        },
+        "expr_values": {
+          "не_зелёный": [
+            true,
+            true,
+            false
+          ],
+          "цвет_жёлтый": [
+            false
+          ],
+          "цвет_красный": [
+            true,
+            false
+          ]
+        },
+        "functions": [],
+        "global_code": {
+          "body": [
+            {
+              "body": {
+                "body": [
+                  {
+                    "branches": [
+                      {
+                        "body": [
+                          {
+                            "id": 21,
+                            "name": "ждать",
+                            "type": "stmt"
+                          }
+                        ],
+                        "cond": {
+                          "id": 20,
+                          "name": "цвет_красный",
+                          "type": "expr"
+                        },
+                        "id": 19,
+                        "name": "if-цвет_красный",
+                        "type": "if"
+                      },
+                      {
+                        "body": [
+                          {
+                            "id": 24,
+                            "name": "приготовиться",
+                            "type": "stmt"
+                          }
+                        ],
+                        "cond": {
+                          "id": 23,
+                          "name": "цвет_жёлтый",
+                          "type": "expr"
+                        },
+                        "id": 22,
+                        "name": "elseif-цвет_жёлтый",
+                        "type": "else-if"
+                      }
+                    ],
+                    "id": 18,
+                    "name": "по_цвету",
+                    "type": "alternative"
+                  }
+                ],
+                "id": 25,
+                "name": "ожидание_loop_body",
+                "type": "sequence"
+              },
+              "cond": {
+                "id": 17,
+                "name": "не_зелёный",
+                "type": "expr"
+              },
+              "id": 16,
+              "name": "ожидание",
+              "type": "while_loop"
+            }
+          ],
+          "id": 15,
+          "name": "global_code",
+          "type": "sequence"
+        },
+        "id": 14,
+        "id2obj": {
+          "15": {
+            "body": [
+              {
+                "body": {
+                  "body": [
+                    {
+                      "branches": [
+                        {
+                          "body": [
+                            {
+                              "id": 21,
+                              "name": "ждать",
+                              "type": "stmt"
+                            }
+                          ],
+                          "cond": {
+                            "id": 20,
+                            "name": "цвет_красный",
+                            "type": "expr"
+                          },
+                          "id": 19,
+                          "name": "if-цвет_красный",
+                          "type": "if"
+                        },
+                        {
+                          "body": [
+                            {
+                              "id": 24,
+                              "name": "приготовиться",
+                              "type": "stmt"
+                            }
+                          ],
+                          "cond": {
+                            "id": 23,
+                            "name": "цвет_жёлтый",
+                            "type": "expr"
+                          },
+                          "id": 22,
+                          "name": "elseif-цвет_жёлтый",
+                          "type": "else-if"
+                        }
+                      ],
+                      "id": 18,
+                      "name": "по_цвету",
+                      "type": "alternative"
+                    }
+                  ],
+                  "id": 25,
+                  "name": "ожидание_loop_body",
+                  "type": "sequence"
+                },
+                "cond": {
+                  "id": 17,
+                  "name": "не_зелёный",
+                  "type": "expr"
+                },
+                "id": 16,
+                "name": "ожидание",
+                "type": "while_loop"
+              }
+            ],
+            "id": 15,
+            "name": "global_code",
+            "type": "sequence"
+          },
+          "16": {
+            "body": {
+              "body": [
+                {
+                  "branches": [
+                    {
+                      "body": [
+                        {
+                          "id": 21,
+                          "name": "ждать",
+                          "type": "stmt"
+                        }
+                      ],
+                      "cond": {
+                        "id": 20,
+                        "name": "цвет_красный",
+                        "type": "expr"
+                      },
+                      "id": 19,
+                      "name": "if-цвет_красный",
+                      "type": "if"
+                    },
+                    {
+                      "body": [
+                        {
+                          "id": 24,
+                          "name": "приготовиться",
+                          "type": "stmt"
+                        }
+                      ],
+                      "cond": {
+                        "id": 23,
+                        "name": "цвет_жёлтый",
+                        "type": "expr"
+                      },
+                      "id": 22,
+                      "name": "elseif-цвет_жёлтый",
+                      "type": "else-if"
+                    }
+                  ],
+                  "id": 18,
+                  "name": "по_цвету",
+                  "type": "alternative"
+                }
+              ],
+              "id": 25,
+              "name": "ожидание_loop_body",
+              "type": "sequence"
+            },
+            "cond": {
+              "id": 17,
+              "name": "не_зелёный",
+              "type": "expr"
+            },
+            "id": 16,
+            "name": "ожидание",
+            "type": "while_loop"
+          },
+          "17": {
+            "id": 17,
+            "name": "не_зелёный",
+            "type": "expr"
+          },
+          "18": {
+            "branches": [
+              {
+                "body": [
+                  {
+                    "id": 21,
+                    "name": "ждать",
+                    "type": "stmt"
+                  }
+                ],
+                "cond": {
+                  "id": 20,
+                  "name": "цвет_красный",
+                  "type": "expr"
+                },
+                "id": 19,
+                "name": "if-цвет_красный",
+                "type": "if"
+              },
+              {
+                "body": [
+                  {
+                    "id": 24,
+                    "name": "приготовиться",
+                    "type": "stmt"
+                  }
+                ],
+                "cond": {
+                  "id": 23,
+                  "name": "цвет_жёлтый",
+                  "type": "expr"
+                },
+                "id": 22,
+                "name": "elseif-цвет_жёлтый",
+                "type": "else-if"
+              }
+            ],
+            "id": 18,
+            "name": "по_цвету",
+            "type": "alternative"
+          },
+          "19": {
+            "body": [
+              {
+                "id": 21,
+                "name": "ждать",
+                "type": "stmt"
+              }
+            ],
+            "cond": {
+              "id": 20,
+              "name": "цвет_красный",
+              "type": "expr"
+            },
+            "id": 19,
+            "name": "if-цвет_красный",
+            "type": "if"
+          },
+          "20": {
+            "id": 20,
+            "name": "цвет_красный",
+            "type": "expr"
+          },
+          "21": {
+            "id": 21,
+            "name": "ждать",
+            "type": "stmt"
+          },
+          "22": {
+            "body": [
+              {
+                "id": 24,
+                "name": "приготовиться",
+                "type": "stmt"
+              }
+            ],
+            "cond": {
+              "id": 23,
+              "name": "цвет_жёлтый",
+              "type": "expr"
+            },
+            "id": 22,
+            "name": "elseif-цвет_жёлтый",
+            "type": "else-if"
+          },
+          "23": {
+            "id": 23,
+            "name": "цвет_жёлтый",
+            "type": "expr"
+          },
+          "24": {
+            "id": 24,
+            "name": "приготовиться",
+            "type": "stmt"
+          },
+          "25": {
+            "body": [
+              {
+                "branches": [
+                  {
+                    "body": [
+                      {
+                        "id": 21,
+                        "name": "ждать",
+                        "type": "stmt"
+                      }
+                    ],
+                    "cond": {
+                      "id": 20,
+                      "name": "цвет_красный",
+                      "type": "expr"
+                    },
+                    "id": 19,
+                    "name": "if-цвет_красный",
+                    "type": "if"
+                  },
+                  {
+                    "body": [
+                      {
+                        "id": 24,
+                        "name": "приготовиться",
+                        "type": "stmt"
+                      }
+                    ],
+                    "cond": {
+                      "id": 23,
+                      "name": "цвет_жёлтый",
+                      "type": "expr"
+                    },
+                    "id": 22,
+                    "name": "elseif-цвет_жёлтый",
+                    "type": "else-if"
+                  }
+                ],
+                "id": 18,
+                "name": "по_цвету",
+                "type": "alternative"
+              }
+            ],
+            "id": 25,
+            "name": "ожидание_loop_body",
+            "type": "sequence"
+          }
+        },
+        "name": "algorithm",
+        "type": "algorithm"
+  } }</textarea></p>
     Response:
     <div id="result_verify_trace_act" style="background-color: #eeffff;"></div>
     
