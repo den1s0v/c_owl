@@ -11,7 +11,7 @@ import os
 import re
 
 from ctrlstrct_run import process_algtraces
-from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, find_by_key_in
+from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, find_by_key_in, find_by_keyval_in
 from trace_gen.json2alg2tr import act_line_for_alg_element
 from upd_onto import get_relation_object
 
@@ -278,9 +278,11 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 			max_id += 1
 			result_acts.append({
 				'executes': algorithm_json["entry_point"]['id'],  # ! а привязываем к глобальному коду (или функции main)
+				'name': algorithm_json["entry_point"]['name'],
 				'phase': 'started',
 				'as_string': act_text,
 				'id': max_id,
+				'n': 1,
 				'is_valid': True  # в начале трассы акт всегда такой
 				})
 		
@@ -306,10 +308,13 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 		max_id += 1
 		act_json = {
 				'executes': elem['id'],
+				'name': elem['name'],
 				'phase': act_type,
 				'as_string': act_text,
 				'id': max_id,
-				'is_valid': None  # пока нет информации о корректности такого акта
+				'n': exec_time,
+				'is_valid': None,  # пока нет информации о корректности такого акта
+				# 'is_valid': True,  # !!
 		}
 		if expr_value is not None:
 			act_json['value'] = expr_value
@@ -319,21 +324,40 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 		# print(result_acts)
 		return result_acts
 	except Exception as e:
-		raise e
+		# raise e
 		return f"Server error in make_act_json() - {type(e).__name__}:\n\t{str(e)}"
 
 
-def process_algorithms_and_traces(alg_trs_dict: dict, process_kwargs=dict(reasoning="jena")) -> ('mistakes', 'error_message: str or None'):
+def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=False, process_kwargs=dict(reasoning="jena", debug_rdf_fpath='test_data/ajax.rdf')) -> ('mistakes', 'error_message: str or None'):
 		
 	try:
-		_onto, mistakes = process_algtraces(alg_trs_dict, verbose=0, mistakes_as_objects=True, **process_kwargs)
+		_onto, mistakes = process_algtraces(alg_trs_list, verbose=0, mistakes_as_objects=False, **process_kwargs)
+		
+		from pprint import pprint
+		pprint(mistakes)
+		
+		if write_mistakes_to_acts and len(alg_trs_list) == 1:
+			trace = alg_trs_list[0]['trace']
+			for mistake in mistakes:
+				act_id = mistake["id"][0]
+				for act_obj in find_by_keyval_in("id", act_id, trace):
+					act_obj["explanations"] = act_obj.get("explanations", []) + mistake["explanations"]
+					if not act_obj["explanations"]:  # был пустой список - запишем хоть что-то
+						act_obj["explanations"] = ["Ошибка обнаружена, но вид ошибки не определён."]
+					act_obj["is_valid"] = False
+					break
+					
+			# Apply correctness mark to other acts:  act_obj["is_valid"] = True
+			for act_obj in trace:
+				if act_obj["is_valid"] is None:
+					act_obj["is_valid"] = True
+			
+		return mistakes, None
 	except Exception as e:
-		msg = "Exception occured: %s: %s"%(str(type(e)), str(e))
+		msg = "Exception occured in process_algorithms_and_traces(): %s: %s"%(str(type(e)), str(e))
 		raise e
 		print(msg)
 		return [], msg
-	
-	return mistakes, None
 
 
 def run_tests(directory="test_data/", process_kwargs={}):

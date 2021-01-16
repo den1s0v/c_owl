@@ -7,7 +7,7 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect
 # # import the flask extension
 # from flask_caching import Cache  
 
-from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json, make_act_json
+from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json, make_act_json, process_algorithms_and_traces
 from ctrlstrct_run import make_trace_for_algorithm
 from trace_gen.txt2algntr import AlgorithmParser, create_algorithm_from_text
 
@@ -103,19 +103,40 @@ def create_app():
 
 
 	@app.route('/verify_trace_act', methods=['POST'])
-	def make_trace_act():
+	def verify_trace_act():
 		# print(request.json)
 		assert 'algorithm_json' in request.json, 'Bad json!'
+		# get the requested trace extension
 		res = make_act_json(**request.json)
-		if isinstance(res, list):
-			return dict(
-				trace_lines_json=res,
-				processing_errors=(), 
-			)
+		# if error
 		if isinstance(res, str):
 			return dict(
 				processing_errors=(res,), 
 				trace_lines_json=[],
+			)
+		if isinstance(res, list):
+			
+			# verify the obtained trace with reasoner
+			full_trace = request.json["existing_trace_json"] + res  # !!
+			alg_tr = {
+			    "trace_name"    : "http_trace",
+			    "algorithm_name": "http",
+			    "trace"         : full_trace,
+			    "algorithm"     : request.json["algorithm_json"],
+			    "header_boolean_chain" : '',   # leave empty
+			}
+			# update acts data (inplace): write mistake explanations
+			_mistakes, err_msg = process_algorithms_and_traces([alg_tr], write_mistakes_to_acts=True)
+			
+			if err_msg:  # error
+				return dict(
+					processing_errors=(err_msg,), 
+					trace_lines_json=[],
+				)
+			
+			return dict(
+				trace_lines_json=res,
+				processing_errors=(), 
 			)
 			
 		return dict(trace_line_json={"as_string": "Dummy act line!", "id": 49, "loop": "waiting", "executes": 7, "gen": "he", "phase": "started", "_n": 4})  # debug
@@ -133,14 +154,14 @@ def create_app():
 			raise ex
 			return dict(messages=[f"Error processing the request - {ex.__class__.__name__}: {str(ex)}"])
 
-	@app.route('/process_as_json', methods=['POST'])
-	def process_data_as_json():
-		try:
-			feedback = process_algorithm_and_trace_as_json_request(request.json)
-			return jsonify(feedback)
-		except Exception as ex:
-			raise ex
-			return dict(messages=[f"Error processing the request - {ex.__class__.__name__}: {str(ex)}"])
+	# @app.route('/process_as_json', methods=['POST'])
+	# def process_data_as_json():
+	# 	try:
+	# 		feedback = process_algorithm_and_trace_as_json_request(request.json)
+	# 		return jsonify(feedback)
+	# 	except Exception as ex:
+	# 		raise ex
+	# 		return dict(messages=[f"Error processing the request - {ex.__class__.__name__}: {str(ex)}"])
 
 
 	return app

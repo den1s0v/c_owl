@@ -43,6 +43,7 @@ def uniqualize_iri(onto, iri):
     while onto[iri]:  # пока есть объект с таким именем
         # модифицировать имя
         iri = orig_iri + ("_%d" % n); n += 1
+    # print(iri)
     return iri
 
 
@@ -58,7 +59,6 @@ class TraceTester():
          }
         """
         self.data = trace_data
-
         # pprint(trace_data)
         # pprint(trace_data["trace"])
         # pprint(trace_data["algorithm"])
@@ -66,12 +66,49 @@ class TraceTester():
         
         # индекс всех объектов АЛГОРИТМА для быстрого поиска по id
         self.id2obj = self.data["algorithm"].get("id2obj", {})
+        
+        self.initial_repair_data()
+        
         self.act_iris = []
         
         self._maxID = 1
         
+        
+    def initial_repair_data(self):
+        '''patch data if it is not connected properly but is replicated instead (ex. after JSON serialization)'''
+
+        # repair dicts' "id" values that are str, not int
+        k = 'id'
+        for d in find_by_key_in(k, self.data):
+            if isinstance(d[k], str):
+                d[k] = int(d[k])
+        # repair dicts keys that are str, not int
+        for k in self.id2obj:
+            if isinstance(k, str):
+                self.id2obj[int(k)] = self.id2obj[k]
+                del self.id2obj[k]
+        
+        data = self.data["algorithm"]  # data to repair
+        roots = data["global_code"], data["functions"]  # where actual data to be stored
+        
+        # referers = data["entry_point"], data["id2obj"]  # these should only refer to some nodes within roots.
+        
+        k = 'id'
+        for d in find_by_keyval_in(k, data["entry_point"][k], roots):
+            data["entry_point"] = d  # reassign the approriate node from roots (global_code or main function)
+            break
+    
+        for ID in list(self.id2obj.keys()):
+            for d in find_by_keyval_in(k, ID, roots):
+                self.id2obj[ID] = d  # reassign the approriate node from roots
+                break
+        
+        
     def newID(self, what=None):
-        self._maxID += 1
+        while True:
+            self._maxID += 1
+            if self._maxID not in self.id2obj:
+                break
         return self._maxID            
         
     def make_correct_trace(self):
@@ -90,7 +127,7 @@ class TraceTester():
                 
         self.last_cond_tuple = (-1, False)
         
-        self._maxID = max(self._maxID, max(self.id2obj.keys()) + 10)
+        self._maxID = max(self._maxID, max(map(int, self.id2obj.keys())) + 10)
         self.expr_id2values = {}
         
         # decide where to read expr values from
@@ -411,12 +448,12 @@ class TraceTester():
         # print(self.data["correct_trace"])
         # exit()
         
-    def inject_to_ontology(self, onto, extra_act_entries=0):
+    def inject_to_ontology(self, onto):
         
         self.inject_algorithm_to_ontology(onto)
         
         self.make_correct_trace()
-        self.prepare_act_candidates(onto, extra_act_entries=extra_act_entries)
+        self.prepare_act_candidates(onto)
         self.inject_trace_to_ontology(onto, self.data["trace"], (), "student_next")
         # self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
         # self.merge_traces(onto, self.data["student_act_iri_list"], self.data["correct_act_iri_list"])
@@ -449,12 +486,22 @@ class TraceTester():
             
             alg_objects = list(find_by_type(self.data["algorithm"]))
             
+            written_ids = set()
+            
             # make algorithm classes and individuals
             for d in alg_objects:
                 if "id" in d:
-                    id_     = d.get("id")
-                    type_   = d.get("type")
-                    name    = d.get("name", "")
+                    id_ = d.get("id")
+                    
+                    # protection from objects cloned via JSON serialization
+                    # ! need to repair the JSON data at start!
+                    if id_ in written_ids:
+                        continue
+                    else:
+                        written_ids.add(id_)
+                    
+                    type_ = d.get("type")
+                    name  = d.get("name", "")
                     
                     assert type_, "Error in agrorithm object: "+str(d)
                     
@@ -538,7 +585,7 @@ class TraceTester():
         Maximum executon number will be exceeded by `extra_act_entries`.
         /* Resulting set of acts of size N will be repeated N times, each act to be possibly placed at each index of the trace, covering the set of all possible traces. */ """
         
-        assert extra_act_entries >= 0, f"extra_act_entries={extra_act_entries}"
+        assert extra_act_entries == 0, f"extra_act_entries={extra_act_entries}"  # TODO: remove parameter (it is deprecated now)
         
         alg_id2max_exec_n = {}  # executed stmt id to max exec_time in correct trace
 
@@ -651,7 +698,7 @@ class TraceTester():
     
     
     def inject_trace_to_ontology(self, onto, trace, act_classnames=("act",), next_propertyname=None):
-        "Writes specified trace to ontology asigning properties to pre-created acts."
+        "Writes specified trace to ontology assigning properties to pre-created acts."
         
         additional_classes = [onto[nm] for nm in act_classnames]
         assert all(additional_classes), f"additional_classes={additional_classes}, {act_classnames}, {onto}"
@@ -717,18 +764,13 @@ class TraceTester():
                     
                     if phase_mark in ("b", "p"):
                         # начало акта
-                        # act_index += 1
-                        # iri = iri_template % "b"
-                        # self.act_iris.append(iri)
-                        # obj = make_act(iri, onto.act_begin, alg_elem["iri"], 
-                        #     prop_class=onto[next_propertyname], 
-                        #     is_last=False)
-                        obj = find_act(onto.act_begin, executes, n or None)  # , iteration_n=iteration_n
+                        obj = find_act(onto.act_begin, executes, n or None)
                         if obj:
                             for class_ in additional_classes:
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
+                            make_triple(obj, onto.id, id_)  # нужно привязать для возврата в GUI ... проверить, что работает
                             if iteration_n:
                                 make_triple(obj, onto.student_iteration_n, iteration_n)
                                 
@@ -741,18 +783,13 @@ class TraceTester():
                     
                     if phase_mark in ("e", "p"):
                         # конец акта
-                        # act_index += 1
-                        # iri = iri_template % "e"
-                        # self.act_iris.append(iri)
-                        # obj = make_act(iri, onto.act_end, alg_elem["iri"], 
-                        #     prop_class=onto[next_propertyname], 
-                        #     is_last=(i==len(self.data["trace"])))
-                        obj = find_act(onto.act_end, executes, n or None)  # , iteration_n=iteration_n
+                        obj = find_act(onto.act_end, executes, n or None)
                         if obj:
                             for class_ in additional_classes:
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
+                            make_triple(obj, onto.id, id_)  # нужно привязать для возврата в GUI ... проверить, что работает
                             if iteration_n:
                                 make_triple(obj, onto.student_iteration_n, iteration_n)
                                 
@@ -1116,7 +1153,7 @@ def extact_mistakes(onto, as_objects=False) -> dict:
      """
     error_classes = onto.Erroneous.descendants()  # a set of the descendant Classes (including self)
 
-    properties_to_extract = ("name", onto.precursor, onto.cause, onto.should_be, onto.should_be_before, onto.context_should_be, onto.text_line, )
+    properties_to_extract = ("id", "name", onto.precursor, onto.cause, onto.should_be, onto.should_be_before, onto.context_should_be, onto.text_line, )
     mistakes = {}
 
     # The .instances() class method can be used to iterate through all Instances of a Class (including its subclasses). It returns a generator.
@@ -1153,7 +1190,7 @@ def create_ontology_tbox() -> "onto":
     my_iri = ('http://vstu.ru/poas/ctrl_structs_2020-05_v%d' % 1)
     # ONTOLOGY_maxID += 1
     onto = get_ontology(my_iri)
-    clear_ontology(onto, keep_tbox=True)
+    clear_ontology(onto, keep_tbox=False)  # True
 
     with onto:
         # каркас онтологии
@@ -1255,12 +1292,12 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         name_out = "pl_out.rdf"
         onto.save(file=name_in, format='rdfxml')
         
-        eval_stats = run_swiprolog_reasoning(name_in, name_out, verbose=1)
+        eval_stats = run_swiprolog_reasoning(name_in, name_out, verbose=0)
         
         if _eval_max_traces is not None:
             return eval_stats
         
-        clear_ontology(onto)
+        clear_ontology(onto, keep_tbox=True)
         onto = get_ontology("file://" + name_out).load()
         seconds = eval_stats['wall_time']
         
@@ -1270,12 +1307,12 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         name_out = f"{reasoning}_out.n3"
         onto.save(file=name_in, format='rdfxml')
         
-        eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=1)
+        eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=0)
         
         if _eval_max_traces is not None:
             return eval_stats
         
-        clear_ontology(onto)
+        clear_ontology(onto, keep_tbox=True)
         onto = get_ontology("file://" + name_out).load()
         
         if False:  # debugging patch to the ontology

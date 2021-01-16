@@ -97,7 +97,7 @@ response: json {
         result_id="result_creating_task"
         escape_nl
     >Test /creating_task [POST]</button>
-    with following JSON payload ['<code>\n</code>'s are expanded for readability, please escape them if copy&paste this as JSON]:
+    with following JSON payload ['<code>\n</code>'s within a string are expanded for readability, please escape them if copy&paste this as JSON]:
     <p><textarea id="payload_creating_task" cols="80" rows="7" placeholder="JSON string">{{ '''{"user_language": "ru", "algorithm_text": "пока не_зелёный -> истина,истина,ложь  // ожидание
     если цвет_красный -> истина,ложь  // по_цвету
         ждать
@@ -136,7 +136,7 @@ response: json {
     "id":       int,  // ID самого акта (может потребоваться на стороне Python)
     "as_string": "string",  // текстовый вид акта (одна строка) - plain text, без всякого оформления (например, 'condition цвет_жёлтый evaluated 1st time - false')
     "-styled?-": {???},
-    "-mistake_explanation?-": "string",  // текстовое пояснение к ошибке
+    "explanations": ["string"],  // текстовое(-ые) пояснение(-ия) к ошибке(-ам) (строки в массиве, т.к. ошибок может быть найдено несколько)
 }
     </pre>
 
