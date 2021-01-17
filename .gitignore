@@ -1,5 +1,6 @@
 *.pyc
 *.lnk
+*.bak
 *.pdf
 *.rdf
 *.n3
