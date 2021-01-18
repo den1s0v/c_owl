@@ -16,6 +16,8 @@ The resulting HTML should be something like this:
     plain text or list of another HTML-tag-like dicts
 </span>
 
+
+See also: `to_html()` function below for how to convert html_tags to HTML string.
 '''
 
 

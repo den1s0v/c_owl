@@ -77,19 +77,157 @@
 <h2> На странице преподавателя </h2>
 
 <h3> Parse Algorithm as text </h3>
+
+<details open>
+    <summary>Request format</summary>
+    Алгоритм в виде текста (ввод от пользователя) и код языка: рус/англ.
     <pre>
 request to 'localhost:2020/creating_task' [method:POST] : json {
     algorithm_text:         "some multiline text"  // содержимое поля ввода алгоритма
     user_language:          "string"  // 'ru' или 'en'
 }
-
-response: json {
-    syntax_errors:          ["message string"],  // ошибка в алгоритме или пустой массив
-    algorithm_json:         {json},  // сохранить для создания задачи
-    algorithm_update_lines: {json},  // внести изменения в editor алгоритма (построчно, не сбив параллельный ввод пользователя) - ещё не используется, т.е. всегда пустой
-    new_algorithm_text:     "some multiline text",  // новый текст в editor алгоритма (если пуст, то заменять не нужно)
-    trace_json:             [array],  // отрендерить проверочную трассу
     </pre>
+</details>
+
+
+<details open>
+    <summary>Response format</summary>
+    Запрос должен выполянться почти мгновенно. В ответ возвращается:
+        <ol>
+            <li> Алгоритм в виде текста (коррекция ввода от пользователя) и в виде JSON (понадобится для страницы студента, см. ниже),
+            </li>
+            <li> Трасса в виде JSON - массива актов, каждый из которых - также JSON-объект (см. ниже).
+            </li>
+        </ol>
+    <pre>
+response: json {
+    "syntax_errors":          ["message string"],  // ошибка в алгоритме или пустой массив
+    "algorithm_json":         {json}*,  // сохранить для создания задачи
+    "algorithm_update_lines": {json},  // внести изменения в editor алгоритма (построчно, не сбив параллельный ввод пользователя) - ещё не используется, т.е. всегда пустой
+    "new_algorithm_text":     "some multiline text",  // новый текст в editor алгоритма (если пуст, то заменять не нужно)
+    "trace_json":             [array]*,  // отрендерить проверочную трассу
+}
+    </pre>
+</details>
+    
+<details>
+    <summary>* {algorithm_json} format</summary>
+    Описание структуры алгоритма в JSON. (При сериализации на одни и те же объекты по разным ссылкам выводятся несколько раз, поэтому JSON может быть весьма большим)
+    <pre>
+  {
+    "id":   int,          // уникальный ID, есть у любого узла в дереве алгоритма 
+    "name": "algorithm",  // имя узла (фиксированное значение для этого вида узла)
+    "type": "algorithm",  // тип узла - алгоритм
+    "entry_point": {...}, // точка входа в алгоритм (копия узла "global_code") (; в дальнейшем может также указывать на тело функции main)
+    "functions": [...],   // в дальнейшем - перечень объявленных функций (напр. main)
+    "global_code": {      // узел глобального кода (т.е. всесь код вне функций)
+      "id":   int,
+      "name": "global_code", // имя следования
+      "type": "sequence",    // тип узла - следование
+      "body": [              // тело следования - список действий (произвольных узлов)
+        <details style="margin-left: 4em;">
+            <summary>// Примеры узлов алгоритма (examples of statements)</summary>
+  // === Цикл ===
+  {
+    "id": 16,
+    "name": "ожидание",    // имя цикла
+    "type": "while_loop",  // тип узла - цикл ПОКА
+    "cond": {              // условие цикла
+      "id": 17,
+      "name": "не_зелёный",  // имя условия
+      "type": "expr"         // тип узла === Выражение === (пока допустим только для условий)
+    },
+    "body": {              // тело цикла
+        // ... один узел (является следованием)
+    }
+  }
+  
+  // === Альтернатива (развилка, IF - ELSE-IF - ELSE) ===
+  {
+    "id": 18,
+    "name": "по_цвету",    // имя альтернатива
+    "type": "alternative", // тип узла - альтернатива c несколькими ветками
+    "branches": [  // список веток развилки (if, [else-if]*, [else])
+      {
+        // первая ветка (if)
+        "id": 19,
+        "name": "if-цвет_красный", // имя ветки
+        "type": "if",              // тип узла - ветка IF
+        "cond": {              // условие ветки
+          "id": 20,
+          "name": "цвет_красный", // имя условия
+          "type": "expr"          // тип узла - выражение
+        },
+        "body": [              // тело ветки
+          // ... (список узлов - statement'ов)
+          {
+            "id": 21,
+            "name": "ждать",
+            "type": "stmt"     // тип узла === Простое действие === 
+          }
+        ]
+      },
+      {
+        // опциональная вторая ветка (тип узла - else-if или else)
+      }
+      // и т.д.
+    ]
+  }
+
+        </details>
+      ]
+    },
+    "id2obj": {   // "индекс" для поиска узлов алгоритма по ID
+      int: {... algorithm node ...},  // эти соответствия требуются на стороне Python при передаче алгоритма
+      int: {... algorithm node ...},
+      ...
+    },
+    "expr_values": {  // заданные преподавателем цепочки булевых величин для условий в алгоритме
+      "не_зелёный": [  // имя выражения
+        true,
+        true,          // значения, которые оно последовательно принимает
+        false
+      ],
+      "цвет_жёлтый": [
+        false
+      ],
+      ...
+    }
+  }
+    </pre>
+</details>
+    
+<details>
+    <summary>* [trace_json_array] format</summary>
+    Описание структуры трассы в JSON. 
+    <pre>
+  [         // массив актов (трасса)
+    ... ,
+    {       // очередной акт
+      "executes": 63,  // ID узла алгоритма, который выполняется этим актом
+      "id": 104,       // ID самого акта
+      "n": 1,          // номер исполения акта (1-й раз, 2-й раз, ...)
+      "name": "программа", // имя (соответтвует имени узла алгоритма)
+      "phase": "finished",  // вид акта "started"/"finished"/"performed"
+      "value": bool,   // [optional] только для актов условий (type == 'expr') - результат "вычисления" выражения
+      
+        // (информация для визуализации акта)
+      "as_string": "закончилась программа",  // строковое представление строки акта (без форматирования)
+      "as_html": "&lt;span class="keyword"&gt;закончилась&lt;/span&gt; &lt;span class="program"&gt;программа&lt;/span&gt;",  // та же строка, форматированные в HTML токены
+      "as_tags": [...],  // те же html-теги, но в виде JSON, для формирования html из них (см. формат html_tag'ов в <a href="https://github.com/den1s0v/c_owl/blob/e70ec8acce56b96a9242e8231472fd94808d6ed0/trace_gen/styling.py#L6">styling.py</a>)
+      
+        // (результаты проверки акта на рассуждателе)
+      "is_valid": bool,  // true - акт корректен - сразу добавить в правильную трассу, иначе - false - не добавлять, и этот выбор затрётся следующим выбором акта студентом.
+      "explanations": ["array", "of", "strings"], // перечень найденных ошибок для этого акта (пуст, если "is_valid" == true)
+      
+    },
+    ...  // ещё акты
+  ]
+    </pre>
+</details>
+    
+<details>
+    <summary>Пример и тест API через $.ajax</summary>
     
     <p><button 
         id="send_creating_task" 
@@ -97,17 +235,19 @@ response: json {
         payload_id="payload_creating_task"
         result_id="result_creating_task"
         escape_nl
-    >Test /creating_task [POST]</button>
-    with following JSON payload ['<code>\n</code>'s within a string are expanded for readability, please escape them if copy&paste this as JSON]:
-    <p><textarea id="payload_creating_task" cols="80" rows="7" placeholder="JSON string">{{ '''{"user_language": "ru", "algorithm_text": "пока не_зелёный -> истина,истина,ложь  // ожидание
+    >Протестировать /creating_task [POST]</button>
+    , отправив следующий JSON <br>[Переводы строк <code>\n</code> в этом поле настоящие, для удобства чтения, но для перед использованием как JSON их нужно будет заэкранировать - явно вписать <code>\n</code>]:
+    <p><textarea id="payload_creating_task" cols="80" rows="7" placeholder="JSON string">{"user_language": "ru", "algorithm_text": "пока не_зелёный -> истина,истина,ложь  // ожидание
     если цвет_красный -> истина,ложь  // по_цвету
         ждать
     иначе если цвет_жёлтый -> ложь
         приготовиться
-"}'''  }}
+"}
     </textarea></p>  <!-- { { some python code } } - шаблонизация в Flask -->
     Response:
     <div id="result_creating_task" style="background-color: #eeffff;"></div>
+    End of response.
+</details>
     
     
 <h2> На странице ученика </h2>
