@@ -14,6 +14,7 @@ from ctrlstrct_run import process_algtraces
 from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, find_by_key_in, find_by_keyval_in
 from trace_gen.json2alg2tr import act_line_for_alg_element
 from upd_onto import get_relation_object
+import trace_gen.styling as styling
 
 
 TEST_DIR = "./test_data"
@@ -276,11 +277,14 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 			# создать строку "program began"
 			act_text = act_line_for_alg_element(algorithm_json, phase='started', lang=user_language, )  # передаём сам корень алгоритма, так как его type=='algorithm',
 			max_id += 1
+			html_tags = styling.prepare_tags_for_line(act_text)
 			result_acts.append({
 				'executes': algorithm_json["entry_point"]['id'],  # ! а привязываем к глобальному коду (или функции main)
 				'name': algorithm_json["entry_point"]['name'],
 				'phase': 'started',
 				'as_string': act_text,
+				'as_tags': html_tags,
+				'as_html': styling.to_html(html_tags),
 				'id': max_id,
 				'n': 1,
 				'is_valid': True  # в начале трассы акт всегда такой
@@ -306,11 +310,14 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 			use_exec_time=exec_time,
 			)
 		max_id += 1
+		html_tags = styling.prepare_tags_for_line(act_text)
 		act_json = {
 				'executes': elem['id'],
 				'name': elem['name'],
 				'phase': act_type,
 				'as_string': act_text,
+				'as_tags': html_tags,
+				'as_html': styling.to_html(html_tags),
 				'id': max_id,
 				'n': exec_time,
 				'is_valid': None,  # пока нет информации о корректности такого акта
@@ -328,13 +335,51 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 		return f"Server error in make_act_json() - {type(e).__name__}:\n\t{str(e)}"
 
 
+def add_styling_to_trace(algorithm_json, trace_json, user_language=None) -> list:
+	'''Adds text line, tags and html form for each act in given trace and returns the same reference to the trace list'''
+	try:
+		assert isinstance(trace_json, (list, tuple)), "The trace was not correctly constructed: " + str(trace_json)
+		
+		for act_dict in trace_json:
+			
+			algorithm_element_id = act_dict['executes']
+			elem = algorithm_json["id2obj"].get(algorithm_element_id, algorithm_json["id2obj"].get(str(algorithm_element_id), None))
+			
+			assert elem, f"No element with id={algorithm_element_id} in given algorithm."
+			
+			if elem['id'] == algorithm_json["entry_point"]['id']:
+				# создать строку типа "program began"
+				# act_text = act_line_for_alg_element(algorithm_json, phase='started', lang=user_language, )  # передаём сам корень 
+				elem = algorithm_json
+				
+			act_text = act_line_for_alg_element(
+				elem, 
+				phase=act_dict['phase'], 
+				lang=user_language,
+				expr_value=act_dict.get('value', None),
+				use_exec_time=act_dict['n'],
+				)
+			html_tags = styling.prepare_tags_for_line(act_text)
+			add_json = {
+					'as_string': act_text,
+					'as_tags': html_tags,
+					'as_html': styling.to_html(html_tags),
+			}
+			act_dict.update(add_json)
+	
+		return trace_json
+	except Exception as e:
+		# raise e
+		return f"Server error in add_styling_to_trace() - {type(e).__name__}:\n\t{str(e)}"
+
+
 def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=False, process_kwargs=dict(reasoning="jena", debug_rdf_fpath='test_data/ajax.rdf')) -> ('mistakes', 'error_message: str or None'):
 		
 	try:
 		_onto, mistakes = process_algtraces(alg_trs_list, verbose=0, mistakes_as_objects=False, **process_kwargs)
 		
-		from pprint import pprint
-		pprint(mistakes)
+		# from pprint import pprint
+		# pprint(mistakes)
 		
 		if write_mistakes_to_acts and len(alg_trs_list) == 1:
 			trace = alg_trs_list[0]['trace']

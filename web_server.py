@@ -7,7 +7,7 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect
 # # import the flask extension
 # from flask_caching import Cache  
 
-from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json, make_act_json, process_algorithms_and_traces
+from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json, make_act_json, process_algorithms_and_traces, add_styling_to_trace
 from ctrlstrct_run import make_trace_for_algorithm
 from trace_gen.txt2algntr import AlgorithmParser, create_algorithm_from_text
 
@@ -78,6 +78,7 @@ def create_app():
 			
 			# trace_json = ()
 			trace_json = make_trace_for_algorithm(res.algorithm)
+			trace_json = add_styling_to_trace(res.algorithm, trace_json, request.json['user_language'])
 	
 			# if error
 			if isinstance(trace_json, str):
