@@ -5,7 +5,8 @@
 *.rdf
 *.n3
 *.ttl
-#*.txt
+*.txt
+*.doc*
 ~*.*
 test_data/*/*output*
 test_data/*/*.rdf
@@ -14,6 +15,7 @@ test_data/*.rdf
 *dbg*
 
 trace_gen/*out*.*
+trace_gen/*test*.*
 trace_gen/tr_in.txt
 trace_gen/alg_in.json
 

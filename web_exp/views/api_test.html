@@ -216,7 +216,7 @@ response: json {
       "as_html": "&lt;span class="keyword"&gt;закончилась&lt;/span&gt; &lt;span class="program"&gt;программа&lt;/span&gt;",  // та же строка, форматированные в HTML токены
       "as_tags": [...],  // те же html-теги, но в виде JSON, для формирования html из них (см. формат html_tag'ов в <a href="https://github.com/den1s0v/c_owl/blob/e70ec8acce56b96a9242e8231472fd94808d6ed0/trace_gen/styling.py#L6">styling.py</a>)
       
-        // (результаты проверки акта на рассуждателе)
+        // (результаты проверки акта на рассуждателе - этих полей нет для страницы преподавателя, т.е. в response команды /creating_task)
       "is_valid": bool,  // true - акт корректен - сразу добавить в правильную трассу, иначе - false - не добавлять, и этот выбор затрётся следующим выбором акта студентом.
       "explanations": ["array", "of", "strings"], // перечень найденных ошибок для этого акта (пуст, если "is_valid" == true)
       
@@ -252,23 +252,30 @@ response: json {
     
 <h2> На странице ученика </h2>
 <h3> Verify new trace act </h3>
+<details open>
+    <summary>Request format</summary>
+    Алгоритм в виде JSON (сохранённый из результата <code>/creating_task</code>), ID элемента алгоритма, вид акта, предшествующий фрагмент трассы (список актов) и код языка: рус/англ.
     <pre>
 request to 'localhost:2020/verify_trace_act' [method:POST] : json {
     user_language:          "string"  // 'ru' или 'en'
     algorithm_json:         {json},
-    algorithm_element_id:   int,      // поле 'id' из кликнутого элемента
-    act_type:               "string"  // начало ('started') или конец ('finished') - для составных, 'performed' - для простых (атомарных)
-    existing_trace_json:             [array],  // вся имеющаяся ПРАВИЛЬНАЯ трасса
+    algorithm_element_id:   int,      // поле 'id' из кликнутого элемента алгоритма
+    act_type:               "string", // начало ('started') или конец ('finished') - для составных, 'performed' - для простых (атомарных)
+    existing_trace_json:    [trace_json_array]  // вся имеющаяся ПРАВИЛЬНАЯ трасса
 }
 
 response: json {
-    trace_lines_json:       [array of {json}],  // строка как один элемент трассы - обычно одна, но может быть несколько строк сразу (автоматическое добавление)
+    trace_lines_json:       [trace_json_array*],  // строка как один элемент трассы - обычно одна, но может быть несколько строк сразу (например, автоматически добавлено "программа началась" при пустой трассе)
     processing_errors:      ["message string"],  // описание исключений, произошедших в процессе обработки запроса (пустой массив, если их не было); в нормальном режиме исключений быть не должно, в противном случае проблемы с заданием или с сервером.
 <!-- ////!   is_trace_line_ok:       boolean,  // true, если всё хорошо, иначе false
 ////!   trace_errors:           ["message string"],  // ошибка в трассе с учётом указаного акта (пустой массив, если is_trace_line_ok == true) -->
 }
+    </pre>
 
-Содержимое {json} для одного элемента (акта) трассы в response:
+<details>
+    <summary>* Содержимое [trace_json_array] для одного элемента (акта) трассы</summary>
+Cм. выше в описании к <code>/creating_task</code>, здесь повторено то же самое в основных чертах.
+    <pre>
 {
     "is_valid": bool,  // информация о корректности акта (если true, то сразу добавить в правильную трассу, иначе - false - этот выбор затрётся следующим выбором акта студентом) <!-- (null, если неизвестно, но этот вариант не должен попасть наружу, к вам) -->
     "executes": int,  // ID элемента алгоритма, который выполняется этим актом
@@ -276,11 +283,18 @@ response: json {
     "value":    "string",  // [optional] результат вычисления выражения, если это условие цикла/развилки (может потребоваться на стороне Python)
     "id":       int,  // ID самого акта (может потребоваться на стороне Python)
     "as_string": "string",  // текстовый вид акта (одна строка) - plain text, без всякого оформления (например, 'condition цвет_жёлтый evaluated 1st time - false')
-    "-styled?-": {???},
+    "as_html": "string",
+    "as_tags": {json_object_or_list},  // структура HTML в виде строк, массивов и вложенных объектов
     "explanations": ["string"],  // текстовое(-ые) пояснение(-ия) к ошибке(-ам) (строки в массиве, т.к. ошибок может быть найдено несколько)
 }
     </pre>
+</details>
 
+</details>
+    
+<details>
+    <summary>Пример и тест API через $.ajax</summary>
+    
     <p><button 
         id="send_verify_trace_act" 
         url="/verify_trace_act" 
@@ -713,6 +727,18 @@ response: json {
   } }</textarea></p>
     Response:
     <div id="result_verify_trace_act" style="background-color: #eeffff;"></div>
-    
-    
+    End of response.
+</details>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
 </body>
