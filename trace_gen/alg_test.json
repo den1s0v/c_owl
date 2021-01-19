@@ -1,66 +1,110 @@
 {
     "entry_point": {
+      "act_name": {
+        "en": "program",
+        "ru": "программа"
+      },
       "body": [
         {
+          "act_name": {
+            "en": "loop 'ожидание'",
+            "ru": "цикл 'ожидание'"
+          },
           "body": {
+            "act_name": {
+              "en": "iteration of loop 'ожидание'",
+              "ru": "итерация цикла 'ожидание'"
+            },
             "body": [
               {
+                "act_name": {
+                  "en": "alternative 'по_цвету'",
+                  "ru": "альтернатива 'по_цвету'"
+                },
                 "branches": [
                   {
+                    "act_name": {
+                      "en": "IF branch with condition 'цвет_красный'",
+                      "ru": "ветка ЕСЛИ с условием 'цвет_красный'"
+                    },
                     "body": [
                       {
-                        "id": 21,
+                        "act_name": {
+                          "en": "statement 'ждать'",
+                          "ru": "действие 'ждать'"
+                        },
+                        "id": 9,
                         "name": "ждать",
                         "type": "stmt"
                       }
                     ],
                     "cond": {
-                      "id": 20,
+                      "act_name": {
+                        "en": "condition 'цвет_красный'",
+                        "ru": "условие 'цвет_красный'"
+                      },
+                      "id": 8,
                       "name": "цвет_красный",
                       "type": "expr"
                     },
-                    "id": 19,
+                    "id": 7,
                     "name": "if-цвет_красный",
                     "type": "if"
                   },
                   {
+                    "act_name": {
+                      "en": "ELSE-IF branch with condition 'цвет_жёлтый'",
+                      "ru": "ветка ИНАЧЕ-ЕСЛИ с условием 'цвет_жёлтый'"
+                    },
                     "body": [
                       {
-                        "id": 24,
+                        "act_name": {
+                          "en": "statement 'приготовиться'",
+                          "ru": "действие 'приготовиться'"
+                        },
+                        "id": 12,
                         "name": "приготовиться",
                         "type": "stmt"
                       }
                     ],
                     "cond": {
-                      "id": 23,
+                      "act_name": {
+                        "en": "condition 'цвет_жёлтый'",
+                        "ru": "условие 'цвет_жёлтый'"
+                      },
+                      "id": 11,
                       "name": "цвет_жёлтый",
                       "type": "expr"
                     },
-                    "id": 22,
+                    "id": 10,
                     "name": "elseif-цвет_жёлтый",
                     "type": "else-if"
                   }
                 ],
-                "id": 18,
+                "id": 6,
                 "name": "по_цвету",
                 "type": "alternative"
               }
             ],
-            "id": 25,
+            "id": 13,
             "name": "ожидание_loop_body",
             "type": "sequence"
           },
           "cond": {
-            "id": 17,
+            "act_name": {
+              "en": "condition 'не_зелёный'",
+              "ru": "условие 'не_зелёный'"
+            },
+            "id": 5,
             "name": "не_зелёный",
             "type": "expr"
           },
-          "id": 16,
+          "id": 4,
           "name": "ожидание",
           "type": "while_loop"
         }
       ],
-      "id": 15,
+      "id": 3,
       "name": "global_code",
       "type": "sequence"
     },
@@ -82,338 +126,562 @@
     "global_code": {
       "body": [
         {
+          "act_name": {
+            "en": "loop 'ожидание'",
+            "ru": "цикл 'ожидание'"
+          },
           "body": {
+            "act_name": {
+              "en": "iteration of loop 'ожидание'",
+              "ru": "итерация цикла 'ожидание'"
+            },
             "body": [
               {
+                "act_name": {
+                  "en": "alternative 'по_цвету'",
+                  "ru": "альтернатива 'по_цвету'"
+                },
                 "branches": [
                   {
+                    "act_name": {
+                      "en": "IF branch with condition 'цвет_красный'",
+                      "ru": "ветка ЕСЛИ с условием 'цвет_красный'"
+                    },
                     "body": [
                       {
-                        "id": 21,
+                        "act_name": {
+                          "en": "statement 'ждать'",
+                          "ru": "действие 'ждать'"
+                        },
+                        "id": 9,
                         "name": "ждать",
                         "type": "stmt"
                       }
                     ],
                     "cond": {
-                      "id": 20,
+                      "act_name": {
+                        "en": "condition 'цвет_красный'",
+                        "ru": "условие 'цвет_красный'"
+                      },
+                      "id": 8,
                       "name": "цвет_красный",
                       "type": "expr"
                     },
-                    "id": 19,
+                    "id": 7,
                     "name": "if-цвет_красный",
                     "type": "if"
                   },
                   {
+                    "act_name": {
+                      "en": "ELSE-IF branch with condition 'цвет_жёлтый'",
+                      "ru": "ветка ИНАЧЕ-ЕСЛИ с условием 'цвет_жёлтый'"
+                    },
                     "body": [
                       {
-                        "id": 24,
+                        "act_name": {
+                          "en": "statement 'приготовиться'",
+                          "ru": "действие 'приготовиться'"
+                        },
+                        "id": 12,
                         "name": "приготовиться",
                         "type": "stmt"
                       }
                     ],
                     "cond": {
-                      "id": 23,
+                      "act_name": {
+                        "en": "condition 'цвет_жёлтый'",
+                        "ru": "условие 'цвет_жёлтый'"
+                      },
+                      "id": 11,
                       "name": "цвет_жёлтый",
                       "type": "expr"
                     },
-                    "id": 22,
+                    "id": 10,
                     "name": "elseif-цвет_жёлтый",
                     "type": "else-if"
                   }
                 ],
-                "id": 18,
+                "id": 6,
                 "name": "по_цвету",
                 "type": "alternative"
               }
             ],
-            "id": 25,
+            "id": 13,
             "name": "ожидание_loop_body",
             "type": "sequence"
           },
           "cond": {
-            "id": 17,
+            "act_name": {
+              "en": "condition 'не_зелёный'",
+              "ru": "условие 'не_зелёный'"
+            },
+            "id": 5,
             "name": "не_зелёный",
             "type": "expr"
           },
-          "id": 16,
+          "id": 4,
           "name": "ожидание",
           "type": "while_loop"
         }
       ],
-      "id": 15,
+      "id": 3,
       "name": "global_code",
       "type": "sequence"
     },
-    "id": 14,
+    "id": 2,
     "id2obj": {
-      "15": {
+      "3": {
         "body": [
           {
+            "act_name": {
+              "en": "loop 'ожидание'",
+              "ru": "цикл 'ожидание'"
+            },
             "body": {
+              "act_name": {
+                "en": "iteration of loop 'ожидание'",
+                "ru": "итерация цикла 'ожидание'"
+              },
               "body": [
                 {
+                  "act_name": {
+                    "en": "alternative 'по_цвету'",
+                    "ru": "альтернатива 'по_цвету'"
+                  },
                   "branches": [
                     {
+                      "act_name": {
+                        "en": "IF branch with condition 'цвет_красный'",
+                        "ru": "ветка ЕСЛИ с условием 'цвет_красный'"
+                      },
                       "body": [
                         {
-                          "id": 21,
+                          "act_name": {
+                            "en": "statement 'ждать'",
+                            "ru": "действие 'ждать'"
+                          },
+                          "id": 9,
                           "name": "ждать",
                           "type": "stmt"
                         }
                       ],
                       "cond": {
-                        "id": 20,
+                        "act_name": {
+                          "en": "condition 'цвет_красный'",
+                          "ru": "условие 'цвет_красный'"
+                        },
+                        "id": 8,
                         "name": "цвет_красный",
                         "type": "expr"
                       },
-                      "id": 19,
+                      "id": 7,
                       "name": "if-цвет_красный",
                       "type": "if"
                     },
                     {
+                      "act_name": {
+                        "en": "ELSE-IF branch with condition 'цвет_жёлтый'",
+                        "ru": "ветка ИНАЧЕ-ЕСЛИ с условием 'цвет_жёлтый'"
+                      },
                       "body": [
                         {
-                          "id": 24,
+                          "act_name": {
+                            "en": "statement 'приготовиться'",
+                            "ru": "действие 'приготовиться'"
+                          },
+                          "id": 12,
                           "name": "приготовиться",
                           "type": "stmt"
                         }
                       ],
                       "cond": {
-                        "id": 23,
+                        "act_name": {
+                          "en": "condition 'цвет_жёлтый'",
+                          "ru": "условие 'цвет_жёлтый'"
+                        },
+                        "id": 11,
                         "name": "цвет_жёлтый",
                         "type": "expr"
                       },
-                      "id": 22,
+                      "id": 10,
                       "name": "elseif-цвет_жёлтый",
                       "type": "else-if"
                     }
                   ],
-                  "id": 18,
+                  "id": 6,
                   "name": "по_цвету",
                   "type": "alternative"
                 }
               ],
-              "id": 25,
+              "id": 13,
               "name": "ожидание_loop_body",
               "type": "sequence"
             },
             "cond": {
-              "id": 17,
+              "act_name": {
+                "en": "condition 'не_зелёный'",
+                "ru": "условие 'не_зелёный'"
+              },
+              "id": 5,
               "name": "не_зелёный",
               "type": "expr"
             },
-            "id": 16,
+            "id": 4,
             "name": "ожидание",
             "type": "while_loop"
           }
         ],
-        "id": 15,
+        "id": 3,
         "name": "global_code",
         "type": "sequence"
       },
-      "16": {
+      "4": {
+        "act_name": {
+          "en": "loop 'ожидание'",
+          "ru": "цикл 'ожидание'"
+        },
         "body": {
+          "act_name": {
+            "en": "iteration of loop 'ожидание'",
+            "ru": "итерация цикла 'ожидание'"
+          },
           "body": [
             {
+              "act_name": {
+                "en": "alternative 'по_цвету'",
+                "ru": "альтернатива 'по_цвету'"
+              },
               "branches": [
                 {
+                  "act_name": {
+                    "en": "IF branch with condition 'цвет_красный'",
+                    "ru": "ветка ЕСЛИ с условием 'цвет_красный'"
+                  },
                   "body": [
                     {
-                      "id": 21,
+                      "act_name": {
+                        "en": "statement 'ждать'",
+                        "ru": "действие 'ждать'"
+                      },
+                      "id": 9,
                       "name": "ждать",
                       "type": "stmt"
                     }
                   ],
                   "cond": {
-                    "id": 20,
+                    "act_name": {
+                      "en": "condition 'цвет_красный'",
+                      "ru": "условие 'цвет_красный'"
+                    },
+                    "id": 8,
                     "name": "цвет_красный",
                     "type": "expr"
                   },
-                  "id": 19,
+                  "id": 7,
                   "name": "if-цвет_красный",
                   "type": "if"
                 },
                 {
+                  "act_name": {
+                    "en": "ELSE-IF branch with condition 'цвет_жёлтый'",
+                    "ru": "ветка ИНАЧЕ-ЕСЛИ с условием 'цвет_жёлтый'"
+                  },
                   "body": [
                     {
-                      "id": 24,
+                      "act_name": {
+                        "en": "statement 'приготовиться'",
+                        "ru": "действие 'приготовиться'"
+                      },
+                      "id": 12,
                       "name": "приготовиться",
                       "type": "stmt"
                     }
                   ],
                   "cond": {
-                    "id": 23,
+                    "act_name": {
+                      "en": "condition 'цвет_жёлтый'",
+                      "ru": "условие 'цвет_жёлтый'"
+                    },
+                    "id": 11,
                     "name": "цвет_жёлтый",
                     "type": "expr"
                   },
-                  "id": 22,
+                  "id": 10,
                   "name": "elseif-цвет_жёлтый",
                   "type": "else-if"
                 }
               ],
-              "id": 18,
+              "id": 6,
               "name": "по_цвету",
               "type": "alternative"
             }
           ],
-          "id": 25,
+          "id": 13,
           "name": "ожидание_loop_body",
           "type": "sequence"
         },
         "cond": {
-          "id": 17,
+          "act_name": {
+            "en": "condition 'не_зелёный'",
+            "ru": "условие 'не_зелёный'"
+          },
+          "id": 5,
           "name": "не_зелёный",
           "type": "expr"
         },
-        "id": 16,
+        "id": 4,
         "name": "ожидание",
         "type": "while_loop"
       },
-      "17": {
-        "id": 17,
+      "5": {
+        "act_name": {
+          "en": "condition 'не_зелёный'",
+          "ru": "условие 'не_зелёный'"
+        },
+        "id": 5,
         "name": "не_зелёный",
         "type": "expr"
       },
-      "18": {
+      "6": {
+        "act_name": {
+          "en": "alternative 'по_цвету'",
+          "ru": "альтернатива 'по_цвету'"
+        },
         "branches": [
           {
+            "act_name": {
+              "en": "IF branch with condition 'цвет_красный'",
+              "ru": "ветка ЕСЛИ с условием 'цвет_красный'"
+            },
             "body": [
               {
-                "id": 21,
+                "act_name": {
+                  "en": "statement 'ждать'",
+                  "ru": "действие 'ждать'"
+                },
+                "id": 9,
                 "name": "ждать",
                 "type": "stmt"
               }
             ],
             "cond": {
-              "id": 20,
+              "act_name": {
+                "en": "condition 'цвет_красный'",
+                "ru": "условие 'цвет_красный'"
+              },
+              "id": 8,
               "name": "цвет_красный",
               "type": "expr"
             },
-            "id": 19,
+            "id": 7,
             "name": "if-цвет_красный",
             "type": "if"
           },
           {
+            "act_name": {
+              "en": "ELSE-IF branch with condition 'цвет_жёлтый'",
+              "ru": "ветка ИНАЧЕ-ЕСЛИ с условием 'цвет_жёлтый'"
+            },
             "body": [
               {
-                "id": 24,
+                "act_name": {
+                  "en": "statement 'приготовиться'",
+                  "ru": "действие 'приготовиться'"
+                },
+                "id": 12,
                 "name": "приготовиться",
                 "type": "stmt"
               }
             ],
             "cond": {
-              "id": 23,
+              "act_name": {
+                "en": "condition 'цвет_жёлтый'",
+                "ru": "условие 'цвет_жёлтый'"
+              },
+              "id": 11,
               "name": "цвет_жёлтый",
               "type": "expr"
             },
-            "id": 22,
+            "id": 10,
             "name": "elseif-цвет_жёлтый",
             "type": "else-if"
           }
         ],
-        "id": 18,
+        "id": 6,
         "name": "по_цвету",
         "type": "alternative"
       },
-      "19": {
+      "7": {
+        "act_name": {
+          "en": "IF branch with condition 'цвет_красный'",
+          "ru": "ветка ЕСЛИ с условием 'цвет_красный'"
+        },
         "body": [
           {
-            "id": 21,
+            "act_name": {
+              "en": "statement 'ждать'",
+              "ru": "действие 'ждать'"
+            },
+            "id": 9,
             "name": "ждать",
             "type": "stmt"
           }
         ],
         "cond": {
-          "id": 20,
+          "act_name": {
+            "en": "condition 'цвет_красный'",
+            "ru": "условие 'цвет_красный'"
+          },
+          "id": 8,
           "name": "цвет_красный",
           "type": "expr"
         },
-        "id": 19,
+        "id": 7,
         "name": "if-цвет_красный",
         "type": "if"
       },
-      "20": {
-        "id": 20,
+      "8": {
+        "act_name": {
+          "en": "condition 'цвет_красный'",
+          "ru": "условие 'цвет_красный'"
+        },
+        "id": 8,
         "name": "цвет_красный",
         "type": "expr"
       },
-      "21": {
-        "id": 21,
+      "9": {
+        "act_name": {
+          "en": "statement 'ждать'",
+          "ru": "действие 'ждать'"
+        },
+        "id": 9,
         "name": "ждать",
         "type": "stmt"
       },
-      "22": {
+      "10": {
+        "act_name": {
+          "en": "ELSE-IF branch with condition 'цвет_жёлтый'",
+          "ru": "ветка ИНАЧЕ-ЕСЛИ с условием 'цвет_жёлтый'"
+        },
         "body": [
           {
-            "id": 24,
+            "act_name": {
+              "en": "statement 'приготовиться'",
+              "ru": "действие 'приготовиться'"
+            },
+            "id": 12,
             "name": "приготовиться",
             "type": "stmt"
           }
         ],
         "cond": {
-          "id": 23,
+          "act_name": {
+            "en": "condition 'цвет_жёлтый'",
+            "ru": "условие 'цвет_жёлтый'"
+          },
+          "id": 11,
           "name": "цвет_жёлтый",
           "type": "expr"
         },
-        "id": 22,
+        "id": 10,
         "name": "elseif-цвет_жёлтый",
         "type": "else-if"
       },
-      "23": {
-        "id": 23,
+      "11": {
+        "act_name": {
+          "en": "condition 'цвет_жёлтый'",
+          "ru": "условие 'цвет_жёлтый'"
+        },
+        "id": 11,
         "name": "цвет_жёлтый",
         "type": "expr"
       },
-      "24": {
-        "id": 24,
+      "12": {
+        "act_name": {
+          "en": "statement 'приготовиться'",
+          "ru": "действие 'приготовиться'"
+        },
+        "id": 12,
         "name": "приготовиться",
         "type": "stmt"
       },
-      "25": {
+      "13": {
+        "act_name": {
+          "en": "iteration of loop 'ожидание'",
+          "ru": "итерация цикла 'ожидание'"
+        },
         "body": [
           {
+            "act_name": {
+              "en": "alternative 'по_цвету'",
+              "ru": "альтернатива 'по_цвету'"
+            },
             "branches": [
               {
+                "act_name": {
+                  "en": "IF branch with condition 'цвет_красный'",
+                  "ru": "ветка ЕСЛИ с условием 'цвет_красный'"
+                },
                 "body": [
                   {
-                    "id": 21,
+                    "act_name": {
+                      "en": "statement 'ждать'",
+                      "ru": "действие 'ждать'"
+                    },
+                    "id": 9,
                     "name": "ждать",
                     "type": "stmt"
                   }
                 ],
                 "cond": {
-                  "id": 20,
+                  "act_name": {
+                    "en": "condition 'цвет_красный'",
+                    "ru": "условие 'цвет_красный'"
+                  },
+                  "id": 8,
                   "name": "цвет_красный",
                   "type": "expr"
                 },
-                "id": 19,
+                "id": 7,
                 "name": "if-цвет_красный",
                 "type": "if"
               },
               {
+                "act_name": {
+                  "en": "ELSE-IF branch with condition 'цвет_жёлтый'",
+                  "ru": "ветка ИНАЧЕ-ЕСЛИ с условием 'цвет_жёлтый'"
+                },
                 "body": [
                   {
-                    "id": 24,
+                    "act_name": {
+                      "en": "statement 'приготовиться'",
+                      "ru": "действие 'приготовиться'"
+                    },
+                    "id": 12,
                     "name": "приготовиться",
                     "type": "stmt"
                   }
                 ],
                 "cond": {
-                  "id": 23,
+                  "act_name": {
+                    "en": "condition 'цвет_жёлтый'",
+                    "ru": "условие 'цвет_жёлтый'"
+                  },
+                  "id": 11,
                   "name": "цвет_жёлтый",
                   "type": "expr"
                 },
-                "id": 22,
+                "id": 10,
                 "name": "elseif-цвет_жёлтый",
                 "type": "else-if"
               }
             ],
-            "id": 18,
+            "id": 6,
             "name": "по_цвету",
             "type": "alternative"
           }
         ],
-        "id": 25,
+        "id": 13,
         "name": "ожидание_loop_body",
         "type": "sequence"
       }
