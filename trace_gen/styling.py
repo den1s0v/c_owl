@@ -24,6 +24,9 @@ See also: `to_html()` function below for how to convert html_tags to HTML string
 
 import re
 
+from trace_gen.json2alg2tr import tr, set_target_lang, get_target_lang
+
+
 def make_lexer():
     '''create and return lexer function 
     that recieves a string with tokens 
@@ -131,9 +134,13 @@ def prepare_tags_for_text(multiline_text) -> dict:
         html["content"] += [{"tag": "br"}]
     return html
 
+
 def to_html(element: str or dict or list, sep='') -> str:
-    if isinstance(element, str):
-        return element
+    if not element:
+        return ''
+        
+    if isinstance(element, (str, int)):
+        return str(element)
         
     if isinstance(element, (list, tuple)):
         inner = sep.join(map(to_html, element))
@@ -154,6 +161,184 @@ def to_html(element: str or dict or list, sep='') -> str:
             html = f'{head} />'
         return html
     
+    return 'UNKNOWN(%s)' % type(element).__name__
+    
+
+INDENT_STEP = 4  # spaxes
+SIMPLE_NODE_STATES = ('performed', )
+COMPLEX_NODE_STATES = ('started', 'finished')
+
+BUTTON_TIP_FREFIX = {
+    "ru": {
+        'performed': 'Выполнится',
+        'started': 'Начнётся',
+        'finished': 'Закончится',
+    },
+    "en": {
+        'performed': 'Perform',
+        'started': 'Start',
+        'finished': 'Finish',
+    }
+}
+
+
+# def escape_quotes(s):
+#     'HTML-escape quotes'
+#     return s.replace("'", '&apos;').replace('"', r'&quot;')
+#     # .replace('\\', '\\\\')
+
+def _make_add_act_button_tip(act_name_json, phase):
+    lang = get_target_lang()
+    return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name_json[lang]).replace("'", '"')
+
+
+def _make_alg_tag(alg_node, token_type, inner='', states=None):
+    more_attrs = {}
+    if alg_node:
+        id_ = alg_node["id"]
+        more_attrs.update({"algorithm_element_id": [id_], })
+    
+    if states:
+        act_name = alg_node["act_name"]
+        states_attr = {state: _make_add_act_button_tip(act_name, state) for state in states}
+        BUTTON_TIPS[id_] = states_attr
+        # states_attr = escape_quotes(str(states_attr))
+        # more_attrs.update({"act_types": [states_attr]})
+    
+    return {
+        "tag": "span",
+        "attributes": {"class": [token_type], **more_attrs},
+        "content": inner
+    }
+
+
+def _make_line_tag(indent, inner=''):
+    return {
+        "tag": "div",
+        "attributes": {"class": ['line'], "style": ['margin-left: %dem;' % indent]},
+        "content": inner
+    }
+
+BUTTON_TIPS = {}  # подсказки к кнопкам (в теги не получилось вставить - вернём отдельно)
+
+def get_button_tips():
+    return BUTTON_TIPS
+
+def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, indent=0) -> list:
+    """ Create new tree of html-tags with additional info about nodes """
+    if user_language:
+        set_target_lang(user_language)  # usually set once on the topmost recursive call
+        BUTTON_TIPS.clear()
+        
+    if isinstance(algorithm_json, (list, tuple)):
+        return [algorithm_to_tags(el, indent=indent) for el in algorithm_json]
+    
+    if isinstance(algorithm_json, str):
+        assert 0, algorithm_json
+        # return algorithm_json
+        
+    if isinstance(algorithm_json, dict):
+        if algorithm_json["type"] == "algorithm":
+            algorithm_json = algorithm_json["entry_point"]
+            
+        # id_ = algorithm_json["id"]
+        type_ = algorithm_json["type"]
+        name = algorithm_json["name"]
+        # act_name = algorithm_json["act_name"]
+            
+        if type_ in ("expr", ):
+            return _make_alg_tag(algorithm_json, "variable button", name, states=SIMPLE_NODE_STATES)
+        
+        if type_ in ("stmt", ):
+            return _make_line_tag(indent, _make_alg_tag(algorithm_json, "variable button", name, states=SIMPLE_NODE_STATES))
+        
+        elif type_ == "sequence":  # and not name.endswith("_loop_body"):
+            # # recurse with list
+            # return algorithm_to_tags(algorithm_json["body"], indent=indent)  # indent++ ??
+            # list of lines
+            # return [_make_line_tag(indent, algorithm_to_tags(el, indent=indent)) for el in algorithm_json["body"]]
+            return [(algorithm_to_tags(el, indent=indent)) for el in algorithm_json["body"]]
+            
+        elif type_.endswith("_loop"):
+            loop_type = type_.replace("_loop", '')
+            
+            if loop_type == 'while':
+                return [
+                    # заголовок цикла
+                    _make_line_tag(indent, [
+                        _make_alg_tag(algorithm_json, 'keyword button', 
+                            inner=tr(loop_type),
+                            states=COMPLEX_NODE_STATES),
+                        " ",
+                        algorithm_to_tags(algorithm_json["cond"], indent=indent),
+                        "&nbsp;" * 2,
+                        _make_alg_tag(None, 'comment', inner=[
+                            tr('comment'),
+                            name
+                        ])
+                    ]),
+                    # кнопка для тела цикла
+                    _make_line_tag(indent + INDENT_STEP, [
+                        _make_alg_tag(algorithm_json["body"], 'button', 
+                            inner='[block-btn]',
+                            states=COMPLEX_NODE_STATES)
+                        ]),
+                    # тело цикла
+                    algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP)
+                ]
+                
+            # do-while, ... and more
+            else:
+                raise 'Not implemented for loop type: ' + loop_type
+                        
+        elif type_ == "alternative":
+            result = []
+            # цикл по веткам
+            for branch in algorithm_json["branches"]:
+                # заголовок ветки
+                line = _make_line_tag(indent, [])
+                if branch["type"] == "if":
+                    # добавить кнопку для всей развилки
+                    line["content"].append(
+                        _make_alg_tag(algorithm_json, 'keyword button',
+                            inner=tr(branch["type"]),
+                            states=COMPLEX_NODE_STATES))
+                else:
+                    # добавить просто ключевое слово - начало ветки
+                    line["content"].append(
+                        _make_alg_tag(algorithm_json, 'keyword',
+                            inner=tr(branch["type"]),
+                            states=None))
+                    
+                if 'cond' in branch:  # эта ветка - не ELSE
+                    line["content"].append(" ")
+                    line["content"].append(algorithm_to_tags(branch["cond"]))
+                    
+                if branch["type"] == "if":
+                    # добавить название развилки
+                    line["content"] += [
+                        "&nbsp;" * 2,
+                        _make_alg_tag(None, 'comment', inner=[
+                            tr('comment'),
+                            name
+                        ])
+                    ]
+                
+                result.append(line)
+                
+                # кнопка для тела ветки
+                result.append(_make_line_tag(indent + INDENT_STEP, [
+                    _make_alg_tag(branch, 'button', 
+                        inner='[block-btn]',
+                        states=COMPLEX_NODE_STATES)
+                    ]))
+
+                # тело ветки
+                result += algorithm_to_tags(branch["body"], indent=indent + INDENT_STEP)
+                
+            return result
+
+    return ''
 
 if __name__ == '__main__':
     

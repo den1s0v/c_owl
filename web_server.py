@@ -10,6 +10,7 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect
 from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json, make_act_json, process_algorithms_and_traces, add_styling_to_trace
 from ctrlstrct_run import make_trace_for_algorithm
 from trace_gen.txt2algntr import AlgorithmParser, create_algorithm_from_text
+import trace_gen.styling as styling
 
 from options import DEBUG, RUN_LOCALLY
 
@@ -91,10 +92,17 @@ def create_app():
 			###
 			# print('LENGTH(trace_json):', len(trace_json))
 			# pprint(res.algorithm)
+
+			algorithm_tags = styling.algorithm_to_tags(res.algorithm, request.json['user_language'])
+			algorithm_tips = styling.get_button_tips()
+			algorithm_html = styling.to_html(algorithm_tags)
 			
 			return dict(
 				syntax_errors=(), 
 				algorithm_json=res.algorithm,
+				algorithm_as_tags=algorithm_tags,
+				algorithm_as_html=algorithm_html,
+				algorithm_button_tips=algorithm_tips,
 				algorithm_update_lines={},
 				trace_json=trace_json
 			)

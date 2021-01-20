@@ -12,7 +12,11 @@ TARGET_LANG = "en"
 
 def set_target_lang(lang_code: str):
 	global TARGET_LANG
+	assert lang_code in SUPPORTED_LANGS, lang_code
 	TARGET_LANG = lang_code
+
+def get_target_lang():
+	return TARGET_LANG
 
 
 def tr(word_en, case='nomn'):
@@ -23,6 +27,7 @@ def tr(word_en, case='nomn'):
 				.replace("(he)", '')  # 1 leading space remains
 				.replace("(she)", '') # 1 leading space remains
 				.replace("(it)", '')  # 1 leading space remains
+				.replace("else-if", "else if")
 				.replace("(branch)", '')
 				.replace("comment", '// ')
 				.replace("nth time", 'th time')
@@ -33,7 +38,7 @@ def tr(word_en, case='nomn'):
 				.lstrip()
 		)
 	if TARGET_LANG != "ru":
-		raise ValueError("TARGET_LANG variable must contain one of {%s}, but has `%s`" % (str(SUPPORTED_LANGS),TARGET_LANG))
+		raise ValueError("TARGET_LANG variable must contain one of {%s}, but has `%s`" % (str(SUPPORTED_LANGS), TARGET_LANG))
 	
 	grammemes = ('nomn','gent')
 	assert case in grammemes, "Unknown case: "+case
@@ -48,6 +53,7 @@ def tr(word_en, case='nomn'):
 		"cond of" 		: ("условие", "условия"),
 		"if" 		: ("если", ),
 		"else if" 	: ("иначе если", ),
+		"else-if" 	: ("иначе если", ),
 		"else" 		: ("иначе", ),
 		"(branch) else" : ("иначe", ), # (e латинск.)
 		"while" 	: ("пока", ),

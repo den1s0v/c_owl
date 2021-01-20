@@ -548,11 +548,60 @@ def test_make_act_line():
 		# user_language='ru',
 		)
 	print(result)
+
+
+STYLE_HEAD = '''<style type="text/css" media="screen">
+	body {
+	  font-family: courier; font-size: 10pt;
+	}
+	# div {
+	#     border: 1px solid #000000;
+	# }
+
+	span.string, span.atom { color: #f08; font-style: italic; font-weight: bold; }
+	span.comment { color: #262; font-style: italic; line-height: 1em; }
+	span.meta { color: #555; font-style: italic; line-height: 1em; }
+	span.variable { color: #700; text-decoration: underline; }
+	span.variable-2 { color: #b11; }
+	span.struct { color: #07c; font-weight: bold; }
+	span.number { color: #f00; font-weight: bold; }
+	span.program { color: #f70; font-weight: bold; }
+	span.function { color: #707; font-weight: bold; }
+	span.action { color: #077; font-weight: bold; }
+	span.qualifier { color: #555; }
+	span.keyword { color: #00a; font-weight: bold; }
+	span.builtin { color: #30a; }
+	span.link { color: #762; }
+
+	span.warning { background-color: #ff9; }
+	span.error { background-color: #fdd; }
+	span.button { background-color: #add; }
+	
+</style>
+'''
+
+def test_algorithm_to_tags():
+	import json
+	with open('trace_gen/alg_test.json') as file:
+		alg_data = json.load(file)
+		
+	from trace_gen.styling import algorithm_to_tags, to_html, get_button_tips
+	
+	tags = algorithm_to_tags(alg_data, 'ru')
+	tips = get_button_tips()
+	from pprint import pprint
+	pprint(tips)
+	
+	with open('web_exp/alg_test.htm', 'w') as file:
+		file.write(STYLE_HEAD)
+		file.write(to_html(tags))
+	
 	
 
 if __name__ == '__main__':
 
-	test_make_act_line()
+	# test_make_act_line()
+	test_algorithm_to_tags()
 	###
 	print()
 	print('Exit as in custom debug mode.')
