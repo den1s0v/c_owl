@@ -600,18 +600,21 @@ def test_algorithm_to_tags():
 
 if __name__ == '__main__':
 
-	# test_make_act_line()
-	test_algorithm_to_tags()
-	###
-	print()
-	print('Exit as in custom debug mode.')
-	exit()
-	###
+	if 0:
+		# test_make_act_line()
+		test_algorithm_to_tags()
+		###
+		print()
+		print('Exit as in custom debug mode.')
+		exit()
+		###
 	
 	success_all = run_tests(process_kwargs=dict(
 		# reasoning=None, 
 		# reasoning="pellet", 
-		reasoning="jena", 
+		# reasoning="clingo", 
+		reasoning="dlv", 
+		# reasoning="jena", 
 		# reasoning="prolog", 
 		# reasoning="sparql", 
 		# reasoning="stardog", 

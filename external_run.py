@@ -14,8 +14,8 @@ import psutil
 MEASURE_TIME = False
 
 # 0 is normal mode, ex. 5 means repeat 5 times and report
-# REPEAT_COUNT = 1
-REPEAT_COUNT = 0
+REPEAT_COUNT = 1  # this is required for stats measurements
+# REPEAT_COUNT = 0
 
 MIN_WALL_TIME = None
 MIN_EXCLUSIVE_TIME = None
@@ -144,7 +144,7 @@ def run_cmd(cmd, measure_time=MEASURE_TIME, repeat_count=REPEAT_COUNT, verbose=F
 	return exitcode
 
 	
-def invoke_shell(cmd, gather_stats=False, *args):
+def invoke_shell(cmd, gather_stats=False, *args, output_handler=ext_stdout_handler):
 	if args:
 		print(*args)
 	# process = subprocess.Popen(cmd, stdout=stdout, stderr=stdout, creationflags=0x08000000)
@@ -166,7 +166,7 @@ def invoke_shell(cmd, gather_stats=False, *args):
 		PROC_STAT_LIST.append(summarize_process_stat(stat_list))
 	
 	printout = process.communicate()
-	ext_stdout_handler(*printout)
+	output_handler(*printout)
 	# process.wait()
 	return process.returncode
 
@@ -217,58 +217,92 @@ def summarize_process_stat(stat_list: list) -> dict:
 # from threading import Thread
 import threading
 
+def gather_clingo_stats(max_wait=3):
+	chooser = lambda process: process.name() == 'clingo.exe' and 'win' in process.exe()
+	return gather_process_stats(process_attributes=('name', 'exe'), chooser_func=chooser, label="Clingo process", max_wait=max_wait)
+
+def gather_dlv_stats(max_wait=3):
+	chooser = lambda process: process.name() == 'dlv.mingw.exe'
+	return gather_process_stats(chooser_func=chooser, label="DLV process", max_wait=max_wait)
+
 def gather_pellet_stats(max_wait=3):
+	chooser = lambda process: process.name() == 'java.exe' and 'pellet.Pellet' in process.cmdline()
+	return gather_process_stats(['name', 'cmdline'], chooser, "Pellet process", max_wait)
+
+def gather_process_stats(process_attributes=('name', ), chooser_func=None, label='Process', max_wait=3):
 	# print('Tread Start!')
-	# search for java proces running Pellet that should start soon
+	# search for <java> process running <Pellet> that should start soon
 	elapsed = 0
 	while elapsed < max_wait:
+		processes = []  # several processes can possibly be found
 		try:
-			for process in psutil.process_iter(['name', 'cmdline']):
-				if process.name() == 'java.exe' and 'pellet.Pellet' in process.cmdline():
-					break
-				# else:
-				# 	print(process.name(), end=' ')
-			else:
-				# print('Pellet not found (%.1f), waiting...' % elapsed)
+			for process in psutil.process_iter(process_attributes):
+				if chooser_func(process):
+					# break
+					processes.append(process)
+					# print(f'Found {label}! pid:', process.pid)
+			if not processes:
 				time.sleep(0.1)
 				elapsed += 0.1
 				continue
 		except psutil.Error:
-			print('failed searching for the Pellet process...')
+			print(f'failed searching for the {label}...')
 			return 'failed to read process data...'
 		break  # found!
 	else:
 		# still not found
-		print("Pellet process has not been detected during %.1f seconds!" % max_wait)
+		print(f"{label} has not been detected during %.1f seconds!" % max_wait)
 		return 'failed to detect process...'
 		
-	# print('Found java->pellet! pid:', process.pid)
+	# print(f'Found {label}! pid:', process.pid)
 	stat_list = []
 	interval = 0.1
 	# stat = True
 	while True:
-		stat = cpu_mem(process, interval)  # blocks over 'interval' seconds
-		if stat:
-			stat_list.append(stat)
+		# stat = cpu_mem(process, interval)  # blocks over 'interval' seconds
+		# if stat:
+		# 	stat_list.append(stat)
+		# else:
+		# 	break
+		stat = [cpu_mem(process, interval) for process in processes]
+		if any(stat):
+			stat_list.append(summarize_process_stat(list(filter(None, stat))))
 		else:
+			# print(f"{label} has finished.")
 			break
+	# print(stat_list)
 	PROC_STAT_LIST.append(summarize_process_stat(stat_list))
 	
 	return 'success'
 
 
-def measure_stats_for_pellet_running(max_wait=3):
-	# '''java -Xmx2000M -cp C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\antlr-3.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\antlr-runtime-3.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\aterm-java-1.6.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\commons-codec-1.6.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\httpclient-4.2.3.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\httpcore-4.2.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jcl-over-slf4j-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-arq-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-core-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-iri-0.9.5.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-tdb-0.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jgrapht-jdk1.5.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\log4j-1.2.16.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\owlapi-distribution-3.4.3-bin.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\pellet-2.3.1.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\slf4j-api-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\slf4j-log4j12-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\xercesImpl-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\xml-apis-1.4.01.jar pellet.Pellet realize --loader Jena --input-format N-Triples --infer-prop-values --infer-data-prop-values --ignore-imports {path}'''
-	
+def measure_stats_for_process_running(max_wait=3, target=None, args=()):	
 	PROC_STAT_LIST.clear()
 	global _WATCHING_THREAD
 	
-	_WATCHING_THREAD = threading.Thread(target=gather_pellet_stats)  # pass max_wait ?
+	_WATCHING_THREAD = threading.Thread(target=target, args=args)  # pass max_wait ?
 	_WATCHING_THREAD.start()
 	
-	return 'wait and call get_pellet_run_stats()'
+	return 'wait and call get_process_run_stats()'
 
-def get_pellet_run_stats():
+
+def measure_stats_for_pellet_running(max_wait=3):
+	# '''java -Xmx2000M -cp C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\antlr-3.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\antlr-runtime-3.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\aterm-java-1.6.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\commons-codec-1.6.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\httpclient-4.2.3.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\httpcore-4.2.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jcl-over-slf4j-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-arq-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-core-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-iri-0.9.5.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-tdb-0.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jgrapht-jdk1.5.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\log4j-1.2.16.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\owlapi-distribution-3.4.3-bin.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\pellet-2.3.1.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\slf4j-api-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\slf4j-log4j12-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\xercesImpl-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\xml-apis-1.4.01.jar pellet.Pellet realize --loader Jena --input-format N-Triples --infer-prop-values --infer-data-prop-values --ignore-imports {path}'''
+	
+	return measure_stats_for_process_running(max_wait, target=gather_pellet_stats)
+
+	
+def measure_stats_for_clingo_running(max_wait=3):
+	'Complete copy of measure_stats_for_pellet_running() function but target function'
+	return measure_stats_for_process_running(max_wait, target=gather_clingo_stats)
+
+def measure_stats_for_dlv_running(max_wait=3):
+	'Complete copy of measure_stats_for_pellet_running() function but target function'
+	return measure_stats_for_process_running(max_wait, target=gather_dlv_stats)
+
+	
+
+def get_process_run_stats():
 	global _WATCHING_THREAD
 	if _WATCHING_THREAD:
 		_WATCHING_THREAD.join()  # wait
@@ -299,12 +333,12 @@ def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena',
 	# How to specify working directory:
 	# subprocess.Popen(r'c:\mytool\tool.exe', cwd=r'd:\test\local')
 	
-	global OUTPUT_TYPE; OUTPUT_TYPE = reasoning_mode
-	
 	if reasoning_mode not in ('sparql', 'jena'):
 		print(' Warning: Unknown reasoning mode:', reasoning_mode)
 		reasoning_mode = 'jena'
 		print(' Defaulting to mode:', reasoning_mode)
+	
+	global OUTPUT_TYPE; OUTPUT_TYPE = reasoning_mode
 	
 	if not rules_path:
 		rules_path = {  # set defaults

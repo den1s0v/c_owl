@@ -1,4 +1,4 @@
-# import_algtr.py
+# ctrlstrct_run.py
 
 
 """ Импорт алгоритмов и трасс из текста (из файлов в handcrafted_traces/*), 
@@ -17,7 +17,7 @@ from upd_onto import *
 from transliterate import slugify
 from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from explanations import format_explanation, get_leaf_classes
-from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, measure_stats_for_pellet_running, get_pellet_run_stats
+from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, measure_stats_for_pellet_running, measure_stats_for_clingo_running, measure_stats_for_dlv_running, get_process_run_stats
 
 # ONTOLOGY_maxID = 1
 
@@ -1202,13 +1202,12 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
                       mistakes_as_objects=False, extra_act_entries=0, 
                       rules_filter=None, reasoning="jena", on_done=None, _eval_max_traces=None) -> "onto, mistakes_list":
     """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found.
-      reasoning: None or "stardog" or "pellet" or "prolog" or "jena" or "sparql"
+      reasoning: None or "stardog" or "pellet" or "prolog" or "jena" or "sparql" or "clingo" or "dlv"
     """
     
     onto = create_ontology_tbox()
         
     # наполняем онтологию с нуля сущностями с теми именами, которые найдём в загруженных json-словарях
-        
     
     if _eval_max_traces is not None:
         # adjust the list size
@@ -1225,11 +1224,6 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     for tr_data in trace_data_list:
         tt = TraceTester(tr_data)
         tt.inject_to_ontology(onto)
-
-    # обёртка для расширенного логического вывода:
-     # при создании наполняет базовую онтологию вспомогательными сущностями
-    # wr_onto = AugmentingOntology(onto)
-    
 
     # после наложения обёртки можно добавлять SWRL-правила
     if reasoning == "pellet":  # incorporating of SWRL is only necessary for Pellet
@@ -1251,12 +1245,6 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         
         
     if reasoning == "pellet":
-        # if not verbose:
-        #     print("Extended reasoning started ...",)
-
-        # # расширенное обновление онтологии и сохранение с новыми фактами
-        # success,n_runs = wr_onto.sync(runs_limit=5, verbose=verbose)
-        
         print(">_ running Pellet ...")
         
         if _eval_max_traces is not None:
@@ -1275,12 +1263,45 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         print(time_report)
         
         if _eval_max_traces is not None:
-            run_stats = get_pellet_run_stats()
+            run_stats = get_process_run_stats()
             run_stats.update({"wall_time": seconds})
             return run_stats
 
-        # if not verbose:
-        #     print("Extended reasoning finished.", f"Success: {success}, Pellet run times: {n_runs}")
+        if debug_rdf_fpath:
+            onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
+            print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
+            
+            
+    if reasoning in ("clingo", "dlv"):
+        print(f">_ running {reasoning} ...")
+        
+        import asp_helpers
+        
+        measure_f, run_f = {
+            "clingo": (measure_stats_for_clingo_running, asp_helpers.run_clingo_on_ontology),
+            "dlv": (measure_stats_for_dlv_running, asp_helpers.run_DLV_on_ontology),
+        }.get(reasoning)
+        
+        if _eval_max_traces is not None:
+            measure_f()
+            # ! {label} has not been detected during 3.0 seconds!
+            
+        start = timer()
+        
+        # запуск Clingo / DLV
+        onto, elapsed_time = run_f(onto, stats=True)
+            
+        end = timer()
+        seconds = end - start
+        time_report = "   Time elapsed: %.3f s." % seconds
+        print(f">_ {reasoning} finished")
+        print(time_report)
+        
+        if _eval_max_traces is not None:
+            run_stats = get_process_run_stats()
+            run_stats.update({"wall_time": seconds})
+            run_stats.update({"exclusive_time": elapsed_time})  # here: clyngor work only
+            return run_stats
 
         if debug_rdf_fpath:
             onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
@@ -1310,6 +1331,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=0)
         
         if _eval_max_traces is not None:
+            # print('   Jena elapsed:', eval_stats['wall_time'])  ###
             return eval_stats
         
         clear_ontology(onto, keep_tbox=True)
