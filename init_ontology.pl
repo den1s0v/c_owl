@@ -14,13 +14,13 @@ load_onto :-
 load_onto(Filename) :-
         rdf_load(Filename, []) ,
 
-		% [my_onto],  % definitions for "Control flow statements"
-		[expr_onto_definitions],  % definitions for "priorities in expressions"
+		[my_onto],  % definitions for "Control flow statements"
+		% [expr_onto_definitions],  % definitions for "priorities in expressions"
 
 		[polyfill],
 
-		% [from_swrl]  % rules for "Control flow statements"
-		[expr_penskoy]  % rules for "priorities in expressions"
+		[from_swrl]  % rules for "Control flow statements"
+		% [expr_penskoy]  % rules for "priorities in expressions"
 		.
 
 
