@@ -103,11 +103,13 @@ def to_prolog(rules, out_path='from_swrl.pl', iri_prefix=None):
             prolog = swrl2prolog(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
             file.write('\n')
             file.write(prolog)
-    
+
+
 def set_IRI_prefix(iri_prefix):
     global IRI_prefix
     IRI_prefix = iri_prefix
-        
+
+
 ### JENA ###
         
 LOCAL_PREFIX = "my:"
@@ -258,74 +260,76 @@ def to_sparql(rules, out_path='sparql_from_swrl.ru', heading_path='sparql/rdfs4c
 
 
 
-### CWM ###
+### ASP: Clingo, DLV ###
 
-CWM_LOCAL_PREFIX = ":"
-RULE_END_PUNCT = " . "
-RE_predicate_with_comma = re.compile(r'([\w\d]+)\(((?:[^)]|"\)|\)")+)\)\s*,?\s*')  # 1: name, 2: args in braces
-
-def convert_builtin2cwm(name: str, args: list):
+def convert_builtin_asp(name: str, args: list):
     if name == 'add':
-        # (?ia 1) math:sum ?ib
-        return f"({args[1]} {args[2]}) math:sum {args[0]}"
-    if name == 'matches':
-        # ?var string:matches 'regex-patern'
-        return f"{args[0]} string:matches {args[1]}"
+        # Note the order (result is first in SWRL)
+        # return f'{args[1]} + {args[2]} = {args[0]}'
+        return f'{args[0]} = {args[1]} + {args[2]}'
+    # if name == 'matches':
+    #     name = 'regex'
     op = {
-        'lessThan' : 'lessThan',
-        'greaterThan' : 'greaterThan',
-        'notEqual' : 'notEqualTo',
-        'equal' : 'equalTo',
+        'lessThan' : '<',
+        'greaterThan' : '>',
+        'notEqual' : '!=',
+        'equal' : '=',
          }.get(name, "==!No op!==")
-    return f"{args[0]} math:{op} {args[1]}"
+    return f"{args[0]} {op} {args[1]}"
 
-def predicate2cwm_triple_replace(pred_match):
+
+def predicate2lowerfirst_replace_asp(pred_match):
     name, args_str = pred_match[1], pred_match[2]
+    name = lower_first_char(name)
     args = [s.strip() for s in args_str.split(", ")]
-    if len(args) == 1:
-        # type checking
-        return f"{args[0]} a {CWM_LOCAL_PREFIX}{name}" + RULE_END_PUNCT
     if RE_SWRL_builtins.match(name):
-        return convert_builtin2cwm(name, args) + RULE_END_PUNCT
-    else:
-        assert len(args) == 2, len(args)
-        return f"{args[0]} {CWM_LOCAL_PREFIX}{name} {args[1]}" + RULE_END_PUNCT
+        return convert_builtin_asp(name, args)
+    if len(args) == 2:
+        args = (args[0], name, args[1])
+    elif len(args) == 1:
+        args = (args[0], 'type', name)  # use 'type' in place of 'rdf:type'
+    args_str = ", ".join(args)
+    return f"t({args_str})"
 
-def convert_predicate_calls_cwm(s):
-    return RE_predicate_with_comma.sub(predicate2cwm_triple_replace, s)
+
+def convert_predicate_calls_clingo(s):
+    return RE_predicate.sub(predicate2lowerfirst_replace_asp, s)
     
-    
-def swrl2cwm(swrl, name=None):
-    s = convert_predicate_calls_cwm(swrl)
+
+def convert_rulehead(s):
     body, head = list(s.split(" -> "))
-    if not name:
-        title = '# Rule'
-    else:
-        title = f'# Rule: {name}'
-    return f'''{title}
-  {{
-    {body.strip()}
-  }} => {{ {head.strip()} }}'''
-    
+    body = body.rstrip(' \t\n,')
+    new_rules = []
+    head_predicates = RE_predicate.finditer(head)
+    # Размножаем правило, оставляя в head по одному утверждению за раз
+    for pred in head_predicates:
+        rule = ("\t" + pred[0] + ':-' + body + '.\n')
+        new_rules.append(rule)
+    return ''.join(new_rules)
 
-def to_cwm(rules, out_path='cwm_from_swrl.n3', heading_path='cwm/cwm_rules_header.n3', base_iri=None):
+    
+def swrl2clingo(swrl, name=None):
+    rule = convert_predicate_calls_clingo(convert_rulehead(convert_varnames(swrl))).replace('# ', '% ')
+    if not name:
+        title = '% Rule\n'
+    else:
+        title = f'% Rule: {name}\n'
+    debug_print_rulename = f"writeln('\t{name},')," if 0 else ""
+    return f'''{title}{rule}'''
+
+
+def to_clingo(rules, out_path='from_swrl.asp', iri_prefix=None):
+    if iri_prefix:
+        set_IRI_prefix(iri_prefix)
+        
     with open(out_path, 'w') as file:
-        with open(heading_path) as heading_file:
-            heading_text = heading_file.read()
-            
-            if base_iri:
-                # ensure it ends with '#'
-                base_iri = base_iri.rstrip('#') + '#'
-                # replace @prefix my:  <IRI>.
-                heading_text = re.sub(r'@prefix (?:my)?\: .+?.\n', '@prefix my:  <%s>.\n' % base_iri, heading_text)
-                
-            file.write(heading_text)
         for rule in rules:
             # swrl = rule._original_swrl
             swrl = rule.swrl
-            cwm = swrl2cwm(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
-            file.write(cwm)
-            file.write(' .\n\n')  # '.' is a rule separator
+            clingo = swrl2clingo(swrl, f'{rule.name} [{" & ".join(sorted(rule.tags))}]')
+            file.write('\n')
+            file.write(clingo)
+
 
 
 def main():
@@ -333,7 +337,7 @@ def main():
     # to_prolog(RULES)
     # to_jena(RULES)
     # to_sparql(RULES)
-    to_cwm(RULES)
+    to_clingo(RULES)
 
 
 if __name__ == '__main__':
