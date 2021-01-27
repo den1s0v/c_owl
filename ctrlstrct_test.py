@@ -443,12 +443,24 @@ def run_tests(directory="test_data/", process_kwargs={}):
 				dataset = os.path.splitext(os.path.split(files[0])[1])[0]
 				eval_results = []
 				# 46
-				for n in range(7, 7 + 1, 1):
+				for n in sorted({
+									*range(1, 10 + 1, 1),
+									*range(5, 100 + 1, 5),
+									*range(100, 201 + 1, 10),
+									# *range(90, 131 + 1, 10),
+									# *range(30, 60 + 1, 10),
+									# *range(65, 95 + 1, 5),
+								}):
 					# reasoners = ("pellet", )
 					# reasoners = ("prolog", ); alg_trs = alg_trs[:22]  # !!!
-					reasoners = ("jena", )
+					# reasoners = ("sparql", )
+					# reasoners = ("jena", )
+					reasoners = ("clingo", )
+					# reasoners = ("dlv", )
+					# reasoners = ("jena", "clingo")
 					# reasoners = ("jena", "sparql")
 					# reasoners = ("jena", "prolog", "sparql")
+					# reasoners = ("clingo", "jena", "prolog", "sparql")
 					for reasoning_type in reasoners:
 						process_kwargs["reasoning"] = reasoning_type
 						
