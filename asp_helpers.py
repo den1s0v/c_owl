@@ -45,9 +45,10 @@ class Checkpointer():  # dict
 ############# Clingo #############
 
 
-def run_clingo_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, elapsed_time':
+def run_clingo_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, {wall_time: float, exclusive_time: float}':
     "Apply incremental (non-mutable) reasoning via Clingo (ASP) and augment the given ontology"
     ch = Checkpointer()
+    elapsed_times = {}
     triples = triples_from_ontology(onto)
     # ch.hit("      + Triples created ")
     if rules_fpath:
@@ -67,14 +68,14 @@ def run_clingo_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, elapse
     # print(answers)
     answers_list = list(answers)
     # print(len(answers))
-    elapsed_time = ch.hit("   ** Clingo exclusively took ")
+    elapsed_times['wall_time'] = ch.hit("   ** Clingo exclusively took ")
     if stats:
         # Note: Access answers.statistics AFTER obtaining the results!
         # print(answers.statistics["Time"])
         # print(answers.statistics["CPU Time"])
         time_str = answers.statistics["Time"]
         time_str = time_str.split('s')[0]
-        elapsed_time = float(time_str)
+        elapsed_times['exclusive_time'] = float(time_str)
     # ch.hit("      + Obtain answers")
     
     ch.reset_now()
@@ -94,7 +95,7 @@ def run_clingo_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, elapse
     # ch.hit("      + Written to ontology ")
     ch.since_start("   ** Integrating results took ")
 
-    return onto, elapsed_time
+    return onto, elapsed_times
     
 
 
@@ -222,10 +223,11 @@ from clyngor.parsing import Parser  # https://github.com/Aluriak/clyngor/blob/f3
 from external_run import invoke_shell, get_process_run_stats
 
 
-def run_DLV_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, elapsed_time':
+def run_DLV_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, {wall_time: float, exclusive_time: float}':
     """Apply incremental (non-mutable) reasoning via DLV (ASP) and augment the given ontology.
     Note: stats argument is ignored; returns whole call to run_DLV_solver() time"""
     ch = Checkpointer()
+    elapsed_times = {}
     triples = triples_from_ontology(onto)
     # ch.hit("      + Triples created ")
     if rules_fpath:
@@ -241,11 +243,11 @@ def run_DLV_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, elapsed_t
     
     answers = run_DLV_solver(DLV_TEMP_IN_FNM)
     answers_list = list(answers)
-    elapsed_time = ch.hit("   ** DLV exclusively took ")
+    elapsed_times['wall_time'] = ch.hit("   ** DLV exclusively took ")
     # if stats:
     #     time_str = answers.statistics["Time"]
     #     time_str = time_str.split('s')[0]
-    #     elapsed_time = float(time_str)
+    #     elapsed_times['exclusive_time'] = float(time_str)
     
     ch.reset_now()
     del asp  # free memory
@@ -263,7 +265,7 @@ def run_DLV_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, elapsed_t
     # ch.hit("      + Written to ontology ")
     ch.since_start("   ** Integrating results took ")
 
-    return onto, elapsed_time
+    return onto, elapsed_times
     
 
 

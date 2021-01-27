@@ -1289,7 +1289,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         start = timer()
         
         # запуск Clingo / DLV
-        onto, elapsed_time = run_f(onto, stats=True)
+        onto, elapsed_times = run_f(onto, stats=True)
             
         end = timer()
         seconds = end - start
@@ -1299,8 +1299,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         
         if _eval_max_traces is not None:
             run_stats = get_process_run_stats()
-            run_stats.update({"wall_time": seconds})
-            run_stats.update({"exclusive_time": elapsed_time})  # here: clyngor work only
+            run_stats.update(elapsed_times)  # add data from dict
             return run_stats
 
         if debug_rdf_fpath:
