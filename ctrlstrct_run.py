@@ -1284,7 +1284,6 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         
         if _eval_max_traces is not None:
             measure_f()
-            # ! {label} has not been detected during 3.0 seconds!
             
         start = timer()
         

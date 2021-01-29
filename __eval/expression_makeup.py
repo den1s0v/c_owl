@@ -4,6 +4,7 @@ import json
 
 from owlready2 import *
 
+ #comment this three imports if running this file in debug.
 from ctrlstrct_run import clear_ontology, uniqualize_iri
 from upd_onto import make_triple
 from __eval.expression_laws import inject_laws
@@ -95,33 +96,43 @@ def test_items_to_expressions(test_items: list) -> list:
     
     return exprs
 
-def iterate_over_expr_chains(expressions: 'iterable of lists', preferred_step=20, sep=',') -> iter:
-    expressions = list(expressions)
-    joined_exprs = expressions[0]  # , sep]
-    for i in range(1, len(expressions)):
-        modulo = len(joined_exprs) % preferred_step
-        need_more = preferred_step - modulo if modulo > 0 else 0
-        can_add = len(expressions[i]) + 1
-        if can_add <= need_more:
-            # add one more and continue
+
+def make_expr_chain(expressions: 'sorted list of lists', size=30, sep=',') -> list:
+    expressions = list(sorted(expressions, key=lambda ops: len(ops)))
+    L = len(expressions)
+    lens = [len(e) for e in expressions]
+    # L0 = lens[0]
+    L9 = lens[-1]
+    last_i = L - 1
+    joined_exprs = []
+    def add(operands):
+        if joined_exprs:
             joined_exprs.append(sep)
-            joined_exprs.extend(expressions[i])
-            continue
-        modulo_can_be = (modulo + can_add) % preferred_step
+            ### print("add:", len(operands))
+        joined_exprs.extend(operands)
         
-        if modulo_can_be < need_more:
-            # add one more before yield
-            joined_exprs.append(sep)
-            joined_exprs.extend(expressions[i])
-            yield joined_exprs
-        else:
-            # yield and then add one more
-            yield joined_exprs
-            joined_exprs.append(sep)
-            joined_exprs.extend(expressions[i])
+    while(len(joined_exprs) < size - L9):
+        operands = expressions[last_i]
+        add(operands)
+        last_i = (last_i - 1 + L) % L
+        
+    # add last by length
+    need_more = size - len(joined_exprs) - 1
+    dist2index = [(abs(need_more - L), i) for i, L in enumerate(lens)]
+    i = min(dist2index)[1]
+    ### print('last add', len(expressions[i]))
+    add(expressions[i])
     
-    yield joined_exprs
+    ### print("joined_exprs size:", len(joined_exprs), 'of', size)
     
+    return joined_exprs
+    
+
+def iterate_over_expr_chains(expressions: 'iterable of lists', preferred_step=20, sep=',') -> iter:
+    # expressions = list(sorted(expressions))
+    for n in range(preferred_step, len(expressions), preferred_step):
+        yield make_expr_chain(expressions, n, sep=sep)
+
 
 def load_all_test_items() -> list:
     paths = [
@@ -159,11 +170,13 @@ def main():
     # from pprint import pprint
     # pprint(data)
     
-    for chain in iterate_over_expr_chains(data[:100]):
+    for chain in iterate_over_expr_chains(data[:], 5):
         L = len(chain)
         print(L)
-        # if L < 100:
-        #     print(' '.join(chain))
+        if L < 100:
+            print('\t'*8, ' '.join(chain))
+        else:
+            break
 
 # if __name__ == '__main__':
 #     main()

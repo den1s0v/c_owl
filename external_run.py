@@ -189,7 +189,7 @@ def cpu_mem(p: psutil.Process, interval=0.1):
 
     
 def summarize_process_stat(stat_list: list) -> dict:
-	'find average CPU and max memoty from list of samples'
+	'find average CPU and max memory from list of samples'
 	cpu = [metrics["cpu"] for metrics in stat_list if "cpu" in metrics]
 	cpu = sum(cpu) / len(cpu) if cpu else 0.0
 	
