@@ -145,17 +145,16 @@ def eval_expressions():
     for n in sorted({
                         # *range(50, 52 + 1, 6),
                         # *range(5, 20 + 1, 5),
-                        *range(25, 35 + 1, 5),
+                        # *range(25, 30 + 1, 5),
+                        *range(32, 35 + 1, 5),
                     }):
         # reasoners = ("pellet", )
         # reasoners = ("prolog", );
         # reasoners = ("sparql", )
         # reasoners = ("jena", )
-        # reasoners = ("clingo", )
-        # reasoners = ("dlv", )
-        # reasoners = ("jena", "clingo")
         # reasoners = ("jena", "sparql")
-        reasoners = ("jena", "prolog", "sparql")
+        reasoners = ("prolog", "sparql")
+        # reasoners = ("jena", "prolog", "sparql")
         # reasoners = ("clingo", "jena", "prolog", "sparql")
             
         for reasoning_type in reasoners:

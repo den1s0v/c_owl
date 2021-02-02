@@ -278,6 +278,8 @@ def gather_process_stats(process_attributes=('name', ), chooser_func=None, label
 
 def measure_stats_for_process_running(max_wait=3, target=None, args=()):	
 	PROC_STAT_LIST.clear()
+	REASONING_STAT_DICT.clear()
+
 	global _WATCHING_THREAD
 	
 	_WATCHING_THREAD = threading.Thread(target=target, args=args)  # pass max_wait ?
@@ -329,7 +331,7 @@ def run_swiprolog_reasoning(rdf_path_in:str, rdf_path_out:str, verbose=True, com
 
 
 def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena', verbose=True, rules_path=None):
-	# java -jar Jena.jar "test_data/test_make_trace_output.rdf" "jena/all.rules" "test_data/jena_output.rdf"
+	# java -jar Jena.jar jena "test_data/test_make_trace_output.rdf" "jena/all.rules" "test_data/jena_output.rdf"
 	# How to specify working directory:
 	# subprocess.Popen(r'c:\mytool\tool.exe', cwd=r'd:\test\local')
 	
