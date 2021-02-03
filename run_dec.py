@@ -19,7 +19,8 @@ CMD_CLINGO = r'clingo.exe .\sparql\DEC.lp .\sparql\dec_in.lp -n 0'
 DIRECTORY = './sparql/'
 
 TEMPLATE_EXT = '.tpl'
-INPUT_TEMPLATES_SPARQL = [DIRECTORY + f for f in ('dec_in.ttl.tpl', 'DEC.ru.tpl')]
+INPUT_TEMPLATES_JENA   = [DIRECTORY + 'DEC.jena_rules.tpl']
+INPUT_TEMPLATES_SPARQL = [(DIRECTORY + f) for f in ('dec_in.ttl.tpl', 'DEC.ru.tpl')]
 INPUT_TEMPLATES_CLINGO = [DIRECTORY + 'dec_in.lp.tpl']
 
 
@@ -128,9 +129,9 @@ def prepare_input_files(template_files: list, fillins: dict):
         with open(new_filename, 'w') as f:
             f.write(filled_template)
         
-def make_fillins(fluents, events, syntax: 'class') -> dict:
+def make_fillins(n_maxstep, fluents, events, syntax: 'class') -> dict:
     fillins = {
-        'MAXSTEP': N_MAXSTEP,
+        'MAXSTEP': n_maxstep,
         'FLUENTS_DECLARATION': [],
         'FLUENTS_DEPENDENCIES': [],
         'FLUENTS_INITIAL_STATE': [],
@@ -147,13 +148,13 @@ def make_fillins(fluents, events, syntax: 'class') -> dict:
 def prepare_eval_case_input(n_params: dict, syntaxes=(SPARQL_Syntax, CLINGO_Syntax)):
     for syntax in syntaxes:
         if syntax is SPARQL_Syntax:
-            template_files = INPUT_TEMPLATES_SPARQL
+            template_files = INPUT_TEMPLATES_SPARQL + INPUT_TEMPLATES_JENA
         elif syntax is CLINGO_Syntax:
             template_files = INPUT_TEMPLATES_CLINGO
         else:
             raise ValueError("Unknown syntax: " + str(syntax))
         prepare_input_files(template_files, 
-            make_fillins(*prepare_entities(**n_params), syntax))
+            make_fillins(n_params["n_maxstep"], *prepare_entities(**n_params), syntax))
     
     
 # if __name__ == '__main__':
@@ -201,7 +202,7 @@ def proccess_with_reasoner(reasoning, count=10):
         # print(answers)
         answers_list = list(answers)
         # print(len(answers))
-        if True:  # stats:
+        if "Time" in answers.statistics:  # stats:
             time_str = answers.statistics["Time"]
             time_str = time_str.split('s')[0]
             elapsed_times['exclusive_time'] = float(time_str)
@@ -249,7 +250,7 @@ def proccess_with_reasoner(reasoning, count=10):
         # onto.save(file=name_in, format='ntriples')
         
         rules_path = {
-            'jena': "======Not=Applicable======",
+            'jena':   "./sparql/DEC.jena_rules",
             'sparql': "./sparql/DEC.ru", 
         }[reasoning]
         
@@ -267,15 +268,18 @@ def proccess_with_reasoner(reasoning, count=10):
 
 def eval_DEC():
     eval_results = []
-    m = 10 ** 3
+    m = 10 ** 2
     for n in sorted({
-                        *range(15 * m, 40 * m + 1, 5 * m),
+                        *range(5 * m, 5 * m + 1, 5 * m),
                         # *range(25, 30 + 1, 5),
                         # *range(32, 35 + 1, 5),
                     }):
+        # reasoners = ("jena", )
         # reasoners = ("clingo", )
-        # reasoners = ("sparql", )
-        reasoners = ("clingo", "sparql")
+        reasoners = ("sparql", )
+        # reasoners = ("clingo", "sparql")
+        # reasoners = ("jena", "clingo")
+        # reasoners = ("jena", "clingo", "sparql")
         
         prepare_eval_case_input(dict(n_maxstep=n, n_fluents=n // 5, n_events=n // 4))
                 
