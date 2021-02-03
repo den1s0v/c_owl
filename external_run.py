@@ -149,8 +149,9 @@ def invoke_shell(cmd, gather_stats=False, *args, output_handler=ext_stdout_handl
 		print(*args)
 	# process = subprocess.Popen(cmd, stdout=stdout, stderr=stdout, creationflags=0x08000000)
 	# process = psutil.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=0x08000000)
-	process = psutil.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	process = psutil.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 	
+	stdout_accumulator = ''
 	# printout = process.communicate()
 	# print("printout-1:", printout)
 	if gather_stats:
@@ -162,11 +163,12 @@ def invoke_shell(cmd, gather_stats=False, *args, output_handler=ext_stdout_handl
 			stat = cpu_mem(process, interval)  # blocks over 'interval' seconds
 			if stat:
 				stat_list.append(stat)
+			stdout_accumulator += process.stdout.read()  # prevent buffer owerflow
 				
 		PROC_STAT_LIST.append(summarize_process_stat(stat_list))
 	
-	printout = process.communicate()
-	output_handler(*printout)
+	stdout, stderr = process.communicate()
+	output_handler(stdout_accumulator + stdout, stderr)
 	# process.wait()
 	return process.returncode
 
