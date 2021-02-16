@@ -1,0 +1,3 @@
+{'dataset': 'ASP-DEC', 'reasoner': 'sparql', 'count': 370, 'cpu': 64.5, 'rss': 151552, 'vms': 331776, 'uss': 81920, 'wall_time': 81.96078520399999, 'exclusive_time': 77.429, 'triples_before': 672, 'triples_after': 13115, 'iterations': 198}
+{'dataset': 'penskoy-expressions', 'reasoner': 'sparql', 'count': 17, 'cpu': 100.0, 'rss': 13062144, 'vms': 214921216, 'uss': 9854976, 'wall_time': 13.712934371000001, 'exclusive_time': 11.575, 'triples_before': 1344, 'triples_after': 13038, 'iterations': 11}
+{'dataset': 'correct_loops', 'reasoner': 'sparql', 'count': 88, 'cpu': 93.0, 'rss': 12718080, 'vms': 214884352, 'uss': 9506816, 'wall_time': 11.541958135999998, 'exclusive_time': 7.916, 'triples_before': 22368, 'triples_after': 35144, 'iterations': 7}
