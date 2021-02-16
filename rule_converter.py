@@ -267,8 +267,9 @@ def convert_builtin_asp(name: str, args: list):
         # Note the order (result is first in SWRL)
         # return f'{args[1]} + {args[2]} = {args[0]}'
         return f'{args[0]} = {args[1]} + {args[2]}'
-    # if name == 'matches':
-    #     name = 'regex'
+    if name == 'matches':
+        # 1 = @matches(X, "[a-zA-Z_0-9]+")
+        return f'1 = @matches({args[0]}, {args[1]})'
     op = {
         'lessThan' : '<',
         'greaterThan' : '>',
@@ -318,11 +319,15 @@ def swrl2clingo(swrl, name=None):
     return f'''{title}{rule}'''
 
 
-def to_clingo(rules, out_path='from_swrl.asp', iri_prefix=None):
+def to_clingo(rules, out_path='from_swrl.asp', iri_prefix=None, heading_path='asp/clingo_polyfill.lp'):
     if iri_prefix:
         set_IRI_prefix(iri_prefix)
         
     with open(out_path, 'w') as file:
+        with open(heading_path) as heading_file:
+            heading_text = heading_file.read()
+                
+        file.write(heading_text)
         for rule in rules:
             # swrl = rule._original_swrl
             swrl = rule.swrl
