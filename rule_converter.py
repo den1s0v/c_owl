@@ -3,7 +3,6 @@
 import re
 
 
-import ctrlstrct_swrl
 
 
 ### PROLOG ###
@@ -338,6 +337,7 @@ def to_clingo(rules, out_path='from_swrl.asp', iri_prefix=None, heading_path='as
 
 
 def main():
+    import ctrlstrct_swrl
     RULES = ctrlstrct_swrl.RULES
     # to_prolog(RULES)
     # to_jena(RULES)
@@ -345,6 +345,68 @@ def main():
     to_clingo(RULES)
 
 
+def convert_swrl_json(file_in=None, target='jena', backend_name=None):
+    import json
+    import trace_gen.txt2algntr
+    find_by_keyval_in = trace_gen.txt2algntr.find_by_keyval_in
+    
+    if not file_in:
+        file_in = r'C:\D\Work\YDev\CompPr\CompPrehension\src\main\resources\com\example\demo\models\businesslogic\domains\programming-language-expression-domain-laws.json'
+    
+    with open(file_in) as file:
+        data = json.load(file)
+        
+    if isinstance(target, str):
+        # func_name = 'swrl2' + target
+        func_name = 'convert_predicate_calls_' + target
+        converter_func = globals()[func_name]
+    else:
+        converter_func = target
+        target = converter_func.__name__
+    assert hasattr(converter_func, '__call__'), func_name
+    
+    if not backend_name:
+        backend_name = target.capitalize()
+    
+    # modify "formulation" field in each SWRL-type law dict
+    rule_field = "formulation"
+    rule_backend = "backend"
+    for formulation_dict in find_by_keyval_in("backend", "SWRL", data):
+        swrl = formulation_dict.get(rule_field, None)
+        if swrl:
+            swrl = swrl.replace(" ^ ", ", ")
+            swrl = swrl.replace('swrlb:', '')
+            
+            rule = converter_func(swrl) + '.'
+            formulation_dict[rule_field] = rule
+            formulation_dict[rule_backend] = backend_name
+            
+    # append -target to file name
+    file_out = re.sub(r'(?=\.[^.]*)', "-" + target, file_in)
+    
+    with open(file_out, 'w') as file:
+        json.dump(data, file, indent=2)
+    
+
+def convert_swrl_list_to_jena(L):
+    for swrl in L:
+        swrl = swrl.replace(" ^ ", ", ")
+        swrl = swrl.replace('swrlb:', '')
+        
+        rule = convert_predicate_calls_jena(swrl) + '.'
+        print(rule)
+
+
+SWRL_raw = [
+    (
+            "describe_error",
+            "student_pos_less(?b, ?a) ^ before_direct(?a, ?b) -> describe_error(?a, ?b)"
+    ),
+]
+    
+
 if __name__ == '__main__':
-    main()
+    convert_swrl_json()
+    # main()
+    # convert_swrl_list_to_jena([e[1] for e in SWRL_raw])
 

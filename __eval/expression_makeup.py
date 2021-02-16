@@ -71,21 +71,12 @@ def write_expression(onto, expression: list):
         make_triple(last_obj_with_step_0, onto["last"], True)
     
     
-def transform_expression_item(s: str) -> str:
-    # Jena "(" workaround
-    s = s.replace('(', '<(>')
-    s = s.replace(',', '<,>')
-    return s
-    
-        
 def test_items_to_expressions(test_items: list) -> list:
     field = 'expression'
     exprs = []
     for d in test_items:
         if field in d and d[field]:
             data = d[field]
-            # Jena "(" workaround
-            data = list(map(transform_expression_item, data))
             
             # in_list = False
             for old_data in exprs:
@@ -151,12 +142,6 @@ def load_all_test_items() -> list:
 def load_test_items_from_file(filepath) -> list:
     with open(filepath) as file:
         return json.load(file)
-    #     text = file.read()
-
-    # # Jena "(" workaround
-    # text = text.replace('"("', '"<(>"')
-    # text = text.replace('","', '"<,>"')
-    # return json.loads(text)
 
 
 def prepare_ontology(expr_chain, inject_swrl=False, iri='http://penskoy.n/expressions'):

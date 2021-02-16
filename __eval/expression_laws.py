@@ -13,10 +13,6 @@ if True:
         return tuple(args)
     
     def getSWRLLawFormulation(name, swrl):
-        # Jena "(" workaround
-        swrl = swrl.replace('"("', '"<(>"')
-        swrl = swrl.replace('","', '"<,>"')
-
         swrl = swrl.replace(' ^ ', ', ')
         swrl = swrl.replace('swrlb:', '')
         name = name.replace('>', 'gt')
