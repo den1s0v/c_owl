@@ -268,11 +268,13 @@ def proccess_with_reasoner(reasoning, count=10):
 
 def eval_DEC():
     eval_results = []
-    m = 10 ** 2
+    m = 10 ** 0
     for n in sorted({
-                        *range(5 * m, 5 * m + 1, 5 * m),
-                        # *range(25, 30 + 1, 5),
-                        # *range(32, 35 + 1, 5),
+                        370,
+                        # *range(5 * m, 50 * m + 1, 5 * m),
+                        # *range(50 * m, 150 * m + 1, 10 * m),
+                        # *range(150 * m, 300 * m + 1, 50 * m),
+                        # *range(300 * m, 500 * m + 1, 50 * m),
                     }):
         # reasoners = ("jena", )
         # reasoners = ("clingo", )

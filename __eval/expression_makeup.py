@@ -4,10 +4,11 @@ import json
 
 from owlready2 import *
 
- #comment this three imports if running this file in debug.
-from ctrlstrct_run import clear_ontology, uniqualize_iri
-from upd_onto import make_triple
-from __eval.expression_laws import inject_laws
+# omit this three imports if running this file in debug.
+if  __name__ != '__main__':
+	from ctrlstrct_run import clear_ontology, uniqualize_iri
+	from upd_onto import make_triple
+	from __eval.expression_laws import inject_laws
 
 
 '''
@@ -97,30 +98,31 @@ def test_items_to_expressions(test_items: list) -> list:
     return exprs
 
 
-def make_expr_chain(expressions: 'sorted list of lists', size=30, sep=',') -> list:
+def make_expr_chain(expressions: 'list of lists', size=30, sep=',') -> list:
     expressions = list(sorted(expressions, key=lambda ops: len(ops)))
     L = len(expressions)
-    lens = [len(e) for e in expressions]
-    # L0 = lens[0]
-    L9 = lens[-1]
+    lens = [len(e) + 1 for e in expressions]
+    ## print('	', lens)
+    L0 = lens[0]
+    L9 = lens[-1] - 1
     last_i = L - 1
     joined_exprs = []
     def add(operands):
         if joined_exprs:
             joined_exprs.append(sep)
-            ### print("add:", len(operands))
+        ## print("	add:", len(operands))
         joined_exprs.extend(operands)
         
-    while(len(joined_exprs) < size - L9):
+    while(len(joined_exprs) < size - len(expressions[last_i]) - L0):
         operands = expressions[last_i]
         add(operands)
-        last_i = (last_i - 1 + L) % L
+        last_i = (last_i - 5 + L) % L
         
     # add last by length
-    need_more = size - len(joined_exprs) - 1
+    need_more = size - len(joined_exprs)
     dist2index = [(abs(need_more - L), i) for i, L in enumerate(lens)]
     i = min(dist2index)[1]
-    ### print('last add', len(expressions[i]))
+    ## print('	last add', len(expressions[i]))
     add(expressions[i])
     
     ### print("joined_exprs size:", len(joined_exprs), 'of', size)
@@ -170,13 +172,16 @@ def main():
     # from pprint import pprint
     # pprint(data)
     
-    for chain in iterate_over_expr_chains(data[:], 5):
-        L = len(chain)
-        print(L)
-        if L < 100:
-            print('\t'*8, ' '.join(chain))
-        else:
-            break
+    for i in range(10, 23 + 1):
+	    print(i, '->', len(make_expr_chain(data, i)))
+    
+    # for chain in iterate_over_expr_chains(data[:], 1):
+    #     L = len(chain)
+    #     print(L)
+    #     if L < 36:
+    #         print('\t'*8, ' '.join(chain))
+    #     else:
+    #         break
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()

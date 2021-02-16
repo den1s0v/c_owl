@@ -67,7 +67,7 @@ def proccess_onto_with_reasoner(reasoning, count=30):
             
             
     if reasoning in ("clingo", "dlv"):
-        raise RuntimeError("ASP solver does not support match(regex, str)!")
+        # raise RuntimeError("ASP solver does not support match(regex, str)!")
         print(f">_ running {reasoning} ...")
         
         import asp_helpers
@@ -94,6 +94,7 @@ def proccess_onto_with_reasoner(reasoning, count=30):
         # if _eval_max_traces is not None:
         run_stats = get_process_run_stats()
         run_stats.update(elapsed_times)  # add data from dict
+        run_stats.update({"count": len(expr_chain)})
         return run_stats
 
         # if debug_rdf_fpath:
@@ -143,19 +144,23 @@ def eval_expressions():
     eval_results = []
     # 46
     for n in sorted({
+                        17
                         # *range(50, 52 + 1, 6),
                         # *range(5, 20 + 1, 5),
                         # *range(25, 30 + 1, 5),
-                        *range(32, 35 + 1, 5),
+                        # *range(18, 29 + 1, 1),
+                        # 29
                     }):
         # reasoners = ("pellet", )
         # reasoners = ("prolog", );
-        # reasoners = ("sparql", )
+        reasoners = ("sparql", )
         # reasoners = ("jena", )
         # reasoners = ("jena", "sparql")
-        reasoners = ("prolog", "sparql")
+        # reasoners = ("prolog", "sparql")
+        # reasoners = ("clingo", "sparql")
         # reasoners = ("jena", "prolog", "sparql")
         # reasoners = ("clingo", "jena", "prolog", "sparql")
+        # reasoners = ("pellet", "clingo", "jena", "prolog", "sparql")
             
         for reasoning_type in reasoners:
             print(' >  >  >  >  >  >  >  >  >  >  >  >  > ')
@@ -200,8 +205,8 @@ def convert_rules():
     _owl, swrl = get_owl_swrl_laws()
     # to_prolog(swrl, out_path='expr_penskoy.pl', iri_prefix="http://penskoy.n/expressions#")
     # to_jena(swrl, out_path='expr_penskoy.jena_rules')
-    to_sparql(swrl, out_path='expr_penskoy.ru', base_iri="http://penskoy.n/expressions#")
-    # to_clingo(swrl, out_path='expr_penskoy.asp')  # match() built-in cannot be converted to ASP !!!
+    # to_sparql(swrl, out_path='expr_penskoy.ru', base_iri="http://penskoy.n/expressions#")
+    to_clingo(swrl, out_path='expr_penskoy.asp')  # matched() built-in was polyfilled.
 
 
 def main():

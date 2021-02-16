@@ -1,0 +1,40 @@
+@prefix  rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix  rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix my: <http://vstu.ru/poas/ctrl_structs_2020-05_v1#> .
+
+
+# Rule: DEC 5 (2)
+# Fluent remains for the next moment if not terminated now
+[
+	(?f my:holdsAt ?t), (?f rdf:type my:fluent), 
+    sum(?t, 1, ?t1), lessThan(?t, 370),
+    (?e rdf:type my:event),
+    (?e my:happens ?t), 
+    noValue(?e, my:terminates ?f)
+	 -> (?f my:holdsAt ?t1)
+]
+
+# Rule: DEC 5 (1)
+# Fluent remains for the next moment if not terminated now
+[
+	(?f my:holdsAt ?t), (?f rdf:type my:fluent), 
+    sum(?t, 1, ?t1), lessThan(?t, 370),
+    (?e rdf:type my:event),
+    noValue(?e my:happens ?t) 
+	 -> (?f my:holdsAt ?t1)
+]
+
+
+
+# Rule: DEC 9
+# Fluent appears at the next moment if is initiated now
+[
+    (?e my:happens ?t), 
+    (?e my:initiates ?f), 
+    (?e rdf:type my:event),
+    (?f rdf:type my:fluent), 
+    sum(?t, 1, ?t1),
+    lessThan(?t, 370),
+  -> (?f my:holdsAt ?t1)
+]

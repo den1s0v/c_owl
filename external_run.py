@@ -24,7 +24,7 @@ OUTPUT_TIME_LIST = []  # exclusive reasoning time measured by the reasoner proce
 PROC_STAT_LIST = []  # measurements of CPU and memory usage
 REASONING_STAT_DICT = {}  # triples_before triples_after iterations (for prolog,sparql modes)
 
-SHOW_PRINTOUT = False
+SHOW_PRINTOUT = True
 
 _WATCHING_THREAD = None
 
@@ -112,12 +112,12 @@ def run_cmd(cmd, measure_time=MEASURE_TIME, repeat_count=REPEAT_COUNT, verbose=F
 			repeat=repeat_count, number=1, globals=globals())
 		print(">_ cmd finished.")
 		
-		MIN_WALL_TIME =  min(time_list) if time_list else 999999
+		MIN_WALL_TIME =  min(time_list) if time_list else None
 		time_report = "     Wall time measured for %d runs: %s (min: %.3f s.)." % (repeat_count, repr(time_list), MIN_WALL_TIME)
 		print(time_report)
 		
-		MIN_EXCLUSIVE_TIME =  min(OUTPUT_TIME_LIST) if OUTPUT_TIME_LIST else 999999
-		time_report = "Exclusive time measured for %d runs: %s (min: %.3f s.)." % (len(OUTPUT_TIME_LIST), repr(OUTPUT_TIME_LIST), MIN_EXCLUSIVE_TIME)
+		MIN_EXCLUSIVE_TIME =  min(OUTPUT_TIME_LIST) if OUTPUT_TIME_LIST else None
+		time_report = "Exclusive time measured for %d runs: %s (min: %.3f s.)." % (len(OUTPUT_TIME_LIST), repr(OUTPUT_TIME_LIST), MIN_EXCLUSIVE_TIME or 999999)
 		print(time_report)
 		
 		# summarize the results of several runs
@@ -256,23 +256,26 @@ def gather_process_stats(process_attributes=('name', ), chooser_func=None, label
 		print(f"{label} has not been detected during %.1f seconds!" % max_wait)
 		return 'failed to detect process...'
 		
+	process = processes[0]
+		
 	# print(f'Found {label}! pid:', process.pid)
 	stat_list = []
 	interval = 0.1
 	# stat = True
 	while True:
-		# stat = cpu_mem(process, interval)  # blocks over 'interval' seconds
-		# if stat:
-		# 	stat_list.append(stat)
-		# else:
-		# 	break
-		stat = [cpu_mem(process, interval) for process in processes]
-		if any(stat):
-			stat_list.append(summarize_process_stat(list(filter(None, stat))))
+		stat = cpu_mem(process, interval)  # blocks over 'interval' seconds
+		if stat:
+			stat_list.append(stat)
 		else:
-			# print(f"{label} has finished.")
 			break
+		# stat = [cpu_mem(process, interval) for process in processes]
+		# if any(stat):
+		# 	stat_list.append(summarize_process_stat(list(filter(None, stat))))
+		# else:
+		# 	# print(f"{label} has finished.")
+		# 	break
 	# print(stat_list)
+	print("finished watching, samples obtained: %d" % len(stat_list))
 	PROC_STAT_LIST.append(summarize_process_stat(stat_list))
 	
 	return 'success'

@@ -444,18 +444,20 @@ def run_tests(directory="test_data/", process_kwargs={}):
 				eval_results = []
 				# 46
 				for n in sorted({
-									*range(1, 10 + 1, 1),
-									*range(5, 100 + 1, 5),
-									*range(100, 201 + 1, 10),
-									# *range(90, 131 + 1, 10),
-									# *range(30, 60 + 1, 10),
+					# 11 , 12 , 14 , 17 , 18 , 21 , 23 , 24 , 26 , 27 , 29 , 32 , 33 , 36 , 38 , 39 , 41 , 42 , 44 , 47 , 48 , 51 , 53 , 54 , 56 , 57 , 59 , 62 , 63 , 66 , 68 , 69 , 71 , 72 , 74 , 77 , 78 , 81 , 83 , 84 , 86 , 87 , 89 , 91 , 92 , 93 , 94 , 105 , 115 , 125 
+									# *range(1, 9 + 1, 1),
+									# *range(5, 100 + 1, 5),
+									# *range(100, 201 + 1, 10),
+									# *range(85, 140 + 1, 10),
+									# *range(60, 130 + 1, 5),
 									# *range(65, 95 + 1, 5),
+									88
 								}):
 					# reasoners = ("pellet", )
 					# reasoners = ("prolog", ); alg_trs = alg_trs[:22]  # !!!
-					# reasoners = ("sparql", )
+					reasoners = ("sparql", )
 					# reasoners = ("jena", )
-					reasoners = ("clingo", )
+					# reasoners = ("clingo", )
 					# reasoners = ("dlv", )
 					# reasoners = ("jena", "clingo")
 					# reasoners = ("jena", "sparql")

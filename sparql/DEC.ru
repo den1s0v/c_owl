@@ -1,6 +1,6 @@
 # Discrete Event Calculus for SPARQL
 
-# maximum time constant set to 10 explicitly
+# maximum time constant set to 370 explicitly
 # initiates/3 was reduced to initiates/2 (drop Time)
     # ASP's `time(T)` is not required, as period of a fluent existance starts by event or via explicit holdsAt fact.
 
@@ -18,7 +18,7 @@ WHERE
     ?f :holdsAt ?t . 
     ?f rdf:type :fluent . 
     BIND( ?t + 1 as ?t1 ) . 
-    FILTER( ?t < 10 ).
+    FILTER( ?t < 370 ).
     FILTER NOT EXISTS { 
         ?e :happens ?t .
         ?e :terminates ?f .
@@ -37,5 +37,5 @@ WHERE
     ?e rdf:type :event . 
     ?f rdf:type :fluent . 
     BIND( ?t + 1 as ?t1 ) . 
-    FILTER( ?t < 10 ).
+    FILTER( ?t < 370 ).
   } ;
