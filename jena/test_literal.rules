@@ -1,0 +1,85 @@
+# @prefix my: <http://test/dream#> .
+@prefix my: <http://vstu.ru/poas/ctrl_structs_2020-05_v1#> .
+
+
+# This is sample file of Jena rules. It tests the rule parser which currently fails on some single-char strings (the open parenthesis and the comma). 
+# An error mention above a line of code means: when this line of code is outcommented then the error disappears.
+
+# Note also the influence of quotes type (double or single).
+
+
+
+# Rules including string "("
+
+
+# ok
+# [ -> print('test jena!') ]
+
+# FAIL: org.apache.jena.reasoner.rulesys.Rule$ParserException: Expected ')' at end of clause, found ]
+# [(?a my:text "(") -> ]
+
+# FAIL: org.apache.jena.reasoner.rulesys.Rule$ParserException: Malformed rule
+# -> print("(").
+
+# FAIL [before]: org.apache.jena.reasoner.rulesys.Rule$ParserException: Expected ')' at end of clause, found [
+# FAIL [now]: org.apache.jena.reasoner.rulesys.Rule$ParserException: Malformed rule
+-> print('(').
+
+# FAIL: org.apache.jena.reasoner.rulesys.Rule$ParserException: Malformed rule
+[ -> print('(') ]
+
+# ok (different char: closing parenthesis)
+# -> print(')') .
+
+
+
+# Rules including string ","
+
+
+# FAIL: org.apache.jena.reasoner.rulesys.Rule$ParserException: Malformed rule
+# -> print(",").
+
+# ok (note the different quotes)
+# -> print(',').
+
+
+
+# Rules including other single-character strings (no problems here)
+
+
+# # ok
+# -> print(".").
+
+# # ok
+# -> print("->").
+
+# # ok
+# -> print("[").
+
+# # ok
+# -> print("]").
+
+# # ok
+# -> print(":").
+
+# # ok
+# -> print("?").
+
+
+# # ok
+# -> print("<<").
+   
+
+
+
+# java -jar jena/Jena.jar jena "test_data/ajax.rdf" "jena/test_literal.rules" "test_data/del_me.rdf"
+# java -jar jena/Jena_02.jar jena "test_data/ajax.rdf" "jena/test_literal.rules" "test_data/del_me.rdf"
+
+# c:\D\Work\Java\jdk-14\bin\java.exe -jar jena/Jena_02.jar jena "test_data/ajax.rdf" "jena/test_literal.rules" "test_data/del_me.rdf"
+
+# c:\D\Work\Java\jdk-14\bin\java.exe -jar jena/Jena_4.jar jena "test_data/ajax.rdf" "jena/test_literal.rules" "test_data/del_me.rdf"
+# c:\D\Work\Java\jdk-14\bin\java.exe -jar jena/Jena_3.jar jena "test_data/ajax.rdf" "jena/test_literal.rules" "test_data/del_me.rdf"
+
+# c:\D\Work\YDev\CompPr\reasoners_compare\JenaTest\out\artifacts\Jena_jar_empty\Jena_jar-empty.jar
+# c:\D\Work\Java\jdk-14\bin\java.exe -jar c:\D\Work\YDev\CompPr\reasoners_compare\JenaTest\out\artifacts\Jena_jar_empty\Jena_jar-empty.jar jena "test_data/ajax.rdf" "jena/test_literal.rules" "test_data/del_me.rdf"
+
