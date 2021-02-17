@@ -3,3 +3,4 @@ transliterate
 Flask
 waitress
 clyngor-with-clingo
+psutil
