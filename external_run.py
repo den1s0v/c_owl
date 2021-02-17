@@ -9,6 +9,8 @@ from timeit import default_timer as timer
 # $ pip install psutil
 import psutil
 
+from options import JAVA_PATH
+
 
 # MEASURE_TIME = True
 MEASURE_TIME = False
@@ -149,7 +151,7 @@ def invoke_shell(cmd, gather_stats=False, *args, output_handler=ext_stdout_handl
 		print(*args)
 	# process = subprocess.Popen(cmd, stdout=stdout, stderr=stdout, creationflags=0x08000000)
 	# process = psutil.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=0x08000000)
-	process = psutil.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+	process = psutil.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 	
 	stdout_accumulator = ''
 	# printout = process.communicate()
@@ -353,7 +355,7 @@ def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena',
 			'sparql': "sparql_from_swrl.ru", 
 		}[reasoning_mode]
 	
-	cmd = f'java -jar jena/Jena.jar {reasoning_mode} "{rdf_path_in}" "{rules_path}" "{rdf_path_out}"'
+	cmd = f'{JAVA_PATH} -jar jena/Jena.jar {reasoning_mode} "{rdf_path_in}" "{rules_path}" "{rdf_path_out}"'
 	run_cmd(cmd, verbose=verbose)
 	# if verbose: print(">_ running cmd:", cmd)
 	# process = subprocess.Popen(cmd, creationflags=0x08000000)
