@@ -14,8 +14,8 @@ import psutil
 MEASURE_TIME = False
 
 # 0 is normal mode, ex. 5 means repeat 5 times and report
-REPEAT_COUNT = 1  # this is required for stats measurements
-# REPEAT_COUNT = 0
+# REPEAT_COUNT = 1  # this is required for stats measurements
+REPEAT_COUNT = 0
 
 MIN_WALL_TIME = None
 MIN_EXCLUSIVE_TIME = None

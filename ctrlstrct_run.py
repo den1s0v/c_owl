@@ -83,7 +83,7 @@ class TraceTester():
             if isinstance(d[k], str):
                 d[k] = int(d[k])
         # repair dicts keys that are str, not int
-        for k in self.id2obj:
+        for k in list(self.id2obj.keys()):
             if isinstance(k, str):
                 self.id2obj[int(k)] = self.id2obj[k]
                 del self.id2obj[k]
