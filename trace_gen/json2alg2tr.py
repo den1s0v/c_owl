@@ -92,11 +92,12 @@ def tr(word_en, case='nomn'):
 		"to first element" 			: ("к первому элементу", ),
 		"to next element" 			: ("к следующему элементу", ),
 		"sequence" 			: ("следование", "следования"),
+		"stmt"				: ("команда", "команды", ),
 	}.get(word_en, ())
 	try:
 		return res[grammemes.index(case)]
 	except IndexError:
-		print("tr(%s, %s) error!"%(word_en, case))
+		print("tr(%s, %s) error !"%(word_en, case))
 		return "==>%s.%s not found!<=="%(word_en, case)
 
 def to_dict_or_self(jn, object_method_name="to_dict"):
