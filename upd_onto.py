@@ -82,7 +82,7 @@ def get_relation_subject(prop, obj):
 	"""
 	Another way to retrieve 1st element of stored triple.
 	Usage:
-		obj = get_relation_object(subj, prop)
+		subj = get_relation_subject(prop, obj)
 	(This may be good for InverseFunctionalProperty'es)
 	"""
 	d = dict((b,a) for a,b in prop.get_relations())
