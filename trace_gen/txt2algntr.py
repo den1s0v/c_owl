@@ -23,10 +23,10 @@ def parse_expr_value(s: str):
 
 def parse_expr_values(s: str) -> list:
     """
-    101             -> (True, False, True)
-    1 0 1           -> (True, False, True)
-    true FalsE TRUE -> (True, False, True)
-    ДА НЕТ 1        -> (True, False, True)
+    '101'             -> (True, False, True)
+    '1 0 1'           -> (True, False, True)
+    'true FalsE TRUE' -> (True, False, True)
+    'ДА Нет 1'        -> (True, False, True)
     
     Допустимы скобочки повторения (как в периодических дробях):
     1(0)  means  100000...  -> (True, "(", False, ")")
