@@ -16,4 +16,8 @@ elif OS.lower() == 'linux':
 	JAVA_PATH = "/opt/jdk-14/bin/java"
 
 else:
-	raise RuntimeError("Unknown platform: %s, check your 'options.py'." % OS)
+	# raise RuntimeError("Unknown platform: %s, check your 'options.py'." % OS)
+	DEBUG = False
+	RUN_LOCALLY = True
+	JAVA_PATH = "java"
+
