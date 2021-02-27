@@ -40,6 +40,11 @@ def create_app():
 	def api_test():
 		return render_template('api_test.html')
 		
+	@app.route('/blockly_test/<lang>/')
+	@app.route('/blockly_test/')
+	def blockly_test(lang='en'):
+		return render_template('blockly_test.html', language=lang)
+		
 	@app.route('/favicon.ico')
 	def icon():
 		url = url_for('static', filename='fireball.png')
