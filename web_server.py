@@ -10,6 +10,7 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect
 from ctrlstrct_test import process_algorithm_and_trace_from_text, process_algorithm_and_trace_from_json, make_act_json, process_algorithms_and_traces, add_styling_to_trace
 from ctrlstrct_run import make_trace_for_algorithm
 from trace_gen.txt2algntr import AlgorithmParser, create_algorithm_from_text
+from trace_gen.blockly_helpers import create_algorithm_from_blockly_xml
 import trace_gen.styling as styling
 
 from options import DEBUG, RUN_LOCALLY
@@ -66,7 +67,11 @@ def create_app():
 	def creating_task():
 		# print(request.json)
 		assert 'algorithm_text' in request.json, 'Bad json!'
-		res = create_algorithm_from_text(request.json['algorithm_text'].splitlines())
+		algorithm_text = request.json['algorithm_text']
+		if algorithm_text.startswith("<xml"):
+			res = create_algorithm_from_blockly_xml(algorithm_text)
+		else:
+			res = create_algorithm_from_text(algorithm_text.splitlines())
 		
 		# if error
 		if isinstance(res, str):
