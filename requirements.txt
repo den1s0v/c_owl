@@ -1,6 +1,15 @@
 owlready2
 transliterate
+
+### Web server ###
 Flask
 waitress
-clyngor-with-clingo
+
+### Java (11+, 14) is currently in use ###
 psutil
+
+### Blockly causes ###
+xmltodict
+
+### ASP support ###
+# clyngor-with-clingo
