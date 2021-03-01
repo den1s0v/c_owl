@@ -113,8 +113,9 @@
     Алгоритм в виде текста (ввод от пользователя) и код языка: рус/англ.
     <pre><code class="js">
 request to 'localhost:2020/creating_task' [method:POST] : json {
-    "algorithm_text":         "some multiline text"  // содержимое поля ввода алгоритма
-    "user_language":          "string"  // 'ru' или 'en'
+    "algorithm_text":         "some multiline text",  // содержимое поля ввода алгоритма
+    "user_language":          "string",  // "ru" или "en"
+    "syntax":                 "string",  // "C" или "Python" или "Pseudocode"
 }
     </code></pre>
 </details>
