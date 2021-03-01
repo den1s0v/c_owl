@@ -2029,7 +2029,7 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
 	elem_type = elem_type.replace('-', ' ')
 	suffix = '_loop'
 	if elem_type.endswith(suffix):
-		elem_type = elem_type.replace(suffix, '')
+		elem_type = elem_type.replace(suffix, '').replace("_", " ")
 		
 	node = None
 	parent = None

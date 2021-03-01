@@ -182,45 +182,52 @@ BUTTON_TIP_FREFIX = {
 }
 
 def set_indent_step(step: int):
-	global INDENT_STEP
-	INDENT_STEP = step
+    global INDENT_STEP
+    INDENT_STEP = step
 
-	
+    
 # features of: Pseudocode / С / Python / JavaScript / etc.
 # token : function(str or tag) -> tag or tags
 SYNTAX = {}
 
 def set_syntax(programming_language_name: str):
-	name = programming_language_name.capitalize()
-	SYNTAX["name"] = name
-	passthrough = lambda tag: tag;
-	
-	if name in ("Pseudocode", ):
-		SYNTAX["BLOCK_OPEN"] = lambda: []
-		SYNTAX["BLOCK_CLOSE"] = lambda: []
-		SYNTAX["COMMENT"] = lambda tag: ["// ", tag]
-		SYNTAX["CONDITION"] = passthrough
-		SYNTAX["ELSEIF_KEYWORD"] = lambda s: tr(s)
-		SYNTAX["STATEMENT"] = passthrough
-	
-	elif name in ("C", "Си"):
-		SYNTAX["BLOCK_OPEN"] = lambda: ["{"]
-		SYNTAX["BLOCK_CLOSE"] = lambda: ["}"]
-		SYNTAX["COMMENT"] = lambda tag: ["// ", tag]
-		SYNTAX["CONDITION"] = lambda tag: ["(", tag, ")"]
-		SYNTAX["ELSEIF_KEYWORD"] = lambda s: s.replace("else-if", "else if")
-		SYNTAX["STATEMENT"] = lambda tag: [tag, ";"]
-	
-	elif name in ("Python"):
-		SYNTAX["BLOCK_OPEN"] = lambda: []
-		SYNTAX["BLOCK_CLOSE"] = lambda: []
-		SYNTAX["COMMENT"] = lambda tag: ["# ", tag]
-		SYNTAX["CONDITION"] = lambda tag: [tag, ":"]
-		SYNTAX["ELSEIF_KEYWORD"] = lambda s: s.replace("else-if", "elif")
-		SYNTAX["STATEMENT"] = passthrough
-		
-	else:
-		print(f"### Warning (ignoring): Unknown syntax in set_syntax('{name}').")
+    name = programming_language_name.capitalize()
+    SYNTAX["name"] = name
+    passthrough = lambda tag: tag;
+    call_tr = lambda s: tr(s);
+    
+    if name in ("Pseudocode", ):
+        SYNTAX["BLOCK_OPEN"] = lambda: []
+        SYNTAX["BLOCK_CLOSE"] = lambda: []
+        SYNTAX["COMMENT"] = lambda tag: ["// ", tag]
+        SYNTAX["CONDITION"] = passthrough
+        SYNTAX["DO_KEYWORD"] = call_tr
+        SYNTAX["ELSEIF_KEYWORD"] = call_tr
+        SYNTAX["STATEMENT"] = passthrough
+        SYNTAX["WHILE_KEYWORD"] = call_tr
+    
+    elif name in ("C", "Си"):
+        SYNTAX["BLOCK_OPEN"] = lambda: ["{"]
+        SYNTAX["BLOCK_CLOSE"] = lambda: ["}"]
+        SYNTAX["COMMENT"] = lambda tag: ["// ", tag]
+        SYNTAX["CONDITION"] = lambda tag: ["(", tag, ")"]
+        SYNTAX["DO_KEYWORD"] = lambda s: "do"
+        SYNTAX["ELSEIF_KEYWORD"] = lambda s: s.replace("else-if", "else if")
+        SYNTAX["STATEMENT"] = lambda tag: [tag, ";"]
+        SYNTAX["WHILE_KEYWORD"] = lambda s: "while"
+    
+    elif name in ("Python"):
+        SYNTAX["BLOCK_OPEN"] = lambda: []
+        SYNTAX["BLOCK_CLOSE"] = lambda: []
+        SYNTAX["COMMENT"] = lambda tag: ["# ", tag]
+        SYNTAX["CONDITION"] = lambda tag: [tag, ":"]
+        SYNTAX["DO_KEYWORD"] = None
+        SYNTAX["ELSEIF_KEYWORD"] = lambda s: s.replace("else-if", "elif")
+        SYNTAX["STATEMENT"] = passthrough
+        SYNTAX["WHILE_KEYWORD"] = lambda s: "while"
+        
+    else:
+        print(f"### Warning (ignoring): Unknown syntax in set_syntax('{name}').")
 
 
 set_syntax("C")  # the default
@@ -315,18 +322,18 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                     # заголовок цикла
                     _make_line_tag(indent, [
                         _make_alg_tag(algorithm_json, 'keyword button', 
-                            inner=tr(loop_type) if SYNTAX["name"] == 'pseudocode' else loop_type,
+                            inner=SYNTAX["WHILE_KEYWORD"](loop_type),
                             states=COMPLEX_NODE_STATES),
                         "&nbsp;",
                         *SYNTAX["CONDITION"](algorithm_to_tags(algorithm_json["cond"])),
                         "&nbsp;" * 2,
                         _make_alg_tag(None, 'comment', 
-                        	inner=SYNTAX["COMMENT"](name))
+                            inner=SYNTAX["COMMENT"](name))
                     ]),
                     # кнопка для тела цикла
                     _make_line_tag(indent, [
-                    	*SYNTAX["BLOCK_OPEN"](),
-                    	"&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
+                        *SYNTAX["BLOCK_OPEN"](),
+                        "&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
                         _make_alg_tag(algorithm_json["body"], 'button', 
                             inner='[iteration-btn]',
                             states=COMPLEX_NODE_STATES)
@@ -337,9 +344,62 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                     *(SYNTAX["BLOCK_CLOSE"]() and [_make_line_tag(indent, SYNTAX["BLOCK_CLOSE"]())]),
                 ]
                 
-            # do-while, ... and more
+            if loop_type == 'do_while':
+                # заголовок цикла
+                header_line = _make_line_tag(indent, [])
+                if SYNTAX["DO_KEYWORD"]:
+                    # syntax like C++/Java with do-while loop 
+                    header_line["content"] += [
+                        _make_alg_tag(algorithm_json, 'keyword button', 
+                            inner=SYNTAX["DO_KEYWORD"](loop_type),
+                            states=COMPLEX_NODE_STATES),
+                        # "&nbsp;",
+                        # *SYNTAX["CONDITION"](algorithm_to_tags(algorithm_json["cond"])),
+                        "&nbsp;" * 2,
+                        _make_alg_tag(None, 'comment', 
+                            inner=SYNTAX["COMMENT"](name))
+                    ];
+                else:
+                    # Python case: emulate with `WHILE(TRUE): IF(): BREAK`.
+                    header_line["content"] += ['==Python не поддерживает DO-WHILE==']
+                    
+                # кнопка для тела цикла
+                body_start_line = _make_line_tag(indent, [
+                    *SYNTAX["BLOCK_OPEN"](),
+                    "&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
+                    _make_alg_tag(algorithm_json["body"], 'button', 
+                        inner='[iteration-btn]',
+                        states=COMPLEX_NODE_STATES)
+                    ])
+                # тело цикла
+                body_lines = algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP)
+                
+                if not SYNTAX["DO_KEYWORD"]:
+                    # TODO: Python case: emulate with `IF(): BREAK`
+                    footer_line = []
+                
+                # закрыть тело цикла (если требуется по синтаксису)
+                body_end_lines = (SYNTAX["BLOCK_CLOSE"]() and [_make_line_tag(indent, SYNTAX["BLOCK_CLOSE"]())])
+                
+                if SYNTAX["DO_KEYWORD"]:
+                    footer_line = _make_line_tag(indent, [
+                        _make_alg_tag(None, 'keyword button', 
+                                    inner=SYNTAX["WHILE_KEYWORD"](loop_type)),
+                        "&nbsp;",
+                        *SYNTAX["STATEMENT"](SYNTAX["CONDITION"](algorithm_to_tags(algorithm_json["cond"]))),
+                    ])
+                    
+                return [
+                    header_line,
+                    body_start_line,
+                    *body_lines,
+                    *body_end_lines,
+                    footer_line
+                ]
+                
+            # for, ... and more
             else:
-                raise 'Not implemented for loop type: ' + loop_type
+                raise NotImplementedError('Not implemented for loop type: ' + loop_type)
                         
         elif type_ == "alternative":
             result = []
@@ -369,15 +429,15 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                     line["content"] += [
                         "&nbsp;" * 2,
                         _make_alg_tag(None, 'comment', 
-                        	inner=SYNTAX["COMMENT"](name))
+                            inner=SYNTAX["COMMENT"](name))
                     ]
                 
                 result.append(line)
                 
                 # кнопка для тела ветки
                 result.append(_make_line_tag(indent, [
-                	*SYNTAX["BLOCK_OPEN"](),
-                	"&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
+                    *SYNTAX["BLOCK_OPEN"](),
+                    "&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
                     _make_alg_tag(branch, 'button', 
                         inner='[branch-btn]',
                         states=COMPLEX_NODE_STATES)
