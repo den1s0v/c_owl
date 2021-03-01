@@ -7,10 +7,10 @@
   <!-- inject Blockly: -->
   	<!-- use packaged snapshot (was valid on 27.02.2021) -->
   	<!-- The snapshot includes blockly, blocks, English locale. -->
-  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  <!-- <script src="https://unpkg.com/blockly/blockly.min.js"></script> -->
   	<!-- or point to local files -->
-  <!-- <script src="../../blockly_compressed.js"></script> -->
-  <!-- <script src="../../blocks_compressed.js"></script> -->
+  <script src="{{ url_for('static', filename='blockly/blockly_compressed.js') }}"></script>
+  <script src="{{ url_for('static', filename='blockly/blocks_compressed.js') }}"></script>
   
   <!-- inject Blockly localization (EN/RU): pick one -->
   	<!-- With "unpkg.com/blockly/blockly.min.js" en.js is redudant here -->
