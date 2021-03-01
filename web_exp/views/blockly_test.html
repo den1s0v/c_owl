@@ -23,6 +23,7 @@
   <!-- Custom configuration for Blockly -->
   <script src="{{ url_for('static', filename='blockly/init_blockly.js') }}"></script>
   
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
   
   <style>
     html, body {
@@ -56,12 +57,13 @@
 
         <!-- <p>&rarr; More info on <a href="https://developers.google.com/blockly/guides/configure/web/resizable">injecting resizable Blockly</a>&hellip;</p> -->
   {% if language == 'ru' %}
-    Изменённые блоки Blockly находятся в палитре слева. You can switch to <a href="{{ url_for('blockly_test', lang='en') }}">English version</a>>
+    Изменённые блоки Blockly находятся в палитре слева. You can switch to <a href="{{ url_for('blockly_test', lang='en') }}">English version</a>.
   {% else %}
         Modified standard blocks are used here. Вы можете переключиться на <a href="{{ url_for('blockly_test', lang='ru') }}">Русскую версию</a>.
   {% endif %}
   
         <button onclick="export_xml_to_console()">Export XML to console</button>
+        <button onclick="send_xml_to_endpoint()">Send XML to endpoint</button>
       </td>
     </tr>
     <tr>
@@ -165,6 +167,48 @@
     	var xml_text = Blockly.Xml.domToPrettyText(xml);  // easy-readable form
     	console.log(xml_text);
     }
+
+    function send_xml_to_endpoint() {
+    	var xml = Blockly.Xml.workspaceToDom(workspace); 
+    	// var xml_text = Blockly.Xml.domToText(xml);  // compact form
+    	var xml_text = Blockly.Xml.domToPrettyText(xml);  // easy-readable form
+    	// console.log(xml_text);
+    	var data = {"user_language": "ru", "algorithm_text": xml_text}
+    	
+    	result_id = 0;
+        $.ajax({
+            url: "http://localhost:2020/creating_task", 
+            method: 'post',
+            dataType: 'json',
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            beforeSend: function(data){
+                processing_callback(result_id, "wait")
+            },
+            success: function(data){
+                processing_callback(result_id, JSON.stringify(data, null, 2))
+            },
+            error: function(data){
+                processing_callback(result_id, "fail")
+            }
+        });
+    }
+	function processing_callback(result_id, response="wait")
+	{
+	    if(response == "wait")
+	    {
+	        console.log("Please wait ...");
+	        return
+	    }
+	    if(response == "fail")
+	    {
+	        console.log("An ajax error occurred...)");
+	        return
+	    }
+	    
+	    // console.log("<pre>" + response + "</pre>");
+	    console.log(response);  // "<plaintext>" + response
+	}
   </script>
 </body>
 </html>
