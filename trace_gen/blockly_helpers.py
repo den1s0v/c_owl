@@ -143,7 +143,7 @@ def parse_xml(xml_string):
 
 
 class AlgorithmXMLParser(AlgorithmParser):
-    def __init__(self, xml_tree=None, start_id=1, verbose=1):
+    def __init__(self, xml_tree=None, start_id=1, verbose=0):
         super().__init__(xml_tree, start_id, verbose)
         # assert type(start_id) is int
         # self._maxID = max(start_id - 1, _maxAlgID)
@@ -323,7 +323,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                     if self.verbose: print("alt else")
                     branch_type = "else"
                     alt_name = block_NAME
-                    branch_name = branch_type + "-" + cond_name  # имя ветки должно отличаться от имени ветвления
+                    branch_name = alt_name + "-" + branch_type  # имя ветки должно отличаться от имени ветвления
                     alt_obj = result[-1]
                     alt_obj["branches"] += [ {
                         "id": self.newID(branch_name),

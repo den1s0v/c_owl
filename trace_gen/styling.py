@@ -164,7 +164,7 @@ def to_html(element: str or dict or list, sep='') -> str:
     return 'UNKNOWN(%s)' % type(element).__name__
     
 
-INDENT_STEP = 4  # spaxes
+INDENT_STEP = 2  # spaces
 SIMPLE_NODE_STATES = ('performed', )
 COMPLEX_NODE_STATES = ('started', 'finished')
 
@@ -180,6 +180,52 @@ BUTTON_TIP_FREFIX = {
         'finished': 'Finish',
     }
 }
+
+def set_indent_step(step: int):
+	global INDENT_STEP
+	INDENT_STEP = step
+
+	
+# features of: Pseudocode / С / Python / JavaScript / etc.
+# token : function(str or tag) -> tag or tags
+SYNTAX = {}
+
+def set_syntax(programming_language_name: str):
+	name = programming_language_name.capitalize()
+	SYNTAX["name"] = name
+	passthrough = lambda tag: tag;
+	
+	if name in ("Pseudocode", ):
+		SYNTAX["BLOCK_OPEN"] = lambda: []
+		SYNTAX["BLOCK_CLOSE"] = lambda: []
+		SYNTAX["COMMENT"] = lambda tag: ["// ", tag]
+		SYNTAX["CONDITION"] = passthrough
+		SYNTAX["ELSEIF_KEYWORD"] = lambda s: tr(s)
+		SYNTAX["STATEMENT"] = passthrough
+	
+	elif name in ("C", "Си"):
+		SYNTAX["BLOCK_OPEN"] = lambda: ["{"]
+		SYNTAX["BLOCK_CLOSE"] = lambda: ["}"]
+		SYNTAX["COMMENT"] = lambda tag: ["// ", tag]
+		SYNTAX["CONDITION"] = lambda tag: ["(", tag, ")"]
+		SYNTAX["ELSEIF_KEYWORD"] = lambda s: s.replace("else-if", "else if")
+		SYNTAX["STATEMENT"] = lambda tag: [tag, ";"]
+	
+	elif name in ("Python"):
+		SYNTAX["BLOCK_OPEN"] = lambda: []
+		SYNTAX["BLOCK_CLOSE"] = lambda: []
+		SYNTAX["COMMENT"] = lambda tag: ["# ", tag]
+		SYNTAX["CONDITION"] = lambda tag: [tag, ":"]
+		SYNTAX["ELSEIF_KEYWORD"] = lambda s: s.replace("else-if", "elif")
+		SYNTAX["STATEMENT"] = passthrough
+		
+	else:
+		print(f"### Warning (ignoring): Unknown syntax in set_syntax('{name}').")
+
+
+set_syntax("C")  # the default
+# set_syntax("Pseudocode")  # the default
+# set_syntax("Python")
 
 
 # def escape_quotes(s):
@@ -224,11 +270,13 @@ BUTTON_TIPS = {}  # подсказки к кнопкам (в теги не по�
 def get_button_tips():
     return BUTTON_TIPS
 
-def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, indent=0) -> list:
+def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, syntax:str=None, indent=0) -> list:
     """ Create new tree of html-tags with additional info about nodes """
     if user_language:
         set_target_lang(user_language)  # usually set once on the topmost recursive call
         BUTTON_TIPS.clear()
+    if syntax:
+        set_syntax(syntax)  # usually set once on the topmost recursive call
         
     if isinstance(algorithm_json, (list, tuple)):
         return [algorithm_to_tags(el, indent=indent) for el in algorithm_json]
@@ -250,7 +298,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, inde
             return _make_alg_tag(algorithm_json, "variable button", name, states=SIMPLE_NODE_STATES)
         
         if type_ in ("stmt", ):
-            return _make_line_tag(indent, _make_alg_tag(algorithm_json, "variable button", name, states=SIMPLE_NODE_STATES))
+            return _make_line_tag(indent, SYNTAX["STATEMENT"](_make_alg_tag(algorithm_json, "variable button", name, states=SIMPLE_NODE_STATES)))
         
         elif type_ == "sequence":  # and not name.endswith("_loop_body"):
             # # recurse with list
@@ -267,24 +315,26 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, inde
                     # заголовок цикла
                     _make_line_tag(indent, [
                         _make_alg_tag(algorithm_json, 'keyword button', 
-                            inner=tr(loop_type),
+                            inner=tr(loop_type) if SYNTAX["name"] == 'pseudocode' else loop_type,
                             states=COMPLEX_NODE_STATES),
-                        " ",
-                        algorithm_to_tags(algorithm_json["cond"], indent=indent),
+                        "&nbsp;",
+                        *SYNTAX["CONDITION"](algorithm_to_tags(algorithm_json["cond"])),
                         "&nbsp;" * 2,
-                        _make_alg_tag(None, 'comment', inner=[
-                            tr('comment'),
-                            name
-                        ])
+                        _make_alg_tag(None, 'comment', 
+                        	inner=SYNTAX["COMMENT"](name))
                     ]),
                     # кнопка для тела цикла
-                    _make_line_tag(indent + INDENT_STEP, [
+                    _make_line_tag(indent, [
+                    	*SYNTAX["BLOCK_OPEN"](),
+                    	"&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
                         _make_alg_tag(algorithm_json["body"], 'button', 
-                            inner='[block-btn]',
+                            inner='[iteration-btn]',
                             states=COMPLEX_NODE_STATES)
                         ]),
                     # тело цикла
-                    algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP)
+                    algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP),
+                    # закрыть тело цикла (если требуется по синтаксису)
+                    *(SYNTAX["BLOCK_CLOSE"]() and [_make_line_tag(indent, SYNTAX["BLOCK_CLOSE"]())]),
                 ]
                 
             # do-while, ... and more
@@ -301,40 +351,43 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, inde
                     # добавить кнопку для всей развилки
                     line["content"].append(
                         _make_alg_tag(algorithm_json, 'keyword button',
-                            inner=tr(branch["type"]),
+                            inner=tr(branch["type"]) if SYNTAX["name"] == 'Pseudocode' else branch["type"],
                             states=COMPLEX_NODE_STATES))
                 else:
                     # добавить просто ключевое слово - начало ветки
                     line["content"].append(
                         _make_alg_tag(algorithm_json, 'keyword',
-                            inner=tr(branch["type"]),
+                            inner=SYNTAX["ELSEIF_KEYWORD"](branch["type"]),
                             states=None))
                     
                 if 'cond' in branch:  # эта ветка - не ELSE
                     line["content"].append(" ")
-                    line["content"].append(algorithm_to_tags(branch["cond"]))
+                    line["content"].append(SYNTAX["CONDITION"](algorithm_to_tags(branch["cond"])))
                     
                 if branch["type"] == "if":
                     # добавить название развилки
                     line["content"] += [
                         "&nbsp;" * 2,
-                        _make_alg_tag(None, 'comment', inner=[
-                            tr('comment'),
-                            name
-                        ])
+                        _make_alg_tag(None, 'comment', 
+                        	inner=SYNTAX["COMMENT"](name))
                     ]
                 
                 result.append(line)
                 
                 # кнопка для тела ветки
-                result.append(_make_line_tag(indent + INDENT_STEP, [
+                result.append(_make_line_tag(indent, [
+                	*SYNTAX["BLOCK_OPEN"](),
+                	"&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
                     _make_alg_tag(branch, 'button', 
-                        inner='[block-btn]',
+                        inner='[branch-btn]',
                         states=COMPLEX_NODE_STATES)
                     ]))
 
                 # тело ветки
                 result += algorithm_to_tags(branch["body"], indent=indent + INDENT_STEP)
+                
+                # закрыть тело ветки (если требуется по синтаксису)
+                result += (SYNTAX["BLOCK_CLOSE"]() and _make_line_tag(indent, SYNTAX["BLOCK_CLOSE"]())),
                 
             return result
 

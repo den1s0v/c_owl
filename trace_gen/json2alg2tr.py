@@ -2050,6 +2050,9 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
 			kwargs[elem_type] = alg_element["cond"]["name"]
 			kwargs['then'] = "dummy"
 			
+		if 'else' in tro.mandatory:  # "else"
+			kwargs['else'] = "dummy"
+			
 		if 'alternative' in tro.mandatory:
 			kwargs[elem_type] = alg_element["name"]
 			# kwargs['branches'] = ["dummy"]

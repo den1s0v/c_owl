@@ -103,7 +103,7 @@ def create_app():
 			# print('LENGTH(trace_json):', len(trace_json))
 			# pprint(res.algorithm)
 
-			algorithm_tags = styling.algorithm_to_tags(res.algorithm, request.json['user_language'])
+			algorithm_tags = styling.algorithm_to_tags(res.algorithm, request.json['user_language'], request.json.get('syntax', 'C'))
 			algorithm_tips = styling.get_button_tips()
 			algorithm_html = styling.to_html(algorithm_tags)
 			
