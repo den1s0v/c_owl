@@ -94,7 +94,7 @@ function init_blockly_environment(argument=null) {
   Blockly.Blocks['condition_with_values_block'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField(new Blockly.FieldTextInput("%s1".replace("%s", Blockly.Msg["CUSTOM_CONDITION_PROMPT"])), "COND_NAME")
+        .appendField(new Blockly.FieldTextInput("%s".replace("%s", Blockly.Msg["CUSTOM_CONDITION_PROMPT"])), "COND_NAME")
         .appendField(Blockly.Msg["CUSTOM_YIELDS_VALUES"])  // "принимает значения"
         .appendField(new Blockly.FieldTextInput("0,1,1,(0)", condition_values_validator), "VALUES");
     this.setOutput(true, "Boolean");
@@ -121,7 +121,7 @@ function init_blockly_environment(argument=null) {
     }
     let sep = ''
     if (repeating && initial)
-      sep = ", а затем ";
+      sep = ", %1 ".replace("%1", Blockly.Msg["CUSTOM_AND_THEN"]);  // "а затем"
     const values_tip = initial + sep + repeating;
 
     return Blockly.Msg["CUSTOM_CONDITION_WITH_VALUES_BLOCK_TOOLTIP"]  // 'Логическое условие с именем "%1". В ходе выполнения программы оно %2.'
@@ -135,6 +135,40 @@ function init_blockly_environment(argument=null) {
   
 
   Blockly.defineBlocksWithJsonArray([
+  {
+	// Block for text value (modified)
+    "type": "text_name_of_alternative",
+    "message0": "%1",
+    "args0": [{
+      "type": "field_input",
+      "name": "TEXT",
+      "text": "%{BKY_CUSTOM_NAME_OF_ALTERNATIVE_PROMPT}"
+    }],
+    "output": "String",
+    "style": "text_blocks",
+    "helpUrl": "%{BKY_TEXT_TEXT_HELPURL}",
+    "tooltip": "%{BKY_CUSTOM_NAME_OF_ALTERNATIVE}",
+    "extensions": [
+      "text_quotes",
+    ]
+  },
+  {
+	// Block for text value (modified)
+    "type": "text_name_of_loop",
+    "message0": "%1",
+    "args0": [{
+      "type": "field_input",
+      "name": "TEXT",
+      "text": "%{BKY_CUSTOM_NAME_OF_LOOP_PROMPT}"
+    }],
+    "output": "String",
+    "style": "text_blocks",
+    "helpUrl": "%{BKY_TEXT_TEXT_HELPURL}",
+    "tooltip": "%{BKY_CUSTOM_NAME_OF_LOOP}",
+    "extensions": [
+      "text_quotes",
+    ]
+  },
   {
     // Block for if/elseif/else condition (modified to be named).
     "type": "controls_named_if",
@@ -185,13 +219,17 @@ function init_blockly_environment(argument=null) {
     "message1": "%1 %2",
     "args1": [
       {
-        "type": "field_dropdown",
+        "align": "RIGHT",	
+        // Hide the Dropdown control
+        // "type": "field_dropdown",
+        // "name": "MODE",
+        // "options": [
+        //   ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_WHILE}", "WHILE"],
+        //   ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_UNTIL}", "UNTIL"]
+        // ],
+        "type": "field_label",
         "name": "MODE",
-        "options": [
-          ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_WHILE}", "WHILE"],
-          ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_UNTIL}", "UNTIL"]
-        ],
-        "align": "RIGHT"
+        "text": "%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_WHILE}",
       },
       {
         "type": "input_value",
@@ -208,7 +246,7 @@ function init_blockly_environment(argument=null) {
     "nextStatement": null,
     "style": "loop_blocks",
     "helpUrl": "%{BKY_CONTROLS_WHILEUNTIL_HELPURL}",
-    "extensions": ["controls_whileUntil_tooltip"]
+    "tooltip": "%{BKY_CONTROLS_WHILEUNTIL_TOOLTIP_WHILE}"
   },
   {
     // Block for 'postconditional do while/until' loop (modified to be named).
@@ -230,13 +268,17 @@ function init_blockly_environment(argument=null) {
     "message2": "%1 %2",
     "args2": [
       {
-        "type": "field_dropdown",
+        "align": "RIGHT",
+        // Hide the Dropdown control
+        // "type": "field_dropdown",
+        // "name": "MODE",
+        // "options": [
+        //   ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_WHILE}", "WHILE"],
+        //   ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_UNTIL}", "UNTIL"]
+        // ],
+        "type": "field_label",
         "name": "MODE",
-        "options": [
-          ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_WHILE}", "WHILE"],
-          ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_UNTIL}", "UNTIL"]
-        ],
-        "align": "RIGHT"
+        "text": "%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_WHILE}",
       },
       {
         "type": "input_value",
@@ -248,7 +290,7 @@ function init_blockly_environment(argument=null) {
     "nextStatement": null,
     "style": "loop_blocks",
     "helpUrl": "%{BKY_CONTROLS_WHILEUNTIL_HELPURL}",
-    "extensions": ["controls_doWhileUntil_tooltip"]
+    "tooltip": "%{BKY_CUSTOM_DOWHILEUNTIL_TOOLTIP_WHILE}"
   },
   // Block for text value (modified)
   {
@@ -257,7 +299,7 @@ function init_blockly_environment(argument=null) {
     "args0": [{
       "type": "field_input",
       "name": "NAME",
-      "text": "%{BKY_CUSTOM_ACTION}"  // "выполнить"
+      "text": "%{BKY_CUSTOM_ACTION_PROMPT}"  // "введите имя действия здесь"
     }],
     "previousStatement": null,
     "nextStatement": null,
@@ -267,21 +309,6 @@ function init_blockly_environment(argument=null) {
   },
 
   ]);
-
-	/** (Modified!)
-	 * Tooltips for the 'controls_whileUntil' block, keyed by MODE value.
-	 * @see {Blockly.Extensions#buildTooltipForDropdown}
-	 * @package
-	 * @readonly
-	 */
-	Blockly.Constants.Loops.DOWHILE_UNTIL_TOOLTIPS = {
-	  'WHILE': '%{BKY_CUSTOM_DOWHILEUNTIL_TOOLTIP_WHILE}',
-	  'UNTIL': '%{BKY_CUSTOM_DOWHILEUNTIL_TOOLTIP_UNTIL}'
-	};
-
-	Blockly.Extensions.register('controls_doWhileUntil_tooltip',
-	    Blockly.Extensions.buildTooltipForDropdown(
-	        'MODE', Blockly.Constants.Loops.DOWHILE_UNTIL_TOOLTIPS));
 
 }
 
@@ -304,10 +331,15 @@ function patch_localization() {
       "выполнить"
     : "run"
     );
+  Blockly.Msg["CUSTOM_ACTION_PROMPT"] = (
+    ru?
+      "введите имя действия здесь"
+    : "enter the name of an action here"
+    );
   Blockly.Msg["CUSTOM_ACTION_TOOLTIP"] = (
     ru?
       "Выполняет произвольное действие"
-    : "Do arbitrary action"
+    : "Do the arbitrary action"
     );
   // Blockly.Msg["CUSTOM_CONDITION"] = (
   //   ru?
@@ -324,16 +356,21 @@ function patch_localization() {
       "имя развилки"
     : "name of the alternative"
     );
+  Blockly.Msg["CUSTOM_NAME_OF_ALTERNATIVE_PROMPT"] = (
+    ru?
+      "введите имя развилки здесь"
+    : "enter the name of the alternative here"
+    );
   Blockly.Msg["CUSTOM_NAME_OF_LOOP"] = (
     ru?
       "имя цикла"
     : "name of the loop"
     );
-  // Blockly.Msg["CUSTOM_NAME_OF_LOOP_PROMPT"] = (
-  //   ru?
-  //     "имя цикла"
-  //   : "name of the loop"
-  //   );
+  Blockly.Msg["CUSTOM_NAME_OF_LOOP_PROMPT"] = (
+    ru?
+      "введите имя цикла здесь"
+    : "enter the name of the loop here"
+    );
   Blockly.Msg["CUSTOM_CONDITION_WITH_VALUES_BLOCK_TOOLTIP"] = (
     ru?
       'Логическое условие с именем "%1". В ходе выполнения программы оно %2.'
