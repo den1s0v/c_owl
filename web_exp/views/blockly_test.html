@@ -18,6 +18,8 @@
   <!-- <script src="../../msg/js/ru.js"></script> -->
   {% if language == 'ru' %}
     <script src="{{ url_for('static', filename='blockly/ru.js') }}"></script>
+  {% else %}
+    <script src="{{ url_for('static', filename='blockly/en.js') }}"></script>
   {% endif %}
 
   <!-- Custom configuration for Blockly -->

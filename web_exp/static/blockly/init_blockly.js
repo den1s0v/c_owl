@@ -94,8 +94,8 @@ function init_blockly_environment(argument=null) {
   Blockly.Blocks['condition_with_values_block'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField(new Blockly.FieldTextInput("%s1".replace("%s", Blockly.Msg["CUSTOMS_CONDITION"])), "COND_NAME")
-        .appendField(Blockly.Msg["CUSTOMS_YIELDS_VALUES"])  // "принимает значения"
+        .appendField(new Blockly.FieldTextInput("%s1".replace("%s", Blockly.Msg["CUSTOM_CONDITION_PROMPT"])), "COND_NAME")
+        .appendField(Blockly.Msg["CUSTOM_YIELDS_VALUES"])  // "принимает значения"
         .appendField(new Blockly.FieldTextInput("0,1,1,(0)", condition_values_validator), "VALUES");
     this.setOutput(true, "Boolean");
     this.setColour(60);
@@ -110,21 +110,21 @@ function init_blockly_environment(argument=null) {
       [initial, repeating] = values.split('(');
       repeating = "циклически принимает значения %1"
         .replace('%1', repeating.replace(")", ""))
-        .replace('циклически', Blockly.Msg["CUSTOMS_REPEATEDLY"])
-        .replace('принимает значения', Blockly.Msg["CUSTOMS_YIELDS_VALUES"]);
+        .replace('циклически', Blockly.Msg["CUSTOM_REPEATEDLY"])
+        .replace('принимает значения', Blockly.Msg["CUSTOM_YIELDS_VALUES"]);
     }
     if (initial) {
       initial = "последовательно принимает значения %1"
         .replace('%1', rstrip(initial, ","))
-        .replace('последовательно', Blockly.Msg["CUSTOMS_SEQUENTIALLY"])
-        .replace('принимает значения', Blockly.Msg["CUSTOMS_YIELDS_VALUES"]);
+        .replace('последовательно', Blockly.Msg["CUSTOM_SEQUENTIALLY"])
+        .replace('принимает значения', Blockly.Msg["CUSTOM_YIELDS_VALUES"]);
     }
     let sep = ''
     if (repeating && initial)
       sep = ", а затем ";
     const values_tip = initial + sep + repeating;
 
-    return Blockly.Msg["CUSTOMS_CONDITION_WITH_VALUES_BLOCK_TOOLTIP"]  // 'Логическое условие с именем "%1". В ходе выполнения программы оно %2.'
+    return Blockly.Msg["CUSTOM_CONDITION_WITH_VALUES_BLOCK_TOOLTIP"]  // 'Логическое условие с именем "%1". В ходе выполнения программы оно %2.'
       .replace('%1', thisBlock.getFieldValue('COND_NAME'))
       .replace('%2', values_tip);
     });
@@ -138,7 +138,7 @@ function init_blockly_environment(argument=null) {
   {
     // Block for if/elseif/else condition (modified to be named).
     "type": "controls_named_if",
-    "message0": "// %{BKY_CUSTOMS_NAME_OF_ALTERNATIVE}: %1",  // имя развилки
+    "message0": "// %{BKY_CUSTOM_NAME_OF_ALTERNATIVE}: %1",  // имя развилки
     "args0": [
       {
         "type": "input_value",
@@ -173,7 +173,7 @@ function init_blockly_environment(argument=null) {
   {
     // Block for 'do while/until' loop (modified to be named).
     "type": "controls_named_whileUntil",
-    "message0": "// %{BKY_CUSTOMS_NAME_OF_LOOP}: %1",
+    "message0": "// %{BKY_CUSTOM_NAME_OF_LOOP}: %1",
     "args0": [
       {
         "type": "input_value",
@@ -213,7 +213,7 @@ function init_blockly_environment(argument=null) {
   {
     // Block for 'postconditional do while/until' loop (modified to be named).
     "type": "controls_named_doWhileUntil",
-    "message0": "// %{BKY_CUSTOMS_NAME_OF_LOOP}: %1",
+    "message0": "// %{BKY_CUSTOM_NAME_OF_LOOP}: %1",
     "args0": [
       {
         "type": "input_value",
@@ -257,13 +257,13 @@ function init_blockly_environment(argument=null) {
     "args0": [{
       "type": "field_input",
       "name": "NAME",
-      "text": "%{BKY_CUSTOMS_ACTION}"  // "выполнить"
+      "text": "%{BKY_CUSTOM_ACTION}"  // "выполнить"
     }],
     "previousStatement": null,
     "nextStatement": null,
     "style": "text_blocks",
     "helpUrl": "",
-    "tooltip": "%{BKY_CUSTOMS_ACTION_TOOLTIP}"  // "Выполняет произвольное действие"
+    "tooltip": "%{BKY_CUSTOM_ACTION_TOOLTIP}"  // "Выполняет произвольное действие"
   },
 
   ]);
@@ -275,8 +275,8 @@ function init_blockly_environment(argument=null) {
 	 * @readonly
 	 */
 	Blockly.Constants.Loops.DOWHILE_UNTIL_TOOLTIPS = {
-	  'WHILE': '%{BKY_CUSTOMS_DOWHILEUNTIL_TOOLTIP_WHILE}',
-	  'UNTIL': '%{BKY_CUSTOMS_DOWHILEUNTIL_TOOLTIP_UNTIL}'
+	  'WHILE': '%{BKY_CUSTOM_DOWHILEUNTIL_TOOLTIP_WHILE}',
+	  'UNTIL': '%{BKY_CUSTOM_DOWHILEUNTIL_TOOLTIP_UNTIL}'
 	};
 
 	Blockly.Extensions.register('controls_doWhileUntil_tooltip',
@@ -299,62 +299,72 @@ function patch_localization() {
     console.log("Warning: Blockly's i10n patch: unknown language used, defaulting to English.");
   }
 
-  Blockly.Msg["CUSTOMS_ACTION"] = (
+  Blockly.Msg["CUSTOM_ACTION"] = (
     ru?
       "выполнить"
     : "run"
     );
-  Blockly.Msg["CUSTOMS_ACTION_TOOLTIP"] = (
+  Blockly.Msg["CUSTOM_ACTION_TOOLTIP"] = (
     ru?
       "Выполняет произвольное действие"
     : "Do arbitrary action"
     );
-  Blockly.Msg["CUSTOMS_CONDITION"] = (
+  // Blockly.Msg["CUSTOM_CONDITION"] = (
+  //   ru?
+  //     "условие"
+  //   : "condition"
+  //   );
+  Blockly.Msg["CUSTOM_CONDITION_PROMPT"] = (
     ru?
-      "условие"
-    : "condition"
+      "введите условие здесь"
+    : "enter the condition here"
     );
-  Blockly.Msg["CUSTOMS_NAME_OF_ALTERNATIVE"] = (
+  Blockly.Msg["CUSTOM_NAME_OF_ALTERNATIVE"] = (
     ru?
       "имя развилки"
-    : "name of alternative"
+    : "name of the alternative"
     );
-  Blockly.Msg["CUSTOMS_NAME_OF_LOOP"] = (
+  Blockly.Msg["CUSTOM_NAME_OF_LOOP"] = (
     ru?
       "имя цикла"
-    : "name of loop"
+    : "name of the loop"
     );
-  Blockly.Msg["CUSTOMS_CONDITION_WITH_VALUES_BLOCK_TOOLTIP"] = (
+  // Blockly.Msg["CUSTOM_NAME_OF_LOOP_PROMPT"] = (
+  //   ru?
+  //     "имя цикла"
+  //   : "name of the loop"
+  //   );
+  Blockly.Msg["CUSTOM_CONDITION_WITH_VALUES_BLOCK_TOOLTIP"] = (
     ru?
       'Логическое условие с именем "%1". В ходе выполнения программы оно %2.'
     : 'A boolean condition named "%1". During the program execution it %2.'
     );
-  Blockly.Msg["CUSTOMS_DOWHILEUNTIL_TOOLTIP_UNTIL"] = (
+  Blockly.Msg["CUSTOM_DOWHILEUNTIL_TOOLTIP_UNTIL"] = (
     ru?
       "Выполняет команды и, пока значение ложно, повторяет их."
     : "Do some statements and repeat them while a value is false."
     );
-  Blockly.Msg["CUSTOMS_DOWHILEUNTIL_TOOLTIP_WHILE"] = (
+  Blockly.Msg["CUSTOM_DOWHILEUNTIL_TOOLTIP_WHILE"] = (
     ru?
       "Выполняет команды и, пока значение истинно, повторяет их."
     : "Do some statements and repeat them while a value is true."
     );
-  Blockly.Msg["CUSTOMS_REPEATEDLY"] = (
+  Blockly.Msg["CUSTOM_REPEATEDLY"] = (
     ru?
       "циклически"
     : "repeatedly"
     );
-  Blockly.Msg["CUSTOMS_SEQUENTIALLY"] = (
+  Blockly.Msg["CUSTOM_SEQUENTIALLY"] = (
     ru?
       "последовательно"
     : "sequentially"
     );
-  Blockly.Msg["CUSTOMS_AND_THEN"] = (
+  Blockly.Msg["CUSTOM_AND_THEN"] = (
     ru?
       "а затем"
     : "and then"
     );
-  Blockly.Msg["CUSTOMS_YIELDS_VALUES"] = (
+  Blockly.Msg["CUSTOM_YIELDS_VALUES"] = (
     ru?
       "принимает значения"
     : "yields values"
