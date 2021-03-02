@@ -64,6 +64,7 @@
         Modified standard blocks are used here. Вы можете переключиться на <a href="{{ url_for('blockly_test', lang='ru') }}">Русскую версию</a>.
   {% endif %}
   
+  		<br/>
         <button onclick="export_xml_to_console()">Export XML to console</button>
         <button onclick="send_xml_to_endpoint()">Send XML to endpoint</button>
       </td>
@@ -79,6 +80,7 @@
 
   <!-- Палитра Blockly -->
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+  <category name="Control">
     <block type="condition_with_values_block"></block>
     <!-- <block type="controls_if"></block> -->
     <block type="controls_named_if">
@@ -86,7 +88,12 @@
           <shadow type="text_name_of_alternative"></shadow>
         </value>
     </block>
+  </category>
+  <category name="Loops">
     <!-- <block type="controls_whileUntil"></block> -->
+    <block type="condition_with_values_block">
+    	<field name="VALUES">1,1,(0)</field>
+    </block>
     <block type="controls_named_whileUntil">
     	<value name="NAME">
           <shadow type="text_name_of_loop"></shadow>
@@ -108,6 +115,8 @@
       <field name="NUM">0</field>
     </block>
     <block type="text"></block> -->
+  </category>
+  <category name="Actions">
     <block type="action"></block>
     <block type="text_print">
 		<value name="TEXT">
@@ -116,6 +125,7 @@
 	      </shadow>
 	    </value>
     </block>
+  </category>
   </xml>
 
   <script>
