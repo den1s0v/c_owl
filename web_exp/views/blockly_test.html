@@ -141,7 +141,9 @@
         
         workspace = Blockly.inject(blocklyDiv,
             {media: 'https://github.com/google/blockly/raw/master/media/',
-             toolbox: document.getElementById('toolbox')});
+             // toolbox: document.getElementById('toolbox')
+             toolbox: get_toolbox_json()
+         });
         var onresize = function(e) {
           // Compute the absolute coordinates and dimensions of blocklyArea.
           var element = blocklyArea;
