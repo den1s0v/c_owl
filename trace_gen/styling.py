@@ -242,7 +242,7 @@ set_syntax("C")  # the default
 
 def _make_add_act_button_tip(act_name_json, phase):
     lang = get_target_lang()
-    return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name_json[lang]).replace("'", '"')
+    return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name_json.replace("'", '"'))
 
 
 def _make_alg_tag(alg_node, token_type, inner='', states=None):
@@ -453,8 +453,8 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 
     return ''
 
+
 if __name__ == '__main__':
-    
     # print(__doc__)
     
     from pprint import pprint

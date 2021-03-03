@@ -12,6 +12,7 @@ from ctrlstrct_run import make_trace_for_algorithm
 from trace_gen.txt2algntr import AlgorithmParser, create_algorithm_from_text
 from trace_gen.blockly_helpers import create_algorithm_from_blockly_xml
 import trace_gen.styling as styling
+from trace_gen.json2alg2tr import set_target_lang
 
 from options import DEBUG, RUN_LOCALLY
 
@@ -68,6 +69,8 @@ def create_app():
 		# print(request.json)
 		assert 'algorithm_text' in request.json, 'Bad json: No "algorithm_text" key in JSON payload!'
 		algorithm_text = request.json['algorithm_text']
+		user_language = request.json.get('user_language', 'en')
+		set_target_lang(user_language)
 		if algorithm_text.startswith("<xml"):
 			res = create_algorithm_from_blockly_xml(algorithm_text)
 		else:
@@ -89,7 +92,7 @@ def create_app():
 			
 			# trace_json = ()
 			trace_json = make_trace_for_algorithm(res.algorithm)
-			trace_json = add_styling_to_trace(res.algorithm, trace_json, request.json.get('user_language', 'en'))
+			trace_json = add_styling_to_trace(res.algorithm, trace_json, user_language)
 	
 			# if error
 			if isinstance(trace_json, str):
@@ -103,7 +106,7 @@ def create_app():
 			# print('LENGTH(trace_json):', len(trace_json))
 			# pprint(res.algorithm)
 
-			algorithm_tags = styling.algorithm_to_tags(res.algorithm, request.json.get('user_language', 'en'), request.json.get('syntax', 'C'))
+			algorithm_tags = styling.algorithm_to_tags(res.algorithm, user_language, request.json.get('syntax', 'C'))
 			algorithm_tips = styling.get_button_tips()
 			algorithm_html = styling.to_html(algorithm_tags)
 			

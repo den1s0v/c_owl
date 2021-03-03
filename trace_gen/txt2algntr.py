@@ -3,6 +3,9 @@
 
 import re
 
+
+from trace_gen.json2alg2tr import get_target_lang
+
 _maxAlgID = 1
 _maxTrID = 1
 
@@ -11,6 +14,12 @@ FALSE_ALIASES = ("ложь","нет","false","0")
 TRUTH_ALIASES_re = re.compile("|".join(TRUTH_ALIASES))
 FALSE_ALIASES_re = re.compile("|".join(FALSE_ALIASES))
 
+
+def select_translation(fallback_lang="en", **lang_to_msg_dict, ):
+    '''returns lang_to_msg_dict[get_target_lang()] or lang_to_msg_dict[fallback_lang] or None'''
+    return lang_to_msg_dict.get(get_target_lang(),
+           lang_to_msg_dict.get(fallback_lang, None))
+    
 
 def parse_expr_value(s: str):
     value = s
@@ -106,7 +115,7 @@ class AlgorithmParser:
                     "id": self.newID("global_code"),
                     "type": "sequence",
                     "name": "global_code",
-                    "act_name": dict(ru=f"программа", en=f"program"),
+                    "act_name": select_translation(ru=f"программа", en=f"program"),
                     "body": []
                 },
               "entry_point": None,
@@ -144,7 +153,7 @@ class AlgorithmParser:
             "id": self.newID(name),
             "type": "expr",
             "name": name,
-            "act_name": dict(ru=f"условие '{name}'", en=f"condition '{name}'"),
+            "act_name": select_translation(ru=f"условие '{name}'", en=f"condition '{name}'"),
         }
 
     def parse_stmt(self, name:str) -> dict:
@@ -153,7 +162,7 @@ class AlgorithmParser:
             "id": self.newID(name),
             "type": "stmt",
             "name": name,
-            "act_name": dict(ru=f"действие '{name}'", en=f"statement '{name}'"),
+            "act_name": select_translation(ru=f"действие '{name}'", en=f"statement '{name}'"),
         }
 
     def parse_algorithm_ids(self, line_list: "list(str)", start_line=0, end_line=None) -> list:
@@ -170,7 +179,7 @@ class AlgorithmParser:
                     "id": self.newID(name),
                     "type": "sequence",
                     "name": name,
-                    "act_name": dict(ru=f"итерация цикла '{loop_name}'", en=f"iteration of loop '{loop_name}'"),
+                    "act_name": select_translation(ru=f"итерация цикла '{loop_name}'", en=f"iteration of loop '{loop_name}'"),
                     "body": stmt_List,
             }
 
@@ -217,14 +226,14 @@ class AlgorithmParser:
                       "id": self.newID(name),
                       "type": "func",
                       "name": name,  # имя функции
-                      "act_name": dict(ru=f"функция '{name}'", en=f"function '{name}'"),
+                      "act_name": select_translation(ru=f"функция '{name}'", en=f"function '{name}'"),
                       "is_entry": name == "main",
                       "param_list": [],
                       "body" : {   #  stmts -> global_code  !!! 
                             "id": self.newID(body_name),
                             "type": "sequence",
                             "name": body_name,
-                            "act_name": dict(ru=f"тело функции '{name}'", en=f"body of function '{name}'"),
+                            "act_name": select_translation(ru=f"тело функции '{name}'", en=f"body of function '{name}'"),
                             "body": parse_algorithm(line_list[i+2:e], start_line=start_line + i+2)  # исключая скобки { } вокруг тела
                         },
                 })
@@ -264,12 +273,12 @@ class AlgorithmParser:
                     "id": self.newID(name),
                     "type": "alternative",
                     "name": name,
-                    "act_name": dict(ru=f"альтернатива '{name}'", en=f"alternative '{name}'"),
+                    "act_name": select_translation(ru=f"альтернатива '{name}'", en=f"alternative '{name}'"),
                     "branches": [ {
                         "id": self.newID(branch_name),
                         "type": "if",
                         "name": branch_name,
-                        "act_name": dict(ru=f"ветка ЕСЛИ с условием '{cond_name}'", en=f"IF branch with condition '{cond_name}'"),
+                        "act_name": select_translation(ru=f"ветка ЕСЛИ с условием '{cond_name}'", en=f"IF branch with condition '{cond_name}'"),
                         "cond":  self.parse_expr(cond_name, values=values),
                         "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                     } ]
@@ -311,7 +320,7 @@ class AlgorithmParser:
                         "id": self.newID(branch_name),
                         "type": "else-if",
                         "name": branch_name,
-                        "act_name": dict(ru=f"ветка ИНАЧЕ-ЕСЛИ с условием '{cond_name}'", en=f"ELSE-IF branch with condition '{cond_name}'"),
+                        "act_name": select_translation(ru=f"ветка ИНАЧЕ-ЕСЛИ с условием '{cond_name}'", en=f"ELSE-IF branch with condition '{cond_name}'"),
                         "cond":  self.parse_expr(cond_name, values=values),
                         "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                     } ]
@@ -336,7 +345,7 @@ class AlgorithmParser:
                         "id": self.newID(branch_name),
                         "type": "else",
                         "name": branch_name,
-                        "act_name": dict(ru=f"ветка ИНАЧЕ альтернативы '{branch_name}'", en=f"ELSE branch of alternative '{branch_name}'"),
+                        "act_name": select_translation(ru=f"ветка ИНАЧЕ альтернативы '{branch_name}'", en=f"ELSE branch of alternative '{branch_name}'"),
                         "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 ci = e + 1
@@ -370,7 +379,7 @@ class AlgorithmParser:
                     "id": self.newID(name),
                     "type": "while_loop",
                     "name": name,
-                    "act_name": dict(ru=f"цикл '{name}'", en=f"loop '{name}'"),
+                    "act_name": select_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
                     "cond": self.parse_expr(cond_name, values=values),
                     "body":  make_loop_body(
                                 name,
@@ -412,7 +421,7 @@ class AlgorithmParser:
                     "id": self.newID(name),
                     "type": "do_while_loop",
                     "name": name,
-                    "act_name": dict(ru=f"цикл '{name}'", en=f"loop '{name}'"),
+                    "act_name": select_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
                     "cond": self.parse_expr(cond_name, values=values),
                     "body": make_loop_body(
                                 name,
@@ -454,7 +463,7 @@ class AlgorithmParser:
                     "id": self.newID(name),
                     "type": "do_until_loop",
                     "name": name,
-                    "act_name": dict(ru=f"цикл '{name}'", en=f"loop '{name}'"),
+                    "act_name": select_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
                     "cond": self.parse_expr(cond_name, values=values),
                     "body": make_loop_body(
                                 name,
@@ -489,7 +498,7 @@ class AlgorithmParser:
                     "id": self.newID(name),
                     "type": "for_loop",
                     "name": name,
-                    "act_name": dict(ru=f"цикл '{name}'", en=f"loop '{name}'"),
+                    "act_name": select_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
                     "variable": s_var,
                     "init":   self.parse_stmt("{}={}".format(s_var, s_from)),
                     "cond":   self.parse_expr("{}<={}".format(s_var,s_to), values=values),
@@ -525,7 +534,7 @@ class AlgorithmParser:
                     "id": self.newID(name),
                     "type": "foreach_loop",
                     "name": name,
-                    "act_name": dict(ru=f"цикл '{name}'", en=f"loop '{name}'"),
+                    "act_name": select_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
                     "variable": s_var,
                     "container": s_container,
                     "init":   self.parse_stmt("{}={}.first()".format(s_var, s_container)),
@@ -549,7 +558,7 @@ class AlgorithmParser:
                     "id": self.newID(name),
                     "type": "sequence",
                     "name": name,
-                    "act_name": dict(ru=f"следование '{name}'", en=f"sequence '{name}'"),
+                    "act_name": select_translation(ru=f"следование '{name}'", en=f"sequence '{name}'"),
                     "body": parse_algorithm(line_list[i+1:e], start_line=start_line + i+1),  # учитывая скобки { } вокруг тела
                 })
                 ci = e + 1

@@ -8,7 +8,7 @@ from collections import OrderedDict
 import xmltodict  # pip install xmltodict
 
 try:
-    from trace_gen.txt2algntr import AlgorithmParser  # , find_by_keyval_in
+    from trace_gen.txt2algntr import AlgorithmParser, select_translation
 except ModuleNotFounError:
     from txt2algntr import AlgorithmParser
 
@@ -183,7 +183,7 @@ class AlgorithmXMLParser(AlgorithmParser):
     #         "id": self.newID(name),
     #         "type": "expr",
     #         "name": name,
-    #         "act_name": dict(ru=f"условие '{name}'", en=f"condition '{name}'"),
+    #         "act_name": select_translation(ru=f"условие '{name}'", en=f"condition '{name}'"),
     #     }
 
     # def parse_stmt(self, name:str) -> dict:
@@ -192,7 +192,7 @@ class AlgorithmXMLParser(AlgorithmParser):
     #         "id": self.newID(name),
     #         "type": "stmt",
     #         "name": name,
-    #         "act_name": dict(ru=f"действие '{name}'", en=f"statement '{name}'"),
+    #         "act_name": select_translation(ru=f"действие '{name}'", en=f"statement '{name}'"),
     #     }
 
     def parse_algorithm_ids(self, xml_tree: OrderedDict) -> list:
@@ -211,7 +211,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                     "id": self.newID(name),
                     "type": "sequence",
                     "name": name,
-                    "act_name": dict(ru=f"итерация цикла '{loop_name}'", en=f"iteration of loop '{loop_name}'"),
+                    "act_name": select_translation(ru=f"итерация цикла '{loop_name}'", en=f"iteration of loop '{loop_name}'"),
                     "body": stmt_List,
             }
 
@@ -272,14 +272,14 @@ class AlgorithmXMLParser(AlgorithmParser):
                     "id": self.newID(block_NAME),
                     "type": "alternative",
                     "name": block_NAME,
-                    "act_name": dict(ru=f"альтернатива '{block_NAME}'", en=f"alternative '{block_NAME}'"),
+                    "act_name": select_translation(ru=f"альтернатива '{block_NAME}'", en=f"alternative '{block_NAME}'"),
                     "branches": []
                 })
                 # alt branches
                 branch_type = "if"
                 for i in range(20):  # максимум 20 веток у альтернативы
-                    block_IFn = get_named_member(xml_tree['value'], 'IF%d' % i)
-                    block_DOn = get_named_member(xml_tree['statement'], 'DO%d' % i)
+                    block_IFn = get_named_member(xml_tree['value'], 'IF%d' % i) if 'value' in xml_tree else None
+                    block_DOn = get_named_member(xml_tree['statement'], 'DO%d' % i) if 'statement' in xml_tree else None
                     if not block_IFn and not block_DOn:
                         break  # ветки кончились
                     if bool(block_IFn) != bool(block_DOn):
@@ -302,7 +302,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                         "id": self.newID(branch_name),
                         "type": branch_type,
                         "name": branch_name,
-                        "act_name": dict(ru=f"ветка ЕСЛИ с условием '{cond_name}'", en=f"IF branch with condition '{cond_name}'"),
+                        "act_name": select_translation(ru=f"ветка ЕСЛИ с условием '{cond_name}'", en=f"IF branch with condition '{cond_name}'"),
                         "cond":  self.parse_expr(cond_name, values=values),
                         "body": parse_algorithm(block_DOn['block'] if 'block' in block_DOn else [])
                     } ]
@@ -318,7 +318,7 @@ class AlgorithmXMLParser(AlgorithmParser):
 
                 # иначе
                 # else
-                block_ELSE = get_named_member(xml_tree['statement'], 'ELSE')
+                block_ELSE = get_named_member(xml_tree['statement'], 'ELSE') if 'statement' in xml_tree else None
                 if block_ELSE:
                     if self.verbose: print("alt else")
                     branch_type = "else"
@@ -329,7 +329,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                         "id": self.newID(branch_name),
                         "type": branch_type,
                         "name": branch_name,
-                        "act_name": dict(ru=f"ветка ИНАЧЕ альтернативы '{alt_name}'", en=f"ELSE branch of alternative '{alt_name}'"),
+                        "act_name": select_translation(ru=f"ветка ИНАЧЕ альтернативы '{alt_name}'", en=f"ELSE branch of alternative '{alt_name}'"),
                         "body": parse_algorithm(block_ELSE['block'] if 'block' in block_ELSE else [])
                         } ]
 
@@ -339,23 +339,26 @@ class AlgorithmXMLParser(AlgorithmParser):
             if '@type' in xml_tree and xml_tree['@type'] == 'controls_named_whileUntil':
                 if self.verbose: print("while")
                 name = block_NAME  # имя цикла (пишется в комментарии)
-                block_BOOL = get_named_member(xml_tree['value'], 'BOOL')
+                block_BOOL = get_named_member(xml_tree['value'], 'BOOL') if 'value' in xml_tree else None
                 if not block_BOOL:
                     raise ValueError('Algorithm error: Missing condition of "%s" loop!' % block_NAME)
+
+                block_DO = get_named_member(xml_tree['statement'], 'DO') if 'statement' in xml_tree else None
+                if not block_DO:
+                    raise ValueError('Algorithm error: Missing body of "%s" loop!' % block_NAME)
                     
                 block_key = next(iter({'shadow', 'block'} & set(block_BOOL.keys())))
                 block_COND_VALUES = block_BOOL[block_key]
                 block_COND_NAME = get_named_member(block_COND_VALUES['field'], "COND_NAME")
                 block_VALUES = get_named_member(block_COND_VALUES['field'], "VALUES")
                 
-                block_DO = get_named_member(xml_tree['statement'], 'DO')
                 cond_name = block_COND_NAME['#text']  # условие цикла
                 values = block_VALUES['#text']  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 result.append({
                     "id": self.newID(name),
                     "type": "while_loop",
                     "name": name,
-                    "act_name": dict(ru=f"цикл '{name}'", en=f"loop '{name}'"),
+                    "act_name": select_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
                     "cond": self.parse_expr(cond_name, values=values),
                     "body":  make_loop_body(
                                 name,
@@ -380,23 +383,27 @@ class AlgorithmXMLParser(AlgorithmParser):
                 if field_MODE and '#text' in field_MODE and field_MODE['#text'] == 'UNTIL':
                     loop_type = "do_until_loop"
 
-                block_BOOL = get_named_member(xml_tree['value'], 'BOOL')
+                block_BOOL = get_named_member(xml_tree['value'], 'BOOL') if 'value' in xml_tree else None
                 if not block_BOOL:
                     raise ValueError('Algorithm error: Missing condition of "%s" loop!' % block_NAME)
+
+                block_DO = get_named_member(xml_tree['statement'], 'DO') if 'statement' in xml_tree else None
+                if not block_DO:
+                    raise ValueError('Algorithm error: Missing body of "%s" loop!' % block_NAME)
+                    
                     
                 block_key = next(iter({'shadow', 'block'} & set(block_BOOL.keys())))
                 block_COND_VALUES = block_BOOL[block_key]
                 block_COND_NAME = get_named_member(block_COND_VALUES['field'], "COND_NAME")
                 block_VALUES = get_named_member(block_COND_VALUES['field'], "VALUES")
                 
-                block_DO = get_named_member(xml_tree['statement'], 'DO')
                 cond_name = block_COND_NAME['#text']  # условие цикла
                 values = block_VALUES['#text']  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 result.append({
                     "id": self.newID(name),
                     "type": loop_type,
                     "name": name,
-                    "act_name": dict(ru=f"цикл '{name}'", en=f"loop '{name}'"),
+                    "act_name": select_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
                     "cond": self.parse_expr(cond_name, values=values),
                     "body": make_loop_body(
                                 name,
