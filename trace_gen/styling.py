@@ -148,16 +148,18 @@ def to_html(element: str or dict or list, sep='') -> str:
     
     if isinstance(element, dict):
         tag = element.get('tag', "")
-        attrs = ''.join(f' {k}="{to_html(v, sep=" ")}"' for k, v in element.get('attributes', {}).items())
+        attrs = ''.join(f' %s="%s"' % (k, to_html(v, sep=" ").replace('"', r'')) for k, v in element.get('attributes', {}).items())
         # inner = ''.join(map(to_html, element.get('content', ())))
         inner = to_html(element.get('content', ()))
         if not tag:
             return inner
             
         head = f'<{tag}{attrs}'
-        if inner:
+        if inner or attrs:
+        	# full form
             html = f'{head}>{inner}</{tag}>'
         else:
+        	# short form
             html = f'{head} />'
         return html
     
