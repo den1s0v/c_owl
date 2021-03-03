@@ -199,6 +199,13 @@
         
         // user config
         setup_blockly_workspace(workspace);
+        
+        xml_text = load_xml()
+        if (xml_text)
+        {
+	        var xml = Blockly.Xml.textToDom(xml_text);
+			Blockly.Xml.domToWorkspace(xml, workspace);
+        }
     }    
     
     function export_xml_to_console() {
@@ -212,6 +219,7 @@
     	var xml = Blockly.Xml.workspaceToDom(workspace); 
     	// var xml_text = Blockly.Xml.domToText(xml);  // compact form
     	var xml_text = Blockly.Xml.domToPrettyText(xml);  // easy-readable form
+    	save_xml(xml_text)
     	// console.log(xml_text);
     	var data = {"user_language": "ru", "algorithm_text": xml_text}
     	
@@ -255,6 +263,17 @@
 	    } else {
 	    	$("#algorithmArea").html(JSON.stringify(response.syntax_errors || response, null, 2))
 	    }
+	}
+
+	function save_xml(xml)
+	{
+		localStorage.blockly_xml_sent = xml
+	}
+	// localStorage
+	function load_xml(field_name)
+	{
+		str = localStorage.blockly_xml_sent
+		return str || null;
 	}
   </script>
 </body>
