@@ -12,6 +12,9 @@
   <script src="{{ url_for('static', filename='blockly/blockly_compressed.js') }}"></script>
   <script src="{{ url_for('static', filename='blockly/blocks_compressed.js') }}"></script>
   
+  <!-- https://semantic-ui.com/elements/icon.html#audio--video -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+  
   <!-- inject Blockly localization (EN/RU): pick one -->
   	<!-- With "unpkg.com/blockly/blockly.min.js" en.js is redudant here -->
   <!-- <script src="../../msg/js/en.js"></script> -->
@@ -70,6 +73,7 @@
   
   		<br/>
         <button onclick="export_xml_to_console()">Export XML to console</button>
+        <i class="play icon"></i>
         <button onclick="send_xml_to_endpoint()">Send XML to endpoint</button>
       </td>
       <td></td>
