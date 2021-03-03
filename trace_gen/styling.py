@@ -52,7 +52,7 @@ def make_lexer():
         {'regex': re.compile(r"программа|program", re.I), 'token': "program"},
         {'regex': re.compile(r"функция|function", re.I), 'token': "function"},
         {'regex': re.compile(r"й|раз|time", re.I), 'token': None},
-        {'regex': re.compile(r"[\wа-яё]+", re.I), 'token': "variable"}
+        {'regex': re.compile(r"[\wа-яё\d]+", re.I), 'token': "variable"}
       ],
     }
     
@@ -367,13 +367,14 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                             inner=SYNTAX["COMMENT"](name))
                     ]),
                     # кнопка для тела цикла
-                    _make_line_tag(indent, [
-                        *SYNTAX["BLOCK_OPEN"](),
-                        "&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
+                    _make_line_tag(indent, 
                         _make_alg_tag(algorithm_json["body"], 'button', 
-                            inner='[iteration-btn]',
+                            inner=[
+		                        *SYNTAX["BLOCK_OPEN"](),
+		                        "&nbsp;" * (INDENT_STEP),
+                            ],
                             states=COMPLEX_NODE_STATES)
-                        ]),
+                        ),
                     # тело цикла
                     algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP),
                     # закрыть тело цикла (если требуется по синтаксису)
@@ -400,13 +401,14 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                     header_line["content"] += ['==Python не поддерживает DO-WHILE==']
                     
                 # кнопка для тела цикла
-                body_start_line = _make_line_tag(indent, [
-                    *SYNTAX["BLOCK_OPEN"](),
-                    "&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
+                body_start_line = _make_line_tag(indent, 
                     _make_alg_tag(algorithm_json["body"], 'button', 
-                        inner='[iteration-btn]',
+                        inner=[
+	                        *SYNTAX["BLOCK_OPEN"](),
+	                        "&nbsp;" * (INDENT_STEP),
+                        ],
                         states=COMPLEX_NODE_STATES)
-                    ])
+                    )
                 # тело цикла
                 body_lines = algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP)
                 
@@ -471,13 +473,14 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                 result.append(line)
                 
                 # кнопка для тела ветки
-                result.append(_make_line_tag(indent, [
-                    *SYNTAX["BLOCK_OPEN"](),
-                    "&nbsp;" * (INDENT_STEP - 0),  # -1 because of '{' is on the line
+                result.append(_make_line_tag(indent, 
                     _make_alg_tag(branch, 'button', 
-                        inner='[branch-btn]',
+                        inner=[
+	                        *SYNTAX["BLOCK_OPEN"](),
+	                        "&nbsp;" * (INDENT_STEP),
+                        ],
                         states=COMPLEX_NODE_STATES)
-                    ]))
+                    ))
 
                 # тело ветки
                 result += algorithm_to_tags(branch["body"], indent=indent + INDENT_STEP)
