@@ -242,7 +242,7 @@ set_syntax("C")  # the default
 #     return s.replace("'", '&apos;').replace('"', r'&quot;')
 #     # .replace('\\', '\\\\')
 
-def _make_add_act_button_tip(act_name_json, phase):
+def _get_act_button_tip(act_name_json, phase):
     lang = get_target_lang()
     return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name_json.replace("'", '"'))
 
@@ -255,10 +255,44 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
     
     if states:
         act_name = alg_node["act_name"]
-        states_attr = {state: _make_add_act_button_tip(act_name, state) for state in states}
+        # вычислить целевое состояние по последнему акту трассы
+        # ... TODO
+        state_name = states[0]  # 'performed'
+        # ...
+        
+        states_attr = {state: _get_act_button_tip(act_name, state) for state in states}
         BUTTON_TIPS[id_] = states_attr
         # states_attr = escape_quotes(str(states_attr))
         # more_attrs.update({"act_types": [states_attr]})
+        inner = [
+        	# <i class="play icon"></i>
+	        {
+		        "tag": "span",
+		        "attributes": {
+		        	"class": ["hidable tooltip"],
+		        	"algorithm_element_id": [str(id_)], 
+		        	"state": [state_name], 
+		        	# **states_attr,
+		        	"onclick": ["on_algorithm_element_clicked(this)"], # `onmouseup` event works too.
+	        	},
+		        "content": [{
+				        "tag": "i",
+				        "attributes": {
+				        	"class": ["play", "icon"],
+			        	},
+				        "content": ''
+		        	},
+		        	{
+				        "tag": "span",
+				        "attributes": {
+				        	"class": ["tooltiptext"],
+			        	},
+				        "content": states_attr[state_name]
+		        	}
+	        	]
+        	},
+        	inner
+    	]
     
     return {
         "tag": "span",

@@ -426,6 +426,10 @@ function setup_blockly_workspace(workspace) {
   // workspace.addChangeListener(Blockly.Events.disableOrphans);
 }
 
+function which_language() {
+	const ru = (Blockly.Msg["ADD_COMMENT"] === "Добавить комментарий");
+	return ru? "ru" : "en";
+}
 
 function patch_localization() {
   // find out what lang is ON
