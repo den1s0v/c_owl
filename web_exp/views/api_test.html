@@ -125,7 +125,7 @@ request to 'localhost:2020/creating_task' [method:POST] : json {
     <summary>Сохранение в БД</summary>
     Сохранению в БД подлежат:
     <ul>
-    	<li>[algorithm_json] и [algorithm_button_tips] из response,
+    	<li>[algorithm_json] из response,
     	</li>
     	<li>[algorithm_text] из request (ещё не точно, - пока с Blockly не разобрались).
     	</li>
@@ -144,8 +144,6 @@ request to 'localhost:2020/creating_task' [method:POST] : json {
 <!--             	<br>* а также алгоритм в виде вложенных объектов-"тегов" [algorithm_as_tags] и  -->
             	<br>* отформатированный HTML [algorithm_as_html]. 
             </li>
-            <li> Кроме того, объект-словарь для сопоставления tooltip-подсказок кнопкам в алгоритме (для создания актов) [algorithm_button_tips]. Он же говорит о том, какого вида акты может создавать каждая кнопка: либо одно состояние "performed" для простых актов, или пара переключающихся "started"/"finished" для составных актов с отдельными началом и концом.
-            </li>
             <li> Трасса в виде JSON - массив актов [trace_json], каждый из которых - также JSON-объект (см. ниже).
             </li>
         </ol>
@@ -154,17 +152,17 @@ response: json {
     "syntax_errors":          ["message string"],  // ошибка в алгоритме или пустой массив
     "algorithm_json":         {json}*,  // сохранить для создания задачи (см. описание ниже, под спойлером)
 
-        // (информация для обновления/исправления текста алгоритма на экране)
+<!--         // (информация для обновления/исправления текста алгоритма на экране)
     "algorithm_update_lines": {json},   // внести изменения в editor алгоритма (построчно, не сбив параллельный ввод пользователя) - ещё не используется, т.е. всегда пустой
     "new_algorithm_text":     "some multiline text",  // новый текст в editor алгоритма (если пуст, то заменять не нужно)
 
-        // (информация для визуализации алгоритма)
+ -->        // (информация для визуализации алгоритма)
     "algorithm_as_html":      "string", // форматированный HTML (кнопки имеют привязку к callback'у: onclick: "on_algorithm_element_clicked(this)")
 <!--     "algorithm_as_tags":      {json},   // те же html-теги, но в виде JSON, для формирования html из них (см. формат html_tag'ов в <a href="https://github.com/den1s0v/c_owl/blob/e70ec8acce56b96a9242e8231472fd94808d6ed0/trace_gen/styling.py#L6">styling.py</a>) -->
-    "algorithm_button_tips":  {ID: {"act_type": "tip message"}},  // для каждого span c классом button - режимы работы кнопок и подсказки к ним:
+<!--     "algorithm_button_tips":  {ID: {"act_type": "tip message"}},  // для каждого span c классом button - режимы работы кнопок и подсказки к ним:
                               // - либо одно состояние "performed", или пара переключающихся "started"/"finished"
                               // - ID (int) - значение атрибута "algorithm_element_id" у &lt;span&gt;, к кнопке которого нужно цеплять "tip message" 
-                              //   (он же параметр algorithm_element_id, передаваемый в /verify_trace_act для создания акта)
+                              //   (он же параметр algorithm_element_id, передаваемый в /verify_trace_act для создания акта) -->
         // (информация для визуализации трассы целиком)
     "trace_json":             [array]*, // отрендерить проверочную трассу (см. описание ниже, под спойлером)
 }
@@ -332,7 +330,7 @@ request to 'localhost:2020/verify_trace_act' [method:POST] : json {
 }
 
 response: json {
-    "trace_lines_json":  [trace_json_array*],  // список ВСЕХ строк (актов) трассы, старых и новых, полученных в результате действия студента. Один последний акт может быть ошибочным (is_valid === false) - его нужно подсветить и как-то показать ошибку.
+    "trace_lines_json":  [trace_json_array*], // список ВСЕХ строк (актов) трассы, старых и новых, полученных в результате действия студента. Один последний акт может быть ошибочным (is_valid === false) - его нужно подсветить и как-то показать ошибку.
     "algorithm_json":    {json},              // алгоритм заново - с актуализированными состояниями кнопок.
     "processing_errors": ["message string"],  // описание исключений, произошедших в процессе обработки запроса (пустой массив, если их не было); в нормальном режиме исключений быть не должно, в противном случае проблемы с заданием или с сервером.
 <!-- ////!   is_trace_line_ok:       boolean,  // true, если всё хорошо, иначе false
