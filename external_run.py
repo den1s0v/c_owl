@@ -151,7 +151,9 @@ def invoke_shell(cmd, gather_stats=False, *args, output_handler=ext_stdout_handl
 		print(*args)
 	# process = subprocess.Popen(cmd, stdout=stdout, stderr=stdout, creationflags=0x08000000)
 	# process = psutil.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=0x08000000)
-	process = psutil.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+	cmd_parts = cmd.split()
+	cmd_parts = [p[1:-1] if ('"'==  p[0] == p[-1]) else p for p in cmd_parts]
+	process = psutil.Popen(cmd_parts, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 	
 	stdout_accumulator = ''
 	# printout = process.communicate()
