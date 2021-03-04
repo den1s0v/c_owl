@@ -126,8 +126,8 @@ def create_app():
 
 	@app.route('/verify_trace_act', methods=['POST'])
 	def verify_trace_act():
-		# print(request.json)
-		assert 'algorithm_json' in request.json, 'Bad json!'
+		### print(request.json)
+		assert 'algorithm_json' in request.json, 'Bad json: No "algorithm_json" key in JSON payload!'
 		# get the requested trace extension
 		res = make_act_json(**request.json)
 		# if error
@@ -141,7 +141,7 @@ def create_app():
 			algorithm_json = request.json["algorithm_json"]
 			
 			# verify the obtained trace with reasoner
-			full_trace = request.json["existing_trace_json"] + res  # !!
+			full_trace = res
 			alg_tr = {
 			    "trace_name"    : "http_trace",
 			    "algorithm_name": "http",
@@ -162,7 +162,7 @@ def create_app():
 			# algorithm_json = new(algorithm_json, full_trace)
 			
 			return dict(
-				trace_lines_json=full_trace,  # res,
+				trace_lines_json=full_trace,  ## res,
 				algorithm_json=algorithm_json,
 				processing_errors=(), 
 			)
@@ -305,41 +305,6 @@ __LINE_IDNEX_RE = re.compile(r"(line|строк\w+)\s*(\d+)")
 
 def camelcase_to_snakecase(s: str, sep='_') -> str:
 	return __CAMELCASE_RE.sub(lambda m: f"{m.group(1)}{sep}{m.group(2)}", s).lower()
-
-
-
-def debug():	
-	text = """
-// алгоритм 10_while
-{
-пока красный -> ложь,ложь // ожидание  (правильно истина,ложь)
-	ждать
-ждать_секунды(3)
-идти
-}
-
-/* 
-SKIP____10_while 10 (с.3) проверка условия (While_Loop)
-10_while (с.3) проверка условия (While_Loop)
-*/ {
-началась программа
-	начался цикл ожидание 1-й раз
-		условие цикла (красный) выполнилось 1-й раз - истина // проверка условия
-		началась итерация 1 цикла ожидание
-			ждать выполнилось 1-й раз
-		закончилась итерация 1 цикла ожидание
-		условие цикла (красный) выполнилось 2-й раз - ложь
-	закончился цикл ожидание 1-й раз
-	ждать_секунды(3) выполнилось 1-й раз
-	идти выполнилось 1-й раз
-закончилась программа
-}
-	"""
-	
-	feedback = process_algorithm_and_trace_from_text(text)
-	
-	from pprint import pprint
-	pprint(feedback)
 
 
 if __name__ == "__main__":

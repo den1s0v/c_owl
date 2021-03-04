@@ -261,7 +261,7 @@ def process_algorithm_and_trace_from_json(alg_tr: dict, process_kwargs=dict(reas
 def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, existing_trace_json, user_language=None) -> list:
 	'''
 	act_type: начало ('started') или конец ('finished') - для составных, 'performed' - для простых (атомарных)
-	Returns list of dicts, each dict represents act object; usually list is 1 in length, but gets two elements if given trace is empty - put begin of trace and requested act.
+	Returns full supplemented trace: list of dicts, each dict represents act object.
 	(Returns string with error description if an exception occured)
 	'''
 	# Отфильтровать неправильные акты (если есть)
@@ -332,7 +332,7 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 		result_acts.append(act_json)
 		
 		# print(result_acts)
-		return result_acts
+		return existing_trace_list + result_acts
 	except Exception as e:
 		# raise e
 		return f"Server error in make_act_json() - {type(e).__name__}:\n\t{str(e)}"
