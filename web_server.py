@@ -126,7 +126,9 @@ def create_app():
 
 	@app.route('/verify_trace_act', methods=['POST'])
 	def verify_trace_act():
-		### print(request.json)
+		### 
+		print(request.json)
+		print(request)
 		assert 'algorithm_json' in request.json, 'Bad json: No "algorithm_json" key in JSON payload!'
 		user_language = request.json.get('user_language', 'en')
 		set_target_lang(user_language)
