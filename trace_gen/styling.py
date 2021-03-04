@@ -306,7 +306,7 @@ def find_state_for_alg_id(algorithm_element_id, states):
 	if len(states) > 1:
 		# iterate the trace up from the bottom
 		for act in reversed(EXISTING_TRACE):
-			if act["executes"] == algorithm_element_id:
+			if act["executes"] == algorithm_element_id and act["is_valid"] == True:
 				# "phase":    "string",  // "started"/"finished"/"performed"
 				last_phase = act["phase"]
 				return {

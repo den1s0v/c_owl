@@ -161,10 +161,12 @@ def create_app():
 					trace_json=[],
 					algorithm_as_html=(),
 				)
+				
+			### print("After reasoning: ", *full_trace, sep='\n *\t')
 			
 			# TODO
 			# algorithm_json = new(algorithm_json, full_trace)
-			algorithm_tags = styling.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', 'C'), existing_trace=request.json.get('existing_trace_json', ()))
+			algorithm_tags = styling.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', 'C'), existing_trace=full_trace)
 			# algorithm_tips = styling.get_button_tips()
 			algorithm_html = styling.to_html(algorithm_tags)
 			
