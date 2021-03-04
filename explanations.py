@@ -2,16 +2,14 @@ import re
 
 # from owlready2 import *
 
+from trace_gen.json2alg2tr import get_target_lang
 from upd_onto import get_relation_object, get_relation_subject
 
 
-SUPPORTED_LANGS = ("ru","en")
-# TARGET_LANG = "ru"
-TARGET_LANG = "en"
 
 def tr(word_en, case='nomn'):
-	""" Перевод на русский язык, если TARGET_LANG=="ru" """
-	if TARGET_LANG == "en":
+	""" Перевод на русский язык, если get_target_lang()=="ru" """
+	if get_target_lang() == "en":
 		return word_en
 	grammemes = ('nomn','gent')
 	assert case in grammemes, "Unknown case: "+case
@@ -144,7 +142,7 @@ def format_explanation(onto, act_instance, _auto_register=True) -> list:
 	# 	return format_explanation(onto, act_instance, _auto_register=False)
 			
 	return result
-	# return 'Cannot format explanation for '
+	# return ['Cannot format explanation for XYZY']
 
 
 def format_by_spec(format_str: str, **params: dict):
@@ -172,9 +170,9 @@ def register_handler(class_name, format_str, method):
 	
 
 def class_formatstr(*args):
-	""" Перевод в русский язык, если TARGET_LANG=="ru" """
+	""" Перевод в русский язык, если get_target_lang()=="ru" """
 	class_name, format_str_ru, format_str_en = args if len(args) == 3 else list(args[0])
-	if TARGET_LANG == "en":
+	if get_target_lang() == "en":
 		return class_name, format_str_en
 	else:
 		return class_name, format_str_ru
