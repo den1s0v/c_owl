@@ -119,13 +119,13 @@ def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, in
 
 def format_explanation(onto, act_instance, _auto_register=True) -> list:
 	
-	# if not FORMAT_STRINGS:
-	# 	register_explanation_handlers(onto)
-	# Не оптимально, зато не кешируются устаревшие онтологии
-	if FORMAT_STRINGS:
-		FORMAT_STRINGS.clear()
-		PARAM_PROVIDERS.clear()
-	register_explanation_handlers(onto)
+	if not FORMAT_STRINGS:
+		register_explanation_handlers(onto)
+	# # Не оптимально, зато не кешируются устаревшие онтологии
+	# if FORMAT_STRINGS:
+	# 	FORMAT_STRINGS.clear()
+	# 	PARAM_PROVIDERS.clear()
+	# register_explanation_handlers(onto)
 	
 	### print(*FORMAT_STRINGS.keys())
 		
