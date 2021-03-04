@@ -248,7 +248,7 @@ def register_explanation_handlers(onto):
 	
 	
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
-	spec = """WrongContext	<Акт Б> не может выполняться при отсутствии выполения <акта А>, потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed while no act of <A> exists"""
+	spec = """WrongContext	Акт <B> не может выполняться при отсутствии выполнения акта <A>, потому что <B> входит в <A>.	Act <B> is a part of <A> so it can't be executed while no act of <A> exists"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -270,7 +270,7 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """TooEarly	<A> должно произойти позже, после некоторых пропущенных актов (подробности см. далее)	<A> must happen later, after some missing acts"""
+	spec = """TooEarly	<A> следует выполнить позже, после некоторых пропущенных актов	<A> must happen later, after some missing acts"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -280,7 +280,7 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """DisplacedAct	<A> должно произойти перед <B>, но не здесь (подробности см. далее)	<A> must happen before <B> but not here (see there for details)"""
+	spec = """DisplacedAct	<A> должно произойти перед <B>, но не здесь	<A> must happen before <B> but not here"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
