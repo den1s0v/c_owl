@@ -264,7 +264,10 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 	Returns list of dicts, each dict represents act object; usually list is 1 in length, but gets two elements if given trace is empty - put begin of trace and requested act.
 	(Returns string with error description if an exception occured)
 	'''
-	existing_trace_list = existing_trace_json
+	# Отфильтровать неправильные акты (если есть)
+	# existing_trace_json
+	
+	existing_trace_list = [act for act in existing_trace_json if act["is_valid"] == True]
 	try:
 		elem = algorithm_json["id2obj"].get(str(algorithm_element_id), None)
 		
@@ -283,7 +286,7 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 				'name': algorithm_json["entry_point"]['name'],
 				'phase': 'started',
 				'as_string': act_text,
-				'as_tags': html_tags,
+				# 'as_tags': html_tags,
 				'as_html': styling.to_html(html_tags),
 				'id': max_id,
 				'n': 1,
@@ -316,12 +319,12 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 				'name': elem['name'],
 				'phase': act_type,
 				'as_string': act_text,
-				'as_tags': html_tags,
+				# 'as_tags': html_tags,
 				'as_html': styling.to_html(html_tags),
 				'id': max_id,
 				'n': exec_time,
 				'is_valid': None,  # пока нет информации о корректности такого акта
-				# 'is_valid': True,  # !!
+				# 'is_valid': True,  # debug !!
 		}
 		if expr_value is not None:
 			act_json['value'] = expr_value

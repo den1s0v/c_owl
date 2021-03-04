@@ -337,8 +337,14 @@
 	    // console.log("<pre>" + response + "</pre>");
 	    console.log("response.length: " + response.length);
 	    response = JSON.parse(response)
-	    if (response.algorithm_as_html) {
-	    	$("#algorithmArea").html(response.algorithm_as_html)
+	    if (response.algorithm_as_html && response.trace_json) {
+	    	let html = response.algorithm_as_html;
+	    	
+	    	for (const act_json of response.trace_json) {
+	    		html += '<br>' + act_json.as_html;
+	    	}
+	    	
+	    	$("#algorithmArea").html(html)
 	    	// decorate_algorithm_elements(response.algorithm_button_tips)
 	    } else {
 	    	$("#algorithmArea").html(JSON.stringify(response.syntax_errors || response, null, 2))
@@ -359,7 +365,7 @@
 		elem = elem || this;
 		console.log("clicked: ", {
 			algorithm_element_id: elem.getAttribute('algorithm_element_id'),
-			state: elem.getAttribute('state'),
+			act_type: elem.getAttribute('act_type'),
 		});
 	}
 	

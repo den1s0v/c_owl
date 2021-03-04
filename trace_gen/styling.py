@@ -257,7 +257,7 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
         act_name = alg_node["act_name"]
         # вычислить целевое состояние по последнему акту трассы
         # ... TODO
-        state_name = states[0]  # 'performed'
+        state_name = states[0]  # started / performed
         # ...
         
         states_attr = {state: _get_act_button_tip(act_name, state) for state in states}
@@ -271,7 +271,7 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
 		        "attributes": {
 		        	"class": ["hidable tooltip"],
 		        	"algorithm_element_id": [str(id_)], 
-		        	"state": [state_name], 
+		        	"act_type": [state_name], 
 		        	# **states_attr,
 		        	"onclick": ["on_algorithm_element_clicked(this)"], # `onmouseup` event works too.
 	        	},

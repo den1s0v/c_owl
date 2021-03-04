@@ -113,10 +113,10 @@ def create_app():
 			return dict(
 				syntax_errors=(), 
 				algorithm_json=res.algorithm,
-				algorithm_as_tags=algorithm_tags,
+				# algorithm_as_tags=algorithm_tags,
 				algorithm_as_html=algorithm_html,
-				algorithm_button_tips=algorithm_tips,
-				algorithm_update_lines={},
+				# algorithm_button_tips=algorithm_tips,
+				# algorithm_update_lines={},
 				trace_json=trace_json
 			)
 			
@@ -138,13 +138,15 @@ def create_app():
 			)
 		if isinstance(res, list):
 			
+			algorithm_json = request.json["algorithm_json"]
+			
 			# verify the obtained trace with reasoner
 			full_trace = request.json["existing_trace_json"] + res  # !!
 			alg_tr = {
 			    "trace_name"    : "http_trace",
 			    "algorithm_name": "http",
 			    "trace"         : full_trace,
-			    "algorithm"     : request.json["algorithm_json"],
+			    "algorithm"     : algorithm_json,
 			    "header_boolean_chain" : '',   # leave empty
 			}
 			# update acts data (inplace): write mistake explanations
@@ -156,8 +158,12 @@ def create_app():
 					trace_lines_json=[],
 				)
 			
+			# TODO
+			# algorithm_json = new(algorithm_json, full_trace)
+			
 			return dict(
-				trace_lines_json=res,
+				trace_lines_json=full_trace,  # res,
+				algorithm_json=algorithm_json,
 				processing_errors=(), 
 			)
 			
