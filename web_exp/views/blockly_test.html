@@ -56,8 +56,8 @@
 <body onload="body_onload()">
   <table>
     <colgroup>
-       <col span="1" style="width: 70%;">
-       <col span="1" style="width: 30%;">
+       <col span="1" style="width: 50%;">
+       <col span="1" style="width: 50%;">
     </colgroup>
     <tr>
       <td>
@@ -304,6 +304,11 @@
 	    		if (act_json.is_final) {
 	    			alert("Трасса выполнения программы построена верно!\nПоследний акт трассы:\n" + act_json.as_string)
 	    		}
+ 				///
+	  			html += ' [' + act_json.is_valid
+	  			if (act_json.explanations)
+		  			html += ': ' + act_json.explanations.join('. ')
+	  			html += ']'
 	    	}
 	    	
 	    	$("#algorithmArea").html(html)
