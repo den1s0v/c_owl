@@ -400,6 +400,19 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 				if act_obj["is_valid"] is None:
 					act_obj["is_valid"] = True
 			
+			# Признак окончания трассы
+			# set act_obj["is_final"] = True for end of the topmost statement
+			top_stmts = set()
+			for alg_obj in find_by_keyval_in("type", "algorithm", alg_trs_list):
+				top_stmts.add(alg_obj["entry_point"]["body"][-1]["id"])
+			assert top_stmts, top_stmts
+					
+			for act_obj in trace:
+				if (act_obj["is_valid"] == True
+						and act_obj["phase"] in ('finished', "performed")
+						and act_obj["executes"] in top_stmts):
+					act_obj["is_final"] = True
+			
 		return mistakes, None
 	except Exception as e:
 		msg = "Exception occured in process_algorithms_and_traces(): %s: %s"%(str(type(e)), str(e))
