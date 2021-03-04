@@ -376,7 +376,7 @@ def add_styling_to_trace(algorithm_json, trace_json, user_language=None) -> list
 		return f"Server error in add_styling_to_trace() - {type(e).__name__}:\n\t{str(e)}"
 
 
-def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=False, process_kwargs=dict(reasoning="jena", debug_rdf_fpath='test_data/ajax.rdf')) -> ('mistakes', 'error_message: str or None'):
+def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=False, process_kwargs=dict(reasoning="jena", debug_rdf_fpath=None and 'test_data/ajax.rdf')) -> ('mistakes', 'error_message: str or None'):
 		
 	try:
 		_onto, mistakes = process_algtraces(alg_trs_list, verbose=0, mistakes_as_objects=False, **process_kwargs)
