@@ -107,7 +107,7 @@ def create_app():
 			# pprint(res.algorithm)
 
 			algorithm_tags = styling.algorithm_to_tags(res.algorithm, user_language, request.json.get('syntax', 'C'))
-			algorithm_tips = styling.get_button_tips()
+			# algorithm_tips = styling.get_button_tips()
 			algorithm_html = styling.to_html(algorithm_tags)
 			
 			return dict(
@@ -128,13 +128,16 @@ def create_app():
 	def verify_trace_act():
 		### print(request.json)
 		assert 'algorithm_json' in request.json, 'Bad json: No "algorithm_json" key in JSON payload!'
-		# get the requested trace extension
+		user_language = request.json.get('user_language', 'en')
+		set_target_lang(user_language)
+		
+		# extend the trace
 		res = make_act_json(**request.json)
 		# if error
 		if isinstance(res, str):
 			return dict(
 				processing_errors=(res,), 
-				trace_lines_json=[],
+				trace_json=[],
 			)
 		if isinstance(res, list):
 			
@@ -155,15 +158,19 @@ def create_app():
 			if err_msg:  # error
 				return dict(
 					processing_errors=(err_msg,), 
-					trace_lines_json=[],
+					trace_json=[],
+					algorithm_as_html=(),
 				)
 			
 			# TODO
 			# algorithm_json = new(algorithm_json, full_trace)
+			algorithm_tags = styling.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', 'C'), existing_trace=request.json.get('existing_trace_json', ()))
+			# algorithm_tips = styling.get_button_tips()
+			algorithm_html = styling.to_html(algorithm_tags)
 			
 			return dict(
-				trace_lines_json=full_trace,  ## res,
-				algorithm_json=algorithm_json,
+				trace_json=full_trace,  ## res,
+				algorithm_as_html=algorithm_html,
 				processing_errors=(), 
 			)
 			

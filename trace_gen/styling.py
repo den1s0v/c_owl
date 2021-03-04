@@ -169,6 +169,7 @@ def to_html(element: str or dict or list, sep='') -> str:
 INDENT_STEP = 2  # spaces
 SIMPLE_NODE_STATES = ('performed', )
 COMPLEX_NODE_STATES = ('started', 'finished')
+EXISTING_TRACE = []
 
 BUTTON_TIP_FREFIX = {
     "ru": {
@@ -256,12 +257,10 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
     if states:
         act_name = alg_node["act_name"]
         # вычислить целевое состояние по последнему акту трассы
-        # ... TODO
-        state_name = states[0]  # started / performed
-        # ...
+        # states[0]  # started / performed
+        state_name = find_state_for_alg_id(id_, states)
         
-        states_attr = {state: _get_act_button_tip(act_name, state) for state in states}
-        BUTTON_TIPS[id_] = states_attr
+        state_tip = _get_act_button_tip(act_name, state_name)
         # states_attr = escape_quotes(str(states_attr))
         # more_attrs.update({"act_types": [states_attr]})
         inner = [
@@ -278,7 +277,7 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
 		        "content": [{
 				        "tag": "i",
 				        "attributes": {
-				        	"class": ["play", "icon"],
+				        	"class": ["play" if state_name != "finished" else "stop", "icon"],
 			        	},
 				        "content": ''
 		        	},
@@ -287,7 +286,7 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
 				        "attributes": {
 				        	"class": ["tooltiptext"],
 			        	},
-				        "content": states_attr[state_name]
+				        "content": state_tip
 		        	}
 	        	]
         	},
@@ -301,6 +300,23 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
     }
 
 
+def find_state_for_alg_id(algorithm_element_id, states):
+	'''Для составных актов сосотяние кнопки зависит от последнего акта в трассе'''
+	assert states
+	if len(states) > 1:
+		# iterate the trace up from the bottom
+		for act in reversed(EXISTING_TRACE):
+			if act["executes"] == algorithm_element_id:
+				# "phase":    "string",  // "started"/"finished"/"performed"
+				last_phase = act["phase"]
+				return {
+					"started": "finished",
+					"finished": "started",
+					"performed": "performed", # this should never match
+				}[last_phase]
+	return states[0]  # started / performed
+
+
 def _make_line_tag(indent, inner=''):
     return {
         "tag": "div",
@@ -308,18 +324,17 @@ def _make_line_tag(indent, inner=''):
         "content": inner
     }
 
-BUTTON_TIPS = {}  # подсказки к кнопкам (в теги не получилось вставить - вернём отдельно)
 
-def get_button_tips():
-    return BUTTON_TIPS
-
-def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, syntax:str=None, indent=0) -> list:
+def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, syntax:str=None, existing_trace=None, indent=0) -> list:
     """ Create new tree of html-tags with additional info about nodes """
     if user_language:
         set_target_lang(user_language)  # usually set once on the topmost recursive call
-        BUTTON_TIPS.clear()
     if syntax:
         set_syntax(syntax)  # usually set once on the topmost recursive call
+    if existing_trace is not None:
+    	# existing_trace tells which states to select for statements buttons
+    	EXISTING_TRACE.clear()
+    	EXISTING_TRACE.extend(existing_trace)
         
     if isinstance(algorithm_json, (list, tuple)):
         return [algorithm_to_tags(el, indent=indent) for el in algorithm_json]

@@ -71,10 +71,10 @@
         Modified standard blocks are used here. Вы можете переключиться на <a href="{{ url_for('blockly_test', lang='ru') }}">Русскую версию</a>.
   {% endif %}
   
-  		<br/>
-        <button onclick="export_xml_to_console()">Export XML to console</button>
+<!--   		<br/>
+        <button onclick="export_xml_to_console()">Export XML to console</button> -->
         <i class="play icon"></i>
-        <button onclick="send_xml_to_endpoint()">Send XML to endpoint</button>
+        <button onclick="send_xml_to_endpoint()">Show Preview</button>
       </td>
       <td></td>
     </tr>
@@ -189,60 +189,12 @@
   <div id="blocklyDiv" style="position: absolute"></div>
 
 
-  <!-- Палитра Blockly -->
-  <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
-  <category name="Control">
-    <block type="condition_with_values_block"></block>
-    <!-- <block type="controls_if"></block> -->
-    <block type="controls_named_if">
-    	<value name="NAME">
-          <shadow type="text_name_of_alternative"></shadow>
-        </value>
-    </block>
-  </category>
-  <category name="Loops">
-    <!-- <block type="controls_whileUntil"></block> -->
-    <block type="condition_with_values_block">
-    	<field name="VALUES">1,1,(0)</field>
-    </block>
-    <block type="controls_named_whileUntil">
-    	<value name="NAME">
-          <shadow type="text_name_of_loop"></shadow>
-        </value>
-    </block>
-    <block type="controls_named_doWhileUntil">
-    	<value name="NAME">
-          <shadow type="text_name_of_loop"></shadow>
-        </value>
-    </block>
-<!--     <block type="controls_repeat_ext">
-    	<value name="TIMES">
-          <shadow type="math_number">
-            <field name="NUM">10</field>
-          </shadow>
-        </value>
-    </block>
-    <block type="math_number">
-      <field name="NUM">0</field>
-    </block>
-    <block type="text"></block> -->
-  </category>
-  <category name="Actions">
-    <block type="action"></block>
-    <block type="text_print">
-		<value name="TEXT">
-	      <shadow type="text">
-	        <field name="TEXT">Wow</field>
-	      </shadow>
-	    </value>
-    </block>
-  </category>
-  </xml>
-
   <script>
     var blocklyArea = document.getElementById('blocklyArea');
     var blocklyDiv = document.getElementById('blocklyDiv');
     var workspace = null;
+    var algorithm_json = null;
+    var trace_json = null;
     
     
     function body_onload() {
@@ -313,7 +265,7 @@
                 processing_callback(result_id, "wait")
             },
             success: function(data){
-                processing_callback(result_id, JSON.stringify(data, null, 2))
+                processing_callback(result_id, data)
             },
             error: function(data){
                 processing_callback(result_id, "fail")
@@ -335,19 +287,31 @@
 	    
 	    // OK response
 	    // console.log("<pre>" + response + "</pre>");
-	    console.log("response.length: " + response.length);
-	    response = JSON.parse(response)
+	    console.log("response received. "); // + response.length);
+	    // response = JSON.parse(response)
+	    
+	    if (response.algorithm_json) {
+		    algorithm_json = response.algorithm_json;
+	    }
+	    if (response.trace_json && response.processing_errors !== undefined) {
+		    trace_json = response.trace_json;
+	    } else { trace_json = null; }
 	    if (response.algorithm_as_html && response.trace_json) {
 	    	let html = response.algorithm_as_html;
 	    	
 	    	for (const act_json of response.trace_json) {
 	    		html += '<br>' + act_json.as_html;
+	    		if (act_json.is_final) {
+	    			alert("Трасса выполнения программы построена верно!\nПоследний акт трассы:\n" + act_json.as_string)
+	    		}
 	    	}
 	    	
 	    	$("#algorithmArea").html(html)
 	    	// decorate_algorithm_elements(response.algorithm_button_tips)
 	    } else {
-	    	$("#algorithmArea").html(JSON.stringify(response.syntax_errors || response, null, 2))
+	    	algorithm_json = null;
+	    	trace_json = null;
+	    	$("#algorithmArea").html(JSON.stringify(response.syntax_errors || response.processing_errors || response, null, 2))
 	    }
 	}
 
@@ -363,13 +327,46 @@
 	
 	function on_algorithm_element_clicked(elem) {
 		elem = elem || this;
-		console.log("clicked: ", {
-			algorithm_element_id: elem.getAttribute('algorithm_element_id'),
-			act_type: elem.getAttribute('act_type'),
-		});
+		act_type = elem.getAttribute('act_type');
+		algorithm_element_id = elem.getAttribute('algorithm_element_id');
+		console.log("clicked: ", {algorithm_element_id, act_type});
+		send_clicked_act_to_endpoint(algorithm_element_id, act_type);
 	}
-	
+    function send_clicked_act_to_endpoint(algorithm_element_id, act_type) {
+    	if (!algorithm_json) {  //// || !trace_json
+    		console.warn("Empty algorithm_json or trace_json!");
+    		return;
+    	}
+    	
+    	///
+    	console.log(trace_json)
+    		
+    	var data = {
+    		user_language: which_language(), 
+    		algorithm_json: algorithm_json,
+    		algorithm_element_id: algorithm_element_id,
+    		act_type: act_type,
+    		existing_trace_json: trace_json || [],
+    	};
+    	
+    	result_id = 0;
+        $.ajax({
+            url: "/verify_trace_act", 
+            method: 'post',
+            dataType: 'json',
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function(data){
+                processing_callback(result_id, data)
+            },
+            error: function(data){
+                processing_callback(result_id, "fail")
+            }
+        });
+    }	
 
+
+    // Local Storage
 	function save_xml(xml)
 	{
 		localStorage.blockly_xml_sent = xml
