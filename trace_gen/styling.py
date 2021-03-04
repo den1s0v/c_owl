@@ -252,7 +252,7 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
     more_attrs = {}
     if alg_node:
         id_ = alg_node["id"]
-        more_attrs.update({"algorithm_element_id": [id_], })
+        # more_attrs.update({"algorithm_element_id": [id_], })
     
     if states:
         act_name = alg_node["act_name"]
