@@ -261,18 +261,15 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
         state_name = find_state_for_alg_id(id_, states)
         
         state_tip = _get_act_button_tip(act_name, state_name)
-        # states_attr = escape_quotes(str(states_attr))
-        # more_attrs.update({"act_types": [states_attr]})
         inner = [
         	# <i class="play icon"></i>
 	        {
 		        "tag": "span",
 		        "attributes": {
-		        	"class": ["hidable tooltip"],
+		        	"class": ["hidable button tooltip"],
 		        	"algorithm_element_id": [str(id_)], 
 		        	"act_type": [state_name], 
-		        	# **states_attr,
-		        	"onclick": ["on_algorithm_element_clicked(this)"], # `onmouseup` event works too.
+		        	# "onclick": ["on_algorithm_element_clicked(this)"], # `onmouseup` event works too.
 	        	},
 		        "content": [{
 				        "tag": "i",
@@ -353,10 +350,10 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
         # act_name = algorithm_json["act_name"]
             
         if type_ in ("expr", ):
-            return _make_alg_tag(algorithm_json, "variable button", name, states=SIMPLE_NODE_STATES)
+            return _make_alg_tag(algorithm_json, "variable", name, states=SIMPLE_NODE_STATES)
         
         if type_ in ("stmt", ):
-            return _make_line_tag(indent, SYNTAX["STATEMENT"](_make_alg_tag(algorithm_json, "variable button", name, states=SIMPLE_NODE_STATES)))
+            return _make_line_tag(indent, SYNTAX["STATEMENT"](_make_alg_tag(algorithm_json, "variable", name, states=SIMPLE_NODE_STATES)))
         
         elif type_ == "sequence":  # and not name.endswith("_loop_body"):
             # # recurse with list
@@ -372,7 +369,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                 return [
                     # заголовок цикла
                     _make_line_tag(indent, [
-                        _make_alg_tag(algorithm_json, 'keyword button', 
+                        _make_alg_tag(algorithm_json, 'keyword', 
                             inner=SYNTAX["WHILE_KEYWORD"](loop_type),
                             states=COMPLEX_NODE_STATES),
                         "&nbsp;",
@@ -383,7 +380,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                     ]),
                     # кнопка для тела цикла
                     _make_line_tag(indent, 
-                        _make_alg_tag(algorithm_json["body"], 'button', 
+                        _make_alg_tag(algorithm_json["body"], '', 
                             inner=[
 		                        *SYNTAX["BLOCK_OPEN"](),
 		                        "&nbsp;" * (INDENT_STEP),
@@ -402,7 +399,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                 if SYNTAX["DO_KEYWORD"]:
                     # syntax like C++/Java with do-while loop 
                     header_line["content"] += [
-                        _make_alg_tag(algorithm_json, 'keyword button', 
+                        _make_alg_tag(algorithm_json, 'keyword', 
                             inner=SYNTAX["DO_KEYWORD"](loop_type),
                             states=COMPLEX_NODE_STATES),
                         # "&nbsp;",
@@ -417,7 +414,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                     
                 # кнопка для тела цикла
                 body_start_line = _make_line_tag(indent, 
-                    _make_alg_tag(algorithm_json["body"], 'button', 
+                    _make_alg_tag(algorithm_json["body"], '', 
                         inner=[
 	                        *SYNTAX["BLOCK_OPEN"](),
 	                        "&nbsp;" * (INDENT_STEP),
@@ -436,7 +433,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                 
                 if SYNTAX["DO_KEYWORD"]:
                     footer_line = _make_line_tag(indent, [
-                        _make_alg_tag(None, 'keyword button', 
+                        _make_alg_tag(None, 'keyword', 
                                     inner=SYNTAX["WHILE_KEYWORD"](loop_type)),
                         "&nbsp;",
                         *SYNTAX["STATEMENT"](SYNTAX["CONDITION"](algorithm_to_tags(algorithm_json["cond"]))),
@@ -463,7 +460,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                 if branch["type"] == "if":
                     # добавить кнопку для всей развилки
                     line["content"].append(
-                        _make_alg_tag(algorithm_json, 'keyword button',
+                        _make_alg_tag(algorithm_json, 'keyword',
                             inner=tr(branch["type"]) if SYNTAX["name"] == 'Pseudocode' else branch["type"],
                             states=COMPLEX_NODE_STATES))
                 else:
@@ -489,7 +486,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
                 
                 # кнопка для тела ветки
                 result.append(_make_line_tag(indent, 
-                    _make_alg_tag(branch, 'button', 
+                    _make_alg_tag(branch, '', 
                         inner=[
 	                        *SYNTAX["BLOCK_OPEN"](),
 	                        "&nbsp;" * (INDENT_STEP),

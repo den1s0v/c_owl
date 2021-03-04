@@ -266,8 +266,11 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 	'''
 	# Отфильтровать неправильные акты (если есть)
 	# existing_trace_json
-	
+	existing_trace_json = existing_trace_json or ()
 	existing_trace_list = [act for act in existing_trace_json if act["is_valid"] == True]
+	
+	### print(algorithm_element_id, act_type, *existing_trace_list, sep='\n')
+	
 	try:
 		elem = algorithm_json["id2obj"].get(str(algorithm_element_id), None)
 		
@@ -294,6 +297,8 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 				})
 		
 		exec_time = 1 + len([a for a in existing_trace_list if a['executes'] == algorithm_element_id and a['phase'] == act_type])
+		
+		### print("exec_time:", exec_time)
 		
 		expr_value = None
 		if elem['type'] == "expr" and act_type in ('finished', 'performed'):
