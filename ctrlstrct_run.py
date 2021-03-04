@@ -23,7 +23,7 @@ from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, mea
 
 def prepare_name(s):
     """Transliterate given word is needed"""
-    return slugify(s) or s
+    return slugify(s, "ru") or s
     
             
 # наладим связи между элементами алгоритма
