@@ -1333,7 +1333,11 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
             return eval_stats
         
         clear_ontology(onto, keep_tbox=True)
-        onto = get_ontology("file://" + name_out).load()
+        
+        # namespace cached so not overwritten workaround:
+        new_world = World()
+        onto = new_world.get_ontology("file://" + name_out).load()
+        print("New base_iri:", onto.base_iri)
         
         if False:  # debugging patch to the ontology
             print("removing cycles from classes:")        
