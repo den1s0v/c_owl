@@ -266,7 +266,7 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
 	        {
 		        "tag": "span",
 		        "attributes": {
-		        	"class": ["hidable button tooltip"],
+		        	"class": ["hidable alg_button tooltip"],
 		        	"algorithm_element_id": [str(id_)], 
 		        	"act_type": [state_name], 
 		        	# "onclick": ["on_algorithm_element_clicked(this)"], # `onmouseup` event works too.
