@@ -86,7 +86,7 @@ def get_ith_expr_value(expr_values: tuple, i: int):
     assert expr_values[-1] == ")", str(expr_values)
     e_i = expr_values.index(")")
     repeat_len = e_i - b_i
-    if repeat_len <= 0:  # in case of stupid empty repeat: (True, "(", ")") 
+    if repeat_len <= 0:  # in the case of stupid empty repeat: (True, "(", ")") 
         return None
     
     return expr_values[b_i + repeat_i % repeat_len]

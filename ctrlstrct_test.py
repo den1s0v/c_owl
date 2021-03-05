@@ -11,7 +11,7 @@ import os
 import re
 
 from ctrlstrct_run import process_algtraces
-from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, find_by_key_in, find_by_keyval_in
+from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from trace_gen.json2alg2tr import act_line_for_alg_element
 from upd_onto import get_relation_object
 import trace_gen.styling as styling
@@ -306,9 +306,10 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 			expr_list = algorithm_json['expr_values'].get(name, None)
 			
 			assert expr_list is not None, f"No expression values provided for expression '{name}' in given algorithm."
-			assert len(expr_list) >= exec_time, f"Not enough expression values provided for expression '{name}': {len(expr_list)} provided, {exec_time} requested."
 			
-			expr_value = expr_list[exec_time - 1]
+			expr_value = get_ith_expr_value(expr_list, exec_time - 1)
+			
+			assert expr_value is not None, f"Not enough expression values provided for expression '{name}': '{expr_list}' provided, # {exec_time} requested."
 		
 		act_text = act_line_for_alg_element(
 			elem, 
