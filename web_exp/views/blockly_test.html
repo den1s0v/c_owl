@@ -293,13 +293,15 @@
 	    if (response.algorithm_json) {
 		    algorithm_json = response.algorithm_json;
 	    }
-	    if (response.trace_json && response.processing_errors !== undefined) {
-		    trace_json = response.trace_json;
+	    if (response.full_trace_json) // && response.processing_errors !== undefined)
+	    {
+		    trace_json = response.full_trace_json;
 	    } else { trace_json = null; }
-	    if (response.algorithm_as_html && response.trace_json) {
+	    received_trace_json = response.full_trace_json || response.trace_json
+	    if (response.algorithm_as_html && received_trace_json) {
 	    	let html = response.algorithm_as_html;
 	    	
-	    	for (const act_json of response.trace_json) {
+	    	for (const act_json of received_trace_json) {
 	    		html += '<br>' + act_json.as_html;
 	    		if (act_json.is_final) {
 	    			alert("Трасса выполнения программы построена верно!\nПоследний акт трассы:\n" + act_json.as_string)
@@ -312,6 +314,7 @@
 	    	}
 	    	
 	    	$("#algorithmArea").html(html)
+	    	bindAlgorithmButtons();
 	    	// decorate_algorithm_elements(response.algorithm_button_tips)
 	    } else {
 	    	algorithm_json = null;
@@ -330,8 +333,14 @@
 	// 	// $('.slide-link[data-slide="0"]').addClass('active');
 	// }
 	
-	function on_algorithm_element_clicked(elem) {
-		elem = elem || this;
+	function bindAlgorithmButtons(argument) {
+	    $('.button').click(on_algorithm_element_clicked);
+    }
+    // bindAlgorithmButtons();
+    
+	function on_algorithm_element_clicked(event) {
+		// console.log({event, this: this});
+		elem = (event && event.currentTarget) || this;
 		act_type = elem.getAttribute('act_type');
 		algorithm_element_id = parseInt(elem.getAttribute('algorithm_element_id'));
 		console.log("clicked: ", {algorithm_element_id, act_type});
@@ -343,14 +352,13 @@
     		return;
     	}
     	
-    	///
-    	console.log(trace_json)
+    	/// console.log(trace_json)
     		
     	var data = {
     		user_language: which_language(), 
     		algorithm_json: algorithm_json,
     		algorithm_element_id: algorithm_element_id,
-    		act_type: act_type,
+    		// act_type: act_type,
     		existing_trace_json: trace_json || [],
     	};
     	
