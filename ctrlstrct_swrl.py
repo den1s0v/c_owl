@@ -178,6 +178,14 @@ RULES.append(DomainRule(name="Propagate_after_act",
 	 -> after_act(?s, ?b)
 """))
 
+# Provide parent_of connection for indirect prop path `branches_item o cond`
+RULES.append(DomainRule(name="branches_item-o-cond-to-parent_of", 
+	tags={'correct', 'helper'},
+	swrl="""
+	branches_item(?a, ?b), cond(?b, ?c)
+	 -> parent_of(?a, ?c)
+	"""))
+
 
 
 				######################
@@ -864,11 +872,32 @@ RULES.append(DomainRule(name="GenericWrongParent_Error",
 		id(?p, ?ip),
 		id(?c, ?ic),
 		notEqual(?ip, ?ic),
-	 -> context_should_be(?a, ?p), 
+	 -> precursor(?a, ?c),
+	 context_should_be(?a, ?p), 
 	 WrongContext(?a)
 """))
+
+# Несоответствие контекстов по структуре алгоритма
+RULES.append(DomainRule(name="GenericWrongStmtParent_Error", 
+	tags={'mistake'},
+	swrl="""
+	executes(?a, ?sa),
+	parent_of(?pa, ?sa),  # context by algotithm
+	
+	student_parent_of(?p, ?a),
+	executes(?p, ?sp),  # context by given trace
+	
+	# DifferentFrom(?pa, ?sp),
+		id(?pa, ?ipa),
+		id(?sp, ?isp),
+		notEqual(?ipa, ?isp),
+	 -> precursor(?a, ?p),
+	 context_should_be(?a, ?pa),  # set context to stmt not act!
+	 WrongContext(?a)
+"""))
+
 # when act of right context (?p) is present
-RULES.append(DomainRule(name="MisplacedBefore_Error", 
+RULES.append(DomainRule(name="-MisplacedBefore_Error", 
 	tags={'mistake'},
 	swrl="""
 	WrongContext(?a),
@@ -883,7 +912,7 @@ RULES.append(DomainRule(name="MisplacedBefore_Error",
 	 MisplacedBefore(?e)
 """))
 # when act of right context (?p) is present
-RULES.append(DomainRule(name="MisplacedAfter_Error", 
+RULES.append(DomainRule(name="-MisplacedAfter_Error", 
 	tags={'mistake'},
 	swrl="""
 	WrongContext(?a),
@@ -899,7 +928,7 @@ RULES.append(DomainRule(name="MisplacedAfter_Error",
 	 MisplacedAfter(?e)
 """))
 # when act of right context (?p) is present
-RULES.append(DomainRule(name="MisplacedDeeper_Error", 
+RULES.append(DomainRule(name="-MisplacedDeeper_Error", 
 	tags={'mistake'},
 	swrl="""
 	WrongContext(?a),
@@ -978,7 +1007,7 @@ RULES.append(DomainRule(name="ActStartsAfterItsEnd_Error",
 RULES.append(DomainRule(name="DuplicateOfAct-seq-b_Error", 
 	tags={'mistake', 'sequence'},
 	swrl="""
-	ExtraAct(?c1), 
+	# ExtraAct(?c1), 
 	act_begin(?c1),
 	student_parent_of(?p, ?c1),
 	executes(?p, ?block),
@@ -989,9 +1018,9 @@ RULES.append(DomainRule(name="DuplicateOfAct-seq-b_Error",
 	executes(?c, ?st),
 	student_parent_of(?p, ?c),
 	act_begin(?c),
-		id(?c1, ?ic1),
-		id(?c, ?ic),
-		notEqual(?ic1, ?ic),
+		student_index(?c1, ?ic1),
+		student_index(?c, ?ic),
+		lessThan(?ic, ?ic1),
 	 -> cause(?c1, ?c), 
 	 DuplicateOfAct(?c1)
 """))
@@ -1126,6 +1155,82 @@ RULES.append(DomainRule(name="WrongBranch-alt_Error",
 	 -> should_be(?b, ?a), 
 	 precursor(?b, ?a),
 	 WrongBranch(?b)
+"""))
+
+# Условная ветка не после своего условия [works]
+RULES.append(DomainRule(name="BranchWithoutCondition-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
+	act_begin(?a),  # ?a is the wrong act in the rule
+	executes(?a, ?br),
+	branches_item(?alt, ?br),
+	alternative(?alt), 
+
+	student_next(?b, ?a),  # b < a
+	executes(?b, ?st),
+	
+	cond(?br, ?cnd),  # branch has cond
+	
+	# previous act is not cond
+		id(?st, ?i),
+		id(?cnd, ?i2),
+		notEqual(?i, ?i2),
+	 -> should_be_after(?a, ?cnd), 
+	 precursor(?a, ?b),
+	 context_should_be(?a, ?alt),
+	 BranchWithoutCondition(?a)
+"""))
+
+# Ветка ИНАЧЕ не после последнего условия [works]
+RULES.append(DomainRule(name="ElseBranchWithoutCondition-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
+	act_begin(?a),  # ?a is the wrong act in the rule
+	executes(?a, ?br),
+	else(?br),
+	branches_item(?alt, ?br),
+	alternative(?alt), 
+
+	student_next(?b, ?a),  # b < a
+	executes(?b, ?st),
+	
+	next(?br1, ?br2),  # ?br1 is previous conditional branch
+	cond(?br1, ?cnd),
+	
+	# previous act is not cond
+		id(?st, ?i),
+		id(?cnd, ?i2),
+		notEqual(?i, ?i2),
+	 -> should_be_after(?a, ?cnd), 
+	 precursor(?a, ?b),
+	 context_should_be(?a, ?alt),
+	 ElseBranchWithoutCondition(?a)
+"""))
+
+# Условие не после предыдущего условия [works]
+RULES.append(DomainRule(name="CondtionWithoutPrevCondition-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
+	act_begin(?a),  # ?a is the wrong act in the rule
+	branches_item(?alt, ?br2),
+	alternative(?alt), 
+	cond(?br2, ?cnd2),  # branch has cond
+	executes(?a, ?cnd2),
+
+	student_next(?b, ?a),  # b < a
+	executes(?b, ?st),
+	
+	next(?br1, ?br2),
+	cond(?br1, ?cnd1),
+	
+	# previous act is not cond
+		id(?st, ?i),
+		id(?cnd1, ?i2),
+		notEqual(?i, ?i2),
+	 -> should_be_after(?a, ?cnd1), 
+	 precursor(?a, ?b),
+	 context_should_be(?a, ?alt),
+	 CondtionWithoutPrevCondition(?a)
 """))
 
 # Условие после ветки  [works with Pellet]

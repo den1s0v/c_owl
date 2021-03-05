@@ -963,7 +963,7 @@ def init_persistent_structure(onto):
             types.new_class(class_name, (onto.alt_branch,))
 
         # make algorithm elements properties
-        for prop_name in ("body", "branches_item", "cond", "init", "update", ):
+        for prop_name in ("body", "cond", "init", "update", ):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
            
@@ -1031,6 +1031,8 @@ def init_persistent_structure(onto):
         class parent_of(Thing >> Thing, InverseFunctionalProperty): pass
         class student_parent_of(Thing >> Thing, InverseFunctionalProperty): pass
 
+        class branches_item(parent_of): pass
+
         # # новое свойство contains_act < contains_child
         # class contains_child(Thing >> Thing, ): pass
         # class contains_act(act_begin >> act, contains_child): pass
@@ -1069,6 +1071,9 @@ def init_persistent_structure(onto):
                 ("WrongBranch", ["ExtraAct"]),
                 ("BranchOfFalseCondition", ["WrongBranch"]),
                 ("AnotherExtraBranch", ["WrongBranch"]),
+                ("BranchWithoutCondition", ["WrongBranch"]),
+                ("ElseBranchWithoutCondition", ["BranchWithoutCondition"]),
+                ("CondtionWithoutPrevCondition", ["ExtraAct"]),
                 "NoBranchWhenConditionIsTrue",
                 # ("NoBranchWhenConditionIsTrue", ["MissingAct"]),
                 "AllFalseNoElse",

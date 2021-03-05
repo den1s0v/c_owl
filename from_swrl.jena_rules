@@ -89,6 +89,12 @@
 	 -> (?s my:after_act ?b)
 ]
 
+# Rule: branches_item-o-cond-to-parent_of [correct & helper]
+[
+	(?a my:branches_item ?b), (?b my:cond ?c)
+	 -> (?a my:parent_of ?c)
+	]
+
 # Rule: start__to__MainFunctionBegin__rule_g3 [correct & entry & function]
 [
 	(?a rdf:type my:trace),
@@ -640,55 +646,26 @@
 		(?p my:id ?ip),
 		(?c my:id ?ic),
 		notEqual(?ip, ?ic),
-	 -> (?a my:context_should_be ?p), 
+	 -> (?a my:precursor ?c),
+	 (?a my:context_should_be ?p), 
 	 (?a rdf:type my:WrongContext)
 ]
 
-# Rule: MisplacedBefore_Error [mistake]
+# Rule: GenericWrongStmtParent_Error [mistake]
 [
-	(?a rdf:type my:WrongContext),
-	(?a my:corresponding_end ?e),
-	(?p my:parent_of ?a),
-	             
-		(?e my:student_index ?ie),
-		(?p my:student_index ?ip),
-		lessThan(?ie, ?ip),
-	 -> 
-	 (?a rdf:type my:MisplacedBefore),
-	 (?e rdf:type my:MisplacedBefore)
-]
-
-# Rule: MisplacedAfter_Error [mistake]
-[
-	(?a rdf:type my:WrongContext),
-	(?a my:corresponding_end ?e),
-	(?p my:parent_of ?a),
-	(?p my:corresponding_end ?pe),
-	                    
-		(?a my:student_index ?ia),
-		(?pe my:student_index ?ipe),
-		lessThan(?ipe, ?ia),
-	 -> 
-	 (?a rdf:type my:MisplacedAfter),
-	 (?e rdf:type my:MisplacedAfter)
-]
-
-# Rule: MisplacedDeeper_Error [mistake]
-[
-	(?a rdf:type my:WrongContext),
-	(?a my:corresponding_end ?e),
-	(?p my:parent_of ?a),
-	(?p my:corresponding_end ?pe),
-	                  
-		(?a my:student_index ?ia),
-		(?p my:student_index ?ip),
-		lessThan(?ip, ?ia),
-		(?e my:student_index ?ie),
-		(?pe my:student_index ?ipe),
-		lessThan(?ie, ?ipe),
-	 -> 
-	 (?a rdf:type my:MisplacedDeeper),
-	 (?e rdf:type my:MisplacedDeeper)
+	(?a my:executes ?sa),
+	(?pa my:parent_of ?sa),                        
+	
+	(?p my:student_parent_of ?a),
+	(?p my:executes ?sp),                          
+	
+	                          
+		(?pa my:id ?ipa),
+		(?sp my:id ?isp),
+		notEqual(?ipa, ?isp),
+	 -> (?a my:precursor ?p),
+	 (?a my:context_should_be ?pa),                                
+	 (?a rdf:type my:WrongContext)
 ]
 
 # Rule: GenericWrongExecTime-b_Error [mistake]
@@ -739,7 +716,7 @@
 
 # Rule: DuplicateOfAct-seq-b_Error [mistake & sequence]
 [
-	(?c1 rdf:type my:ExtraAct), 
+	                 
 	(?c1 rdf:type my:act_begin),
 	(?p my:student_parent_of ?c1),
 	(?p my:executes ?block),
@@ -750,9 +727,9 @@
 	(?c my:executes ?st),
 	(?p my:student_parent_of ?c),
 	(?c rdf:type my:act_begin),
-		(?c1 my:id ?ic1),
-		(?c my:id ?ic),
-		notEqual(?ic1, ?ic),
+		(?c1 my:student_index ?ic1),
+		(?c my:student_index ?ic),
+		lessThan(?ic, ?ic1),
 	 -> (?c1 my:cause ?c), 
 	 (?c1 rdf:type my:DuplicateOfAct)
 ]
@@ -820,8 +797,7 @@
 
 	(?a my:student_next ?b),
 	(?b rdf:type my:Erroneous), 
-	 ->                      
-	 (?b my:precursor ?a),
+	 -> (?b my:precursor ?a),
 	 (?b rdf:type my:NoFirstCondition)
 ]
 
@@ -871,6 +847,51 @@
 	 -> (?b my:should_be ?a), 
 	 (?b my:precursor ?a),
 	 (?b rdf:type my:WrongBranch)
+]
+
+# Rule: BranchWithoutCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),                                   
+	(?a my:executes ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative), 
+
+	(?b my:student_next ?a),         
+	(?b my:executes ?st),
+	
+	(?br my:cond ?cnd),                   
+	
+	                          
+		(?st my:id ?i),
+		(?cnd my:id ?i2),
+		notEqual(?i, ?i2),
+	 -> (?a my:should_be_after ?cnd), 
+	 (?a my:precursor ?b),
+	 (?a rdf:type my:BranchWithoutCondition)
+]
+
+# Rule: CondtionWithoutPrevCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),                                   
+	(?alt my:branches_item ?br2),
+	(?alt rdf:type my:alternative), 
+	(?br2 my:cond ?cnd2),                   
+	(?a my:executes ?cnd2),
+
+	(?b my:student_next ?a),         
+	(?b my:executes ?st),
+	
+	(?br1 my:next ?br2),
+	(?br1 my:cond ?cnd1),
+	
+	                          
+		(?st my:id ?i),
+		(?cnd1 my:id ?i2),
+		notEqual(?i, ?i2),
+	 -> (?a my:should_be_after ?cnd1), 
+	 (?a my:precursor ?b),
+	 (?a my:context_should_be ?alt),
+	 (?a rdf:type my:CondtionWithoutPrevCondition)
 ]
 
 # Rule: ConditionAfterBranch-alt_Error [alternative & mistake]

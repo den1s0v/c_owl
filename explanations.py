@@ -265,14 +265,17 @@ def register_explanation_handlers():
 	
 	
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
-	spec = """WrongContext	Акт <B> не может выполняться при отсутствии акта <A>, потому что <B> входит в <A>.	Act <B> is a part of <A> so it can't be executed while no act of <A> exists"""
+	spec = """WrongContext	Акт <B> не может выполняться вне акта <A><EX>, потому что <B> входит в <A>.	Act <B> is a part of <A><EX> so it can't be executed outside of <A>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
 		correct_parent_act = get_relation_object(a, onto.context_should_be) or get_relation_subject(onto.parent_of, a)
+		wrong_parent_act = get_relation_object(a, onto.precursor)
+		
 		return {
 			'<A>': format_full_name(correct_parent_act, 0,0,0, case='gent'),
 			'<B>': format_full_name(a, 0,0,0),
+			'<EX>': f" ({tr('ex.')} {format_full_name(wrong_parent_act, 0,1,0)})" if wrong_parent_act else "",
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
@@ -356,13 +359,13 @@ def register_explanation_handlers():
 		missed_act = get_relation_subject(onto.should_be_before, a)
 		print(" **** missed_act", missed_act)
 		return {
-			'<A>': format_full_name(a, 1,1,0),
+			'<A>': format_full_name(a, 0,1,0),
 			'<EX>': f" ({tr('ex.')} {format_full_name(missed_act, 0,1,0)})" if missed_act else "",
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """DuplicateOfAct (sequence only)	Оператор Б входит в следование А, при этом между  началом акта А и концом акта А содержится больше одного акта Б	Act <B> is a part of sequence <A> so each execution of <A> can contain strictly one execution of <B>"""
+	spec = """DuplicateOfAct (sequence only)	Оператор <B> входит в следование <A>, поэтому между началом и концом акта <A> должен содержаться ровно один акт <B>.	Act <B> is a part of sequence <A> so each execution of <A> must contain strictly one execution of <B>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	class_name = list(class_name.split())[0]
 	
@@ -381,7 +384,7 @@ def register_explanation_handlers():
 	######### Alternative mistakes #########
 	########========================########
 	
-	spec = """NoFirstCondition	Развилка <A> должна начинаться с проверки условия <B>.	The first condition <B> must be executed right after alternative <A> starts"""
+	spec = """NoFirstCondition	Развилка <A> должна начинаться с проверки первого условия <B>.	The first condition <B> must be executed right after alternative <A> starts"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -395,28 +398,70 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """WrongBranch -> BranchOfLaterCondition	Во время выполнения альтернативы <акт А> не должна выполниться ветка <В>, потому что условие <Б> не должно проверяться после истинного условия	Alternative <A> must not execute branch <D> because the condition <C> is true"""
+	# spec = """WrongBranch -> BranchOfLaterCondition	Во время выполнения альтернативы <A> не должна выполниться ветка <D>, потому что условие <C> уже истинно.	Alternative <A> must not execute branch <D> because the condition <C> is true"""
+	# class_name, format_str = class_formatstr(spec.split('\t'))
+	# class_name = list(class_name.split())[0]
+	
+	# def _param_provider(a: 'act_instance'):
+	# 	wrong_branch_act = a
+	# 	wrong_branch = get_relation_object(wrong_branch_act, onto.executes)
+	# 	# wrong_cond = get_relation_object(wrong_branch, onto.cond)  # - fails in case of ELSE branch
+	# 	correct_branch_act = get_relation_object(a, onto.should_be)
+	# 	correct_branch = get_relation_object(correct_branch_act, onto.executes)
+	# 	true_cond = get_relation_object(correct_branch, onto.cond)
+	# 	alt_act = get_relation_subject(onto.student_parent_of, a)
+	# 	return {
+	# 		'<A>': format_full_name(alt_act, 0,0,0),
+	# 		# '<B>': format_full_name(wrong_cond, 0,1,1),
+	# 		'<C>': format_full_name(true_cond, 0,0,0),
+	# 		'<D>': format_full_name(a, 0,0,0),
+	# 		}
+	# register_handler(class_name, format_str, _param_provider)
+
+	
+	spec = """BranchWithoutCondition	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute branch <C> until the condition <B> is checked"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
-	class_name = list(class_name.split())[0]
 	
 	def _param_provider(a: 'act_instance'):
-		wrong_branch_act = a
-		wrong_branch = get_relation_object(wrong_branch_act, onto.executes)
-		# wrong_cond = get_relation_object(wrong_branch, onto.cond)  # - fails in case of ELSE branch
-		correct_branch_act = get_relation_object(a, onto.should_be)
-		correct_branch = get_relation_object(correct_branch_act, onto.executes)
-		true_cond = get_relation_object(correct_branch, onto.cond)
-		alt_act = get_relation_subject(onto.student_parent_of, a)
+		cond = get_relation_object(a, onto.should_be_after)
+		# alt_act = get_relation_subject(onto.student_parent_of, a)
 		return {
-			'<A>': format_full_name(alt_act, 0,0,0),
-			# '<B>': format_full_name(wrong_cond, 0,1,1),
-			'<C>': format_full_name(true_cond, 0,0,0),
-			'<D>': format_full_name(a, 0,0,0),
+			# '<A>': format_full_name(alt_act, 0,0,0),
+			'<B>': format_full_name(cond, 0,0,0),
+			'<C>': format_full_name(a, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """BranchOfFalseCondition	Во время выполнения альтернативы <акт A> не должна выполниться ветка <C>, потому что условие <B> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
+	spec = """ElseBranchWithoutCondition	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute branch <C> until the condition <B> is checked"""
+	class_name, format_str = class_formatstr(spec.split('\t'))
+	
+	def _param_provider(a: 'act_instance'):
+		cond = get_relation_object(a, onto.should_be_after)
+		# alt_act = get_relation_subject(onto.student_parent_of, a)
+		return {
+			# '<A>': format_full_name(alt_act, 0,0,0),
+			'<B>': format_full_name(cond, 0,0,0),
+			'<C>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+	
+	spec = """CondtionWithoutPrevCondition	Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие <B> не проверено (и не окажется ложным)	Alternative <A> cannot check condition <C> until the condition <B> is checked (and evaluated to false)"""
+	class_name, format_str = class_formatstr(spec.split('\t'))
+	
+	def _param_provider(a: 'act_instance'):
+		cond = get_relation_object(a, onto.should_be_after)
+		alt = get_relation_object(a, onto.context_should_be)
+		return {
+			'<A>': format_full_name(alt, 0,0,0),
+			'<B>': format_full_name(cond, 0,0,0),
+			'<C>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+	
+	spec = """BranchOfFalseCondition	Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
