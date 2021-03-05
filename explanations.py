@@ -374,7 +374,7 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """BranchOfFalseCondition	Во время выполнения альтернативы <акт А> не должна выполниться ветка <В>, потому что условие <Б> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
+	spec = """BranchOfFalseCondition	Во время выполнения альтернативы <акт A> не должна выполниться ветка <C>, потому что условие <B> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -390,7 +390,7 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AnotherExtraBranch	Во время выполнения альтернативы <акт А> не должна выполниться ветка <В>, потому что ветка <Г> уже выполнилась	Alternative <A> must not execute branch <B> because the branch <D> has already been executed"""
+	spec = """AnotherExtraBranch	Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <Г> уже выполнилась	Alternative <A> must not execute branch <B> because the branch <D> has already been executed"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -404,7 +404,7 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """NoBranchWhenConditionIsTrue	Во время выполнения альтернативы <акт А> должна выполниться ветка <В>, потому что условие <Б> истинно	Alternative <A> must execute branch <C> because the condition <B> is true"""
+	spec = """NoBranchWhenConditionIsTrue	Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно	Alternative <A> must execute branch <C> because the condition <B> is true"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -436,7 +436,7 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AllFalseNoElse	Во время выполнения альтернативы <акт А> должна выполниться ветка <Г>, потому что условие <Б> ложно	Alternative <A> must execute branch <D> because the condition <B> is false"""
+	spec = """AllFalseNoElse	Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно	Alternative <A> must execute branch <D> because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -469,10 +469,10 @@ def register_explanation_handlers(onto):
 		
 		return {
 			'<i-ой>': 'очередной',
+			'<A>': format_full_name(loop, 0,0,0),
+			'<B>': format_full_name(cond, 0,0,0),
 			' <C>': '',
 			'<D>': format_full_name(body, 0,0,0),
-			'<B>': format_full_name(cond, 0,0,0),
-			'<A>': format_full_name(loop, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
@@ -488,10 +488,10 @@ def register_explanation_handlers(onto):
 		body = get_relation_object(loop, onto.body)
 		
 		return {
+			'<A>': format_full_name(loop, 0,0,0),
+			'<B>': format_full_name(cond_act, 0,0,1),
 			'<C> ': '',
 			'<D>': format_full_name(body, 0,0,0),
-			'<B>': format_full_name(cond_act, 0,0,1),
-			'<A>': format_full_name(loop, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	

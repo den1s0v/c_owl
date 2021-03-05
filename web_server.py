@@ -173,7 +173,8 @@ def create_app():
 			algorithm_html = styling.to_html(algorithm_tags)
 			
 			return dict(
-				trace_json=full_trace,  ## res,
+				full_trace_json=full_trace,  ## res,
+				algorithm_json=algorithm_json,  # pass back
 				algorithm_as_html=algorithm_html,
 				processing_errors=(), 
 			)
