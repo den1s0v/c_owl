@@ -1308,6 +1308,40 @@ RULES.append(DomainRule(name="IterationAfterFailedCondition-loop_Error",
 	 -> IterationAfterFailedCondition(?b)
 """))
 
+# Нет проверки условия после итерации цикла (while, do-while, do-until, foreach) [works?]
+RULES.append(DomainRule(name="MissingConditionAfterIteration-loop_Error", 
+	tags={'mistake', 'loop'},
+	swrl="""
+	normal_flow_correct_act(?a),
+	act_end(?a),
+	body_then_cond(?loop), 
+	body(?loop, ?st),
+	executes(?a, ?st),
+	
+	student_next(?a, ?b),
+	Erroneous(?b), 
+	 -> precursor(?b, ?a),
+	 MissingConditionAfterIteration(?b)
+"""))
+
+# Начало итерации цикла сразу после итерации, минуя условие (while, do-while, do-until, foreach) [works?]
+RULES.append(DomainRule(name="MissingConditionBetweenIterations-loop_Error", 
+	tags={'mistake', 'loop'},
+	swrl="""
+	normal_flow_correct_act(?a),
+	act_end(?a),
+	body_then_cond(?loop), 
+	body(?loop, ?st),
+	executes(?a, ?st),
+	
+	student_next(?a, ?b),
+	act_begin(?b),
+	executes(?b, ?st),
+	
+	Erroneous(?b), 
+	 -> precursor(?b, ?a),
+	 MissingConditionBetweenIterations(?b)
+"""))
 
 
 _more_rules = {}

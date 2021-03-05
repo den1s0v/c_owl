@@ -180,7 +180,7 @@ def to_jena(rules, out_path='from_swrl.jena_rules'):
         for rule in rules:
             # swrl = rule._original_swrl
             swrl = rule.swrl
-            jena = swrl2jena(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
+            jena = swrl2jena(swrl, f'{rule.name} [{" & ".join(sorted(rule.tags))}]')
             file.write('\n' * 2)
             file.write(jena)
 
@@ -252,7 +252,7 @@ def to_sparql(rules, out_path='sparql_from_swrl.ru', heading_path='sparql/rdfs4c
         for rule in rules:
             # swrl = rule._original_swrl
             swrl = rule.swrl
-            sparql = swrl2sparql(swrl, f'{rule.name} [{" & ".join(rule.tags)}]')
+            sparql = swrl2sparql(swrl, f'{rule.name} [{" & ".join(sorted(rule.tags))}]')
             file.write(sparql)
             file.write(' ;\n\n')  # ';' is a query separator
 
@@ -340,9 +340,9 @@ def main():
     import ctrlstrct_swrl
     RULES = ctrlstrct_swrl.RULES
     # to_prolog(RULES)
-    # to_jena(RULES)
+    to_jena(RULES)
     # to_sparql(RULES)
-    to_clingo(RULES)
+    # to_clingo(RULES)
 
 
 def convert_swrl_json(file_in=None, target='jena', backend_name=None):
@@ -406,7 +406,7 @@ SWRL_raw = [
     
 
 if __name__ == '__main__':
-    convert_swrl_json()
-    # main()
+    # convert_swrl_json()
+    main()
     # convert_swrl_list_to_jena([e[1] for e in SWRL_raw])
 

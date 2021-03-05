@@ -1040,6 +1040,7 @@ def init_persistent_structure(onto):
             Erroneous = types.new_class("Erroneous", (Thing,))
             
             # make Erroneous subclasses
+            # (class, [bases])
             for class_name in [
                 # Sequence mistakes ...
                 "CorrespondingEndMismatched",
@@ -1077,6 +1078,8 @@ def init_persistent_structure(onto):
                 "MissingIterationAfterSuccessfulCondition",
                 "MissingLoopEndAfterFailedCondition",
                 ("IterationAfterFailedCondition", ["MissingLoopEndAfterFailedCondition"]),
+                "MissingConditionAfterIteration",
+                ("MissingConditionBetweenIterations", ["MissingConditionAfterIteration"]),
             ]:
                 if isinstance(class_name, str):
                     types.new_class(class_name, (Erroneous,))

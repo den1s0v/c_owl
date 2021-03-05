@@ -1,11 +1,11 @@
 
 
-# Rule: Incr_index [helper & correct]
+# Rule: Incr_index [correct & helper]
 [
 	(?a my:next_act ?b), (?a my:index ?ia), sum(?ia, 1, ?ib)
 	 -> (?b my:index ?ib)]
 
-# Rule: DepthIncr_rule_s6 [helper & correct]
+# Rule: DepthIncr_rule_s6 [correct & helper]
 [
 	(?a rdf:type my:act_begin), (?a my:next_act ?b), (?b rdf:type my:act_begin)
 	 -> (?a my:parent_of ?b)
@@ -17,7 +17,7 @@
 	 -> (?a my:student_parent_of ?b)
 	]
 
-# Rule: DepthSame_b-e_rule_s7 [helper & correct]
+# Rule: DepthSame_b-e_rule_s7 [correct & helper]
 [
 	(?a rdf:type my:act_begin), (?a my:next_act ?b), (?b rdf:type my:act_end), 
 	(?p my:parent_of ?a),
@@ -31,11 +31,11 @@
 	 -> (?p my:student_parent_of ?b), (?a my:student_corresponding_end ?b)
 	]
 
-# Rule: DepthSame_e-b_rule_s8 [helper & correct]
+# Rule: DepthSame_e-b_rule_s8 [correct & helper]
 [
 	(?a rdf:type my:act_end), (?a my:next_act ?b), (?b rdf:type my:act_begin), 
-	(?p my:parent_of ?a)                   
-	 -> (?p my:parent_of ?b)                    
+	(?p my:parent_of ?a)
+	 -> (?p my:parent_of ?b)
 	]
 
 # Rule: student_DepthSame_e-b_rule_s8 [helper & mistake]
@@ -45,7 +45,7 @@
 	 -> (?p my:student_parent_of ?b)
 	]
 
-# Rule: DepthDecr_rule_s9 [helper & correct]
+# Rule: DepthDecr_rule_s9 [correct & helper]
 [
 	(?a rdf:type my:act_end), (?a my:next_act ?b), (?b rdf:type my:act_end), 
 	(?p my:parent_of ?a)
@@ -59,7 +59,7 @@
 	 -> (?p my:student_corresponding_end ?b)
 	]
 
-# Rule: SameParentOfCorrActs_rule_s10 [helper & correct]
+# Rule: SameParentOfCorrActs_rule_s10 [correct & helper]
 [
 	(?a my:corresponding_end ?b), (?p my:parent_of ?a)
 	 -> (?p my:parent_of ?b)
@@ -71,14 +71,14 @@
 	 -> (?p my:student_parent_of ?b)
 	]
 
-# Rule: Earliest_after_act_is_previous_correct_sibling [helper & correct]
+# Rule: Earliest_after_act_is_previous_correct_sibling [correct & helper]
 [
-	(?a rdf:type my:correct_act),
-	(?a my:next_sibling ?s),
+	(?a rdf:type my:correct_act),             
+	(?a my:next_sibling ?s),                        
 	 -> (?s my:after_act ?a)
 ]
 
-# Rule: Propagate_after_act [helper & correct]
+# Rule: Propagate_after_act [correct & helper]
 [
 	(?s my:after_act ?a),
 	(?a my:next_act ?b),
@@ -89,16 +89,14 @@
 	 -> (?s my:after_act ?b)
 ]
 
-# Rule: start__to__MainFunctionBegin__rule_g3 [correct & function & entry]
+# Rule: start__to__MainFunctionBegin__rule_g3 [correct & entry & function]
 [
 	(?a rdf:type my:trace),
 	(?a my:executes ?alg),
 	(?alg my:entry_point ?func_),
 	(?func_ rdf:type my:func), 
-	                                                                                                            
 	(?b rdf:type my:act_begin),
-		                                          
-	(?a my:next_sibling ?b),              
+	(?a my:next_sibling ?b),
 	(?b my:executes ?func_),
 
 	 -> (?b rdf:type my:normal_flow_correct_act), 
@@ -114,8 +112,7 @@
 	(?gc rdf:type my:sequence), 
 
 	(?b rdf:type my:act_begin),
-		                                          
-	(?a my:next_sibling ?b),              
+	(?a my:next_sibling ?b),
 	(?b my:executes ?gc),
 
 	 -> (?b rdf:type my:normal_flow_correct_act), 
@@ -265,9 +262,6 @@
 	(?b my:executes ?cnd),        
 	
 	(?b my:after_act ?a),
-
-	                                        
-	                 
 	 -> (?b rdf:type my:normal_flow_correct_act), (?a my:next_act ?b), (?b rdf:type my:AltBegin)
 ]
 
@@ -647,7 +641,6 @@
 		(?c my:id ?ic),
 		notEqual(?ip, ?ic),
 	 -> (?a my:context_should_be ?p), 
-	                  
 	 (?a rdf:type my:WrongContext)
 ]
 
@@ -751,13 +744,12 @@
 	(?p my:student_parent_of ?c1),
 	(?p my:executes ?block),
 	(?block rdf:type my:sequence),
-		(?block my:body_item ?st),                                                                      
+	(?block my:body_item ?st),
 	(?c1 my:executes ?st),
 
 	(?c my:executes ?st),
 	(?p my:student_parent_of ?c),
 	(?c rdf:type my:act_begin),
-
 		(?c1 my:id ?ic1),
 		(?c my:id ?ic),
 		notEqual(?ic1, ?ic),
@@ -1028,8 +1020,7 @@
 
 	(?a my:student_next ?b),
 	(?b rdf:type my:Erroneous), 
-	 -> (?b my:should_be ?a), 
-	 (?b my:precursor ?a),
+	 -> (?b my:precursor ?a),
 	 (?b rdf:type my:MissingLoopEndAfterFailedCondition)
 ]
 
@@ -1040,9 +1031,38 @@
 	(?b my:executes ?st),
 	(?L my:body ?st),
 	(?L rdf:type my:loop),
-	 -> (?b my:should_be ?a), 
-	 (?b my:precursor ?a),
-	 (?b rdf:type my:IterationAfterFailedCondition)
+	 -> (?b rdf:type my:IterationAfterFailedCondition)
+]
+
+# Rule: MissingConditionAfterIteration-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:body_then_cond), 
+	(?loop__ my:body ?st),
+	(?a my:executes ?st),
+	
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous), 
+	 -> (?b my:precursor ?a),
+	 (?b rdf:type my:MissingConditionAfterIteration)
+]
+
+# Rule: MissingConditionBetweenIterations-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:normal_flow_correct_act),
+	(?a rdf:type my:act_end),
+	(?loop__ rdf:type my:body_then_cond), 
+	(?loop__ my:body ?st),
+	(?a my:executes ?st),
+	
+	(?a my:student_next ?b),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?st),
+	
+	(?b rdf:type my:Erroneous), 
+	 -> (?b my:precursor ?a),
+	 (?b rdf:type my:MissingConditionBetweenIterations)
 ]
 
 # Rule: ExtraAct_1_Error [mistake]
@@ -1297,7 +1317,7 @@
 		 (?b rdf:type my:TooEarly)
 	]
 
-# Rule: LoopIteration1_after_0 [helper & correct & loop]
+# Rule: LoopIteration1_after_0 [correct & helper & loop]
 [
 		(?a rdf:type my:act_begin),
 		(?a my:executes ?L),
@@ -1312,7 +1332,7 @@
 		
 	]
 
-# Rule: LoopIteration1_after_1 [helper & correct & loop]
+# Rule: LoopIteration1_after_1 [correct & helper & loop]
 [
 		(?a rdf:type my:act_begin),
 		(?a my:executes ?L),
@@ -1333,7 +1353,7 @@
 		
 	]
 
-# Rule: LoopIteration1_after_2 [helper & correct & loop]
+# Rule: LoopIteration1_after_2 [correct & helper & loop]
 [
 		(?a rdf:type my:act_begin),
 		(?a my:executes ?L),
@@ -1360,7 +1380,7 @@
 		
 	]
 
-# Rule: LoopIteration1_after_3 [helper & correct & loop]
+# Rule: LoopIteration1_after_3 [correct & helper & loop]
 [
 		(?a rdf:type my:act_begin),
 		(?a my:executes ?L),
@@ -1393,7 +1413,7 @@
 		
 	]
 
-# Rule: LoopIterationNext_after_0 [helper & correct & loop]
+# Rule: LoopIterationNext_after_0 [correct & helper & loop]
 [
 		(?a rdf:type my:act_end),
 		(?a my:iteration_n ?n),
@@ -1408,7 +1428,7 @@
 		
 	]
 
-# Rule: LoopIterationNext_after_1 [helper & correct & loop]
+# Rule: LoopIterationNext_after_1 [correct & helper & loop]
 [
 		(?a rdf:type my:act_end),
 		(?a my:iteration_n ?n),
@@ -1429,7 +1449,7 @@
 		
 	]
 
-# Rule: LoopIterationNext_after_2 [helper & correct & loop]
+# Rule: LoopIterationNext_after_2 [correct & helper & loop]
 [
 		(?a rdf:type my:act_end),
 		(?a my:iteration_n ?n),
