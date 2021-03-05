@@ -81,7 +81,7 @@ def create_app():
 			return dict(
 				syntax_errors=(res,), 
 				algorithm_json=None,
-				algorithm_update_lines={},
+				algorithm_as_html=None,
 				trace_json=()
 			)
 		if isinstance(res, AlgorithmParser):
@@ -99,7 +99,7 @@ def create_app():
 				return dict(
 					syntax_errors=(trace_json,), 
 					algorithm_json=None,
-					algorithm_update_lines={},
+					algorithm_as_html=None,
 					trace_json=()
 				)
 			###
@@ -113,10 +113,7 @@ def create_app():
 			return dict(
 				syntax_errors=(), 
 				algorithm_json=res.algorithm,
-				# algorithm_as_tags=algorithm_tags,
 				algorithm_as_html=algorithm_html,
-				# algorithm_button_tips=algorithm_tips,
-				# algorithm_update_lines={},
 				trace_json=trace_json
 			)
 			
@@ -146,7 +143,8 @@ def create_app():
 		if isinstance(res, str):
 			return dict(
 				processing_errors=(res,), 
-				trace_json=[],
+				full_trace_json=[],
+				algorithm_as_html=(),
 			)
 		if isinstance(res, list):
 			
@@ -167,8 +165,9 @@ def create_app():
 			if err_msg:  # error
 				return dict(
 					processing_errors=(err_msg,), 
-					trace_json=[],
+					full_trace_json=[],
 					algorithm_as_html=(),
+					algorithm_json=algorithm_json,  # pass back
 				)
 				
 			### print("After reasoning: ", *full_trace, sep='\n *\t')
