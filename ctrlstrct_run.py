@@ -47,6 +47,16 @@ def uniqualize_iri(onto, iri):
     return iri
 
 
+def uniqualize_id(onto, id_:int):
+    """uniqualize individual's id"""
+    prop = onto.id
+    existing = [o for s, o in prop.get_relations()]
+    while id_ in existing:  # пока есть объект с таким ID
+        # модифицировать ID
+        id_ += 100
+    return id_
+
+
 class TraceTester():
     def __init__(self, trace_data):
         """trace_data: dict like
@@ -770,7 +780,7 @@ class TraceTester():
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
-                            make_triple(obj, onto.id, id_)  # нужно привязать для возврата в GUI ... проверить, что работает
+                            make_triple(obj, onto.id, uniqualize_id(onto, id_))  # нужно убедиться, что все ID уникальны
                             if iteration_n:
                                 make_triple(obj, onto.student_iteration_n, iteration_n)
                                 
@@ -789,7 +799,7 @@ class TraceTester():
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
-                            make_triple(obj, onto.id, id_)  # нужно привязать для возврата в GUI ... проверить, что работает
+                            make_triple(obj, onto.id, uniqualize_id(onto, id_))  # нужно убедиться, что все ID уникальны
                             if iteration_n:
                                 make_triple(obj, onto.student_iteration_n, iteration_n)
                                 
@@ -1152,12 +1162,18 @@ def extact_mistakes(onto, as_objects=False) -> dict:
     
      """
     error_classes = onto.Erroneous.descendants()  # a set of the descendant Classes (including self)
+    
+    ### print("Erroneous descendants:", error_classes)
 
     properties_to_extract = ("id", "name", onto.precursor, onto.cause, onto.should_be, onto.should_be_before, onto.context_should_be, onto.text_line, )
     mistakes = {}
 
     # The .instances() class method can be used to iterate through all Instances of a Class (including its subclasses). It returns a generator.
     for inst in onto.Erroneous.instances():
+        
+        ###
+        print("Erroneous instance:", inst.name)
+        
         for prop in properties_to_extract:
             values = []
             # fill values ...
