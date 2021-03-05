@@ -131,8 +131,17 @@ def create_app():
 		user_language = request.json.get('user_language', 'en')
 		set_target_lang(user_language)
 		
-		# extend the trace
-		res = make_act_json(**request.json)
+		try:
+			# extend the trace
+			res = make_act_json(**request.json)
+		except Exception as ex:
+			res = f"{type(ex)}: {ex}"
+			import traceback
+			print(''.join(traceback.format_exception(etype=type(ex), value=ex, tb=ex.__traceback__)))
+			print("request.json :")
+			print(request.json)
+			print("The error above reported as response, continue.")
+			
 		# if error
 		if isinstance(res, str):
 			return dict(
