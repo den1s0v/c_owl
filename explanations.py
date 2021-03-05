@@ -6,6 +6,8 @@ from trace_gen.json2alg2tr import get_target_lang
 from upd_onto import get_relation_object, get_relation_subject
 
 
+onto = None
+
 
 def tr(word_en, case='nomn'):
 	""" Перевод на русский язык, если get_target_lang()=="ru" """
@@ -14,13 +16,14 @@ def tr(word_en, case='nomn'):
 	grammemes = ('nomn','gent')
 	assert case in grammemes, "Unknown case: "+case
 	res = {
+		"__"				: ("__", ),
+		"[unknown]"			: ("[неизвестно]", ),
 		"begin of " 		: ("начало ", ),
 		"end of " 			: ("конец ", ),
 		" (at line %d)" 	: (" (в строке %d)", ),
 		" (the line is missing)" : (" (строка отсутствует)", ),
 		"%s-branch" 		: ("ветка %s", ),
 		"unknown structure" : ("неизвестная структура", ),
-		"[unknown]"			: ("[неизвестно]", ),
 		"expr"				: ("выражение", "выражения", ),
 		"stmt"				: ("команда", "команды", ),
 		"sequence"			: ("следование", "следования", ),
@@ -28,6 +31,7 @@ def tr(word_en, case='nomn'):
 		"loop"				: ("цикл", "цикла", ),
 		"while_loop"		: ("цикл", "цикла", ),
 		"body of loop"		: ("тело цикла", "тела цикла", ),
+		"ex."				: ("например,", ),
 	}.get(word_en, ())
 	try:
 		return res[grammemes.index(case)]
@@ -62,7 +66,6 @@ def get_leaf_classes(classes) -> set:
 def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, include_line_index=True, case='nomn', quote="'"):
 	""" -> begin of loop waiting (at line 45) """
 	try:
-		onto = a.namespace
 		
 		is_act = bool({onto.act_begin, onto.act_end, onto.trace} & set(a.is_a))
 		
@@ -122,18 +125,22 @@ def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, in
 	except Exception as e:
 		print(e)
 		# raise e
-		return tr("[unknown]")
+		# return tr("[unknown]")
+		return tr("__")
 
 
-def format_explanation(onto, act_instance, _auto_register=True) -> list:
+def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
+	
+	global onto
+	onto = current_onto
 	
 	if not FORMAT_STRINGS:
-		register_explanation_handlers(onto)
+		register_explanation_handlers()
 	# # Не оптимально, зато не кешируются устаревшие онтологии
 	# if FORMAT_STRINGS:
 	# 	FORMAT_STRINGS.clear()
 	# 	PARAM_PROVIDERS.clear()
-	# register_explanation_handlers(onto)
+	# register_explanation_handlers()
 	
 	### print(*FORMAT_STRINGS.keys())
 		
@@ -153,7 +160,7 @@ def format_explanation(onto, act_instance, _auto_register=True) -> list:
 			print("Skipping explanation for:", class_name)
 	
 	# if not result and _auto_register:
-	# 	register_explanation_handlers(onto)
+	# 	register_explanation_handlers()
 	# 	return format_explanation(onto, act_instance, _auto_register=False)
 			
 	return result
@@ -195,7 +202,7 @@ def class_formatstr(*args):
 		return class_name, format_str_ru
 
 
-def register_explanation_handlers(onto):
+def register_explanation_handlers():
 	
 	
 	######### General act mistakes #########
@@ -258,7 +265,7 @@ def register_explanation_handlers(onto):
 	
 	
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
-	spec = """WrongContext	Акт <B> не может выполняться при отсутствии выполнения акта <A>, потому что <B> входит в <A>.	Act <B> is a part of <A> so it can't be executed while no act of <A> exists"""
+	spec = """WrongContext	Акт <B> не может выполняться при отсутствии акта <A>, потому что <B> входит в <A>.	Act <B> is a part of <A> so it can't be executed while no act of <A> exists"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -280,14 +287,14 @@ def register_explanation_handlers(onto):
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """TooEarly	<A> следует выполнить позже, после некоторых пропущенных актов	<A> must happen later, after some missing acts"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	# spec = """TooEarly	<A> следует выполнить позже, после некоторых пропущенных актов	<A> must happen later, after some missing acts"""
+	# class_name, format_str = class_formatstr(spec.split('\t'))
 	
-	def _param_provider(a: 'act_instance'):
-		return {
-			'<A>': format_full_name(a, 1,1,0).capitalize(),
-			}
-	register_handler(class_name, format_str, _param_provider)
+	# def _param_provider(a: 'act_instance'):
+	# 	return {
+	# 		'<A>': format_full_name(a, 1,1,0).capitalize(),
+	# 		}
+	# register_handler(class_name, format_str, _param_provider)
 	
 	
 	spec = """DisplacedAct	<A> должно произойти перед <B>, но не здесь	<A> must happen before <B> but not here"""
@@ -306,25 +313,51 @@ def register_explanation_handlers(onto):
 	######### Sequence mistakes #########
 	########=====================########
 	
-	spec = """TooEarlyInSequence	<конец акта А> не может находится позже <начало акта Б>, потому что в <следование В><оператор А> находится перед <оператор Б>	Act <A> is placed in sequnce <C> before act <B> so act <A> must finish before act <B> starts"""
+	# spec = """TooEarlyInSequence	<конец акта А> не может находится позже <начало акта Б>, потому что в <следование В><оператор А> находится перед <оператор Б>	Act <A> is placed in sequnce <C> before act <B> so act <A> must finish before act <B> starts"""
+	# class_name, format_str = class_formatstr(spec.split('\t'))
+	
+	# def _param_provider(a: 'act_instance'):
+	# 	item = get_relation_object(a, onto.executes)
+	# 	sequence = get_relation_subject(onto.body_item, item)
+	# 	missing_acts = list(onto.should_be_after[a])
+	# 	stmts = {format_full_name(act, 0,0,0) for act in missing_acts}
+	# 	plur1_s = 's' if len(stmts) > 1 else ''
+	# 	is1_are = 'are' if len(stmts) > 1 else 'is'
+	# 	stmts = ", ".join(stmts)
+	# 	acts = ", ".join("'%s'"%format_full_name(act, 1,0,0, quote='') for act in missing_acts)
+	# 	plur2_s = 's:' if len(stmts) > 1 else ''
+		
+	# 	return {
+	# 		'Act <A> is': f"Act{plur1_s} {stmts} {is1_are}",
+	# 		'act <A>': f"act{plur2_s} {acts}",
+	# 		'<B>': format_full_name(a, 0,0,0),
+	# 		'<C>': format_full_name(sequence, 0,0,0),
+	# 		}
+	# register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """TooEarlyInSequence	<A> является частью следования и не может выполняться раньше, чем <B>	It's too early to finish  <A> is a part of a sequence, so it cannot run before <B>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		item = get_relation_object(a, onto.executes)
-		sequence = get_relation_subject(onto.body_item, item)
-		missing_acts = list(onto.should_be_after[a])
-		stmts = {format_full_name(act, 0,0,0) for act in missing_acts}
-		plur1_s = 's' if len(stmts) > 1 else ''
-		is1_are = 'are' if len(stmts) > 1 else 'is'
-		stmts = ", ".join(stmts)
-		acts = ", ".join("'%s'"%format_full_name(act, 1,0,0, quote='') for act in missing_acts)
-		plur2_s = 's:' if len(stmts) > 1 else ''
-		
+		missed_act = get_relation_object(a, onto.should_be_after)
+		print(" **** missed_act", missed_act)
 		return {
-			'Act <A> is': f"Act{plur1_s} {stmts} {is1_are}",
-			'act <A>': f"act{plur2_s} {acts}",
-			'<B>': format_full_name(a, 0,0,0),
-			'<C>': format_full_name(sequence, 0,0,0),
+			'<A>': format_full_name(a, 0,1,0).capitalize(),
+			'<B>': format_full_name(missed_act, 0,1,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """SequenceFinishedTooEarly	Следование <A> заканчивать рано, т.к. ещё не все действия следования выполнены<EX>	It's too early to finish the sequence <A>, because there are some missing acts<EX>"""
+	class_name, format_str = class_formatstr(spec.split('\t'))
+	
+	def _param_provider(a: 'act_instance'):
+		missed_act = get_relation_subject(onto.should_be_before, a)
+		print(" **** missed_act", missed_act)
+		return {
+			'<A>': format_full_name(a, 1,1,0),
+			'<EX>': f" ({tr('ex.')} {format_full_name(missed_act, 0,1,0)})" if missed_act else "",
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
@@ -348,11 +381,10 @@ def register_explanation_handlers(onto):
 	######### Alternative mistakes #########
 	########========================########
 	
-	spec = """NoFirstCondition		The first condition <B> must be executed right after alternative <A> starts"""
+	spec = """NoFirstCondition	Развилка <A> должна начинаться с проверки условия <B>.	The first condition <B> must be executed right after alternative <A> starts"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		onto = a.namespace  # debugging reassignment (useless until different 'onto' appear)
 		alt_act = get_relation_object(a, onto.precursor)
 		# cond = get_relation_object(cond_act, onto.executes)
 		cond_act = get_relation_object(a, onto.should_be)
@@ -388,7 +420,6 @@ def register_explanation_handlers(onto):
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		onto = a.namespace  # debugging reassignment (useless until different 'onto' appear)
 		cond_act = get_relation_object(a, onto.cause)
 		# cond = get_relation_object(cond_act, onto.executes)
 		alt_act = get_relation_subject(onto.student_parent_of, a)
@@ -433,7 +464,6 @@ def register_explanation_handlers(onto):
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		# onto = a.namespace
 		cond_act = get_relation_object(a, onto.precursor)
 		cond = get_relation_object(cond_act, onto.executes)
 		br = get_relation_subject(onto.cond, cond)
@@ -450,7 +480,6 @@ def register_explanation_handlers(onto):
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		onto = a.namespace
 		cond_act = get_relation_object(a, onto.precursor)
 		alt_act = get_relation_subject(onto.student_parent_of, cond_act)
 		return {
@@ -469,7 +498,6 @@ def register_explanation_handlers(onto):
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		onto = a.namespace
 		
 		# cond_act = get_relation_subject(onto.student_next, a)
 		cond_act = get_relation_object(a, onto.precursor)
@@ -491,7 +519,6 @@ def register_explanation_handlers(onto):
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		# onto = a.namespace
 		cond_act = get_relation_object(a, onto.precursor)
 		cond = get_relation_object(cond_act, onto.executes)
 		loop = get_relation_subject(onto.cond, cond)
@@ -510,15 +537,14 @@ def register_explanation_handlers(onto):
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		# onto = a.namespace
 		body_act = get_relation_object(a, onto.precursor)
 		body = get_relation_object(body_act, onto.executes)
 		loop = get_relation_subject(onto.body, body)
 		cond = get_relation_object(loop, onto.cond)
 		
 		return {
-			'<A>': format_full_name(loop, 0,0,0),
-			'<B>': format_full_name(cond, 0,0,1),
+			'<A>': format_full_name(loop, 0,0,0) if loop else '',
+			'<B>': format_full_name(cond, 0,0,1) if cond else '',
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
@@ -527,15 +553,14 @@ def register_explanation_handlers(onto):
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		# onto = a.namespace
 		body_act = get_relation_object(a, onto.precursor)
 		body = get_relation_object(body_act, onto.executes)
 		loop = get_relation_subject(onto.body, body)
 		cond = get_relation_object(loop, onto.cond)
 		
 		return {
-			'<A>': format_full_name(loop, 0,0,0),
-			'<B>': format_full_name(cond, 0,0,1),
+			'<A>': format_full_name(loop, 0,0,0) if loop else '',
+			'<B>': format_full_name(cond, 0,0,1) if cond else '',
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
