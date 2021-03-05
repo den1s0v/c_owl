@@ -307,10 +307,10 @@
 	    			alert("Трасса выполнения программы построена верно!\nПоследний акт трассы:\n" + act_json.as_string)
 	    		}
  				///
-	  			html += ' [' + act_json.is_valid
+	  			html += ' [<i>' + act_json.is_valid
 	  			if (act_json.explanations)
-		  			html += ': ' + act_json.explanations.join('. ')
-	  			html += ']'
+		  			html += ['', ...act_json.explanations].join('<br>&diams; ')
+	  			html += '</i>]'
 	    	}
 	    	
 	    	$("#algorithmArea").html(html)

@@ -27,6 +27,7 @@ def tr(word_en, case='nomn'):
 		"alternative"		: ("альтернатива", "альтернативы", ),
 		"loop"				: ("цикл", "цикла", ),
 		"while_loop"		: ("цикл", "цикла", ),
+		"body of loop"		: ("тело цикла", "тела цикла", ),
 	}.get(word_en, ())
 	try:
 		return res[grammemes.index(case)]
@@ -58,7 +59,7 @@ def get_leaf_classes(classes) -> set:
 		return set(classes) - get_base_classes(classes)
 	
 	
-def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, include_line_index=True, quote="'"):
+def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, include_line_index=True, case='nomn', quote="'"):
 	""" -> begin of loop waiting (at line 45) """
 	try:
 		onto = a.namespace
@@ -90,6 +91,13 @@ def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, in
 		stmt_name = get_relation_object(stmt, onto.stmt_name)
 		assert stmt_name, f" ValueError: no stmt_name found for {str(stmt)}"
 		
+		if stmt_name.endswith("_loop_body"):
+			# тело цикла XYZ
+			# body of loop XYZ
+			stmt_name = tr("body of loop", case) + " " + quote + stmt_name.replace("_loop_body", '') + quote
+		else:
+			stmt_name = quote + stmt_name + quote
+		
 		type_ = ''
 		if include_type:
 			onto_classes = get_leaf_classes(stmt.is_a)
@@ -110,7 +118,7 @@ def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, in
 			
 		### print(phase, type_, quote, stmt_name, quote, line_index)
 		
-		return phase + type_ + quote + stmt_name + quote + line_index
+		return phase + type_ + stmt_name + line_index
 	except Exception as e:
 		print(e)
 		# raise e
@@ -157,6 +165,8 @@ def format_by_spec(format_str: str, **params: dict):
 	for key, value in params.items():
 		format_str = format_str.replace(key, value)
 		
+	if not format_str.endswith('.'):
+		format_str += '.'
 	###
 	print('*', format_str)
 		
@@ -252,9 +262,9 @@ def register_explanation_handlers(onto):
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		correct_parent_act = get_relation_object(a, onto.context_should_be)
+		correct_parent_act = get_relation_object(a, onto.context_should_be) or get_relation_subject(onto.parent_of, a)
 		return {
-			'<A>': format_full_name(correct_parent_act, 0,0,0),
+			'<A>': format_full_name(correct_parent_act, 0,0,0, case='gent'),
 			'<B>': format_full_name(a, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
@@ -465,14 +475,14 @@ def register_explanation_handlers(onto):
 		cond_act = get_relation_object(a, onto.precursor)
 		cond = get_relation_object(cond_act, onto.executes)
 		loop = get_relation_subject(onto.cond, cond)
-		body = get_relation_object(loop, onto.body)
+		# body = get_relation_object(loop, onto.body)
 		
 		return {
 			'<i-ой>': 'очередной',
 			'<A>': format_full_name(loop, 0,0,0),
 			'<B>': format_full_name(cond, 0,0,0),
 			' <C>': '',
-			'<D>': format_full_name(body, 0,0,0),
+			'<D>': tr("loop", 'gent'),  # format_full_name(body, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
@@ -485,13 +495,47 @@ def register_explanation_handlers(onto):
 		cond_act = get_relation_object(a, onto.precursor)
 		cond = get_relation_object(cond_act, onto.executes)
 		loop = get_relation_subject(onto.cond, cond)
-		body = get_relation_object(loop, onto.body)
+		# body = get_relation_object(loop, onto.body)
 		
 		return {
 			'<A>': format_full_name(loop, 0,0,0),
 			'<B>': format_full_name(cond_act, 0,0,1),
 			'<C> ': '',
-			'<D>': format_full_name(body, 0,0,0),
+			'<D>': tr("loop", 'gent'),  # format_full_name(body, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """MissingConditionAfterIteration	Во время выполнения цикла <A> после очередной итерации нужно проверить условие <B>, чтобы продолжить цикл или закончить его.	Right after the iteration of loop <A> finished, condition <B> must check whether to continue or finish looping."""
+	class_name, format_str = class_formatstr(spec.split('\t'))
+	
+	def _param_provider(a: 'act_instance'):
+		# onto = a.namespace
+		body_act = get_relation_object(a, onto.precursor)
+		body = get_relation_object(body_act, onto.executes)
+		loop = get_relation_subject(onto.body, body)
+		cond = get_relation_object(loop, onto.cond)
+		
+		return {
+			'<A>': format_full_name(loop, 0,0,0),
+			'<B>': format_full_name(cond, 0,0,1),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+
+	spec = """MissingConditionBetweenIterations	Во время выполнения цикла <A>, перед тем как перейти к следующей итерации цикла, нужно проверить условие <B> и узнать, продолжится ли цикл или закончится.	Prior to proceeding to the next iteration of the loop <A>, the condition <B> checks out whether the loop will continue or end."""
+	class_name, format_str = class_formatstr(spec.split('\t'))
+	
+	def _param_provider(a: 'act_instance'):
+		# onto = a.namespace
+		body_act = get_relation_object(a, onto.precursor)
+		body = get_relation_object(body_act, onto.executes)
+		loop = get_relation_subject(onto.body, body)
+		cond = get_relation_object(loop, onto.cond)
+		
+		return {
+			'<A>': format_full_name(loop, 0,0,0),
+			'<B>': format_full_name(cond, 0,0,1),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	

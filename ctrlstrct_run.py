@@ -1061,6 +1061,7 @@ def init_persistent_structure(onto):
                 "TooEarly", # right after missing acts
                 ("DisplacedAct", ["TooEarly","ExtraAct","MissingAct"]),
                 ("TooEarlyInSequence", ["TooEarly"]),
+                ("SequenceFinishedTooEarly", ["TooEarly"]),
                 
                 # Alternatives mistakes ...
                 "NoFirstCondition",

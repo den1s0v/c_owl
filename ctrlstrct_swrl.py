@@ -1021,7 +1021,7 @@ RULES.append(DomainRule(name="DuplicateOfAct-seq-e_Error",
 
 # Moved act [works with Pellet]
 # Базируется одновременно на ExtraAct и MissingAct
-RULES.append(DomainRule(name="DisplacedAct_Error", 
+RULES.append(DomainRule(name="DisplacedAct-Seq_error", 
 	tags={'mistake', 'sequence'},
 	swrl="""
 	ExtraAct(?c1), 
@@ -1030,17 +1030,34 @@ RULES.append(DomainRule(name="DisplacedAct_Error",
 """))
 
 # TooEarly act in sequence [works with Pellet?]
-RULES.append(DomainRule(name="TooEarlyInSequence_Error", 
+RULES.append(DomainRule(name="TooEarlyInSequence-Seq_error", 
 	tags={'mistake', 'sequence'},
 	swrl="""
 	TooEarly(?b), 
 	student_parent_of(?sa, ?b),
 	executes(?sa, ?seq),
 	sequence(?seq),
-	should_be_before(?a, ?b), 
-	student_parent_of(?sa, ?a),
+	should_be_before(?a, ?b),
+		executes(?a, ?st_a),
+		executes(?b, ?st_b),
+		id(?st_a, ?ia),
+		id(?st_b, ?ib),
+		notEqual(?ia, ?ib),
+	student_parent_of(?sa, ?a),  # what if student did not created ?a yet?
 	 -> should_be_after(?b, ?a), 
 	 TooEarlyInSequence(?b)
+"""))
+
+# TooEarly act in sequence [works]
+RULES.append(DomainRule(name="SequenceFinishedTooEarly-Seq_error", 
+	tags={'mistake', 'sequence'},
+	swrl="""
+	TooEarly(?b), 
+	act_end(?b),
+	executes(?b, ?seq),
+	sequence(?seq),
+	# should_be_before(?a, ?b), 
+	 -> SequenceFinishedTooEarly(?b)
 """))
 
 # ============ Alternatives mistakes ============ #
@@ -1055,8 +1072,7 @@ RULES.append(DomainRule(name="NoFirstCondition-alt_Error",
 
 	student_next(?a, ?b),
 	Erroneous(?b), 
-	 -> should_be(?b, ?a), 
-	 precursor(?b, ?a),
+	 -> precursor(?b, ?a),
 	 NoFirstCondition(?b)
 """))
 
@@ -1308,7 +1324,7 @@ RULES.append(DomainRule(name="IterationAfterFailedCondition-loop_Error",
 	 -> IterationAfterFailedCondition(?b)
 """))
 
-# Нет проверки условия после итерации цикла (while, do-while, do-until, foreach) [works?]
+# Нет проверки условия после итерации цикла (while, do-while, do-until, foreach) [works]
 RULES.append(DomainRule(name="MissingConditionAfterIteration-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""
@@ -1324,7 +1340,7 @@ RULES.append(DomainRule(name="MissingConditionAfterIteration-loop_Error",
 	 MissingConditionAfterIteration(?b)
 """))
 
-# Начало итерации цикла сразу после итерации, минуя условие (while, do-while, do-until, foreach) [works?]
+# Начало итерации цикла сразу после итерации, минуя условие (while, do-while, do-until, foreach) [works]
 RULES.append(DomainRule(name="MissingConditionBetweenIterations-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""

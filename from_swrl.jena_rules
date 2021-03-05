@@ -778,23 +778,38 @@
 	 (?c1 rdf:type my:DuplicateOfAct)
 ]
 
-# Rule: DisplacedAct_Error [mistake & sequence]
+# Rule: DisplacedAct-Seq_error [mistake & sequence]
 [
 	(?c1 rdf:type my:ExtraAct), 
 	(?c1 rdf:type my:MissingAct), 
 	 -> (?c1 rdf:type my:DisplacedAct)
 ]
 
-# Rule: TooEarlyInSequence_Error [mistake & sequence]
+# Rule: TooEarlyInSequence-Seq_error [mistake & sequence]
 [
 	(?b rdf:type my:TooEarly), 
 	(?sa my:student_parent_of ?b),
 	(?sa my:executes ?seq),
 	(?seq rdf:type my:sequence),
-	(?a my:should_be_before ?b), 
-	(?sa my:student_parent_of ?a),
+	(?a my:should_be_before ?b),
+		(?a my:executes ?st_a),
+		(?b my:executes ?st_b),
+		(?st_a my:id ?ia),
+		(?st_b my:id ?ib),
+		notEqual(?ia, ?ib),
+	(?sa my:student_parent_of ?a),                                           
 	 -> (?b my:should_be_after ?a), 
 	 (?b rdf:type my:TooEarlyInSequence)
+]
+
+# Rule: SequenceFinishedTooEarly-Seq_error [mistake & sequence]
+[
+	(?b rdf:type my:TooEarly), 
+	(?b rdf:type my:act_end),
+	(?b my:executes ?seq),
+	(?seq rdf:type my:sequence),
+	                            
+	 -> (?b rdf:type my:SequenceFinishedTooEarly)
 ]
 
 # Rule: NoFirstCondition-alt_Error [alternative & mistake]
@@ -805,7 +820,7 @@
 
 	(?a my:student_next ?b),
 	(?b rdf:type my:Erroneous), 
-	 -> (?b my:should_be ?a), 
+	 ->                      
 	 (?b my:precursor ?a),
 	 (?b rdf:type my:NoFirstCondition)
 ]
