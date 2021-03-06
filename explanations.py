@@ -511,7 +511,7 @@ def register_explanation_handlers():
 		alt_act = get_relation_subject(onto.student_parent_of, cond_act)
 		return {
 			'<A>': format_full_name(alt_act, 0,0,0),
-			'<B>': format_full_name(cond_act, 0,1,1),
+			'<B>': format_full_name(cond_act, 0,0,0),
 			'<C>': format_full_name(correct_branch_act, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)

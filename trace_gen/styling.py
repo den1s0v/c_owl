@@ -169,6 +169,8 @@ def to_html(element: str or dict or list, sep='') -> str:
 INDENT_STEP = 2  # spaces
 SIMPLE_NODE_STATES = ('performed', )
 COMPLEX_NODE_STATES = ('started', 'finished')
+COMPLEX_NODE_STARTED = ('started', )
+COMPLEX_NODE_FINISHED = ('finished', )
 EXISTING_TRACE = []
 
 BUTTON_TIP_FREFIX = {
@@ -234,7 +236,7 @@ def set_syntax(programming_language_name: str):
 
 
 set_syntax("C")  # the default
-# set_syntax("Pseudocode")  # the default
+# set_syntax("Pseudocode")
 # set_syntax("Python")
 
 
@@ -243,46 +245,55 @@ set_syntax("C")  # the default
 #     return s.replace("'", '&apos;').replace('"', r'&quot;')
 #     # .replace('\\', '\\\\')
 
-def _get_act_button_tip(act_name_json, phase):
+def _get_act_button_tip(act_name, phase):
 	lang = get_target_lang()
-	return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name_json.replace("'", '"'))
+	return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name.replace("'", '"'))
 
+def _make_alg_button(alg_mode_id, act_name, state_name, allow_states=None) -> list or tuple:
+	if allow_states is None or state_name not in allow_states:
+		return ()
+	state_tip = _get_act_button_tip(act_name, state_name)
+	return [
+		{
+			"tag": "span",
+			"attributes": {
+				"class": ["alg_button"],
+				"algorithm_element_id": [str(alg_mode_id)], 
+				"act_type": [state_name], 
+				"data-tooltip": [state_tip],
+				"data-position": ["top left"],
+				# "onclick": ["on_algorithm_element_clicked(this)"], # `onmouseup` event works too.
+			},
+			"content": [{
+				"tag": "i",
+				"attributes": {
+					"class": ["play" if state_name != "finished" else "stop", "small icon"],
+				},
+				"content": ''
+			},
+			]
+		},
+	]
 
-def _make_alg_tag(alg_node, token_type, inner='', states=None):
+def _make_alg_tag(alg_node, token_type, inner='', states_before=None, states_after=None):
 	more_attrs = {}
 	if alg_node:
 		id_ = alg_node["id"]
-		# more_attrs.update({"algorithm_element_id": [id_], })
 	
-	if states:
+	all_states = tuple([*(states_before or ()), *(states_after or ())])
+		
+	if all_states:
+		if all_states != SIMPLE_NODE_STATES:
+			all_states = COMPLEX_NODE_STATES
 		act_name = alg_node["act_name"]
 		# вычислить целевое состояние по последнему акту трассы
-		# states[0]  # started / performed
-		state_name = find_state_for_alg_id(id_, states)
+		# all_states[0]  # started / performed
+		state_name = find_state_for_alg_id(id_, all_states)
 		
-		state_tip = _get_act_button_tip(act_name, state_name)
 		inner = [
-			# <i class="play icon"></i>
-			{
-				"tag": "span",
-				"attributes": {
-					"class": ["hidable alg_button tooltip"],
-					"algorithm_element_id": [str(id_)], 
-					"act_type": [state_name], 
-					"data-tooltip": [state_tip],
-					"data-position": ["top left"],
-					# "onclick": ["on_algorithm_element_clicked(this)"], # `onmouseup` event works too.
-				},
-				"content": [{
-					"tag": "i",
-					"attributes": {
-						"class": ["play" if state_name != "finished" else "stop", "icon"],
-					},
-					"content": ''
-				},
-				]
-			},
-			inner
+			*_make_alg_button(id_, act_name, state_name, states_before),
+			inner,
+			*_make_alg_button(id_, act_name, state_name, states_after),
 		]
 	
 	return {
@@ -316,6 +327,30 @@ def _make_line_tag(indent, inner=''):
 		"content": inner
 	}
 
+def _make_block_with_braces(indent, block_json, inner=()):
+	return [
+	# кнопка для начала тела цикла
+	_make_line_tag(indent, 
+		_make_alg_tag(block_json, '', 
+			inner=[
+				*(SYNTAX["BLOCK_OPEN"]() or ["&nbsp;" * (INDENT_STEP)]),
+			],
+			states_after=COMPLEX_NODE_STARTED)
+		),
+	# # тело цикла
+	# algorithm_to_tags(block_json, indent=indent + INDENT_STEP),
+	*inner,
+	# закрыть тело цикла (если требуется по синтаксису)
+	# кнопка для конца тела цикла
+	_make_line_tag(indent, 
+		_make_alg_tag(block_json, '', 
+			inner=[
+				*(SYNTAX["BLOCK_CLOSE"]() or ["&nbsp;" * (INDENT_STEP)]),
+			],
+			states_after=COMPLEX_NODE_FINISHED)
+		),
+	]
+
 
 def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, syntax:str=None, existing_trace=None, indent=0) -> list:
 	""" Create new tree of html-tags with additional info about nodes """
@@ -345,10 +380,10 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 		# act_name = algorithm_json["act_name"]
 			
 		if type_ in ("expr", ):
-			return _make_alg_tag(algorithm_json, "variable", name, states=SIMPLE_NODE_STATES)
+			return _make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)
 		
 		if type_ in ("stmt", ):
-			return _make_line_tag(indent, SYNTAX["STATEMENT"](_make_alg_tag(algorithm_json, "variable", name, states=SIMPLE_NODE_STATES)))
+			return _make_line_tag(indent, SYNTAX["STATEMENT"](_make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)))
 		
 		elif type_ == "sequence":  # and not name.endswith("_loop_body"):
 			# # recurse with list
@@ -366,26 +401,14 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 					_make_line_tag(indent, [
 						_make_alg_tag(algorithm_json, 'keyword', 
 							inner=SYNTAX["WHILE_KEYWORD"](loop_type),
-							states=COMPLEX_NODE_STATES),
+							states_before=COMPLEX_NODE_STARTED, states_after=COMPLEX_NODE_FINISHED),
 						"&nbsp;",
 						*SYNTAX["CONDITION"](algorithm_to_tags(algorithm_json["cond"])),
 						"&nbsp;" * 2,
 						_make_alg_tag(None, 'comment', 
 							inner=SYNTAX["COMMENT"](name))
 					]),
-					# кнопка для тела цикла
-					_make_line_tag(indent, 
-						_make_alg_tag(algorithm_json["body"], '', 
-							inner=[
-								*SYNTAX["BLOCK_OPEN"](),
-								"&nbsp;" * (INDENT_STEP),
-							],
-							states=COMPLEX_NODE_STATES)
-						),
-					# тело цикла
-					algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP),
-					# закрыть тело цикла (если требуется по синтаксису)
-					*(SYNTAX["BLOCK_CLOSE"]() and [_make_line_tag(indent, SYNTAX["BLOCK_CLOSE"]())]),
+					*_make_block_with_braces(indent, algorithm_json["body"], inner=algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP))
 				]
 				
 			if loop_type == 'do_while':
@@ -396,9 +419,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 					header_line["content"] += [
 						_make_alg_tag(algorithm_json, 'keyword', 
 							inner=SYNTAX["DO_KEYWORD"](loop_type),
-							states=COMPLEX_NODE_STATES),
-						# "&nbsp;",
-						# *SYNTAX["CONDITION"](algorithm_to_tags(algorithm_json["cond"])),
+							states_before=COMPLEX_NODE_STARTED, states_after=COMPLEX_NODE_FINISHED),
 						"&nbsp;" * 2,
 						_make_alg_tag(None, 'comment', 
 							inner=SYNTAX["COMMENT"](name))
@@ -407,26 +428,16 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 					# Python case: emulate with `WHILE(TRUE): IF(): BREAK`.
 					header_line["content"] += ['==Python не поддерживает DO-WHILE==']
 					
-				# кнопка для тела цикла
-				body_start_line = _make_line_tag(indent, 
-					_make_alg_tag(algorithm_json["body"], '', 
-						inner=[
-							*SYNTAX["BLOCK_OPEN"](),
-							"&nbsp;" * (INDENT_STEP),
-						],
-						states=COMPLEX_NODE_STATES)
-					)
-				# тело цикла
-				body_lines = algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP)
+				body_lines = _make_block_with_braces(indent, algorithm_json["body"], inner=algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP))
 				
 				if not SYNTAX["DO_KEYWORD"]:
 					# TODO: Python case: emulate with `IF(): BREAK`
 					footer_line = []
 				
-				# закрыть тело цикла (если требуется по синтаксису)
-				body_end_lines = (SYNTAX["BLOCK_CLOSE"]() and [_make_line_tag(indent, SYNTAX["BLOCK_CLOSE"]())])
+				# # закрыть тело цикла (если требуется по синтаксису)
+				# body_end_lines = (SYNTAX["BLOCK_CLOSE"]() and [_make_line_tag(indent, SYNTAX["BLOCK_CLOSE"]())])
 				
-				if SYNTAX["DO_KEYWORD"]:
+				if SYNTAX["DO_KEYWORD"]:  # make 'WHILE' end
 					footer_line = _make_line_tag(indent, [
 						_make_alg_tag(None, 'keyword', 
 									inner=SYNTAX["WHILE_KEYWORD"](loop_type)),
@@ -436,9 +447,8 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 					
 				return [
 					header_line,
-					body_start_line,
 					*body_lines,
-					*body_end_lines,
+					# *body_end_lines,
 					footer_line
 				]
 				
@@ -457,13 +467,12 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 					line["content"].append(
 						_make_alg_tag(algorithm_json, 'keyword',
 							inner=tr(branch["type"]) if SYNTAX["name"] == 'Pseudocode' else branch["type"],
-							states=COMPLEX_NODE_STATES))
+							states_before=COMPLEX_NODE_STARTED, states_after=COMPLEX_NODE_FINISHED))
 				else:
 					# добавить просто ключевое слово - начало ветки
 					line["content"].append(
 						_make_alg_tag(algorithm_json, 'keyword',
-							inner=SYNTAX["ELSEIF_KEYWORD"](branch["type"]),
-							states=None))
+							inner=SYNTAX["ELSEIF_KEYWORD"](branch["type"])))
 					
 				if 'cond' in branch:  # эта ветка - не ELSE
 					line["content"].append(" ")
@@ -479,21 +488,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 				
 				result.append(line)
 				
-				# кнопка для тела ветки
-				result.append(_make_line_tag(indent, 
-					_make_alg_tag(branch, '', 
-						inner=[
-							*SYNTAX["BLOCK_OPEN"](),
-							"&nbsp;" * (INDENT_STEP),
-						],
-						states=COMPLEX_NODE_STATES)
-					))
-
-				# тело ветки
-				result += algorithm_to_tags(branch["body"], indent=indent + INDENT_STEP)
-				
-				# закрыть тело ветки (если требуется по синтаксису)
-				result += (SYNTAX["BLOCK_CLOSE"]() and _make_line_tag(indent, SYNTAX["BLOCK_CLOSE"]())),
+				result += _make_block_with_braces(indent, branch, inner=algorithm_to_tags(branch["body"], indent=indent + INDENT_STEP))
 				
 			return result
 
