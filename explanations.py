@@ -242,7 +242,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """MisplacedBefore Раньше-объемлющего-акта	<Акт Б> не может выполняться раньше <начало акта А> потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>"""
+	spec = """MisplacedBefore Раньше-объемлющего-акта	Акт <Б> не может выполняться раньше <начало акта А> потому что <B> входит в <A>.	Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -254,7 +254,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """MisplacedAfter Позже-объемлющего-акта	<Акт Б> не может выполняться позже <конец акта А> потому что <Б> входит в <А>	Act <B> is a part of <A> so it can't be executed outside of (later than) <A>"""
+	spec = """MisplacedAfter Позже-объемлющего-акта	<Акт Б> не может выполняться позже <конец акта А> потому что <B> входит в <A>	Act <B> is a part of <A> so it can't be executed outside of (later than) <A>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -488,7 +488,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AnotherExtraBranch Лишняя-вторая-ветка	Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <Г> уже выполнилась	Alternative <A> must not execute branch <B> because the branch <D> has already been executed"""
+	spec = """AnotherExtraBranch Лишняя-вторая-ветка	Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <D> уже выполнилась	Alternative <A> must not execute branch <B> because the branch <D> has already been executed"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):

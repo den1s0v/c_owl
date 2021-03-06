@@ -815,7 +815,7 @@
 	(?b rdf:type my:act_begin),
 	(?b my:executes ?br),
 	
-	(?alt_act my:parent_of ?a),                                                                                   
+	(?alt_act my:student_parent_of ?a),                                                                                   
 	(?alt_act my:student_parent_of ?b),
 	
 	                       

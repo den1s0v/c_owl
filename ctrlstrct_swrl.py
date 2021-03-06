@@ -1121,7 +1121,7 @@ RULES.append(DomainRule(name="BranchOfFalseCondition-alt_Error",
 	act_begin(?b),
 	executes(?b, ?br),
 	
-	parent_of(?alt_act, ?a),  # ensure the act is found by the rule (because can be missing in student's trace)
+	student_parent_of(?alt_act, ?a),  # ensure the act is found by the rule (because can be missing in student's trace)
 	student_parent_of(?alt_act, ?b),
 	
 	# student_next(?a, ?b),
