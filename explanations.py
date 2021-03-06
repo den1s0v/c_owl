@@ -209,7 +209,6 @@ def class_formatstr(*args):
 	class_name, format_str_ru, format_str_en = args if len(args) == 3 else list(args[0])
 	
 	class_names_dict = dict(zip(("en", "ru"), class_name.split()))
-	print(class_names_dict)
 	
 	return class_names_dict, {
 		"ru": format_str_ru,
