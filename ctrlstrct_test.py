@@ -309,7 +309,10 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 			
 			expr_value = get_ith_expr_value(expr_list, exec_time - 1)
 			
-			assert expr_value is not None, f"Not enough expression values provided for expression '{name}': '{expr_list}' provided, # {exec_time} requested."
+			# assert expr_value is not None, f"Not enough expression values provided for expression '{name}': '{expr_list}' provided, # {exec_time} requested."
+			if expr_value is None:
+				expr_value = False
+				print(f"Info: use default value: {expr_value} for expression '{name}'.")
 		
 		act_text = act_line_for_alg_element(
 			elem, 
