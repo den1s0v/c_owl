@@ -269,6 +269,7 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
 		        	"class": ["hidable alg_button tooltip"],
 		        	"algorithm_element_id": [str(id_)], 
 		        	"act_type": [state_name], 
+				        	"data-tooltip": [state_tip],
 		        	# "onclick": ["on_algorithm_element_clicked(this)"], # `onmouseup` event works too.
 	        	},
 		        "content": [{
@@ -278,13 +279,6 @@ def _make_alg_tag(alg_node, token_type, inner='', states=None):
 			        	},
 				        "content": ''
 		        	},
-		        	{
-				        "tag": "span",
-				        "attributes": {
-				        	"class": ["tooltiptext"],
-			        	},
-				        "content": state_tip
-		        	}
 	        	]
         	},
         	inner
