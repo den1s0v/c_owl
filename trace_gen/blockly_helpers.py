@@ -379,9 +379,9 @@ class AlgorithmXMLParser(AlgorithmParser):
                 name = block_NAME  # имя цикла (пишется в комментарии)
                 
                 loop_type = "do_while_loop"  # the default
-                field_MODE = get_named_member(xml_tree['field'], "MODE")
-                if field_MODE and '#text' in field_MODE and field_MODE['#text'] == 'UNTIL':
-                    loop_type = "do_until_loop"
+                # field_MODE = get_named_member(xml_tree['field'], "MODE")  # the field removed from the Block
+                # if field_MODE and '#text' in field_MODE and field_MODE['#text'] == 'UNTIL':
+                #     loop_type = "do_until_loop"
 
                 block_BOOL = get_named_member(xml_tree['value'], 'BOOL') if 'value' in xml_tree else None
                 if not block_BOOL:
