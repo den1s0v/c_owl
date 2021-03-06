@@ -52,6 +52,7 @@ ALGORITHM_ITEM_CLASS_NAMES = {
 # map error class name to format string & method of it's expansion
 FORMAT_STRINGS = {}
 PARAM_PROVIDERS = {}
+CLASS_NAMES = {}  # "lang" -> str
 
 
 def get_base_classes(classes) -> set:
@@ -151,8 +152,9 @@ def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 	for error_class in error_classes:
 		class_name = error_class.name
 		if class_name in PARAM_PROVIDERS:
+			format_str = FORMAT_STRINGS[class_name].get(get_target_lang(), None) or FORMAT_STRINGS[class_name].get("en", '__')
 			expl = format_by_spec(
-				FORMAT_STRINGS[class_name],
+				format_str,
 				**PARAM_PROVIDERS[class_name](act_instance)
 			)
 			result.append(f"{class_name}: {expl}")
@@ -180,10 +182,10 @@ def format_by_spec(format_str: str, **params: dict):
 	return format_str
 	# return 'cannot format it...'
 
-def register_handler(class_name, format_str, method):
+def register_handler(class_name, format_dict, method):
 	"Map class name to function procesing act with that error "
 	PARAM_PROVIDERS[class_name] = method
-	FORMAT_STRINGS[class_name] = format_str
+	FORMAT_STRINGS[class_name] = format_dict
 	# onto_class = onto[class_name]
 	# # assert onto_class, onto_class
 	# if onto_class:
@@ -194,12 +196,12 @@ def register_handler(class_name, format_str, method):
 	
 
 def class_formatstr(*args):
-	""" Перевод в русский язык, если get_target_lang()=="ru" """
+	""" Сохраняем все переводы в словарь """
 	class_name, format_str_ru, format_str_en = args if len(args) == 3 else list(args[0])
-	if get_target_lang() == "en":
-		return class_name, format_str_en
-	else:
-		return class_name, format_str_ru
+	return class_name, {
+		"ru": format_str_ru,
+		"en": format_str_en,
+	}
 
 
 def register_explanation_handlers():
@@ -273,9 +275,9 @@ def register_explanation_handlers():
 		wrong_parent_act = get_relation_object(a, onto.precursor)
 		
 		return {
-			'<A>': format_full_name(correct_parent_act, 0,0,0, case='gent'),
+			'<A>': format_full_name(correct_parent_act, 0,1,0, case='gent'),
 			'<B>': format_full_name(a, 0,0,0),
-			'<EX>': f" ({tr('ex.')} {format_full_name(wrong_parent_act, 0,1,0)})" if wrong_parent_act else "",
+			'<EX>': '', # f" ({tr('ex.')} {format_full_name(wrong_parent_act, 0,1,0)})" if wrong_parent_act else "",
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
@@ -424,9 +426,9 @@ def register_explanation_handlers():
 	
 	def _param_provider(a: 'act_instance'):
 		cond = get_relation_object(a, onto.should_be_after)
-		# alt_act = get_relation_subject(onto.student_parent_of, a)
+		alt = get_relation_object(a, onto.context_should_be)
 		return {
-			# '<A>': format_full_name(alt_act, 0,0,0),
+			'<A>': format_full_name(alt, 0,0,0),
 			'<B>': format_full_name(cond, 0,0,0),
 			'<C>': format_full_name(a, 0,0,0),
 			}
@@ -438,9 +440,9 @@ def register_explanation_handlers():
 	
 	def _param_provider(a: 'act_instance'):
 		cond = get_relation_object(a, onto.should_be_after)
-		# alt_act = get_relation_subject(onto.student_parent_of, a)
+		alt = get_relation_object(a, onto.context_should_be)
 		return {
-			# '<A>': format_full_name(alt_act, 0,0,0),
+			'<A>': format_full_name(alt, 0,0,0),
 			'<B>': format_full_name(cond, 0,0,0),
 			'<C>': format_full_name(a, 0,0,0),
 			}
@@ -470,7 +472,7 @@ def register_explanation_handlers():
 		alt_act = get_relation_subject(onto.student_parent_of, a)
 		return {
 			'<A>': format_full_name(alt_act, 0,0,0),
-			'<B>': format_full_name(cond_act, 0,1,1),
+			'<B>': format_full_name(cond_act, 0,1,0),
 			'<C>': format_full_name(a, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)

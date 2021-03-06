@@ -867,7 +867,32 @@
 		notEqual(?i, ?i2),
 	 -> (?a my:should_be_after ?cnd), 
 	 (?a my:precursor ?b),
+	 (?a my:context_should_be ?alt),
 	 (?a rdf:type my:BranchWithoutCondition)
+]
+
+# Rule: ElseBranchWithoutCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),                                   
+	(?a my:executes ?br),
+	(?br rdf:type my:else),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative), 
+
+	(?b my:student_next ?a),         
+	(?b my:executes ?st),
+	
+	(?br1 my:next ?br2),                                       
+	(?br1 my:cond ?cnd),
+	
+	                          
+		(?st my:id ?i),
+		(?cnd my:id ?i2),
+		notEqual(?i, ?i2),
+	 -> (?a my:should_be_after ?cnd), 
+	 (?a my:precursor ?b),
+	 (?a my:context_should_be ?alt),
+	 (?a rdf:type my:ElseBranchWithoutCondition)
 ]
 
 # Rule: CondtionWithoutPrevCondition-alt_Error [alternative & mistake]
