@@ -157,7 +157,8 @@ def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 				format_str,
 				**PARAM_PROVIDERS[class_name](act_instance)
 			)
-			result.append(f"{class_name}: {expl}")
+			localized_class_name = CLASS_NAMES[class_name].get(get_target_lang(), None) or class_name
+			result.append(f"{localized_class_name}: {expl}")
 		else:
 			print("Skipping explanation for:", class_name)
 	
@@ -184,8 +185,16 @@ def format_by_spec(format_str: str, **params: dict):
 
 def register_handler(class_name, format_dict, method):
 	"Map class name to function procesing act with that error "
+	if isinstance(class_name, dict):
+		class_names_dict = class_name
+		class_name = class_names_dict["en"]
+	else:
+		class_names_dict = {}
+	
 	PARAM_PROVIDERS[class_name] = method
 	FORMAT_STRINGS[class_name] = format_dict
+	if class_names_dict:
+		CLASS_NAMES[class_name] = class_names_dict
 	# onto_class = onto[class_name]
 	# # assert onto_class, onto_class
 	# if onto_class:
@@ -198,7 +207,11 @@ def register_handler(class_name, format_dict, method):
 def class_formatstr(*args):
 	""" Сохраняем все переводы в словарь """
 	class_name, format_str_ru, format_str_en = args if len(args) == 3 else list(args[0])
-	return class_name, {
+	
+	class_names_dict = dict(zip(("en", "ru"), class_name.split()))
+	print(class_names_dict)
+	
+	return class_names_dict, {
 		"ru": format_str_ru,
 		"en": format_str_en,
 	}
@@ -210,7 +223,7 @@ def register_explanation_handlers():
 	######### General act mistakes #########
 	########========================########
 	
-	spec = """ActEndsWithoutStart	<начало акта А> не может выполняться позже <конец акта А>.	Act <A> can't finish in this line because it didn't start yet."""
+	spec = """ActEndsWithoutStart Конец-без-начала	<начало акта А> не может выполняться позже <конец акта А>.	Act <A> can't finish in this line because it didn't start yet."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -220,7 +233,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """ActStartsAfterItsEnd	<начало акта А> не может выполняться позже <конец акта А>.	Act <A> can't start in this line because it is already finished."""
+	spec = """ActStartsAfterItsEnd Акт-начался-позже-чем-закончился	<начало акта А> не может выполняться позже <конец акта А>.	Act <A> can't start in this line because it is already finished."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -230,7 +243,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """MisplacedBefore	<Акт Б> не может выполняться раньше <начало акта А> потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>"""
+	spec = """MisplacedBefore Раньше-объемлющего-акта	<Акт Б> не может выполняться раньше <начало акта А> потому что <Б> входит в <А>.	Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -242,7 +255,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """MisplacedAfter	<Акт Б> не может выполняться позже <конец акта А> потому что <Б> входит в <А>	Act <B> is a part of <A> so it can't be executed outside of (later than) <A>"""
+	spec = """MisplacedAfter Позже-объемлющего-акта	<Акт Б> не может выполняться позже <конец акта А> потому что <Б> входит в <А>	Act <B> is a part of <A> so it can't be executed outside of (later than) <A>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -254,7 +267,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """MisplacedDeeper	Акт <B> не может выполняться в рамках акта, вложенного в акт <A>, потому что <B> входит в <A>	Act <B> is a part of <A> so it can't be executed whitin act nested to <A>"""
+	spec = """MisplacedDeeper Внутри-вложенного-акта	Акт <B> не может выполняться в рамках акта, вложенного в акт <A>, потому что <B> входит в <A>	Act <B> is a part of <A> so it can't be executed whitin act nested to <A>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -267,7 +280,7 @@ def register_explanation_handlers():
 	
 	
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
-	spec = """WrongContext	Акт <B> не может выполняться вне акта <A><EX>, потому что <B> входит в <A>.	Act <B> is a part of <A><EX> so it can't be executed outside of <A>"""
+	spec = """WrongContext Вне-контекста	Акт <B> не может выполняться вне акта <A><EX>, потому что <B> входит в <A>.	Act <B> is a part of <A><EX> so it can't be executed outside of <A>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -282,7 +295,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """ExtraAct		<A> must not happen here due to previous error(s)"""
+	spec = """ExtraAct Лишний-акт	Не должно быть здесь	<A> must not happen here due to previous error(s)"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -302,7 +315,7 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """DisplacedAct	<A> должно произойти перед <B>, но не здесь	<A> must happen before <B> but not here"""
+	spec = """DisplacedAct Перемещённый-акт	<A> должно произойти перед <B>, но не здесь	<A> must happen before <B> but not here"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -341,7 +354,7 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """TooEarlyInSequence	<A> является частью следования и не может выполняться раньше, чем <B>	It's too early to finish  <A> is a part of a sequence, so it cannot run before <B>"""
+	spec = """TooEarlyInSequence Не-в-порядке-следования	<A> является частью следования и не может выполняться раньше, чем <B>	It's too early to finish  <A> is a part of a sequence, so it cannot run before <B>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -354,7 +367,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """SequenceFinishedTooEarly	Следование <A> заканчивать рано, т.к. ещё не все действия следования выполнены<EX>	It's too early to finish the sequence <A>, because there are some missing acts<EX>"""
+	spec = """SequenceFinishedTooEarly Следование-прервано	Следование <A> заканчивать рано, т.к. ещё не все действия следования выполнены<EX>	It's too early to finish the sequence <A>, because there are some missing acts<EX>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -367,9 +380,8 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """DuplicateOfAct (sequence only)	Оператор <B> входит в следование <A>, поэтому между началом и концом акта <A> должен содержаться ровно один акт <B>.	Act <B> is a part of sequence <A> so each execution of <A> must contain strictly one execution of <B>"""
+	spec = """DuplicateOfAct Дубликат (sequence only)	Оператор <B> входит в следование <A>, поэтому между началом и концом акта <A> должен содержаться ровно один акт <B>.	Act <B> is a part of sequence <A> so each execution of <A> must contain strictly one execution of <B>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
-	class_name = list(class_name.split())[0]
 	
 	def _param_provider(a: 'act_instance'):
 		# sequence_act = get_relation_subject(onto.parent_of, a)
@@ -386,7 +398,7 @@ def register_explanation_handlers():
 	######### Alternative mistakes #########
 	########========================########
 	
-	spec = """NoFirstCondition	Развилка <A> должна начинаться с проверки первого условия <B>.	The first condition <B> must be executed right after alternative <A> starts"""
+	spec = """NoFirstCondition Нет-первого-условия	Развилка <A> должна начинаться с проверки первого условия <B>.	The first condition <B> must be executed right after alternative <A> starts"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -402,7 +414,6 @@ def register_explanation_handlers():
 
 	# spec = """WrongBranch -> BranchOfLaterCondition	Во время выполнения альтернативы <A> не должна выполниться ветка <D>, потому что условие <C> уже истинно.	Alternative <A> must not execute branch <D> because the condition <C> is true"""
 	# class_name, format_str = class_formatstr(spec.split('\t'))
-	# class_name = list(class_name.split())[0]
 	
 	# def _param_provider(a: 'act_instance'):
 	# 	wrong_branch_act = a
@@ -421,7 +432,7 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """BranchWithoutCondition	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute branch <C> until the condition <B> is checked"""
+	spec = """BranchWithoutCondition Ветка-без-условия	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute branch <C> until the condition <B> is checked"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -435,7 +446,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """ElseBranchWithoutCondition	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute branch <C> until the condition <B> is checked"""
+	spec = """ElseBranchWithoutCondition Ветка-иначе-без-условия	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute branch <C> until the condition <B> is checked"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -449,7 +460,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """CondtionWithoutPrevCondition	Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие <B> не проверено (и не окажется ложным)	Alternative <A> cannot check condition <C> until the condition <B> is checked (and evaluated to false)"""
+	spec = """CondtionWithoutPrevCondition Условие-не-по-порядку	Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие <B> не проверено (и не окажется ложным)	Alternative <A> cannot check condition <C> until the condition <B> is checked (and evaluated to false)"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -463,7 +474,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """BranchOfFalseCondition	Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
+	spec = """BranchOfFalseCondition Ветка-при-ложном-условии	Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -478,7 +489,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AnotherExtraBranch	Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <Г> уже выполнилась	Alternative <A> must not execute branch <B> because the branch <D> has already been executed"""
+	spec = """AnotherExtraBranch Лишняя-вторая-ветка	Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <Г> уже выполнилась	Alternative <A> must not execute branch <B> because the branch <D> has already been executed"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -492,7 +503,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """NoBranchWhenConditionIsTrue	Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно	Alternative <A> must execute branch <C> because the condition <B> is true"""
+	spec = """NoBranchWhenConditionIsTrue Нет-ветки-при-истинном-условии	Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно	Alternative <A> must execute branch <C> because the condition <B> is true"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -507,7 +518,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AllFalseNoEnd	Альтернатива <A> не имеет ветви "иначе", поэтому она должна завершиться, потому что условие <B> является ложным	Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
+	spec = """AllFalseNoEnd Развилка-не-закочилась	Альтернатива <A> не имеет ветви "иначе", поэтому она должна завершиться, потому что условие <B> является ложным	Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -523,7 +534,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AllFalseNoElse	Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно	Alternative <A> must execute branch <D> because the condition <B> is false"""
+	spec = """AllFalseNoElse Нет-ветки-иначе	Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно	Alternative <A> must execute branch <D> because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -541,7 +552,7 @@ def register_explanation_handlers():
 	######### Lops mistakes #########
 	########=================########
 	
-	spec = """MissingIterationAfterSuccessfulCondition	Во время выполнения цикла <A> на <i-ой> итерации должно выполниться тело <D>, потому что условие <B> истинно	Iteration <C> of loop <A> must happen because condition <B> is true"""
+	spec = """MissingIterationAfterSuccessfulCondition Нет-итерации	Во время выполнения цикла <A> на <i-ой> итерации должно выполниться тело <D>, потому что условие <B> истинно	Iteration <C> of loop <A> must happen because condition <B> is true"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -562,7 +573,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """IterationAfterFailedCondition	Во время выполнения цикла <A> на очередной итерации не должно выполниться тело <D>, потому что условие <B> ложно	During execution of loop <A>, iteration <C> mustn't happen because condition <B> is false."""
+	spec = """IterationAfterFailedCondition Итерация-при-ложном-условии	Во время выполнения цикла <A> на очередной итерации не должно выполниться тело <D>, потому что условие <B> ложно	During execution of loop <A>, iteration <C> mustn't happen because condition <B> is false."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -580,7 +591,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """MissingConditionAfterIteration	Во время выполнения цикла <A> после очередной итерации нужно проверить условие <B>, чтобы продолжить цикл или закончить его.	Right after the iteration of loop <A> finished, condition <B> must check whether to continue or finish looping."""
+	spec = """MissingConditionAfterIteration Нет-проверки-условия	Во время выполнения цикла <A> после очередной итерации нужно проверить условие <B>, чтобы продолжить цикл или закончить его.	Right after the iteration of loop <A> finished, condition <B> must check whether to continue or finish looping."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -596,7 +607,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 
-	spec = """MissingConditionBetweenIterations	Во время выполнения цикла <A>, перед тем как перейти к следующей итерации цикла, нужно проверить условие <B> и узнать, продолжится ли цикл или закончится.	Prior to proceeding to the next iteration of the loop <A>, the condition <B> checks out whether the loop will continue or end."""
+	spec = """MissingConditionBetweenIterations Нет-проверки-условия-между-итерациями	Во время выполнения цикла <A>, перед тем как перейти к следующей итерации цикла, нужно проверить условие <B> и узнать, продолжится ли цикл или закончится.	Prior to proceeding to the next iteration of the loop <A>, the condition <B> checks out whether the loop will continue or end."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
