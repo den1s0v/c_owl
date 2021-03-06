@@ -67,56 +67,56 @@ def create_app():
 	@app.route('/creating_task', methods=['POST'])
 	def creating_task():
 		# print(request.json)
-		assert 'algorithm_text' in request.json, 'Bad json: No "algorithm_text" key in JSON payload!'
-		algorithm_text = request.json['algorithm_text']
-		user_language = request.json.get('user_language', 'en')
-		set_target_lang(user_language)
-		if algorithm_text.startswith("<xml"):
-			res = create_algorithm_from_blockly_xml(algorithm_text)
-		else:
-			res = create_algorithm_from_text(algorithm_text.splitlines())
+		try:
+			assert 'algorithm_text' in request.json, 'Bad json: No "algorithm_text" key in JSON payload!'
+			
+			algorithm_text = request.json['algorithm_text']
+			user_language = request.json.get('user_language', 'en')
+			set_target_lang(user_language)
+			if algorithm_text.startswith("<xml"):
+				res = create_algorithm_from_blockly_xml(algorithm_text)
+			else:
+				res = create_algorithm_from_text(algorithm_text.splitlines())
 		
-		# if error
-		if isinstance(res, str):
+			# if error
+			assert not isinstance(res, str), res
+				
+			if isinstance(res, AlgorithmParser):
+				###
+				# from pprint import pprint
+				# pprint(res.algorithm)
+				
+				# trace_json = ()
+				trace_json = make_trace_for_algorithm(res.algorithm)
+				trace_json = add_styling_to_trace(res.algorithm, trace_json, user_language)
+		
+				# if error
+				assert not isinstance(trace_json, str), trace_json
+
+				algorithm_tags = styling.algorithm_to_tags(res.algorithm, user_language, request.json.get('syntax', 'C'))
+				# algorithm_tips = styling.get_button_tips()
+				algorithm_html = styling.to_html(algorithm_tags)
+				
+				return dict(
+					syntax_errors=(), 
+					algorithm_json=res.algorithm,
+					algorithm_as_html=algorithm_html,
+					trace_json=trace_json
+				)
+			
+		except Exception as ex:
+			res = f"{type(ex)}: {ex}"
+			print_exception(ex)
+			print("request.json :")
+			print(request.json)
+			print("The error above reported as response, continue.")
 			return dict(
 				syntax_errors=(res,), 
 				algorithm_json=None,
 				algorithm_as_html=None,
 				trace_json=()
 			)
-		if isinstance(res, AlgorithmParser):
-			
-			###
-			# from pprint import pprint
-			# pprint(res.algorithm)
-			
-			# trace_json = ()
-			trace_json = make_trace_for_algorithm(res.algorithm)
-			trace_json = add_styling_to_trace(res.algorithm, trace_json, user_language)
-	
-			# if error
-			if isinstance(trace_json, str):
-				return dict(
-					syntax_errors=(trace_json,), 
-					algorithm_json=None,
-					algorithm_as_html=None,
-					trace_json=()
-				)
-			###
-			# print('LENGTH(trace_json):', len(trace_json))
-			# pprint(res.algorithm)
 
-			algorithm_tags = styling.algorithm_to_tags(res.algorithm, user_language, request.json.get('syntax', 'C'))
-			# algorithm_tips = styling.get_button_tips()
-			algorithm_html = styling.to_html(algorithm_tags)
-			
-			return dict(
-				syntax_errors=(), 
-				algorithm_json=res.algorithm,
-				algorithm_as_html=algorithm_html,
-				trace_json=trace_json
-			)
-			
 		return dict(syntax_errors=("Server error: /creating_task command is not implemented",))  # debug
 	
 
@@ -124,66 +124,61 @@ def create_app():
 	@app.route('/verify_trace_act', methods=['POST'])
 	def verify_trace_act():
 		### print(request.json)
-		assert 'algorithm_json' in request.json, 'Bad json: No "algorithm_json" key in JSON payload!'
-		user_language = request.json.get('user_language', 'en')
-		set_target_lang(user_language)
-		
 		try:
+			assert 'algorithm_json' in request.json, 'Bad json: No "algorithm_json" key in JSON payload!'
+			
+			user_language = request.json.get('user_language', 'en')
+			set_target_lang(user_language)
+		
 			# extend the trace
 			res = make_act_json(**request.json)
+			
+			# if error
+			assert not isinstance(res, str), res
+
+			if isinstance(res, list):
+				
+				algorithm_json = request.json["algorithm_json"]
+				
+				# verify the obtained trace with reasoner
+				full_trace = res
+				alg_tr = {
+				    "trace_name"    : "http_trace",
+				    "algorithm_name": "http",
+				    "trace"         : full_trace,
+				    "algorithm"     : algorithm_json,
+				    "header_boolean_chain" : '',   # leave empty
+				}
+				# update acts data (inplace): write mistake explanations
+				_mistakes, err_msg = process_algorithms_and_traces([alg_tr], write_mistakes_to_acts=True)
+				
+				assert not err_msg, err_msg
+					
+				### print("After reasoning: ", *full_trace, sep='\n *\t')
+				
+				algorithm_tags = styling.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', 'C'), existing_trace=full_trace)
+				# algorithm_tips = styling.get_button_tips()
+				algorithm_html = styling.to_html(algorithm_tags)
+				
+				return dict(
+					full_trace_json=full_trace,  ## res,
+					algorithm_json=algorithm_json,  # pass back
+					algorithm_as_html=algorithm_html,
+					processing_errors=(), 
+				)
+
 		except Exception as ex:
 			res = f"{type(ex)}: {ex}"
-			import traceback
-			print(''.join(traceback.format_exception(etype=type(ex), value=ex, tb=ex.__traceback__)))
+			print_exception(ex)
 			print("request.json :")
 			print(request.json)
-			print("The error above reported as response, continue.")
-			
-		# if error
-		if isinstance(res, str):
 			return dict(
 				processing_errors=(res,), 
-				full_trace_json=[],
-				algorithm_as_html=(),
+				full_trace_json=(),
+				algorithm_json=None,
+				algorithm_as_html=None,
 			)
-		if isinstance(res, list):
-			
-			algorithm_json = request.json["algorithm_json"]
-			
-			# verify the obtained trace with reasoner
-			full_trace = res
-			alg_tr = {
-			    "trace_name"    : "http_trace",
-			    "algorithm_name": "http",
-			    "trace"         : full_trace,
-			    "algorithm"     : algorithm_json,
-			    "header_boolean_chain" : '',   # leave empty
-			}
-			# update acts data (inplace): write mistake explanations
-			_mistakes, err_msg = process_algorithms_and_traces([alg_tr], write_mistakes_to_acts=True)
-			
-			if err_msg:  # error
-				return dict(
-					processing_errors=(err_msg,), 
-					full_trace_json=[],
-					algorithm_as_html=(),
-					algorithm_json=algorithm_json,  # pass back
-				)
-				
-			### print("After reasoning: ", *full_trace, sep='\n *\t')
-			
-			# TODO
-			# algorithm_json = new(algorithm_json, full_trace)
-			algorithm_tags = styling.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', 'C'), existing_trace=full_trace)
-			# algorithm_tips = styling.get_button_tips()
-			algorithm_html = styling.to_html(algorithm_tags)
-			
-			return dict(
-				full_trace_json=full_trace,  ## res,
-				algorithm_json=algorithm_json,  # pass back
-				algorithm_as_html=algorithm_html,
-				processing_errors=(), 
-			)
+			print("The error above reported as response, continue.")
 			
 		return dict(trace_line_json={"as_string": "Dummy act line!", "id": 49, "loop": "waiting", "executes": 7, "gen": "he", "phase": "started", "_n": 4})  # debug
 
@@ -212,6 +207,10 @@ def create_app():
 
 	return app
 
+def print_exception(ex, print_args=()):
+	import traceback
+	print(''.join(traceback.format_exception(etype=type(ex), value=ex, tb=ex.__traceback__)))
+	if print_args: print(*print_args)
 
 
 def process_algorithm_and_trace_as_text_request(json):
