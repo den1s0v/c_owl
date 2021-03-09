@@ -247,6 +247,7 @@ set_syntax("C")  # the default
 
 def _get_act_button_tip(act_name, phase):
 	lang = get_target_lang()
+	act_name = act_name.get(lang, None) or act_name.get("en", "[action]")
 	return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name.replace("'", '"'))
 
 def _make_alg_button(alg_mode_id, act_name, state_name, allow_states=None) -> list or tuple:
@@ -374,10 +375,8 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 		if algorithm_json["type"] == "algorithm":
 			algorithm_json = algorithm_json["entry_point"]
 			
-		# id_ = algorithm_json["id"]
 		type_ = algorithm_json["type"]
 		name = algorithm_json["name"]
-		# act_name = algorithm_json["act_name"]
 			
 		if type_ in ("expr", ):
 			return _make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)
