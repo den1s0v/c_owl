@@ -71,12 +71,20 @@
         Modified standard blocks are used here. Вы можете переключиться на <a href="{{ url_for('blockly_test', lang='ru') }}">Русскую версию</a>.
   {% endif %}
   
+      </td>
+      <td>
 <!--   		<br/>
         <button onclick="export_xml_to_console()">Export XML to console</button> -->
         <i class="play icon"></i>
         <button onclick="send_xml_to_endpoint()">Show Preview</button>
+      	
+	    <select id="syntaxSelector">
+	        <option value="" style="display:none">Choose the  syntax</option>
+	        <option value="1">C</option>
+	        <option value="2">Java</option>
+	        <option value="2">Python</option>
+	    </select>
       </td>
-      <td></td>
     </tr>
     <tr>
       <td id="blocklyArea">
@@ -252,7 +260,12 @@
     	var xml_text = Blockly.Xml.domToPrettyText(xml);  // easy-readable form
     	save_xml(xml_text)
     	// console.log(xml_text);
-    	var data = {"user_language": which_language(), "algorithm_text": xml_text}
+    	
+    	var syntax = $('#syntaxSelector option:selected').text();
+    	// console.log(syntax);
+    	
+    	var data = {"user_language": which_language(), "algorithm_text": xml_text,
+    		syntax: syntax}
     	
     	result_id = 0;
         $.ajax({
@@ -364,6 +377,8 @@
     		algorithm_element_id: algorithm_element_id,
     		act_type: act_type,
     		existing_trace_json: trace_json || [],
+    		syntax: $('#syntaxSelector option:selected').text()
+
     	};
     	
     	result_id = 0;

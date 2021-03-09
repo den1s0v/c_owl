@@ -131,7 +131,9 @@ def create_app():
 			set_target_lang(user_language)
 		
 			# extend the trace
-			res = make_act_json(**request.json)
+			res = make_act_json(**{
+				k:v for k,v in request.json.items() if k in ("algorithm_json", "algorithm_element_id", "act_type", "existing_trace_json", "user_language")
+				})
 			
 			# if error
 			assert not isinstance(res, str), res
