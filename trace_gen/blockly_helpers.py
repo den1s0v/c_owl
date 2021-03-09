@@ -8,8 +8,8 @@ from collections import OrderedDict
 import xmltodict  # pip install xmltodict
 
 try:
-    from trace_gen.txt2algntr import AlgorithmParser, select_translation
-except ModuleNotFounError:
+    from trace_gen.txt2algntr import AlgorithmParser, make_translation
+except ModuleNotFoundError:
     from txt2algntr import AlgorithmParser
 
 
@@ -183,7 +183,7 @@ class AlgorithmXMLParser(AlgorithmParser):
     #         "id": self.newID(name),
     #         "type": "expr",
     #         "name": name,
-    #         "act_name": select_translation(ru=f"условие '{name}'", en=f"condition '{name}'"),
+    #         "act_name": make_translation(ru=f"условие '{name}'", en=f"condition '{name}'"),
     #     }
 
     # def parse_stmt(self, name:str) -> dict:
@@ -192,7 +192,7 @@ class AlgorithmXMLParser(AlgorithmParser):
     #         "id": self.newID(name),
     #         "type": "stmt",
     #         "name": name,
-    #         "act_name": select_translation(ru=f"действие '{name}'", en=f"statement '{name}'"),
+    #         "act_name": make_translation(ru=f"действие '{name}'", en=f"statement '{name}'"),
     #     }
 
     def parse_algorithm_ids(self, xml_tree: OrderedDict) -> list:
@@ -211,7 +211,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                     "id": self.newID(name),
                     "type": "sequence",
                     "name": name,
-                    "act_name": select_translation(ru=f"итерация цикла '{loop_name}'", en=f"iteration of loop '{loop_name}'"),
+                    "act_name": make_translation(ru=f"итерация цикла '{loop_name}'", en=f"iteration of loop '{loop_name}'"),
                     "body": stmt_List,
             }
 
@@ -272,7 +272,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                     "id": self.newID(block_NAME),
                     "type": "alternative",
                     "name": block_NAME,
-                    "act_name": select_translation(ru=f"альтернатива '{block_NAME}'", en=f"alternative '{block_NAME}'"),
+                    "act_name": make_translation(ru=f"альтернатива '{block_NAME}'", en=f"alternative '{block_NAME}'"),
                     "branches": []
                 })
                 # alt branches
@@ -302,7 +302,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                         "id": self.newID(branch_name),
                         "type": branch_type,
                         "name": branch_name,
-                        "act_name": select_translation(ru=f"ветка ЕСЛИ с условием '{cond_name}'", en=f"IF branch with condition '{cond_name}'"),
+                        "act_name": make_translation(ru=f"ветка ЕСЛИ с условием '{cond_name}'", en=f"IF branch with condition '{cond_name}'"),
                         "cond":  self.parse_expr(cond_name, values=values),
                         "body": parse_algorithm(block_DOn['block'] if 'block' in block_DOn else [])
                     } ]
@@ -329,7 +329,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                         "id": self.newID(branch_name),
                         "type": branch_type,
                         "name": branch_name,
-                        "act_name": select_translation(ru=f"ветка ИНАЧЕ альтернативы '{alt_name}'", en=f"ELSE branch of alternative '{alt_name}'"),
+                        "act_name": make_translation(ru=f"ветка ИНАЧЕ альтернативы '{alt_name}'", en=f"ELSE branch of alternative '{alt_name}'"),
                         "body": parse_algorithm(block_ELSE['block'] if 'block' in block_ELSE else [])
                         } ]
 
@@ -358,7 +358,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                     "id": self.newID(name),
                     "type": "while_loop",
                     "name": name,
-                    "act_name": select_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
+                    "act_name": make_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
                     "cond": self.parse_expr(cond_name, values=values),
                     "body":  make_loop_body(
                                 name,
@@ -403,7 +403,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                     "id": self.newID(name),
                     "type": loop_type,
                     "name": name,
-                    "act_name": select_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
+                    "act_name": make_translation(ru=f"цикл '{name}'", en=f"loop '{name}'"),
                     "cond": self.parse_expr(cond_name, values=values),
                     "body": make_loop_body(
                                 name,
