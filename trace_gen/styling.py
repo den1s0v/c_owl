@@ -278,7 +278,7 @@ def _make_alg_button(alg_mode_id, act_name, state_name, allow_states=None) -> li
 		},
 	]
 
-def _make_alg_tag(alg_node, token_type, inner='', states_before=None, states_after=None):
+def _make_alg_tag(alg_node, token_type, inner='', states_before=None, states_after=None, trailing_content=None):
 	more_attrs = {}
 	if alg_node:
 		id_ = alg_node["id"]
@@ -297,6 +297,7 @@ def _make_alg_tag(alg_node, token_type, inner='', states_before=None, states_aft
 			*_make_alg_button(id_, act_name, state_name, states_before),
 			inner,
 			*_make_alg_button(id_, act_name, state_name, states_after),
+			*([trailing_content] if trailing_content else ()),
 		]
 	
 	return {
@@ -323,12 +324,15 @@ def find_state_for_alg_id(algorithm_element_id, states):
 	return states[0]  # started / performed
 
 
-def _make_line_tag(indent, inner=''):
+def _make_line_tag(indent, inner='', css_class='code-line', indent_attr='margin-left'):
 	return {
 		"tag": "div",
-		"attributes": {"class": ['line'], "style": ['margin-left: %dem;' % indent]},
+		"attributes": {"class": [css_class], "style": [indent_attr + ': %dem;' % indent] if indent else ()},
 		"content": inner
 	}
+def _make_block_tag(indent, inner='', indent_attr='margin-left'):
+	return _make_line_tag(indent, inner, css_class='code-block', indent_attr=indent_attr)
+
 
 def _make_block_with_braces(indent, block_json, inner=()):
 	return [
@@ -336,22 +340,24 @@ def _make_block_with_braces(indent, block_json, inner=()):
 	_make_line_tag(indent, 
 		_make_alg_tag(block_json, '', 
 			inner=[
-				*(SYNTAX["BLOCK_OPEN"]() or ["&nbsp;" * (INDENT_STEP)]),
+				*(SYNTAX["BLOCK_OPEN"]() or [""]),
 			],
-			states_after=COMPLEX_NODE_STARTED)
+			states_after=COMPLEX_NODE_STARTED,
+			trailing_content="&nbsp;" * (INDENT_STEP))
 		),
 	# # тело цикла
 	# algorithm_to_tags(block_json, indent=indent + INDENT_STEP),
-	*inner,
+	_make_block_tag(INDENT_STEP, inner, indent_attr='padding-left'),
 	# закрыть тело цикла (если требуется по синтаксису)
 	# кнопка для конца тела цикла
-	_make_line_tag(indent, 
+	_make_line_tag(indent,
 		_make_alg_tag(block_json, '', 
 			inner=[
-				*(SYNTAX["BLOCK_CLOSE"]() or ["&nbsp;" * (INDENT_STEP)]),
+				*(SYNTAX["BLOCK_CLOSE"]() or [""]),
 			],
-			states_after=COMPLEX_NODE_FINISHED)
-		),
+			states_after=COMPLEX_NODE_FINISHED,
+			trailing_content="&nbsp;" * (INDENT_STEP) # немного пробелов, т.к. сторока короткая
+		)),
 	]
 
 
@@ -376,7 +382,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 	if isinstance(algorithm_json, dict):
 		if algorithm_json["type"] == "algorithm":
 			algorithm_json = algorithm_json["entry_point"]
-			
+
 		type_ = algorithm_json["type"]
 		name = algorithm_json["name"]
 			
@@ -397,7 +403,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 			loop_type = type_.replace("_loop", '')
 			
 			if loop_type == 'while':
-				return [
+				return _make_line_tag(0, [
 					# заголовок цикла
 					_make_line_tag(indent, [
 						_make_alg_tag(algorithm_json, 'keyword', 
@@ -409,8 +415,8 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 						_make_alg_tag(None, 'comment', 
 							inner=SYNTAX["COMMENT"](name))
 					]),
-					*_make_block_with_braces(indent, algorithm_json["body"], inner=algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP))
-				]
+					*_make_block_with_braces(indent, algorithm_json["body"], inner=algorithm_to_tags(algorithm_json["body"], indent=0))
+				])
 				
 			if loop_type == 'do_while':
 				# заголовок цикла
@@ -429,7 +435,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 					# Python case: emulate with `WHILE(TRUE): IF(): BREAK`.
 					header_line["content"] += ['==Python не поддерживает DO-WHILE==']
 					
-				body_lines = _make_block_with_braces(indent, algorithm_json["body"], inner=algorithm_to_tags(algorithm_json["body"], indent=indent + INDENT_STEP))
+				body_lines = _make_block_with_braces(indent, algorithm_json["body"], inner=algorithm_to_tags(algorithm_json["body"], indent=0))
 				
 				if not SYNTAX["DO_KEYWORD"]:
 					# TODO: Python case: emulate with `IF(): BREAK`
@@ -446,12 +452,12 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 						*SYNTAX["STATEMENT"](SYNTAX["CONDITION"](algorithm_to_tags(algorithm_json["cond"]))),
 					])
 					
-				return [
+				return _make_line_tag(0, [
 					header_line,
 					*body_lines,
 					# *body_end_lines,
 					footer_line
-				]
+				])
 				
 			# for, ... and more
 			else:
@@ -489,9 +495,9 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 				
 				result.append(line)
 				
-				result += _make_block_with_braces(indent, branch, inner=algorithm_to_tags(branch["body"], indent=indent + INDENT_STEP))
+				result += _make_block_with_braces(indent, branch, inner=algorithm_to_tags(branch["body"], indent=0))
 				
-			return result
+			return _make_line_tag(0, result)
 
 	return ''
 
