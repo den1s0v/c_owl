@@ -431,7 +431,7 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """BranchWithoutCondition Ветка-без-условия	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute branch <C> until the condition <B> is checked"""
+	spec = """BranchWithoutCondition Ветка-без-условия	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute the branch <C> until the condition <B> is checked"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -445,7 +445,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """ElseBranchWithoutCondition Ветка-иначе-без-условия	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute branch <C> until the condition <B> is checked"""
+	spec = """ElseBranchWithoutCondition Ветка-иначе-без-условия	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute the branch <C> until the condition <B> is checked"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -473,7 +473,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """BranchOfFalseCondition Ветка-при-ложном-условии	Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно	Alternative <A> must not execute branch <C> because the condition <B> is false"""
+	spec = """BranchOfFalseCondition Ветка-при-ложном-условии	Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно	Alternative <A> must not execute the branch <C> because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -488,7 +488,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AnotherExtraBranch Лишняя-вторая-ветка	Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <D> уже выполнилась	Alternative <A> must not execute branch <B> because the branch <D> has already been executed"""
+	spec = """AnotherExtraBranch Лишняя-вторая-ветка	Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <D> уже выполнилась	Alternative <A> must not execute the branch <B> because the branch <D> has already been executed"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -502,7 +502,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """NoBranchWhenConditionIsTrue Нет-ветки-при-истинном-условии	Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно	Alternative <A> must execute branch <C> because the condition <B> is true"""
+	spec = """NoBranchWhenConditionIsTrue Нет-ветки-при-истинном-условии	Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно	Alternative <A> must execute the branch <C> because the condition <B> is true"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -517,7 +517,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AllFalseNoEnd Развилка-не-закочилась	Альтернатива <A> не имеет ветви "иначе", поэтому она должна завершиться, потому что условие <B> является ложным	Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
+	spec = """AllFalseNoEnd Развилка-не-закончилась	Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, потому что условие <B> является ложным	Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -533,7 +533,22 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AllFalseNoElse Нет-ветки-иначе	Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно	Alternative <A> must execute branch <D> because the condition <B> is false"""
+	spec = """NoEndAfterBranch Развилка-не-закончена	Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, потому что условие <B> является ложным	Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
+	class_name, format_str = class_formatstr(spec.split('\t'))
+	
+	def _param_provider(a: 'act_instance'):
+		# cond_act = get_relation_object(a, onto.precursor)
+		# cond = get_relation_object(cond_act, onto.executes)
+		# br = get_relation_subject(onto.cond, cond)
+		alt = get_relation_object(a, onto.should_be)
+		return {
+			'<A>': format_full_name(alt, 0,0,0),
+			'<B>': format_full_name(a, 0,1,1),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+	spec = """AllFalseNoElse Нет-ветки-иначе	Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно	Alternative <A> must execute the branch <D> because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):

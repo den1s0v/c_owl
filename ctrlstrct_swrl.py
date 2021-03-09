@@ -1353,11 +1353,33 @@ RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error",
 	student_next(?a, ?b),
 	Erroneous(?b),
 	
-	 -> should_be(?b, ?a), 
+	 -> # ?? should_be(?b, ?a), 
 	 precursor(?b, ?a),
 	 AllFalseNoEnd(?b)
 """))
 
+
+# Условие после ветки  [works?]
+RULES.append(DomainRule(name="NoEndAfterBranch-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
+	act_end(?a),
+	executes(?a, ?br),
+	branches_item(?alt, ?br),
+	alternative(?alt), 
+
+	student_next(?a, ?b),
+	# act_begin(?b),  # allow any type of erroneous act
+	executes(?b, ?st),
+	# next act is not alt
+		id(?st, ?i),
+		id(?alt, ?i2),
+		notEqual(?i, ?i2),
+	
+	 -> should_be(?b, ?alt), 
+	 precursor(?b, ?a),
+	 NoEndAfterBranch(?b)
+"""))
 
 # ============ Loops mistakes ============ #
 

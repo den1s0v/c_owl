@@ -1068,6 +1068,7 @@ def init_persistent_structure(onto):
                 # Alternatives mistakes ...
                 "NoFirstCondition",
                 ("ConditionAfterBranch", ["ExtraAct"]),
+                ("NoEndAfterBranch", ["ExtraAct"]),
                 ("WrongBranch", ["ExtraAct"]),
                 ("BranchOfFalseCondition", ["WrongBranch"]),
                 ("AnotherExtraBranch", ["WrongBranch"]),
