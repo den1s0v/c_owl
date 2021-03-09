@@ -197,7 +197,6 @@ SYNTAX = {}
 
 def set_syntax(programming_language_name: str):
 	name = programming_language_name.capitalize()
-	SYNTAX["name"] = name
 	passthrough = lambda tag: tag;
 	call_tr = lambda s: tr(s);
 	
@@ -211,7 +210,7 @@ def set_syntax(programming_language_name: str):
 		SYNTAX["STATEMENT"] = passthrough
 		SYNTAX["WHILE_KEYWORD"] = call_tr
 	
-	elif name in ("C", "Си"):
+	elif name in ("C", "Си", "Java"):
 		SYNTAX["BLOCK_OPEN"] = lambda: ["{"]
 		SYNTAX["BLOCK_CLOSE"] = lambda: ["}"]
 		SYNTAX["COMMENT"] = lambda tag: ["// ", tag]
@@ -233,6 +232,9 @@ def set_syntax(programming_language_name: str):
 		
 	else:
 		print(f"### Warning (ignoring): Unknown syntax in set_syntax('{name}').")
+		return
+		
+	SYNTAX["name"] = name
 
 
 set_syntax("C")  # the default

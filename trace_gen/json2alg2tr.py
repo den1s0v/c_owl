@@ -14,7 +14,7 @@ def set_target_lang(lang_code: str):
 	global TARGET_LANG
 	assert lang_code in SUPPORTED_LANGS, lang_code
 	TARGET_LANG = lang_code
-	### print("TARGET_LANG:", TARGET_LANG)
+	### print('===', "TARGET_LANG:", TARGET_LANG, '===')
 
 def get_target_lang():
 	return TARGET_LANG
