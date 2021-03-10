@@ -222,8 +222,10 @@ def register_explanation_handlers():
 	######### General act mistakes #########
 	########========================########
 	
-	spec = """ActEndsWithoutStart Конец-без-начала	<начало акта А> не может выполняться позже <конец акта А>.	Act <A> can't finish in this line because it didn't start yet."""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """ActEndsWithoutStart Конец-без-начала
+<начало акта А> не может выполняться позже <конец акта А>.
+Act <A> can't finish in this line because it didn't start yet."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		return {
@@ -232,8 +234,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """ActStartsAfterItsEnd Акт-начался-позже-чем-закончился	<начало акта А> не может выполняться позже <конец акта А>.	Act <A> can't start in this line because it is already finished."""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """ActStartsAfterItsEnd Акт-начался-позже-чем-закончился
+<начало акта А> не может выполняться позже <конец акта А>.
+Act <A> can't start in this line because it is already finished."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		return {
@@ -242,8 +246,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """MisplacedBefore Раньше-объемлющего-акта	Акт <Б> не может выполняться раньше <начало акта А> потому что <B> входит в <A>.	Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """MisplacedBefore Раньше-объемлющего-акта
+Акт <Б> не может выполняться раньше <начало акта А> потому что <B> входит в <A>.
+Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		correct_parent_act = get_relation_object(a, onto.context_should_be)
@@ -254,8 +260,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """MisplacedAfter Позже-объемлющего-акта	<Акт Б> не может выполняться позже <конец акта А> потому что <B> входит в <A>	Act <B> is a part of <A> so it can't be executed outside of (later than) <A>"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """MisplacedAfter Позже-объемлющего-акта
+<Акт Б> не может выполняться позже <конец акта А> потому что <B> входит в <A>
+Act <B> is a part of <A> so it can't be executed outside of (later than) <A>"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		correct_parent_act = get_relation_object(a, onto.context_should_be)
@@ -266,8 +274,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """EndedDeeper Конец-внутри-вложенного-акта	Всякий акт заканчивается ровно тогда, когда завершились все его вложенные акты, поэтому aкт <A> не может закончиться до окончания акта <B> (<B> входит в <A>)	Every act ends exactly when all its nested acts have ended, so the act <A> cannot end until the end of the act <B> (<B> is included in <A>)"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """EndedDeeper Конец-внутри-вложенного-акта
+Всякий акт заканчивается ровно тогда, когда завершились все его вложенные акты, поэтому aкт <A> не может закончиться до окончания акта <B> (<B> входит в <A>)
+Every act ends exactly when all its nested acts have ended, so the act <A> cannot end until the end of the act <B> (<B> is included in <A>)"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		nested = get_relation_object(a, onto.cause)
@@ -279,8 +289,10 @@ def register_explanation_handlers():
 	
 	
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
-	spec = """WrongContext Вне-контекста	Акт <B> не может выполняться в рамках акта <EX>, потому что <B> непосредственно входит в <A>.	Act <B> is a immediate part of <A><EX> so it can't be executed outside of <A>"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """WrongContext Вне-контекста
+Акт <B> не может выполняться в рамках акта <EX>, потому что <B> непосредственно входит в "<A>".
+Act <B> is a immediate part of "<A>" so it can't be executed inside of <EX>"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		correct_parent_act = get_relation_object(a, onto.context_should_be) or get_relation_subject(onto.parent_of, a)
@@ -294,8 +306,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """ExtraAct Лишний-акт	Не должно быть здесь	<A> must not happen here due to previous error(s)"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """ExtraAct Лишний-акт
+Не должно быть здесь
+<A> must not happen here due to previous error(s)"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		return {
@@ -304,8 +318,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	# spec = """TooEarly	<A> следует выполнить позже, после некоторых пропущенных актов	<A> must happen later, after some missing acts"""
-	# class_name, format_str = class_formatstr(spec.split('\t'))
+	# spec = """TooEarly
+	# <A> следует выполнить позже, после некоторых пропущенных актов
+	# <A> must happen later, after some missing acts"""
+	# class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	# def _param_provider(a: 'act_instance'):
 	# 	return {
@@ -314,8 +330,10 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """DisplacedAct Перемещённый-акт	<A> должно произойти перед <B>, но не здесь	<A> must happen before <B> but not here"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """DisplacedAct Перемещённый-акт
+<A> должно произойти перед <B>, но не здесь
+<A> must happen before <B> but not here"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		before_this_act = get_relation_object(a, onto.should_be_before)
@@ -330,8 +348,10 @@ def register_explanation_handlers():
 	######### Sequence mistakes #########
 	########=====================########
 	
-	# spec = """TooEarlyInSequence	<конец акта А> не может находится позже <начало акта Б>, потому что в <следование В><оператор А> находится перед <оператор Б>	Act <A> is placed in sequnce <C> before act <B> so act <A> must finish before act <B> starts"""
-	# class_name, format_str = class_formatstr(spec.split('\t'))
+	# spec = """TooEarlyInSequence
+	# <конец акта А> не может находится позже <начало акта Б>, потому что в <следование В><оператор А> находится перед <оператор Б>
+	# Act <A> is placed in sequnce <C> before act <B> so act <A> must finish before act <B> starts"""
+	# class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	# def _param_provider(a: 'act_instance'):
 	# 	item = get_relation_object(a, onto.executes)
@@ -353,8 +373,10 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """TooEarlyInSequence Не-в-порядке-следования	Следование выполняет все свои действия по порядку, поэтому <A> не может выполняться раньше, чем <B>.	A sequence performs all actions in order, so <A> cannot run before <B>"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """TooEarlyInSequence Не-в-порядке-следования
+Следование выполняет все свои действия по порядку, поэтому <A> не может выполняться раньше, чем <B>.
+A sequence performs all actions in order, so <A> cannot run before <B>"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		missed_act = get_relation_object(a, onto.should_be_after)
@@ -367,8 +389,10 @@ def register_explanation_handlers():
 	
 	
 	# переработано
-	spec = """NoFirstOfSequence Следование-не-сначала	Следование выполняет все действия по порядку от первого до последнего, поэтому выполнение следования <S> должно начинаться с этого: <B> (но не с этого: <A>)	A sequence performs all actions in order from the first through the last, so the execution of the sequence <S> must start with <B> (but not with <A>)"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """NoFirstOfSequence Следование-не-сначала
+Следование выполняет все действия по порядку от первого до последнего, поэтому выполнение следования <S> должно начинаться с этого: <B> (но не с этого: <A>)
+A sequence performs all actions in order from the first through the last, so the execution of the sequence <S> must start with <B> (but not with <A>)"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		st = get_relation_object(a, onto.should_be)
@@ -382,8 +406,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """SequenceFinishedTooEarly Следование-прервано	Следование выполняет все свои действия от первого до последнего, потому рано заканчивать следование <A>, т.к. не все действия следования выполнены<EX>	A sequence performs all its actions from the first through the last, so it's too early to finish the sequence <A>, because not all the actions of the following have completed<EX>"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """SequenceFinishedTooEarly Следование-прервано
+Следование выполняет все свои действия от первого до последнего, потому рано заканчивать следование <A>, т.к. не все действия следования выполнены<EX>
+A sequence performs all its actions from the first through the last, so it's too early to finish the sequence <A>, because not all the actions of the following have completed<EX>"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		missed_act = get_relation_subject(onto.should_be_before, a)
@@ -395,8 +421,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """DuplicateOfAct Дубликат (sequence only)	Оператор <B> входит в следование <A>, поэтому между началом и концом акта <A> должен содержаться ровно один акт <B>.	Act <B> is a part of sequence <A> so each execution of <A> must contain strictly one execution of <B>"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """DuplicateOfAct Дубликат (sequence only)
+Оператор <B> входит в следование <A>, поэтому между началом и концом акта <A> должен содержаться ровно один акт <B>.
+Act <B> is a part of sequence <A> so each execution of <A> must contain strictly one execution of <B>"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		# sequence_act = get_relation_subject(onto.parent_of, a)
@@ -413,8 +441,10 @@ def register_explanation_handlers():
 	######### Alternative mistakes #########
 	########========================########
 	
-	spec = """NoFirstCondition Нет-первого-условия	Развилка <A> должна начинаться с проверки первого условия <B>.	The first condition <B> must be executed right after alternative <A> starts"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """NoFirstCondition Нет-первого-условия
+Развилка <A> должна начинаться с проверки первого условия <B>.
+The first condition <B> must be executed right after alternative <A> starts"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		alt_act = get_relation_object(a, onto.precursor)
@@ -427,8 +457,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	# spec = """WrongBranch -> BranchOfLaterCondition	Во время выполнения альтернативы <A> не должна выполниться ветка <D>, потому что условие <C> уже истинно.	Alternative <A> must not execute branch <D> because the condition <C> is true"""
-	# class_name, format_str = class_formatstr(spec.split('\t'))
+	# spec = """WrongBranch -> BranchOfLaterCondition
+# Во время выполнения альтернативы <A> не должна выполниться ветка <D>, потому что условие <C> уже истинно.
+# Alternative <A> must not execute branch <D> because the condition <C> is true"""
+	# class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	# def _param_provider(a: 'act_instance'):
 	# 	wrong_branch_act = a
@@ -447,8 +479,10 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """BranchWithoutCondition Ветка-без-условия	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute the branch <C> until the condition <B> is checked"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """BranchWithoutCondition Ветка-без-условия
+Альтернативная ветка <C> не может начаться, пока условие <B> не проверено
+Alternative <A> cannot execute the branch <C> until the condition <B> is checked"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		cond = get_relation_object(a, onto.should_be_after)
@@ -461,8 +495,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """ElseBranchWithoutCondition Ветка-иначе-без-условия	Альтернативная ветка <C> не может начаться, пока условие <B> не проверено	Alternative <A> cannot execute the branch <C> until the condition <B> is checked"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """ElseBranchWithoutCondition Ветка-иначе-без-условия
+Альтернативная ветка <C> не может начаться, пока условие <B> не проверено
+Alternative <A> cannot execute the branch <C> until the condition <B> is checked"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		cond = get_relation_object(a, onto.should_be_after)
@@ -475,8 +511,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """CondtionWithoutPrevCondition Условие-не-по-порядку	Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие <B> не проверено (и не окажется ложным)	Alternative <A> cannot check condition <C> until the condition <B> is checked (and evaluated to false)"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """CondtionWithoutPrevCondition Условие-не-по-порядку
+Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие <B> не проверено (и не окажется ложным)
+Alternative <A> cannot check condition <C> until the condition <B> is checked (and evaluated to false)"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		cond = get_relation_object(a, onto.should_be_after)
@@ -489,8 +527,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """BranchOfFalseCondition Ветка-при-ложном-условии	Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно	Alternative <A> must not execute the branch <C> because the condition <B> is false"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """BranchOfFalseCondition Ветка-при-ложном-условии
+Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно
+Alternative <A> must not execute the branch <C> because the condition <B> is false"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		cond_act = get_relation_object(a, onto.cause)
@@ -504,8 +544,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AnotherExtraBranch Лишняя-вторая-ветка	Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <D> уже выполнилась	Alternative <A> must not execute the branch <B> because the branch <D> has already been executed"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """AnotherExtraBranch Лишняя-вторая-ветка
+Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <D> уже выполнилась
+Alternative <A> must not execute the branch <B> because the branch <D> has already been executed"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		prev_branch_act = get_relation_object(a, onto.cause)
@@ -518,8 +560,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """NoBranchWhenConditionIsTrue Нет-ветки-при-истинном-условии	Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно	Alternative <A> must execute the branch <C> because the condition <B> is true"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """NoBranchWhenConditionIsTrue Нет-ветки-при-истинном-условии
+Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно
+Alternative <A> must execute the branch <C> because the condition <B> is true"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		cond_act = get_relation_object(a, onto.precursor)
@@ -533,8 +577,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AllFalseNoEnd Развилка-не-закончилась	Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, потому что условие <B> является ложным	Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """AllFalseNoEnd Развилка-не-закончилась
+Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, потому что условие <B> является ложным
+Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		cond_act = get_relation_object(a, onto.precursor)
@@ -549,8 +595,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """NoEndAfterBranch Развилка-не-закончена	Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, потому что условие <B> является ложным	Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """NoEndAfterBranch Развилка-не-закончена
+Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, потому что условие <B> является ложным
+Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		# cond_act = get_relation_object(a, onto.precursor)
@@ -564,8 +612,10 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AllFalseNoElse Нет-ветки-иначе	Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно	Alternative <A> must execute the branch <D> because the condition <B> is false"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """AllFalseNoElse Нет-ветки-иначе
+Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно
+Alternative <A> must execute the branch <D> because the condition <B> is false"""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		cond_act = get_relation_object(a, onto.precursor)
@@ -582,50 +632,86 @@ def register_explanation_handlers():
 	######### Lops mistakes #########
 	########=================########
 	
-	spec = """MissingIterationAfterSuccessfulCondition Нет-итерации	Во время выполнения цикла <A> на <i-ой> итерации должно выполниться тело <D>, потому что условие <B> истинно	Iteration <C> of loop <A> must happen because condition <B> is true"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """MissingIterationAfterSuccessfulCondition Нет-итерации
+Если условие продолжения цикла истинно, то цикл должен продолжиться, т.е. начаться итерация цикла. Поэтому, раз условие <B> истинно, должно начаться тело цикла <A>.
+Every time the condition of continuation of a loop is true, the loop should continue, i.e. an iteration should begin. The Iteration of loop <A> must start because the condition <B> is true."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		
-		# cond_act = get_relation_subject(onto.student_next, a)
-		cond_act = get_relation_object(a, onto.precursor)
+		cond_act = get_relation_object(a, onto.cause)
 		cond = get_relation_object(cond_act, onto.executes)
 		loop = get_relation_subject(onto.cond, cond)
-		# body = get_relation_object(loop, onto.body)
+		
+		print(cond_act, cond, loop)
 		
 		return {
-			'<i-ой>': 'очередной',
 			'<A>': format_full_name(loop, 0,0,0),
 			'<B>': format_full_name(cond, 0,0,0),
-			' <C>': '',
-			'<D>': tr("loop", 'gent'),  # format_full_name(body, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """IterationAfterFailedCondition Итерация-при-ложном-условии	Во время выполнения цикла <A> на очередной итерации не должно выполниться тело <D>, потому что условие <B> ложно	During execution of loop <A>, iteration <C> mustn't happen because condition <B> is false."""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """MissingLoopEndAfterFailedCondition Нет-конца-цикла
+Цикл заканчивается, как только условие продолжения стало ложным. Поэтому, раз условие <B> ложно, цикл <A> должен завершиться.
+A loop ends as soon as the continuation condition becomes false. Therefore, if the condition <B> is false, the loop <A> must end."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		
+		cond_act = get_relation_object(a, onto.cause)
+		cond = get_relation_object(cond_act, onto.executes)
+		loop = get_relation_subject(onto.cond, cond)
+		
+		return {
+			'<A>': format_full_name(loop, 0,0,0),
+			'<B>': format_full_name(cond, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """LoopEndsWithoutCondition Конец-цикла-без-проверки-условия
+Цикл заканчивается только тогда, когда условие продолжения стало ложным. Поэтому, чтобы цикл <A> должен завершиться, раз условие <B> ложно.
+A loop ends as soon as the continuation condition becomes false. Therefore, if the condition <B> is false, the loop <A> must end."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		
+		cond_act = get_relation_object(a, onto.cause)
+		cond = get_relation_object(cond_act, onto.executes)
+		loop = get_relation_subject(onto.cond, cond)
+		
+		return {
+			'<A>': format_full_name(loop, 0,0,0),
+			'<B>': format_full_name(cond, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """IterationAfterFailedCondition Итерация-при-ложном-условии
+Как только условие продолжения стало ложным, цикл заканчивается. Поэтому, раз условие <B> ложно, итерация цикла <A> не может начаться.
+As soon as the continuation condition becomes false, the loop ends. Therefore, if the condition <B> is false, the iteration of the loop <A> cannot start."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		cond_act = get_relation_object(a, onto.precursor)
 		cond = get_relation_object(cond_act, onto.executes)
 		loop = get_relation_subject(onto.cond, cond)
-		# body = get_relation_object(loop, onto.body)
 		
 		return {
 			'<A>': format_full_name(loop, 0,0,0),
 			'<B>': format_full_name(cond_act, 0,0,1),
-			'<C> ': '',
-			'<D>': tr("loop", 'gent'),  # format_full_name(body, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """MissingConditionAfterIteration Нет-проверки-условия	Во время выполнения цикла <A> после очередной итерации нужно проверить условие <B>, чтобы продолжить цикл или закончить его.	Right after the iteration of loop <A> finished, condition <B> must check whether to continue or finish looping."""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	spec = """MissingConditionAfterIteration Нет-проверки-условия
+Во время выполнения цикла <A> после очередной итерации нужно проверить условие <B>, чтобы продолжить цикл или закончить его.
+Right after the iteration of loop <A> finished, condition <B> must check whether to continue or finish looping."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
-		body_act = get_relation_object(a, onto.precursor)
+		body_act = get_relation_object(a, onto.cause)
 		body = get_relation_object(body_act, onto.executes)
 		loop = get_relation_subject(onto.body, body)
 		cond = get_relation_object(loop, onto.cond)
@@ -635,10 +721,12 @@ def register_explanation_handlers():
 			'<B>': format_full_name(cond, 0,0,1) if cond else '',
 			}
 	register_handler(class_name, format_str, _param_provider)
-	
 
-	spec = """MissingConditionBetweenIterations Нет-проверки-условия-между-итерациями	Во время выполнения цикла <A>, перед тем как перейти к следующей итерации цикла, нужно проверить условие <B> и узнать, продолжится ли цикл или закончится.	Prior to proceeding to the next iteration of the loop <A>, the condition <B> checks out whether the loop will continue or end."""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+
+	spec = """MissingConditionBetweenIterations Нет-проверки-условия-между-итерациями
+Во время выполнения цикла <A>, перед тем как перейти к следующей итерации цикла, нужно проверить условие <B> и узнать, продолжится ли цикл или закончится.
+Prior to proceeding to the next iteration of the loop <A>, the condition <B> checks out whether the loop will continue or end."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		body_act = get_relation_object(a, onto.precursor)
