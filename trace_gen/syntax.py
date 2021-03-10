@@ -56,7 +56,7 @@ def set_syntax(programming_language_name: str):
 		SYNTAX["STATEMENT"] = passthrough
 		SYNTAX["WHILE_KEYWORD"] = call_tr
 	
-	elif name in ("C", "Си", "Java"):
+	elif name in ("C", "C++", "Си", "Java"):
 		SYNTAX["BLOCK_OPEN"] = lambda: ["{"]
 		SYNTAX["BLOCK_CLOSE"] = lambda: ["}"]
 		SYNTAX["COMMENT"] = lambda tag: ["// ", tag]

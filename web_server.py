@@ -62,7 +62,13 @@ def create_app():
 			return redirect(url)
 		
 		url = url_for('index')
-		return redirect(url)
+		return '<p>HTTP 404 Error Encountered</p><p>Requested URL: %s</p>Get me <a href="%s">Home</a>' % (request.url, url), 404
+		# return redirect(url)
+
+
+	@app.route('/available_syntaxes', methods=['GET'])
+	def available_syntaxes():
+		return {"available_syntaxes": ["C++", "Java", "Python", ]}
 
 
 	@app.route('/creating_task', methods=['POST'])
