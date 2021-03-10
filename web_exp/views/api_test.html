@@ -79,30 +79,18 @@
 <h1>API test</h1>
 <noscript><h2>Please enable Javascript!</h2></noscript>
     
-<h2> Заметки по <a href="https://developers.google.com/blockly">Blockly</a> </h2>
+<h3> Auxilary: get available syntaxes </h3>
 
-<!-- <details open> -->
-<details>
-    <summary>Перечень необходимых синтаксических элементов:</summary>
-    
-    <ol>
-        <li> Блок кода (следование) - 1 и более действий подряд
-			(можно обойтись без спец. элемента Blockly)
-        </li>
-        <li> Развилка именованная - имя (строка), условие (строка), слоты: ветка IF, опционально ветка ELSE
-        </li>
-        <!-- <li> Развилка с множественнымим условиями: IF - ELSE-IF - ... - ELSE-IF [- ELSE]
-        	<br>* [если не получится, можно отложить]
-        	<br>* каждому условию сопоставлена своя ветка, плюс опциональная ветка ELSE.
-        	<br>* вместо переменного числа веток можно сделать несколько шаблонов с 1, 2, 3, 4 ветками + ELSE
-        </li> -->
-        <li>Циклы именованные: имя (строка), условие (строка), слоты: тело:
-        	<br>* WHILE - условие и тело
-        	<br>* DO-WHILE - тело и условие (только для Си)
-        </li>
-    </ol>
+<details open>
+    <summary>Format</summary>
+    Получить список поддерживаемых синтаксисов для оформления алгоритма
+    <pre><code class="js">
+request : 'localhost:2020/available_syntaxes' [method:GET]
+response : json {
+  "available_syntaxes": ["C++", "Java", "Python"]
+}
+    </code></pre>
 </details>
-    Кстати, Си не поддерживается в Blockly, но есть версия "Dart" с похожим синтаксисом.
 
 
 <h2> На странице преподавателя </h2>
@@ -121,7 +109,7 @@ request to 'localhost:2020/creating_task' [method:POST] : json {
     </code></pre>
 </details>
 
-<details open>
+<details close>
     <summary>Сохранение в БД</summary>
     Сохранению в БД подлежат:
     <ul>
