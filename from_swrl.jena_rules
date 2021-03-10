@@ -613,7 +613,7 @@
 	 (?b rdf:type my:LoopCondAfterUpdate)
 ]
 
-# Rule: CorrespondingActsMismatch_Error [mistake]
+# Rule: CorrespondingEndMismatched-Error [mistake]
 [
 	(?a my:student_corresponding_end ?b), 
 	(?a my:executes ?s1),
@@ -641,6 +641,7 @@
 # Rule: GenericWrongParent_Error [mistake]
 [
 	(?p my:parent_of ?a),
+	(?p my:student_index ?i),                                        
 	(?c my:student_parent_of ?a),
 	                        
 		(?p my:id ?ip),
@@ -666,6 +667,20 @@
 	 -> (?a my:precursor ?p),
 	 (?a my:context_should_be ?pa),                                
 	 (?a rdf:type my:WrongContext)
+]
+
+# Rule: EndedDeeper-error [mistake]
+[
+	(?a rdf:type my:CorrespondingEndMismatched),
+	(?b1 my:corresponding_end ?a),
+	(?b2 my:student_corresponding_end ?a),
+	         
+		(?b1 my:student_index ?i1),
+		(?b2 my:student_index ?i2),
+		lessThan(?i1, ?i2),
+	 -> 
+	 (?a my:cause ?b2),
+	 (?a rdf:type my:EndedDeeper)
 ]
 
 # Rule: GenericWrongExecTime-b_Error [mistake]
@@ -762,19 +777,40 @@
 	 -> (?c1 rdf:type my:DisplacedAct)
 ]
 
+# Rule: NoFirstOfSequence-Seq_error [mistake & sequence]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?seq),
+	(?seq rdf:type my:sequence),
+	(?seq my:body_item ?st),
+	(?st rdf:type my:first_item),
+	
+	(?a my:student_next ?b),
+	                                   
+		(?b my:executes ?st_b),
+		(?st my:id ?i1),
+		(?st_b my:id ?i2),
+		notEqual(?i1, ?i2),
+	 -> (?b my:should_be ?st), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:NoFirstOfSequence)
+]
+
 # Rule: TooEarlyInSequence-Seq_error [mistake & sequence]
 [
 	(?b rdf:type my:TooEarly), 
 	(?sa my:student_parent_of ?b),
+	(?sa my:parent_of ?b),                                       
 	(?sa my:executes ?seq),
 	(?seq rdf:type my:sequence),
 	(?a my:should_be_before ?b),
+	                                 
 		(?a my:executes ?st_a),
 		(?b my:executes ?st_b),
 		(?st_a my:id ?ia),
 		(?st_b my:id ?ib),
 		notEqual(?ia, ?ib),
-	(?sa my:student_parent_of ?a),                                           
+	(?sa my:parent_of ?a),                             
 	 -> (?b my:should_be_after ?a), 
 	 (?b rdf:type my:TooEarlyInSequence)
 ]
@@ -1030,9 +1066,29 @@
 	(?a my:student_next ?b),
 	(?b rdf:type my:Erroneous),
 	
-	 -> (?b my:should_be ?a), 
+	 ->                         
 	 (?b my:precursor ?a),
 	 (?b rdf:type my:AllFalseNoEnd)
+]
+
+# Rule: NoEndAfterBranch-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative), 
+
+	(?a my:student_next ?b),
+	                                                   
+	(?b my:executes ?st),
+	                     
+		(?st my:id ?i),
+		(?alt my:id ?i2),
+		notEqual(?i, ?i2),
+	
+	 -> (?b my:should_be ?alt), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:NoEndAfterBranch)
 ]
 
 # Rule: MissingIterationAfterSuccessfulCondition-1-loop_Error [loop & mistake]

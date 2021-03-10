@@ -817,7 +817,7 @@ RULES.append(DomainRule(name="connect_LoopUpdate-cond",
 # ============ General mistakes ============ #
 
 # Начало и конец одного акта (соответствующие) должны выполнять одно и то же действие алгоритма
-RULES.append(DomainRule(name="CorrespondingActsMismatch_Error", 
+RULES.append(DomainRule(name="CorrespondingEndMismatched-Error", 
 	tags={'mistake'},
 	swrl="""
 	student_corresponding_end(?a, ?b), 
@@ -867,6 +867,7 @@ RULES.append(DomainRule(name="GenericWrongParent_Error",
 	tags={'mistake'},
 	swrl="""
 	parent_of(?p, ?a),
+	student_index(?p, ?i),  # ensure is present in student's trace
 	student_parent_of(?c, ?a),
 	# DifferentFrom(?p, ?c),
 		id(?p, ?ip),
@@ -945,6 +946,22 @@ RULES.append(DomainRule(name="-MisplacedDeeper_Error",
 	 -> 
 	 MisplacedDeeper(?a),
 	 MisplacedDeeper(?e)
+"""))
+
+# when act of right context (?p) is present
+RULES.append(DomainRule(name="EndedDeeper-error", 
+	tags={'mistake'},
+	swrl="""
+	CorrespondingEndMismatched(?a),
+	corresponding_end(?b1, ?a),
+	student_corresponding_end(?b2, ?a),
+	# b1 < b2
+		student_index(?b1, ?i1),
+		student_index(?b2, ?i2),
+		lessThan(?i1, ?i2),
+	 -> 
+	 cause(?a, ?b2),
+	 EndedDeeper(?a)
 """))
 
 RULES.append(DomainRule(name="GenericWrongExecTime-b_Error", 
@@ -1058,21 +1075,44 @@ RULES.append(DomainRule(name="DisplacedAct-Seq_error",
 	 -> DisplacedAct(?c1)
 """))
 
+# No first of sequence [works with Pellet?]
+RULES.append(DomainRule(name="NoFirstOfSequence-Seq_error", 
+	tags={'mistake', 'sequence'},
+	swrl="""
+	act_begin(?a),
+	executes(?a, ?seq),
+	sequence(?seq),
+	body_item(?seq, ?st),
+	first_item(?st),
+	
+	student_next(?a, ?b),
+	# If the executed stmt is different
+		executes(?b, ?st_b),
+		id(?st, ?i1),
+		id(?st_b, ?i2),
+		notEqual(?i1, ?i2),
+	 -> should_be(?b, ?st), 
+	 precursor(?b, ?a),
+	 NoFirstOfSequence(?b)
+"""))
+
 # TooEarly act in sequence [works with Pellet?]
 RULES.append(DomainRule(name="TooEarlyInSequence-Seq_error", 
 	tags={'mistake', 'sequence'},
 	swrl="""
 	TooEarly(?b), 
 	student_parent_of(?sa, ?b),
+	parent_of(?sa, ?b),  # ensure ?b in the same (correct) seq
 	executes(?sa, ?seq),
 	sequence(?seq),
 	should_be_before(?a, ?b),
+	# check that not duplicates: a, b
 		executes(?a, ?st_a),
 		executes(?b, ?st_b),
 		id(?st_a, ?ia),
 		id(?st_b, ?ib),
 		notEqual(?ia, ?ib),
-	student_parent_of(?sa, ?a),  # what if student did not created ?a yet?
+	parent_of(?sa, ?a),  # ensure ?a in the same seq
 	 -> should_be_after(?b, ?a), 
 	 TooEarlyInSequence(?b)
 """))

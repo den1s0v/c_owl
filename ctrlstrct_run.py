@@ -1056,12 +1056,14 @@ def init_persistent_structure(onto):
                 ("MisplacedBefore", ["WrongContext"]),
                 ("MisplacedAfter", ["WrongContext"]),
                 ("MisplacedDeeper", ["WrongContext"]),
+                ("EndedDeeper", ["WrongContext", "CorrespondingEndMismatched"]),
                 
                 "ExtraAct",
                 ("DuplicateOfAct", ["ExtraAct"]), # act was moved somewhere
                 "MissingAct",
                 "TooEarly", # right after missing acts
                 ("DisplacedAct", ["TooEarly","ExtraAct","MissingAct"]),
+                ("NoFirstOfSequence", ["ExtraAct"]),
                 ("TooEarlyInSequence", ["TooEarly"]),
                 ("SequenceFinishedTooEarly", ["TooEarly"]),
                 

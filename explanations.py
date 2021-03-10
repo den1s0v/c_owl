@@ -266,20 +266,20 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """MisplacedDeeper Внутри-вложенного-акта	Акт <B> не может выполняться в рамках акта, вложенного в акт <A>, потому что <B> входит в <A>	Act <B> is a part of <A> so it can't be executed whitin act nested to <A>"""
+	spec = """EndedDeeper Конец-внутри-вложенного-акта	Всякий акт заканчивается ровно тогда, когда завершились все его вложенные акты, поэтому aкт <A> не может закончиться до окончания акта <B> (<B> входит в <A>)	Every act ends exactly when all its nested acts have ended, so the act <A> cannot end until the end of the act <B> (<B> is included in <A>)"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
-		correct_parent_act = get_relation_object(a, onto.context_should_be)
+		nested = get_relation_object(a, onto.cause)
 		return {
-			'<A>': format_full_name(correct_parent_act, 0,1,0),
-			'<B>': format_full_name(a, 0,0,0),
+			'<A>': format_full_name(a, 0,0,0),
+			'<B>': format_full_name(nested, 0,1,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
 	
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
-	spec = """WrongContext Вне-контекста	Акт <B> не может выполняться вне акта <A><EX>, потому что <B> входит в <A>.	Act <B> is a part of <A><EX> so it can't be executed outside of <A>"""
+	spec = """WrongContext Вне-контекста	Акт <B> не может выполняться в рамках акта <EX>, потому что <B> непосредственно входит в <A>.	Act <B> is a immediate part of <A><EX> so it can't be executed outside of <A>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -289,7 +289,7 @@ def register_explanation_handlers():
 		return {
 			'<A>': format_full_name(correct_parent_act, 0,1,0, case='gent'),
 			'<B>': format_full_name(a, 0,0,0),
-			'<EX>': '', # f" ({tr('ex.')} {format_full_name(wrong_parent_act, 0,1,0)})" if wrong_parent_act else "",
+			'<EX>': format_full_name(wrong_parent_act, 0,1,0) if wrong_parent_act else "__",
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
@@ -353,25 +353,41 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """TooEarlyInSequence Не-в-порядке-следования	<A> является частью следования и не может выполняться раньше, чем <B>	It's too early to finish  <A> is a part of a sequence, so it cannot run before <B>"""
+	spec = """TooEarlyInSequence Не-в-порядке-следования	Следование выполняет все свои действия по порядку, поэтому <A> не может выполняться раньше, чем <B>.	A sequence performs all actions in order, so <A> cannot run before <B>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
 		missed_act = get_relation_object(a, onto.should_be_after)
 		print(" **** missed_act", missed_act)
 		return {
-			'<A>': format_full_name(a, 0,1,0).capitalize(),
+			'<A>': format_full_name(a, 0,1,0),
 			'<B>': format_full_name(missed_act, 0,1,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """SequenceFinishedTooEarly Следование-прервано	Следование <A> заканчивать рано, т.к. ещё не все действия следования выполнены<EX>	It's too early to finish the sequence <A>, because there are some missing acts<EX>"""
+	# переработано
+	spec = """NoFirstOfSequence Следование-не-сначала	Следование выполняет все действия по порядку от первого до последнего, поэтому выполнение следования <S> должно начинаться с этого: <B> (но не с этого: <A>)	A sequence performs all actions in order from the first through the last, so the execution of the sequence <S> must start with <B> (but not with <A>)"""
+	class_name, format_str = class_formatstr(spec.split('\t'))
+	
+	def _param_provider(a: 'act_instance'):
+		st = get_relation_object(a, onto.should_be)
+		seq = get_relation_object(a, onto.precursor)
+		print(" **** NoFirstOfSequence",)
+		return {
+			'<A>': format_full_name(a, 0,1,0),
+			'<B>': format_full_name(st, 0,1,0),
+			'<S>': format_full_name(seq, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+	spec = """SequenceFinishedTooEarly Следование-прервано	Следование выполняет все свои действия от первого до последнего, потому рано заканчивать следование <A>, т.к. не все действия следования выполнены<EX>	A sequence performs all its actions from the first through the last, so it's too early to finish the sequence <A>, because not all the actions of the following have completed<EX>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 	
 	def _param_provider(a: 'act_instance'):
 		missed_act = get_relation_subject(onto.should_be_before, a)
-		print(" **** missed_act", missed_act)
+		print(" **** SequenceFinishedTooEarly", missed_act)
 		return {
 			'<A>': format_full_name(a, 0,1,0),
 			'<EX>': f" ({tr('ex.')} {format_full_name(missed_act, 0,1,0)})" if missed_act else "",
