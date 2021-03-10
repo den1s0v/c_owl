@@ -1095,16 +1095,16 @@
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
-	(?loop__ rdf:type my:cond_then_body), 
-	(?loop__ my:cond ?cnd),
 	(?a my:executes ?cnd),
+	(?loop__ my:cond ?cnd),
+	(?loop__ rdf:type my:cond_then_body), 
 
 	(?a my:expr_value "true"^^xsd:boolean),                    
 
 	(?a my:student_next ?b),
 	(?b rdf:type my:Erroneous), 
-	 -> (?b my:should_be ?a), 
-	 (?b my:precursor ?a),
+	 ->                      
+	 (?b my:cause ?a),
 	 (?b rdf:type my:MissingIterationAfterSuccessfulCondition)
 ]
 
@@ -1120,8 +1120,8 @@
 
 	(?a my:student_next ?b),
 	(?b rdf:type my:Erroneous), 
-	 -> (?b my:should_be ?a), 
-	 (?b my:precursor ?a),
+	 ->                      
+	 (?b my:cause ?a),
 	 (?b rdf:type my:MissingIterationAfterSuccessfulCondition)
 ]
 
@@ -1137,8 +1137,20 @@
 
 	(?a my:student_next ?b),
 	(?b rdf:type my:Erroneous), 
-	 -> (?b my:precursor ?a),
+	 -> (?b my:cause ?a),
 	 (?b rdf:type my:MissingLoopEndAfterFailedCondition)
+]
+
+# Rule: LoopEndsWithoutCondition-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:act_end),
+	(?b my:executes ?loop__),
+	(?loop__ rdf:type my:loop), 
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous), 
+	 ->                     
+	 (?b rdf:type my:LoopEndsWithoutCondition)
 ]
 
 # Rule: IterationAfterFailedCondition-loop_Error [loop & mistake]

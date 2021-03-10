@@ -1429,16 +1429,16 @@ RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-1-loop_Er
 	swrl="""
 	normal_flow_correct_act(?a),
 	act_end(?a),
-	cond_then_body(?loop), 
-	cond(?loop, ?cnd),
 	executes(?a, ?cnd),
+	cond(?loop, ?cnd),
+	cond_then_body(?loop), 
 
 	expr_value(?a, true),  # condition passed
 
 	student_next(?a, ?b),
 	Erroneous(?b), 
-	 -> should_be(?b, ?a), 
-	 precursor(?b, ?a),
+	 -> # should_be(?b, ?a), 
+	 cause(?b, ?a),
 	 MissingIterationAfterSuccessfulCondition(?b)
 """))
 
@@ -1456,8 +1456,8 @@ RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-0-loop_Er
 
 	student_next(?a, ?b),
 	Erroneous(?b), 
-	 -> should_be(?b, ?a), 
-	 precursor(?b, ?a),
+	 -> # should_be(?b, ?a), 
+	 cause(?b, ?a),
 	 MissingIterationAfterSuccessfulCondition(?b)
 """))
 
@@ -1475,8 +1475,22 @@ RULES.append(DomainRule(name="MissingLoopEndAfterFailedCondition-0-loop_Error",
 
 	student_next(?a, ?b),
 	Erroneous(?b), 
-	 -> precursor(?b, ?a),
+	 -> cause(?b, ?a),
 	 MissingLoopEndAfterFailedCondition(?b)
+"""))
+
+# Цикл заканчивается без проверки условия [works?]
+RULES.append(DomainRule(name="LoopEndsWithoutCondition-loop_Error", 
+	tags={'mistake', 'loop'},
+	swrl="""
+	act_end(?b),
+	executes(?b, ?loop),
+	loop(?loop), 
+
+	student_next(?a, ?b),
+	Erroneous(?b), 
+	 -> # precursor(?b, ?a),
+	 LoopEndsWithoutCondition(?b)
 """))
 
 # IterationAfterFailedCondition is a sort of MissingLoopEndAfterFailedCondition when act is an iteration [works]
