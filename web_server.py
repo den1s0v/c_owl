@@ -12,6 +12,7 @@ from ctrlstrct_run import make_trace_for_algorithm
 from trace_gen.txt2algntr import AlgorithmParser, create_algorithm_from_text
 from trace_gen.blockly_helpers import create_algorithm_from_blockly_xml
 import trace_gen.styling as styling
+import trace_gen.syntax as syntax
 from trace_gen.json2alg2tr import set_target_lang
 
 from options import DEBUG, RUN_LOCALLY
@@ -93,8 +94,7 @@ def create_app():
 				# if error
 				assert not isinstance(trace_json, str), trace_json
 
-				algorithm_tags = styling.algorithm_to_tags(res.algorithm, user_language, request.json.get('syntax', 'C'))
-				# algorithm_tips = styling.get_button_tips()
+				algorithm_tags = syntax.algorithm_to_tags(res.algorithm, user_language, request.json.get('syntax', 'C'))
 				algorithm_html = styling.to_html(algorithm_tags)
 				
 				return dict(
@@ -158,8 +158,7 @@ def create_app():
 					
 				### print("After reasoning: ", *full_trace, sep='\n *\t')
 				
-				algorithm_tags = styling.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', 'C'), existing_trace=full_trace)
-				# algorithm_tips = styling.get_button_tips()
+				algorithm_tags = syntax.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', 'C'), existing_trace=full_trace)
 				algorithm_html = styling.to_html(algorithm_tags)
 				
 				return dict(
