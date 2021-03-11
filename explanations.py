@@ -442,7 +442,7 @@ Act <B> is a part of sequence <A> so each execution of <A> must contain strictly
 	########========================########
 	
 	spec = """NoFirstCondition Нет-первого-условия
-Развилка <A> должна начинаться с проверки первого условия <B>.
+Развилка проверяет условие(-я) до первого истинного, опре. Развилка <A> должна начинаться с проверки первого условия <B>.
 The first condition <B> must be executed right after alternative <A> starts"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
@@ -481,7 +481,7 @@ The first condition <B> must be executed right after alternative <A> starts"""
 	
 	spec = """BranchWithoutCondition Ветка-без-условия
 Альтернативная ветка <C> не может начаться, пока условие <B> не проверено
-Alternative <A> cannot execute the branch <C> until the condition <B> is checked"""
+Alternative <A> cannot execute the branch <C> until the condition <B> is evaluated"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -497,7 +497,7 @@ Alternative <A> cannot execute the branch <C> until the condition <B> is checked
 	
 	spec = """ElseBranchWithoutCondition Ветка-иначе-без-условия
 Альтернативная ветка <C> не может начаться, пока условие <B> не проверено
-Alternative <A> cannot execute the branch <C> until the condition <B> is checked"""
+Alternative <A> cannot execute the branch <C> until the condition <B> is evaluated"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -513,7 +513,7 @@ Alternative <A> cannot execute the branch <C> until the condition <B> is checked
 	
 	spec = """CondtionWithoutPrevCondition Условие-не-по-порядку
 Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие <B> не проверено (и не окажется ложным)
-Alternative <A> cannot check condition <C> until the condition <B> is checked (and evaluated to false)"""
+Alternative <A> cannot evaluate condition <C> until the condition <B> is evaluated (to false)"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -595,9 +595,9 @@ Alternative <A> does not have 'else' branch so it must finish because the condit
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """NoEndAfterBranch Развилка-не-закончена
-Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, потому что условие <B> является ложным
-Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
+	spec = """NoAlternativeEndAfterBranch Развилка-не-закончена-после-ветки
+Всякая альтернатива выполняет не более одного альтернативного действия и завершается. Альтернатива <A> выполнила ветку <B> и должна завершиться.
+Each alternative performs no more than one alternative action and terminates. Alternative <A> has executed the <B> branch and should finish."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -605,9 +605,10 @@ Alternative <A> does not have 'else' branch so it must finish because the condit
 		# cond = get_relation_object(cond_act, onto.executes)
 		# br = get_relation_subject(onto.cond, cond)
 		alt = get_relation_object(a, onto.should_be)
+		branch = get_relation_object(a, onto.precursor)
 		return {
 			'<A>': format_full_name(alt, 0,0,0),
-			'<B>': format_full_name(a, 0,1,1),
+			'<B>': format_full_name(branch, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 
@@ -707,7 +708,7 @@ As soon as the continuation condition becomes false, the loop ends. Therefore, i
 	
 	spec = """MissingConditionAfterIteration Нет-проверки-условия
 Во время выполнения цикла <A> после очередной итерации нужно проверить условие <B>, чтобы продолжить цикл или закончить его.
-Right after the iteration of loop <A> finished, condition <B> must check whether to continue or finish looping."""
+After the end of an iteration of the loop <A>, the loop's control condition <B> must be evaluated to determine whether to start the next iteration or to finish the loop."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -725,7 +726,7 @@ Right after the iteration of loop <A> finished, condition <B> must check whether
 
 	spec = """MissingConditionBetweenIterations Нет-проверки-условия-между-итерациями
 Во время выполнения цикла <A>, перед тем как перейти к следующей итерации цикла, нужно проверить условие <B> и узнать, продолжится ли цикл или закончится.
-Prior to proceeding to the next iteration of the loop <A>, the condition <B> checks out whether the loop will continue or end."""
+Prior to proceeding to the next iteration of the loop <A>, the condition <B> must be evaluated to determine whether to start the next iteration or to finish the loop."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):

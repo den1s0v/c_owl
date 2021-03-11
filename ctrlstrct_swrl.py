@@ -1400,7 +1400,7 @@ RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error",
 
 
 # Условие после ветки  [works?]
-RULES.append(DomainRule(name="NoEndAfterBranch-alt_Error", 
+RULES.append(DomainRule(name="NoAlternativeEndAfterBranch-alt_Error", 
 	tags={'mistake', 'alternative'},
 	swrl="""
 	act_end(?a),
@@ -1418,7 +1418,7 @@ RULES.append(DomainRule(name="NoEndAfterBranch-alt_Error",
 	
 	 -> should_be(?b, ?alt), 
 	 precursor(?b, ?a),
-	 NoEndAfterBranch(?b)
+	 NoAlternativeEndAfterBranch(?b)
 """))
 
 # ============ Loops mistakes ============ #

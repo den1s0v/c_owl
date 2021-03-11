@@ -1071,7 +1071,7 @@
 	 (?b rdf:type my:AllFalseNoEnd)
 ]
 
-# Rule: NoEndAfterBranch-alt_Error [alternative & mistake]
+# Rule: NoAlternativeEndAfterBranch-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_end),
 	(?a my:executes ?br),
@@ -1088,7 +1088,7 @@
 	
 	 -> (?b my:should_be ?alt), 
 	 (?b my:precursor ?a),
-	 (?b rdf:type my:NoEndAfterBranch)
+	 (?b rdf:type my:NoAlternativeEndAfterBranch)
 ]
 
 # Rule: MissingIterationAfterSuccessfulCondition-1-loop_Error [loop & mistake]
