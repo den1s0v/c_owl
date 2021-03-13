@@ -689,7 +689,7 @@ class TraceTester():
 
                         
                         # attach expr value: for act_end only!
-                        if mark == "e" and alg_elem["type"] in {"expr"}:
+                        if mark == "e" and alg_elem["type"] in ("expr",):
                             values = self.expr_id2values[st_id] if st_id in self.expr_id2values else []
                             # if len(values) <= exec_n:
                             if exec_n <= len(values):
@@ -758,6 +758,7 @@ class TraceTester():
                     iteration_n = d.get("iteration_n", None)
                     name        = d.get("name", None)  or  d.get("action", None)  # !  name <- action
                     text_line   = d.get("text_line", None)
+                    expr_value  = d.get("value", None)
                     
                     id_         = int(id_)
                     clean_name  = prepare_name(name)
@@ -800,6 +801,8 @@ class TraceTester():
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
                             make_triple(obj, onto.id, uniqualize_id(onto, id_))  # нужно убедиться, что все ID уникальны
+                            if expr_value is not None:
+                                make_triple(obj, onto.expr_value, expr_value)
                             if iteration_n:
                                 make_triple(obj, onto.student_iteration_n, iteration_n)
                                 
@@ -1177,7 +1180,7 @@ def extact_mistakes(onto, as_objects=False) -> dict:
     
     ### print("Erroneous descendants:", error_classes)
 
-    properties_to_extract = ("id", "name", onto.precursor, onto.cause, onto.should_be, onto.should_be_before, onto.context_should_be, onto.text_line, )
+    properties_to_extract = ("id", "name", onto.precursor, onto.cause, onto.should_be, onto.should_be_before, onto.should_be_after, onto.context_should_be, onto.text_line, )
     mistakes = {}
 
     # The .instances() class method can be used to iterate through all Instances of a Class (including its subclasses). It returns a generator.
