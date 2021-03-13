@@ -1305,9 +1305,10 @@ def parse_algorithms_and_traces_from_text(text: str):
                     words = name.split()
                     alg_name_i = words.index(alg_name)
                     if alg_name_i < len(words) - 1:
-                        boolean_chain = words[alg_name_i + 1]
-                        boolean_chain = re.sub(r"[^01]", "", boolean_chain)
-                        boolean_chain = list(map({"0":False, "1":True}.get, boolean_chain))  # convert to boolean list
+                        boolean_chain_str = words[alg_name_i + 1]
+                        if re.match(r"[01]", boolean_chain_str):
+                            boolean_chain_str = re.sub(r"[^01]", "", boolean_chain_str)
+                            boolean_chain = list(map({"0":False, "1":True}.get, boolean_chain_str))  # convert to boolean list
                     break
     
             if not name:
