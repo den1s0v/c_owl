@@ -821,7 +821,7 @@
 	(?b rdf:type my:act_end),
 	(?b my:executes ?seq),
 	(?seq rdf:type my:sequence),
-	                            
+	(?a my:should_be_before ?b),                                        
 	 -> (?b rdf:type my:SequenceFinishedTooEarly)
 ]
 
@@ -831,8 +831,17 @@
 	(?a my:executes ?alt),
 	(?alt rdf:type my:alternative), 
 
+	(?alt my:branches_item ?br),
+	(?br rdf:type my:first_item),
+	(?br my:cond ?cnd),
+
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous), 
+	                 
+		(?b my:executes ?st_b),
+		(?cnd my:id ?i1),
+		(?st_b my:id ?i2),
+		notEqual(?i1, ?i2),
+
 	 -> (?b my:precursor ?a),
 	 (?b rdf:type my:NoFirstCondition)
 ]
@@ -907,7 +916,32 @@
 	 (?a rdf:type my:BranchWithoutCondition)
 ]
 
-# Rule: ElseBranchWithoutCondition-alt_Error [alternative & mistake]
+# Rule: BranchNotNextToCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:BranchWithoutCondition),                                   
+	                             
+	(?a my:executes ?br),
+	(?br my:cond ?cnd),                   
+	
+	(?alt_act my:student_parent_of ?a),
+	(?c my:executes ?cnd),
+	(?a my:in_trace ?trace),                              
+	(?c my:in_trace ?trace),
+	
+	            
+		(?alt_act my:student_index ?ia),
+		(?c my:student_index ?ic),
+		lessThan(?ia, ?ic),
+	           
+		                         
+		(?a my:student_index ?ib),
+		lessThan(?ic, ?ib),
+		
+	 ->                            
+	 (?a rdf:type my:BranchNotNextToCondition)
+]
+
+# Rule: ElseBranchNotNextToLastCondition-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_begin),                                   
 	(?a my:executes ?br),
@@ -918,7 +952,7 @@
 	(?b my:student_next ?a),         
 	(?b my:executes ?st),
 	
-	(?br1 my:next ?br2),                                       
+	(?br1 my:next ?br),                                       
 	(?br1 my:cond ?cnd),
 	
 	                          
@@ -928,10 +962,32 @@
 	 -> (?a my:should_be_after ?cnd), 
 	 (?a my:precursor ?b),
 	 (?a my:context_should_be ?alt),
-	 (?a rdf:type my:ElseBranchWithoutCondition)
+	 (?a rdf:type my:ElseBranchNotNextToLastCondition)
 ]
 
-# Rule: CondtionWithoutPrevCondition-alt_Error [alternative & mistake]
+# Rule: ElseBranchAfterTrueCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),                                   
+	(?a my:executes ?br),
+	(?br rdf:type my:else),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative), 
+
+	(?br1 my:next ?br),                                       
+	(?br1 my:cond ?cnd),
+	
+	(?b my:student_next ?a),         
+	(?b my:executes ?cnd),
+	
+	(?b my:expr_value "true"^^xsd:boolean),                    
+	
+	 -> (?a my:should_be_after ?cnd), 
+	 (?a my:precursor ?b),
+	 (?a my:context_should_be ?alt),
+	 (?a rdf:type my:ElseBranchAfterTrueCondition)
+]
+
+# Rule: CondtionNotNextToPrevCondition-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_begin),                                   
 	(?alt my:branches_item ?br2),
@@ -952,7 +1008,7 @@
 	 -> (?a my:should_be_after ?cnd1), 
 	 (?a my:precursor ?b),
 	 (?a my:context_should_be ?alt),
-	 (?a rdf:type my:CondtionWithoutPrevCondition)
+	 (?a rdf:type my:CondtionNotNextToPrevCondition)
 ]
 
 # Rule: ConditionAfterBranch-alt_Error [alternative & mistake]
@@ -1006,14 +1062,20 @@
 	(?br rdf:type my:alt_branch),                             
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous), 	                                        
+	                                                          
+	(?b my:executes ?st),
 	
-	 -> (?b my:should_be ?a), 
+	                    
+		(?st my:id ?i),
+		(?br my:id ?i2),
+		notEqual(?i, ?i2),
+	
+	 -> (?b my:should_be ?br), 
 	  (?b my:precursor ?a),
 	  (?b rdf:type my:NoBranchWhenConditionIsTrue)
 ]
 
-# Rule: AllFalseNoElse-alt_Error [alternative & mistake]
+# Rule: LastConditionIsFalseButNoElse-alt_Error [alternative & mistake]
 [
 	(?a rdf:type my:act_end),
 	(?cnd rdf:type my:expr), 
@@ -1025,11 +1087,17 @@
 	(?br2 rdf:type my:else), 	                          
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous),
+	                
+	(?b my:executes ?st),
 	
-	 -> (?b my:should_be ?a), 
+	                     
+		(?st my:id ?i),
+		(?br2 my:id ?i2),
+		notEqual(?i, ?i2),
+	
+	 -> (?b my:should_be ?br2), 
 	  (?b my:precursor ?a),
-	  (?b rdf:type my:AllFalseNoElse)
+	  (?b rdf:type my:LastConditionIsFalseButNoElse)
 ]
 
 # Rule: NoNextCondition-alt_Error [alternative & mistake]
@@ -1044,9 +1112,14 @@
 	(?br2 my:cond ?cnd2), 	                               
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous),
+	(?b my:executes ?st),
 	
-	 -> (?b my:should_be ?a), 
+	                      
+		(?st my:id ?i),
+		(?cnd2 my:id ?i2),
+		notEqual(?i, ?i2),
+	 
+	 -> (?b my:should_be ?cnd2), 
 	  (?b my:precursor ?a),
 	  (?b rdf:type my:NoNextCondition)
 ]
@@ -1064,7 +1137,11 @@
 	(?br rdf:type my:last_item),                                
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous),
+	(?b my:executes ?st),
+	                     
+		(?st my:id ?i),
+		(?alt my:id ?i2),
+		notEqual(?i, ?i2),
 	
 	 ->                         
 	 (?b my:precursor ?a),
@@ -1073,6 +1150,7 @@
 
 # Rule: NoAlternativeEndAfterBranch-alt_Error [alternative & mistake]
 [
+	                                        
 	(?a rdf:type my:act_end),
 	(?a my:executes ?br),
 	(?alt my:branches_item ?br),
@@ -1081,7 +1159,7 @@
 	(?a my:student_next ?b),
 	                                                   
 	(?b my:executes ?st),
-	                     
+	                                     
 		(?st my:id ?i),
 		(?alt my:id ?i2),
 		notEqual(?i, ?i2),
@@ -1089,6 +1167,24 @@
 	 -> (?b my:should_be ?alt), 
 	 (?b my:precursor ?a),
 	 (?b rdf:type my:NoAlternativeEndAfterBranch)
+]
+
+# Rule: AlternativeEndAfterTrueCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:expr_value "true"^^xsd:boolean),                    
+	(?a my:executes ?cnd),
+	(?br my:cond ?cnd),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative), 
+
+	(?a my:student_next ?b),
+	              
+	(?b my:executes ?alt),
+	
+	 -> (?b my:should_be ?br), 
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:AlternativeEndAfterTrueCondition)
 ]
 
 # Rule: MissingIterationAfterSuccessfulCondition-1-loop_Error [loop & mistake]

@@ -1072,19 +1072,22 @@ def init_persistent_structure(onto):
                 
                 # Alternatives mistakes ...
                 "NoFirstCondition",
-                ("ConditionAfterBranch", ["ExtraAct"]),
                 ("NoAlternativeEndAfterBranch", ["ExtraAct"]),
+                ("ConditionAfterBranch", ["NoAlternativeEndAfterBranch"]),  # маскирует -- правильно ли это ?
                 ("WrongBranch", ["ExtraAct"]),
                 ("BranchOfFalseCondition", ["WrongBranch"]),
                 ("AnotherExtraBranch", ["WrongBranch"]),
                 ("BranchWithoutCondition", ["WrongBranch"]),
-                ("ElseBranchWithoutCondition", ["BranchWithoutCondition"]),
-                ("CondtionWithoutPrevCondition", ["ExtraAct"]),
+                ("BranchNotNextToCondition", ["BranchWithoutCondition"]),
+                ("ElseBranchNotNextToLastCondition", ["BranchWithoutCondition"]),
+                ("ElseBranchAfterTrueCondition", ["BranchWithoutCondition"]),
+                ("CondtionNotNextToPrevCondition", ["ExtraAct"]),
                 "NoBranchWhenConditionIsTrue",
                 # ("NoBranchWhenConditionIsTrue", ["MissingAct"]),
-                "AllFalseNoElse",
+                "LastConditionIsFalseButNoElse",
                 "NoNextCondition",
                 "AllFalseNoEnd",
+                ("AlternativeEndAfterTrueCondition", ["TooEarly"]),
                 
                 # Loops mistakes ...
                 "MissingIterationAfterSuccessfulCondition",
@@ -1357,7 +1360,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         name_out = f"{reasoning}_out.n3"
         onto.save(file=name_in, format='rdfxml')
         
-        eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=0)
+        eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=1)
         
         if _eval_max_traces is not None:
             # print('   Jena elapsed:', eval_stats['wall_time'])  ###

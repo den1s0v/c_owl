@@ -112,8 +112,8 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	# extract erroneous acts provided by trace
 	def error_description(comment_str) -> list:
 		if "error" in comment_str or "ошибк" in comment_str:
-			# For input str "error: AllFalseNoElse, TooEarly (Нет ветки ИНАЧЕ)"
-			# the result will be ['AllFalseNoElse', 'TooEarly']
+			# For input str "error: LastConditionIsFalseButNoElse, TooEarly (Нет ветки ИНАЧЕ)"
+			# the result will be ['LastConditionIsFalseButNoElse', 'TooEarly']
 			m = re.search(r"(?:ошибк[аи]|errors?)\s*:?\s*([^()]*)\s*(?:\(.+\).*)?$", comment_str, re.I)
 			if m:
 				err_names = m.group(1).strip()
@@ -464,7 +464,7 @@ def run_tests(directory="test_data/", process_kwargs={}):
 				
 			if not EVALUATE:
 				onto, mistakes = process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True, **process_kwargs)
-			else:
+			else:  # EVALUATE !
 				dataset = os.path.splitext(os.path.split(files[0])[1])[0]
 				eval_results = []
 				# 46

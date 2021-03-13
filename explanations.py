@@ -235,7 +235,7 @@ Act <A> can't finish in this line because it didn't start yet."""
 	
 	
 	spec = """ActStartsAfterItsEnd Акт-начался-позже-чем-закончился
-<начало акта А> не может выполняться позже <конец акта А>.
+Акт <A> не может начаться, потому что он уже закончился.
 Act <A> can't start in this line because it is already finished."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
@@ -247,7 +247,7 @@ Act <A> can't start in this line because it is already finished."""
 
 
 	spec = """MisplacedBefore Раньше-объемлющего-акта
-Акт <Б> не может выполняться раньше <начало акта А> потому что <B> входит в <A>.
+Акт <B> не может выполняться раньше начала акта <A>, потому что <B> входит в <A>.
 Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
@@ -261,7 +261,7 @@ Act <B> is a part of <A> so it can't be executed outside of (earlier than) <A>""
 	
 	
 	spec = """MisplacedAfter Позже-объемлющего-акта
-<Акт Б> не может выполняться позже <конец акта А> потому что <B> входит в <A>
+Акт <B> не может выполняться позже окончания акта <A>, потому что <B> входит в <A>
 Act <B> is a part of <A> so it can't be executed outside of (later than) <A>"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
@@ -273,7 +273,7 @@ Act <B> is a part of <A> so it can't be executed outside of (later than) <A>"""
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
-	
+	# EndedDeeper: Every act ends exactly when all its nested acts have ended, so the act of the body of the loop 'work' cannot end until the end of the act of the alternative 'choose' (the alternative 'choose' is included in the body of the loop 'work').
 	spec = """EndedDeeper Конец-внутри-вложенного-акта
 Всякий акт заканчивается ровно тогда, когда завершились все его вложенные акты, поэтому aкт <A> не может закончиться до окончания акта <B> (<B> входит в <A>)
 Every act ends exactly when all its nested acts have ended, so the act <A> cannot end until the end of the act <B> (<B> is included in <A>)"""
@@ -406,16 +406,17 @@ A sequence performs all actions in order from the first through the last, so the
 	register_handler(class_name, format_str, _param_provider)
 	
 	
+	# SequenceFinishedTooEarly: A sequence performs all its actions from the first through the last, so it's too early to finish the sequence of the body of the loop 'work', because not all the actions of the sequence have completed (ex. alternative 'choose').
 	spec = """SequenceFinishedTooEarly Следование-прервано
 Следование выполняет все свои действия от первого до последнего, потому рано заканчивать следование <A>, т.к. не все действия следования выполнены<EX>
-A sequence performs all its actions from the first through the last, so it's too early to finish the sequence <A>, because not all the actions of the following have completed<EX>"""
+A sequence performs all its actions from the first through the last, so it's too early to finish the sequence <A>, because not all the actions of the sequence have completed<EX>"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		missed_act = get_relation_subject(onto.should_be_before, a)
 		print(" **** SequenceFinishedTooEarly", missed_act)
 		return {
-			'<A>': format_full_name(a, 0,1,0),
+			'<A>': format_full_name(a, 0,0,0),
 			'<EX>': f" ({tr('ex.')} {format_full_name(missed_act, 0,1,0)})" if missed_act else "",
 			}
 	register_handler(class_name, format_str, _param_provider)
@@ -479,7 +480,7 @@ The first condition <B> must be executed right after alternative <A> starts"""
 	# register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """BranchWithoutCondition Ветка-без-условия
+	spec = """BranchNotNextToCondition Ветка-без-условия
 Альтернативная ветка <C> не может начаться, пока условие <B> не проверено
 Alternative <A> cannot execute the branch <C> until the condition <B> is evaluated"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
@@ -495,7 +496,7 @@ Alternative <A> cannot execute the branch <C> until the condition <B> is evaluat
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """ElseBranchWithoutCondition Ветка-иначе-без-условия
+	spec = """ElseBranchNotNextToLastCondition Ветка-иначе-без-условия
 Альтернативная ветка <C> не может начаться, пока условие <B> не проверено
 Alternative <A> cannot execute the branch <C> until the condition <B> is evaluated"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
@@ -511,9 +512,9 @@ Alternative <A> cannot execute the branch <C> until the condition <B> is evaluat
 	register_handler(class_name, format_str, _param_provider)
 
 	
-	spec = """CondtionWithoutPrevCondition Условие-не-по-порядку
+	spec = """CondtionNotNextToPrevCondition Условие-не-по-порядку
 Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие <B> не проверено (и не окажется ложным)
-Alternative <A> cannot evaluate condition <C> until the condition <B> is evaluated (to false)"""
+Alternative <A> cannot evaluate condition <C> until the condition <B> is evaluated (and evaluated to false)"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -594,7 +595,7 @@ Alternative <A> does not have 'else' branch so it must finish because the condit
 			}
 	register_handler(class_name, format_str, _param_provider)
 
-
+	# NoAlternativeEndAfterBranch: Each alternative performs no more than one alternative action and terminates. The alternative 'choose' has executed the 'if-ready' branch and should finish.
 	spec = """NoAlternativeEndAfterBranch Развилка-не-закончена-после-ветки
 Всякая альтернатива выполняет не более одного альтернативного действия и завершается. Альтернатива <A> выполнила ветку <B> и должна завершиться.
 Each alternative performs no more than one alternative action and terminates. Alternative <A> has executed the <B> branch and should finish."""
@@ -613,7 +614,7 @@ Each alternative performs no more than one alternative action and terminates. Al
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AllFalseNoElse Нет-ветки-иначе
+	spec = """LastConditionIsFalseButNoElse Нет-ветки-иначе
 Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно
 Alternative <A> must execute the branch <D> because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\n'))

@@ -1125,7 +1125,7 @@ RULES.append(DomainRule(name="SequenceFinishedTooEarly-Seq_error",
 	act_end(?b),
 	executes(?b, ?seq),
 	sequence(?seq),
-	# should_be_before(?a, ?b), 
+	should_be_before(?a, ?b),   # ? ensure something should be before
 	 -> SequenceFinishedTooEarly(?b)
 """))
 
@@ -1139,8 +1139,17 @@ RULES.append(DomainRule(name="NoFirstCondition-alt_Error",
 	executes(?a, ?alt),
 	alternative(?alt), 
 
+	branches_item(?alt, ?br),
+	first_item(?br),
+	cond(?br, ?cnd),
+
 	student_next(?a, ?b),
-	Erroneous(?b), 
+	# Erroneous(?b), 
+		executes(?b, ?st_b),
+		id(?cnd, ?i1),
+		id(?st_b, ?i2),
+		notEqual(?i1, ?i2),
+
 	 -> precursor(?b, ?a),
 	 NoFirstCondition(?b)
 """))
@@ -1197,7 +1206,7 @@ RULES.append(DomainRule(name="WrongBranch-alt_Error",
 	 WrongBranch(?b)
 """))
 
-# Условная ветка не после своего условия [works]
+# Условная ветка при отсутствии своего условия [works]
 RULES.append(DomainRule(name="BranchWithoutCondition-alt_Error", 
 	tags={'mistake', 'alternative'},
 	swrl="""
@@ -1221,8 +1230,35 @@ RULES.append(DomainRule(name="BranchWithoutCondition-alt_Error",
 	 BranchWithoutCondition(?a)
 """))
 
+# Условная ветка не после своего условия [works]
+RULES.append(DomainRule(name="BranchNotNextToCondition-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
+	BranchWithoutCondition(?a),  # ?a is the wrong act in the rule
+	# should_be_after(?a, ?cnd), 
+	executes(?a, ?br),
+	cond(?br, ?cnd),  # branch has cond
+	
+	student_parent_of(?alt_act, ?a),
+	executes(?c, ?cnd),
+	in_trace(?a, ?trace),  # ensure ?c is in same trace
+	in_trace(?c, ?trace),
+	
+	# alt < cond
+		student_index(?alt_act, ?ia),
+		student_index(?c, ?ic),
+		lessThan(?ia, ?ic),
+	# cond < br
+		# student_index(?c, ?ic),
+		student_index(?a, ?ib),
+		lessThan(?ic, ?ib),
+		
+	 -> # should_be_after(?a, ?c), 
+	 BranchNotNextToCondition(?a)
+"""))
+
 # Ветка ИНАЧЕ не после последнего условия [works]
-RULES.append(DomainRule(name="ElseBranchWithoutCondition-alt_Error", 
+RULES.append(DomainRule(name="ElseBranchNotNextToLastCondition-alt_Error", 
 	tags={'mistake', 'alternative'},
 	swrl="""
 	act_begin(?a),  # ?a is the wrong act in the rule
@@ -1234,7 +1270,7 @@ RULES.append(DomainRule(name="ElseBranchWithoutCondition-alt_Error",
 	student_next(?b, ?a),  # b < a
 	executes(?b, ?st),
 	
-	next(?br1, ?br2),  # ?br1 is previous conditional branch
+	next(?br1, ?br),  # ?br1 is previous conditional branch
 	cond(?br1, ?cnd),
 	
 	# previous act is not cond
@@ -1244,11 +1280,36 @@ RULES.append(DomainRule(name="ElseBranchWithoutCondition-alt_Error",
 	 -> should_be_after(?a, ?cnd), 
 	 precursor(?a, ?b),
 	 context_should_be(?a, ?alt),
-	 ElseBranchWithoutCondition(?a)
+	 ElseBranchNotNextToLastCondition(?a)
+"""))
+
+
+# Ветка ИНАЧЕ после истинного условия [works]
+RULES.append(DomainRule(name="ElseBranchAfterTrueCondition-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
+	act_begin(?a),  # ?a is the wrong act in the rule
+	executes(?a, ?br),
+	else(?br),
+	branches_item(?alt, ?br),
+	alternative(?alt), 
+
+	next(?br1, ?br),  # ?br1 is previous conditional branch
+	cond(?br1, ?cnd),
+	
+	student_next(?b, ?a),  # b < a
+	executes(?b, ?cnd),
+	
+	expr_value(?b, true),  # condition passed
+	
+	 -> should_be_after(?a, ?cnd), 
+	 precursor(?a, ?b),
+	 context_should_be(?a, ?alt),
+	 ElseBranchAfterTrueCondition(?a)
 """))
 
 # Условие не после предыдущего условия [works]
-RULES.append(DomainRule(name="CondtionWithoutPrevCondition-alt_Error", 
+RULES.append(DomainRule(name="CondtionNotNextToPrevCondition-alt_Error", 
 	tags={'mistake', 'alternative'},
 	swrl="""
 	act_begin(?a),  # ?a is the wrong act in the rule
@@ -1270,7 +1331,7 @@ RULES.append(DomainRule(name="CondtionWithoutPrevCondition-alt_Error",
 	 -> should_be_after(?a, ?cnd1), 
 	 precursor(?a, ?b),
 	 context_should_be(?a, ?alt),
-	 CondtionWithoutPrevCondition(?a)
+	 CondtionNotNextToPrevCondition(?a)
 """))
 
 # Условие после ветки  [works with Pellet]
@@ -1330,14 +1391,20 @@ RULES.append(DomainRule(name="NoBranchWhenConditionIsTrue-alt_Error",
 	alt_branch(?br),  # belonds to an alternative
 
 	student_next(?a, ?b),
-	Erroneous(?b), 	  # как страховка, сработает и без этого
+	# Erroneous(?b), 	  # как страховка, сработает и без этого
+	executes(?b, ?st),
 	
-	 -> should_be(?b, ?a), 
+	# next act is not br
+		id(?st, ?i),
+		id(?br, ?i2),
+		notEqual(?i, ?i2),
+	
+	 -> should_be(?b, ?br), 
 	  precursor(?b, ?a),
 	  NoBranchWhenConditionIsTrue(?b)
 """))
 
-RULES.append(DomainRule(name="AllFalseNoElse-alt_Error", 
+RULES.append(DomainRule(name="LastConditionIsFalseButNoElse-alt_Error", 
 	tags={'mistake', 'alternative'},
 	swrl="""
 	act_end(?a),
@@ -1350,11 +1417,17 @@ RULES.append(DomainRule(name="AllFalseNoElse-alt_Error",
 	else(?br2), 	  # "else" branch expected
 
 	student_next(?a, ?b),
-	Erroneous(?b),
+	# Erroneous(?b),
+	executes(?b, ?st),
 	
-	 -> should_be(?b, ?a), 
+	# next act is not br2
+		id(?st, ?i),
+		id(?br2, ?i2),
+		notEqual(?i, ?i2),
+	
+	 -> should_be(?b, ?br2), 
 	  precursor(?b, ?a),
-	  AllFalseNoElse(?b)
+	  LastConditionIsFalseButNoElse(?b)
 """))
 
 RULES.append(DomainRule(name="NoNextCondition-alt_Error", 
@@ -1370,9 +1443,14 @@ RULES.append(DomainRule(name="NoNextCondition-alt_Error",
 	cond(?br2, ?cnd2), 	  # one more condition expected
 
 	student_next(?a, ?b),
-	Erroneous(?b),
+	executes(?b, ?st),
 	
-	 -> should_be(?b, ?a), 
+	# next act is not cnd2
+		id(?st, ?i),
+		id(?cnd2, ?i2),
+		notEqual(?i, ?i2),
+	 
+	 -> should_be(?b, ?cnd2), 
 	  precursor(?b, ?a),
 	  NoNextCondition(?b)
 """))
@@ -1391,7 +1469,11 @@ RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error",
 	last_item(?br),   # no more conditions expected
 
 	student_next(?a, ?b),
-	Erroneous(?b),
+	executes(?b, ?st),
+	# next act is not alt
+		id(?st, ?i),
+		id(?alt, ?i2),
+		notEqual(?i, ?i2),
 	
 	 -> # ?? should_be(?b, ?a), 
 	 precursor(?b, ?a),
@@ -1403,6 +1485,7 @@ RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error",
 RULES.append(DomainRule(name="NoAlternativeEndAfterBranch-alt_Error", 
 	tags={'mistake', 'alternative'},
 	swrl="""
+	# act ?a ends a branch of an alternative
 	act_end(?a),
 	executes(?a, ?br),
 	branches_item(?alt, ?br),
@@ -1411,7 +1494,7 @@ RULES.append(DomainRule(name="NoAlternativeEndAfterBranch-alt_Error",
 	student_next(?a, ?b),
 	# act_begin(?b),  # allow any type of erroneous act
 	executes(?b, ?st),
-	# next act is not alt
+	# ?b executes an act that is not ?alt
 		id(?st, ?i),
 		id(?alt, ?i2),
 		notEqual(?i, ?i2),
@@ -1419,6 +1502,27 @@ RULES.append(DomainRule(name="NoAlternativeEndAfterBranch-alt_Error",
 	 -> should_be(?b, ?alt), 
 	 precursor(?b, ?a),
 	 NoAlternativeEndAfterBranch(?b)
+"""))
+
+
+# Условие после ветки  [works?]
+RULES.append(DomainRule(name="AlternativeEndAfterTrueCondition-alt_Error", 
+	tags={'mistake', 'alternative'},
+	swrl="""
+	act_end(?a),
+	expr_value(?a, true),  # condition passed
+	executes(?a, ?cnd),
+	cond(?br, ?cnd),
+	branches_item(?alt, ?br),
+	alternative(?alt), 
+
+	student_next(?a, ?b),
+	# act_end(?b),
+	executes(?b, ?alt),
+	
+	 -> should_be(?b, ?br), 
+	 precursor(?b, ?a),
+	 AlternativeEndAfterTrueCondition(?b)
 """))
 
 # ============ Loops mistakes ============ #
