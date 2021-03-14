@@ -1086,7 +1086,7 @@ def init_persistent_structure(onto):
                 # ("NoBranchWhenConditionIsTrue", ["MissingAct"]),
                 "LastConditionIsFalseButNoElse",
                 "NoNextCondition",
-                "AllFalseNoEnd",
+                "LastFalseNoEnd",
                 ("AlternativeEndAfterTrueCondition", ["TooEarly"]),
                 
                 # Loops mistakes ...

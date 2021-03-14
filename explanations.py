@@ -121,8 +121,11 @@ def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, in
 			type_ = type_.strip() + " "
 			
 		### print(phase, type_, quote, stmt_name, quote, line_index)
-		
-		return phase + type_ + stmt_name + line_index
+		full_msg = phase + type_ + stmt_name + line_index
+		if full_msg != stmt_name:
+			# wrap in additional quotes
+			full_msg = "«%s»" % full_msg
+		return full_msg
 	except Exception as e:
 		print(e)
 		# raise e
@@ -443,8 +446,8 @@ Act <B> is a part of sequence <A> so each execution of <A> must contain strictly
 	########========================########
 	
 	spec = """NoFirstCondition Нет-первого-условия
-Развилка проверяет условие(-я) до первого истинного, опре. Развилка <A> должна начинаться с проверки первого условия <B>.
-The first condition <B> must be executed right after alternative <A> starts"""
+Развилка в первую очередь проверяет все условия по порядку до первого истинного. Развилка <A> должна начинаться с проверки первого условия <B>.
+An alternative first evaluates its conditions in order until one is true. The alternative <A> should start with the first condition <B>."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -481,8 +484,8 @@ The first condition <B> must be executed right after alternative <A> starts"""
 
 	
 	spec = """BranchNotNextToCondition Ветка-без-условия
-Альтернативная ветка <C> не может начаться, пока условие <B> не проверено
-Alternative <A> cannot execute the branch <C> until the condition <B> is evaluated"""
+Альтернатива выполняет ветку только тогда, когда соответствующее условие истинно. Альтернативная ветка <C> не может начаться, пока условие <B> не проверено.
+An alternative performs a branch only if the corresponding condition is true. The alternative <A> cannot execute the branch <C> until the condition <B> is evaluated."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -497,8 +500,8 @@ Alternative <A> cannot execute the branch <C> until the condition <B> is evaluat
 
 	
 	spec = """ElseBranchNotNextToLastCondition Ветка-иначе-без-условия
-Альтернативная ветка <C> не может начаться, пока условие <B> не проверено
-Alternative <A> cannot execute the branch <C> until the condition <B> is evaluated"""
+Альтернатива выполняет ветку "ИНАЧЕ" только тогда, когда ни одно условие не оказалось истинным. Альтернативная ветка <C> не может начаться, пока условие <B> не проверено.
+An alternative performs the "ELSE" branch only if no condition is true. The alternative <A> cannot execute the branch <C> until the condition <B> is evaluated"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -513,8 +516,8 @@ Alternative <A> cannot execute the branch <C> until the condition <B> is evaluat
 
 	
 	spec = """CondtionNotNextToPrevCondition Условие-не-по-порядку
-Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие <B> не проверено (и не окажется ложным)
-Alternative <A> cannot evaluate condition <C> until the condition <B> is evaluated (and evaluated to false)"""
+Развилка проверяет все условия по порядку до первого истинного. Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие не проверено <B> (и не примет значение "ложь")
+An alternative evaluates its conditions in order until one is true. The alternative <A> cannot evaluate condition <C> until the condition <B> is evaluated (and yielded false)"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -529,8 +532,8 @@ Alternative <A> cannot evaluate condition <C> until the condition <B> is evaluat
 
 	
 	spec = """BranchOfFalseCondition Ветка-при-ложном-условии
-Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно
-Alternative <A> must not execute the branch <C> because the condition <B> is false"""
+Альтернатива выполняет ветку только тогда, когда соответствующее условие истинно. Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно.
+An alternative performs a branch only if the corresponding condition is true. The alternative <A> must not execute the branch <C> because the condition <B> is false."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -546,8 +549,8 @@ Alternative <A> must not execute the branch <C> because the condition <B> is fal
 
 
 	spec = """AnotherExtraBranch Лишняя-вторая-ветка
-Во время выполнения альтернативы <A> не должна выполниться ветка <V>, потому что ветка <D> уже выполнилась
-Alternative <A> must not execute the branch <B> because the branch <D> has already been executed"""
+Выполнив не более одного из альтернативных действий, развилка завершается. Во время выполнения альтернативы <A> не должна выполниться ветка <B>, потому что ветка <D> уже выполнилась.
+Each alternative performs no more than one alternative action and terminates. The alternative <A> must not execute the branch <B> because the branch <D> has already been executed."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -562,8 +565,8 @@ Alternative <A> must not execute the branch <B> because the branch <D> has alrea
 
 
 	spec = """NoBranchWhenConditionIsTrue Нет-ветки-при-истинном-условии
-Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно
-Alternative <A> must execute the branch <C> because the condition <B> is true"""
+Альтернатива выполняет ветку тогда, когда соответствующее условие истинно. Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно.
+An alternative performs a branch if the corresponding condition is true. The alternative <A> must execute the branch <C> because the condition <B> is true."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -578,9 +581,9 @@ Alternative <A> must execute the branch <C> because the condition <B> is true"""
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AllFalseNoEnd Развилка-не-закончилась
-Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, потому что условие <B> является ложным
-Alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
+	spec = """LastFalseNoEnd Развилка-не-закончилась
+Когда ни одно условие альтернативы не оказалось истинным, выполняется ветка "ИНАЧЕ" (при наличии), и завершается вся развилка. Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, так как условие <B> является ложным.
+When no condition of an alternative is true, the alternative performs the "ELSE" branch (if exists) and finishes. The alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -598,7 +601,7 @@ Alternative <A> does not have 'else' branch so it must finish because the condit
 	# NoAlternativeEndAfterBranch: Each alternative performs no more than one alternative action and terminates. The alternative 'choose' has executed the 'if-ready' branch and should finish.
 	spec = """NoAlternativeEndAfterBranch Развилка-не-закончена-после-ветки
 Всякая альтернатива выполняет не более одного альтернативного действия и завершается. Альтернатива <A> выполнила ветку <B> и должна завершиться.
-Each alternative performs no more than one alternative action and terminates. Alternative <A> has executed the <B> branch and should finish."""
+Each alternative performs no more than one alternative action and terminates. The alternative <A> has executed the <B> branch and should finish."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -615,8 +618,8 @@ Each alternative performs no more than one alternative action and terminates. Al
 
 
 	spec = """LastConditionIsFalseButNoElse Нет-ветки-иначе
-Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно
-Alternative <A> must execute the branch <D> because the condition <B> is false"""
+Альтернатива выполняет ветку "ИНАЧЕ" только тогда, когда ни одно условие не оказалось истинным. Во время выполнения альтернативы <A> должна выполниться ветка <D>, потому что условие <B> ложно.
+An alternative performs the "ELSE" branch only if no condition is true. The alternative <A> must execute the branch <D> because the condition <B> is false."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):

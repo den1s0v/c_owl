@@ -1455,7 +1455,7 @@ RULES.append(DomainRule(name="NoNextCondition-alt_Error",
 	  NoNextCondition(?b)
 """))
 
-RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error", 
+RULES.append(DomainRule(name="LastFalseNoEnd-alt_Error", 
 	tags={'mistake', 'alternative'},
 	swrl="""
 	act_end(?a),
@@ -1477,7 +1477,7 @@ RULES.append(DomainRule(name="AllFalseNoEnd-alt_Error",
 	
 	 -> # ?? should_be(?b, ?a), 
 	 precursor(?b, ?a),
-	 AllFalseNoEnd(?b)
+	 LastFalseNoEnd(?b)
 """))
 
 
