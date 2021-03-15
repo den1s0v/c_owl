@@ -232,7 +232,7 @@ Act <A> can't finish in this line because it didn't start yet."""
 	
 	def _param_provider(a: 'act_instance'):
 		return {
-			'<A>': format_full_name(a, 1,1,1),
+			'<A>': format_full_name(a, 1,1,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
@@ -244,7 +244,7 @@ Act <A> can't start in this line because it is already finished."""
 	
 	def _param_provider(a: 'act_instance'):
 		return {
-			'<A>': format_full_name(a, 1,1,1),
+			'<A>': format_full_name(a, 1,1,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 
@@ -342,7 +342,7 @@ Act <B> is a immediate part of "<A>" so it can't be executed inside of <EX>"""
 		before_this_act = get_relation_object(a, onto.should_be_before)
 		return {
 			'<A>': format_full_name(a, 1,0,0).capitalize(),
-			'<B>': format_full_name(before_this_act, 1,1,1),
+			'<B>': format_full_name(before_this_act, 1,1,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
@@ -476,7 +476,7 @@ An alternative first evaluates its conditions in order until one is true. The al
 	# 	alt_act = get_relation_subject(onto.student_parent_of, a)
 	# 	return {
 	# 		'<A>': format_full_name(alt_act, 0,0,0),
-	# 		# '<B>': format_full_name(wrong_cond, 0,1,1),
+	# 		# '<B>': format_full_name(wrong_cond, 0,1,0),
 	# 		'<C>': format_full_name(true_cond, 0,0,0),
 	# 		'<D>': format_full_name(a, 0,0,0),
 	# 		}
@@ -558,7 +558,7 @@ Each alternative performs no more than one alternative action and terminates. Th
 		alt_act = get_relation_subject(onto.student_parent_of, a)
 		return {
 			'<A>': format_full_name(alt_act, 0,0,0),
-			'<B>': format_full_name(a, 0,1,1),
+			'<B>': format_full_name(a, 0,1,0),
 			'<D>': format_full_name(prev_branch_act, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
@@ -594,7 +594,7 @@ When no condition of an alternative is true, the alternative performs the "ELSE"
 		# alt_act = get_relation_subject(onto.student_parent_of, cond_act)
 		return {
 			'<A>': format_full_name(alt, 0,0,0),
-			'<B>': format_full_name(cond, 0,1,1),
+			'<B>': format_full_name(cond, 0,1,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 
@@ -627,7 +627,7 @@ An alternative performs the "ELSE" branch only if no condition is true. The alte
 		alt_act = get_relation_subject(onto.student_parent_of, cond_act)
 		return {
 			'<A>': format_full_name(alt_act, 0,0,0),
-			'<B>': format_full_name(cond_act, 0,1,1),
+			'<B>': format_full_name(cond_act, 0,1,0),
 			'<D>': "'else'",
 			}
 	register_handler(class_name, format_str, _param_provider)
@@ -637,7 +637,8 @@ An alternative performs the "ELSE" branch only if no condition is true. The alte
 	######### Lops mistakes #########
 	########=================########
 	
-	spec = """MissingIterationAfterSuccessfulCondition Нет-итерации
+                # cond_then_body (-> true)
+	spec = """NoIterationAfterSuccessfulCondition Нет-итерации
 Если условие продолжения цикла истинно, то цикл должен продолжиться, т.е. начаться итерация цикла. Поэтому, раз условие <B> истинно, должно начаться тело цикла <A>.
 Every time the condition of continuation of a loop is true, the loop should continue, i.e. an iteration should begin. The Iteration of loop <A> must start because the condition <B> is true."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
@@ -657,9 +658,11 @@ Every time the condition of continuation of a loop is true, the loop should cont
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """MissingLoopEndAfterFailedCondition Нет-конца-цикла
+                # a general Loop
+	spec = """NoLoopEndAfterFailedCondition Нет-конца-цикла
 Цикл заканчивается, как только условие продолжения стало ложным. Поэтому, раз условие <B> ложно, цикл <A> должен завершиться.
 A loop ends as soon as the continuation condition becomes false. Therefore, if the condition <B> is false, the loop <A> must end."""
+                # a general Loop
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -675,6 +678,7 @@ A loop ends as soon as the continuation condition becomes false. Therefore, if t
 	register_handler(class_name, format_str, _param_provider)
 	
 	
+                # a general Loop
 	spec = """LoopEndsWithoutCondition Конец-цикла-без-проверки-условия
 Цикл заканчивается только тогда, когда условие продолжения стало ложным. Поэтому, чтобы цикл <A> должен завершиться, раз условие <B> ложно.
 A loop ends as soon as the continuation condition becomes false. Therefore, if the condition <B> is false, the loop <A> must end."""
@@ -693,6 +697,45 @@ A loop ends as soon as the continuation condition becomes false. Therefore, if t
 	register_handler(class_name, format_str, _param_provider)
 	
 	
+                # start_with_cond
+	spec = """LoopStartIsNotCondition Цикл-начался-не-с-проверки-условия
+Цикл WHILE/FOREACH является циклом с предусловием. Поэтому начать цикл <A> следует с проверки условия <B>.
+The WHILE/FOREACH loop is a preconditioned loop. Therefore, the <A> loop should start with a check of the condition <B>."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		
+		loop_act = get_relation_object(a, onto.precursor)
+		loop = get_relation_object(loop_act, onto.executes)
+		cond = get_relation_object(loop, onto.cond)
+		
+		return {
+			'<A>': format_full_name(loop, 0,0,0),
+			'<B>': format_full_name(cond, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+                # start_with_body
+	spec = """LoopStartIsNotIteration Цикл-начался-не-с-итерации
+Цикл DO[/БезусловныйЦикл?] является циклом с постусловием. Поэтому начать цикл <A> следует с итерации.
+The Do[/unconditionalLoop?] loop is a loop with a postcondition. Therefore, the loop <A> should start with an iteration."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		
+		loop_act = get_relation_object(a, onto.precursor)
+		loop = get_relation_object(loop_act, onto.executes)
+		# cond = get_relation_object(loop, onto.cond)
+		
+		return {
+			'<A>': format_full_name(loop, 0,0,0),
+			# '<B>': format_full_name(cond, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+	
+                # a general Loop
 	spec = """IterationAfterFailedCondition Итерация-при-ложном-условии
 Как только условие продолжения стало ложным, цикл заканчивается. Поэтому, раз условие <B> ложно, итерация цикла <A> не может начаться.
 As soon as the continuation condition becomes false, the loop ends. Therefore, if the condition <B> is false, the iteration of the loop <A> cannot start."""
@@ -710,9 +753,10 @@ As soon as the continuation condition becomes false, the loop ends. Therefore, i
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """MissingConditionAfterIteration Нет-проверки-условия
-Во время выполнения цикла <A> после очередной итерации нужно проверить условие <B>, чтобы продолжить цикл или закончить его.
-After the end of an iteration of the loop <A>, the loop's control condition <B> must be evaluated to determine whether to start the next iteration or to finish the loop."""
+                # body_then_cond
+	spec = """NoConditionAfterIteration Нет-проверки-условия
+После очередной итерации цикла WHILE/DO/FOREACH нужно проверить условие, чтобы продолжить цикл или закончить его. После итерации цикла <A> надо проверить условие <B>.
+After an iteration of the WHILE/DO/FOREACH loop, the condition must be checked in order to continue the loop or finish it. After iteration of loop <A>, condition <B> must be checked."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -722,15 +766,16 @@ After the end of an iteration of the loop <A>, the loop's control condition <B> 
 		cond = get_relation_object(loop, onto.cond)
 		
 		return {
-			'<A>': format_full_name(loop, 0,0,0) if loop else '',
-			'<B>': format_full_name(cond, 0,0,1) if cond else '',
+			'<A>': format_full_name(loop, 0,1,0) if loop else '',
+			'<B>': format_full_name(cond, 0,0,0) if cond else '',
 			}
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """MissingConditionBetweenIterations Нет-проверки-условия-между-итерациями
-Во время выполнения цикла <A>, перед тем как перейти к следующей итерации цикла, нужно проверить условие <B> и узнать, продолжится ли цикл или закончится.
-Prior to proceeding to the next iteration of the loop <A>, the condition <B> must be evaluated to determine whether to start the next iteration or to finish the loop."""
+                # body_then_cond
+	spec = """NoConditionBetweenIterations Нет-проверки-условия-между-итерациями
+После очередной итерации цикла WHILE/DO/FOREACH нужно проверить условие, чтобы продолжить цикл или закончить его. Перед тем как перейти к следующей итерации цикла <A>, нужно проверить условие <B>.
+After an iteration of the WHILE/DO/FOREACH loop, the condition must be checked in order to continue the loop or finish it. Before proceeding to the next iteration of the loop <A>, the condition <B> must be checked."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -745,4 +790,23 @@ Prior to proceeding to the next iteration of the loop <A>, the condition <B> mus
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
+
+
+                # ForLoop
+	spec = """LoopStartsNotWithInit Цикл-FOR-начался-не-с-инициализации
+Прежде чем начать цикл FOR, следует сначала инициализировать его. После начала цикла <A> нужно выполнить инициализацию <B>.
+Before a FOR loop can be started, it must first be initialised. Once the <A> loop has been started, the initialisation <B> should be performed. """
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		loop_act = get_relation_object(a, onto.precursor)
+		init = get_relation_object(loop, onto.init)
+		
+		return {
+			'<A>': format_full_name(loop, 0,0,0),
+			'<B>': format_full_name(init, 0,0,0) if init else '',
+			}
+	register_handler(class_name, format_str, _param_provider)
+	
+
 

@@ -1528,7 +1528,7 @@ RULES.append(DomainRule(name="AlternativeEndAfterTrueCondition-alt_Error",
 # ============ Loops mistakes ============ #
 
 # Нет итерации после успешного условия при cond=1 (while, do-while, for) [works]
-RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-1-loop_Error", 
+RULES.append(DomainRule(name="NoIterationAfterSuccessfulCondition-1-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""
 	normal_flow_correct_act(?a),
@@ -1543,11 +1543,11 @@ RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-1-loop_Er
 	Erroneous(?b), 
 	 -> # should_be(?b, ?a), 
 	 cause(?b, ?a),
-	 MissingIterationAfterSuccessfulCondition(?b)
+	 NoIterationAfterSuccessfulCondition(?b)
 """))
 
 # Нет итерации после успешного условия при cond=0 (do-until) [works?]
-RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-0-loop_Error", 
+RULES.append(DomainRule(name="NoIterationAfterSuccessfulCondition-0-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""
 	normal_flow_correct_act(?a),
@@ -1562,11 +1562,11 @@ RULES.append(DomainRule(name="MissingIterationAfterSuccessfulCondition-0-loop_Er
 	Erroneous(?b), 
 	 -> # should_be(?b, ?a), 
 	 cause(?b, ?a),
-	 MissingIterationAfterSuccessfulCondition(?b)
+	 NoIterationAfterSuccessfulCondition(?b)
 """))
 
 # Нет конца цикла после неуспешного условия - при cond=0 (while, do-while, for, ?) [works]
-RULES.append(DomainRule(name="MissingLoopEndAfterFailedCondition-0-loop_Error", 
+RULES.append(DomainRule(name="NoLoopEndAfterFailedCondition-0-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""
 	normal_flow_correct_act(?a),
@@ -1580,7 +1580,7 @@ RULES.append(DomainRule(name="MissingLoopEndAfterFailedCondition-0-loop_Error",
 	student_next(?a, ?b),
 	Erroneous(?b), 
 	 -> cause(?b, ?a),
-	 MissingLoopEndAfterFailedCondition(?b)
+	 NoLoopEndAfterFailedCondition(?b)
 """))
 
 # Цикл заканчивается без проверки условия [works?]
@@ -1597,11 +1597,11 @@ RULES.append(DomainRule(name="LoopEndsWithoutCondition-loop_Error",
 	 LoopEndsWithoutCondition(?b)
 """))
 
-# IterationAfterFailedCondition is a sort of MissingLoopEndAfterFailedCondition when act is an iteration [works]
+# IterationAfterFailedCondition is a sort of NoLoopEndAfterFailedCondition when act is an iteration [works]
 RULES.append(DomainRule(name="IterationAfterFailedCondition-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""
-	MissingLoopEndAfterFailedCondition(?b),
+	NoLoopEndAfterFailedCondition(?b),
 	act_begin(?b),
 	executes(?b, ?st),
 	body(?L, ?st),
@@ -1610,7 +1610,7 @@ RULES.append(DomainRule(name="IterationAfterFailedCondition-loop_Error",
 """))
 
 # Нет проверки условия после итерации цикла (while, do-while, do-until, foreach) [works]
-RULES.append(DomainRule(name="MissingConditionAfterIteration-loop_Error", 
+RULES.append(DomainRule(name="NoConditionAfterIteration-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""
 	normal_flow_correct_act(?a),
@@ -1622,11 +1622,11 @@ RULES.append(DomainRule(name="MissingConditionAfterIteration-loop_Error",
 	student_next(?a, ?b),
 	Erroneous(?b), 
 	 -> precursor(?b, ?a),
-	 MissingConditionAfterIteration(?b)
+	 NoConditionAfterIteration(?b)
 """))
 
 # Начало итерации цикла сразу после итерации, минуя условие (while, do-while, do-until, foreach) [works]
-RULES.append(DomainRule(name="MissingConditionBetweenIterations-loop_Error", 
+RULES.append(DomainRule(name="NoConditionBetweenIterations-loop_Error", 
 	tags={'mistake', 'loop'},
 	swrl="""
 	normal_flow_correct_act(?a),
@@ -1641,7 +1641,7 @@ RULES.append(DomainRule(name="MissingConditionBetweenIterations-loop_Error",
 	
 	Erroneous(?b), 
 	 -> precursor(?b, ?a),
-	 MissingConditionBetweenIterations(?b)
+	 NoConditionBetweenIterations(?b)
 """))
 
 

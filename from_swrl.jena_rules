@@ -1187,7 +1187,7 @@
 	 (?b rdf:type my:AlternativeEndAfterTrueCondition)
 ]
 
-# Rule: MissingIterationAfterSuccessfulCondition-1-loop_Error [loop & mistake]
+# Rule: NoIterationAfterSuccessfulCondition-1-loop_Error [loop & mistake]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -1201,10 +1201,10 @@
 	(?b rdf:type my:Erroneous), 
 	 ->                      
 	 (?b my:cause ?a),
-	 (?b rdf:type my:MissingIterationAfterSuccessfulCondition)
+	 (?b rdf:type my:NoIterationAfterSuccessfulCondition)
 ]
 
-# Rule: MissingIterationAfterSuccessfulCondition-0-loop_Error [loop & mistake]
+# Rule: NoIterationAfterSuccessfulCondition-0-loop_Error [loop & mistake]
 [
 	(?a rdf:type my:normal_flow_correct_act),
 	(?a rdf:type my:act_end),
@@ -1218,7 +1218,7 @@
 	(?b rdf:type my:Erroneous), 
 	 ->                      
 	 (?b my:cause ?a),
-	 (?b rdf:type my:MissingIterationAfterSuccessfulCondition)
+	 (?b rdf:type my:NoIterationAfterSuccessfulCondition)
 ]
 
 # Rule: MissingLoopEndAfterFailedCondition-0-loop_Error [loop & mistake]
