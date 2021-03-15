@@ -1090,11 +1090,33 @@ def init_persistent_structure(onto):
                 ("AlternativeEndAfterTrueCondition", ["TooEarly"]),
                 
                 # Loops mistakes ...
-                "MissingIterationAfterSuccessfulCondition",
-                "MissingLoopEndAfterFailedCondition",
-                ("IterationAfterFailedCondition", ["MissingLoopEndAfterFailedCondition"]),
-                "MissingConditionAfterIteration",
-                ("MissingConditionBetweenIterations", ["MissingConditionAfterIteration"]),
+                # a general Loop
+                "NoLoopEndAfterFailedCondition",  # +
+                ("IterationAfterFailedCondition", ["NoLoopEndAfterFailedCondition"]), # +
+                "LoopEndsWithoutCondition",  # +
+                # start_with_cond
+                "LoopStartIsNotCondition", # ~
+                # start_with_body
+                "LoopStartIsNotIteration", # ~
+                # cond_then_body (-> true)
+                "NoIterationAfterSuccessfulCondition",  # +
+                # body_then_cond
+                "NoConditionAfterIteration", # +
+                ("NoConditionBetweenIterations", ["NoConditionAfterIteration"]), # +
+                # ForLoop
+                "LoopStartsNotWithInit",
+                "InitNotAtLoopStart",
+                "NoConditionAfterForInit",
+                ("IterationAfterForInit", ["NoConditionAfterForInit"]),
+                "NoUpdateAfterIteration",
+                "UpdateNotAfterIteration",
+                "NoConditionAfterForUpdate",
+                ("ForConditionAfterIteration", ["NoConditionAfterForUpdate"]),
+                # ForeachLoop
+                "NoForeachUpdateAfterSuccessfulCondition",
+                "ForeachUpdateNotAfterSuccessfulCondition",
+                "NoIterationAfterForeachUpdate",
+                "IterationNotAfterForeachUpdate",
             ]:
                 if isinstance(class_name, str):
                     types.new_class(class_name, (Erroneous,))
