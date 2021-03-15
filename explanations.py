@@ -276,10 +276,10 @@ Act <B> is a part of <A> so it can't be executed outside of (later than) <A>"""
 			}
 	register_handler(class_name, format_str, _param_provider)
 	
-	# EndedDeeper: Every act ends exactly when all its nested acts have ended, so the act of the body of the loop 'work' cannot end until the end of the act of the alternative 'choose' (the alternative 'choose' is included in the body of the loop 'work').
+	# EndedDeeper: Every act ends exactly when all its nested acts have ended, so act of the body of the loop 'work' cannot end until the end of act of the alternative 'choose' (the alternative 'choose' is included in the body of the loop 'work').
 	spec = """EndedDeeper Конец-внутри-вложенного-акта
 Всякий акт заканчивается ровно тогда, когда завершились все его вложенные акты, поэтому aкт <A> не может закончиться до окончания акта <B> (<B> входит в <A>)
-Every act ends exactly when all its nested acts have ended, so the act <A> cannot end until the end of the act <B> (<B> is included in <A>)"""
+Every act ends exactly when all its nested acts have ended, so act <A> cannot end until the end of act <B> (<B> is included in <A>)"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -294,7 +294,7 @@ Every act ends exactly when all its nested acts have ended, so the act <A> canno
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
 	spec = """WrongContext Вне-контекста
 Акт <B> не может выполняться в рамках акта <EX>, потому что <B> непосредственно входит в "<A>".
-Act <B> is a immediate part of "<A>" so it can't be executed inside of <EX>"""
+Act <B> is an immediate part of "<A>" so it can't be executed inside of <EX>"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -309,16 +309,16 @@ Act <B> is a immediate part of "<A>" so it can't be executed inside of <EX>"""
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """ExtraAct Лишний-акт
-Не должно быть здесь
-<A> must not happen here due to previous error(s)"""
-	class_name, format_str = class_formatstr(spec.split('\n'))
+	# spec = """ExtraAct Лишний-акт
+	# Не должно быть здесь
+	# <A> must not happen here due to previous error(s)"""
+	# class_name, format_str = class_formatstr(spec.split('\n'))
 	
-	def _param_provider(a: 'act_instance'):
-		return {
-			'<A>': format_full_name(a, 1,1,0).capitalize(),
-			}
-	register_handler(class_name, format_str, _param_provider)
+	# def _param_provider(a: 'act_instance'):
+	# 	return {
+	# 		'<A>': format_full_name(a, 1,1,0).capitalize(),
+	# 		}
+	# register_handler(class_name, format_str, _param_provider)
 	
 	
 	# spec = """TooEarly
@@ -333,18 +333,18 @@ Act <B> is a immediate part of "<A>" so it can't be executed inside of <EX>"""
 	# register_handler(class_name, format_str, _param_provider)
 	
 	
-	spec = """DisplacedAct Перемещённый-акт
-<A> должно произойти перед <B>, но не здесь
-<A> must happen before <B> but not here"""
-	class_name, format_str = class_formatstr(spec.split('\n'))
+	# spec = """DisplacedAct Перемещённый-акт
+	# <A> должно произойти перед <B>, но не здесь
+	# <A> must happen before <B> but not here"""
+	# class_name, format_str = class_formatstr(spec.split('\n'))
 	
-	def _param_provider(a: 'act_instance'):
-		before_this_act = get_relation_object(a, onto.should_be_before)
-		return {
-			'<A>': format_full_name(a, 1,0,0).capitalize(),
-			'<B>': format_full_name(before_this_act, 1,1,0),
-			}
-	register_handler(class_name, format_str, _param_provider)
+	# def _param_provider(a: 'act_instance'):
+	# 	before_this_act = get_relation_object(a, onto.should_be_before)
+	# 	return {
+	# 		'<A>': format_full_name(a, 1,0,0).capitalize(),
+	# 		'<B>': format_full_name(before_this_act, 1,1,0),
+	# 		}
+	# register_handler(class_name, format_str, _param_provider)
 	
 	
 	
@@ -409,10 +409,10 @@ A sequence performs all actions in order from the first through the last, so the
 	register_handler(class_name, format_str, _param_provider)
 	
 	
-	# SequenceFinishedTooEarly: A sequence performs all its actions from the first through the last, so it's too early to finish the sequence of the body of the loop 'work', because not all the actions of the sequence have completed (ex. alternative 'choose').
+	# SequenceFinishedTooEarly: A sequence performs all its actions from the first through the last, so it's too early to finish the sequence of the body of the loop 'work' because not all actions of the sequence have completed (ex. alternative 'choose').
 	spec = """SequenceFinishedTooEarly Следование-прервано
 Следование выполняет все свои действия от первого до последнего, потому рано заканчивать следование <A>, т.к. не все действия следования выполнены<EX>
-A sequence performs all its actions from the first through the last, so it's too early to finish the sequence <A>, because not all the actions of the sequence have completed<EX>"""
+A sequence performs all its actions from the first through the last, so it's too early to finish the sequence <A> because not all actions of the sequence have completed<EX>"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -583,7 +583,7 @@ An alternative performs a branch if the corresponding condition is true. The alt
 
 	spec = """LastFalseNoEnd Развилка-не-закончилась
 Когда ни одно условие альтернативы не оказалось истинным, выполняется ветка "ИНАЧЕ" (при наличии), и завершается вся развилка. Альтернатива <A> не имеет ветки "иначе", поэтому она должна завершиться, так как условие <B> является ложным.
-When no condition of an alternative is true, the alternative performs the "ELSE" branch (if exists) and finishes. The alternative <A> does not have 'else' branch so it must finish because the condition <B> is false"""
+When no condition of an alternative is true, the alternative performs the "ELSE" branch (if exists) and finishes. The alternative <A> does not have an 'else' branch so it must finish because the condition <B> is false"""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -700,7 +700,7 @@ A loop ends as soon as the continuation condition becomes false. Therefore, if t
                 # start_with_cond
 	spec = """LoopStartIsNotCondition Цикл-начался-не-с-проверки-условия
 Цикл WHILE/FOREACH является циклом с предусловием. Поэтому начать цикл <A> следует с проверки условия <B>.
-The WHILE/FOREACH loop is a preconditioned loop. Therefore, the <A> loop should start with a check of the condition <B>."""
+The WHILE/FOREACH loop is a preconditioned. Therefore, the <A> loop should start with a check of the condition <B>."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -719,7 +719,7 @@ The WHILE/FOREACH loop is a preconditioned loop. Therefore, the <A> loop should 
                 # start_with_body
 	spec = """LoopStartIsNotIteration Цикл-начался-не-с-итерации
 Цикл DO[/БезусловныйЦикл?] является циклом с постусловием. Поэтому начать цикл <A> следует с итерации.
-The Do[/unconditionalLoop?] loop is a loop with a postcondition. Therefore, the loop <A> should start with an iteration."""
+The Do[/unconditional-Loop?] loop is post-conditioned. Therefore, the loop <A> should start with an iteration."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -756,7 +756,7 @@ As soon as the continuation condition becomes false, the loop ends. Therefore, i
                 # body_then_cond
 	spec = """NoConditionAfterIteration Нет-проверки-условия
 После очередной итерации цикла WHILE/DO/FOREACH нужно проверить условие, чтобы продолжить цикл или закончить его. После итерации цикла <A> надо проверить условие <B>.
-After an iteration of the WHILE/DO/FOREACH loop, the condition must be checked in order to continue the loop or finish it. After iteration of loop <A>, condition <B> must be checked."""
+After an iteration of the WHILE/DO/FOREACH loop, the condition must be checked to continue the loop or finish it. After the iteration of loop <A>, condition <B> must be checked."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -775,7 +775,7 @@ After an iteration of the WHILE/DO/FOREACH loop, the condition must be checked i
                 # body_then_cond
 	spec = """NoConditionBetweenIterations Нет-проверки-условия-между-итерациями
 После очередной итерации цикла WHILE/DO/FOREACH нужно проверить условие, чтобы продолжить цикл или закончить его. Перед тем как перейти к следующей итерации цикла <A>, нужно проверить условие <B>.
-After an iteration of the WHILE/DO/FOREACH loop, the condition must be checked in order to continue the loop or finish it. Before proceeding to the next iteration of the loop <A>, the condition <B> must be checked."""
+After an iteration of the WHILE/DO/FOREACH loop, the condition must be checked to continue the loop or finish it. Before proceeding to the next iteration of the loop <A>, the condition <B> must be checked."""
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
@@ -795,11 +795,12 @@ After an iteration of the WHILE/DO/FOREACH loop, the condition must be checked i
                 # ForLoop
 	spec = """LoopStartsNotWithInit Цикл-FOR-начался-не-с-инициализации
 Прежде чем начать цикл FOR, следует сначала инициализировать его. После начала цикла <A> нужно выполнить инициализацию <B>.
-Before a FOR loop can be started, it must first be initialised. Once the <A> loop has been started, the initialisation <B> should be performed. """
+Before a FOR loop can be started, it must first be initialised. Once the <A> loop has been started, the initialization <B> should be performed. """
 	class_name, format_str = class_formatstr(spec.split('\n'))
 	
 	def _param_provider(a: 'act_instance'):
 		loop_act = get_relation_object(a, onto.precursor)
+		loop = get_relation_object(loop_act, onto.executes)
 		init = get_relation_object(loop, onto.init)
 		
 		return {
@@ -807,6 +808,194 @@ Before a FOR loop can be started, it must first be initialised. Once the <A> loo
 			'<B>': format_full_name(init, 0,0,0) if init else '',
 			}
 	register_handler(class_name, format_str, _param_provider)
+
+
+                # ForLoop
+	spec = """InitNotAtLoopStart Инициализация-FOR-не-в-начале-цикла
+Инициализация цикла FOR выполняется один раз в самом начале цикла. После акта <A> инициализацию <B> выполнять не следует.
+The initialization of the FOR loop is performed once at the beginning of the loop. After the <A> act, the initialization <B> should not be performed."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		some_act = get_relation_object(a, onto.precursor)
+		# init = get_relation_object(loop, onto.init)
+		
+		return {
+			'<A>': format_full_name(some_act, 0,1,0),
+			'<B>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
 	
 
+# =========================
+
+                # ForLoop
+	spec = """NoConditionAfterForInit Нет-проверки-условия-после-инициализации-цикла-FOR
+Цикл FOR является циклом с предусловием, поэтому сразу после инициализации он проверяет условие продолжения. После инициализации <A> следует проверить условие цикла <B>.
+The FOR loop is a preconditioned, so immediately after initialization, it checks the continuation condition. After initialization <A> the loop condition <B> should be evaluated."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		init_act = get_relation_object(a, onto.precursor)
+		# init = get_relation_object(loop, onto.init)
+		
+		return {
+			'<A>': format_full_name(init_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+                # ForLoop
+	spec = """IterationAfterForInit Итерация-после-инициализации-цикла-FOR
+Цикл FOR является циклом с предусловием, поэтому прежде чем начать возможную итерацию, необходимо проверить условие цикла. После инициализации <A> следует проверить условие цикла <B>.
+The FOR loop is a pre-conditioned loop, so it is necessary to check the loop condition before starting a possible iteration. After initialization <A> the condition of the loop <B> should be checked."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		init_act = get_relation_object(a, onto.precursor)
+		# init = get_relation_object(loop, onto.init)
+		
+		return {
+			'<A>': format_full_name(init_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+                # ForLoop
+	spec = """NoUpdateAfterIteration Нет-перехода-после-итерации-цикла-FOR
+Цикл FOR является циклом с инкрементом, поэтому после всякой итерации необходимо выполнить переход к новому значению переменной цикла. После итерации цикла <A> следует выполнить переход <B>. (??? Терминология: переход/инкремент ???)
+The FOR loop is a loop with increment, so after every iteration, it is necessary to update the loop variable. After the iteration of the loop <A>, the update <B> must be performed."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		init_act = get_relation_object(a, onto.precursor)
+		# init = get_relation_object(loop, onto.init)
+		
+		return {
+			'<A!>': format_full_name(init_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+                # ForLoop
+	spec = """UpdateNotAfterIteration Нет-перехода-после-итерации-цикла-FOR
+Цикл FOR является циклом с инкрементом, поэтому обновление переменной цикла до нового значения необходимо выполнять только после итерации. После итерации цикла <A> следует выполнить переход <B>.
+The FOR loop is a loop with increment, so the update of the loop variable to a new value should only be done after iteration. After the iteration of the loop <A>, the update <B> should be performed."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		init_act = get_relation_object(a, onto.precursor)
+		# init = get_relation_object(loop, onto.init)
+		
+		return {
+			'<A!>': format_full_name(init_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+                # ForLoop
+	spec = """ForConditionAfterIteration Условие-после-итерации-цикла-FOR
+Цикл FOR является циклом с инкрементом, поэтому после итерации необходимо обновить значение переменной цикла, и только затем проверять условие цикла. После итерации цикла <A> следует выполнить переход <B>.
+The FOR loop is a loop with increment, so it is necessary to update the loop variable after an iteration, and only then check the loop condition. After the iteration of the loop <A> the update <B> should be performed."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		init_act = get_relation_object(a, onto.precursor)
+		# init = get_relation_object(loop, onto.init)
+		
+		return {
+			'<A!>': format_full_name(init_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+                # ForLoop
+	spec = """NoConditionAfterForUpdate Нет-условия-после-перехода-цикла-FOR
+Цикл FOR является циклом с инкрементом, и после обновления переменной цикла до нового значения необходимо проверить условие продолжения цикла. После перехода <A> следует проверить условие <B>.
+The FOR loop is a loop with an increment, and after updating the loop variable to a new value, it is necessary to check the continuation condition of the loop. After the update <A> the condition <B> should be checked."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		init_act = get_relation_object(a, onto.precursor)
+		# init = get_relation_object(loop, onto.init)
+		
+		return {
+			'<A!>': format_full_name(init_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+                # ForeachLoop
+	spec = """NoForeachUpdateAfterSuccessfulCondition Нет-перехода-после-условия-цикла-FOREACH
+Цикл FOREACH обходит коллекцию/перебирает итератор, поэтому после проверки наличия очередного элемента должен перейти к этому элементу. Так как условие <A> истинно, следует получить очередной элемент и начать итерацию цикла <B>.
+The FOREACH loop traverses the collection/iterator, so after checking for the next element, it should go to that element. Since condition <A> is true, the next element should be retrieved and the iteration of loop <B> should start."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		prev_act = get_relation_object(a, onto.precursor)
+		# prev = get_relation_object(loop, onto.prev)
+		
+		return {
+			'<A!>': format_full_name(prev_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+                # ForeachLoop
+	spec = """ForeachUpdateNotAfterSuccessfulCondition Переход-не-после-истинного-условия-цикла-FOREACH
+Цикл FOREACH обходит коллекцию/перебирает итератор, поэтому переходить к следующему элементу должен непосредственно после проверки наличия очередного элемента. Переход к очередному элементу должен следовать сразу за успешной проверкой условия <A> цикла <B>.
+The FOREACH loop traverses the collection/iterator, so it should move to the next element immediately after checking for that element. Retrieving the next element in the loop <B> should immediately follow a successful check of the condition <A>."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		prev_act = get_relation_object(a, onto.precursor)
+		# prev = get_relation_object(loop, onto.prev)
+		
+		return {
+			'<A!>': format_full_name(prev_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+                # ForeachLoop
+	spec = """NoIterationAfterForeachUpdate Нет-итерации-после-перехода-цикла-FOREACH
+Цикл FOREACH обходит коллекцию/перебирает итератор, поэтому после перехода к очередному элементу должен начинать новую итерацию. Сразу за переходом к очередному элементу должно следовать начало итерации цикла <B>.
+The FOREACH loop traverses the collection/iterator, so it should start a new iteration after traversing to the next element. As soon as the next element is retrieved the iteration of the <B> loop should start."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		prev_act = get_relation_object(a, onto.precursor)
+		# prev = get_relation_object(loop, onto.prev)
+		
+		return {
+			'<A!>': format_full_name(prev_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
+
+
+
+                # ForeachLoop
+	spec = """IterationNotAfterForeachUpdate Итерация-не-после-перехода-цикла-FOREACH
+Цикл FOREACH обходит коллекцию/перебирает итератор, поэтому начинать новую итерацию должен непосредственно после перехода к очередному элементу. Сразу за переходом к очередному элементу должно следовать начало итерации цикла <B>.
+The FOREACH loop traverses the collection/iterator, so a new iteration should start immediately after traversing to the next element. The iteration of the <B> loop should start right after an element is retrieved."""
+	class_name, format_str = class_formatstr(spec.split('\n'))
+	
+	def _param_provider(a: 'act_instance'):
+		prev_act = get_relation_object(a, onto.precursor)
+		# prev = get_relation_object(loop, onto.prev)
+		
+		return {
+			'<A!>': format_full_name(prev_act, 0,1,0),
+			'<B!>': format_full_name(a, 0,0,0),
+			}
+	register_handler(class_name, format_str, _param_provider)
 

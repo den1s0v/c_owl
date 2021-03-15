@@ -1110,8 +1110,8 @@ def init_persistent_structure(onto):
                 ("IterationAfterForInit", ["NoConditionAfterForInit"]),
                 "NoUpdateAfterIteration",
                 "UpdateNotAfterIteration",
+                ("ForConditionAfterIteration", ["UpdateNotAfterIteration"]),
                 "NoConditionAfterForUpdate",
-                ("ForConditionAfterIteration", ["NoConditionAfterForUpdate"]),
                 # ForeachLoop
                 "NoForeachUpdateAfterSuccessfulCondition",
                 "ForeachUpdateNotAfterSuccessfulCondition",
