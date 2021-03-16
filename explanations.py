@@ -121,10 +121,12 @@ def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, in
 			type_ = type_.strip() + " "
 			
 		### print(phase, type_, quote, stmt_name, quote, line_index)
-		full_msg = phase + type_ + stmt_name + line_index
+		full_msg = phase + type_ + stmt_name  # + line_index
 		if full_msg != stmt_name:
 			# wrap in additional quotes
 			full_msg = "«%s»" % full_msg
+		if line_index:
+			full_msg += line_index
 		return full_msg
 	except Exception as e:
 		print(e)
