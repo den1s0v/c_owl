@@ -121,13 +121,21 @@ class TraceTester():
                 break
         return self._maxID            
         
-    def make_correct_trace(self):
-        if "correct_trace" in self.data:
-            # print("Warning: make_correct_trace(): correct_trace already exists...")
-            pass
-            # return
+    def alg_entry(self):
+        if "entry_point" in self.data["algorithm"]:
+            alg_node = self.data["algorithm"]["entry_point"]
+        else:
+            raise "Cannot resolve 'entry_point' from algorithm's keys: " + str(list(self.data["algorithm"].keys()))
+        return alg_node
+
+    def make_correct_trace(self, noop=False):
             
         self.data["correct_trace"] = []
+        self.expr_id2values = {}
+        
+        if noop:
+            # !!!
+            return
         
         def _gen(states_str):
             for ch in states_str:
@@ -138,7 +146,6 @@ class TraceTester():
         self.last_cond_tuple = (-1, False)
         
         self._maxID = max(self._maxID, max(map(int, self.id2obj.keys())) + 10)
-        self.expr_id2values = {}
         
         # decide where to read expr values from
         self.values_source = None
@@ -425,10 +432,7 @@ class TraceTester():
                 })
                 
         
-        if "entry_point" in self.data["algorithm"]:
-            alg_node = self.data["algorithm"]["entry_point"]
-        else:
-            raise "Cannot resolve 'entry_point' from algorithm's keys: " + str(list(self.data["algorithm"].keys()))
+        alg_node = self.alg_entry()
         
         name = "программа"
         phase = "started"
@@ -462,7 +466,7 @@ class TraceTester():
         
         self.inject_algorithm_to_ontology(onto)
         
-        self.make_correct_trace()
+        self.make_correct_trace(noop=True)
         self.prepare_act_candidates(onto)
         self.inject_trace_to_ontology(onto, self.data["trace"], (), "student_next")
         # self.inject_trace_to_ontology(onto, self.data["correct_trace"], ("correct_act",), "correct_next")
@@ -500,94 +504,95 @@ class TraceTester():
             
             # make algorithm classes and individuals
             for d in alg_objects:
-                if "id" in d:
-                    id_ = d.get("id")
+                if "id" not in d:
+                    continue
+                id_ = d.get("id")
+                
+                # (once more) protection from objects cloned via JSON serialization
+                if id_ in written_ids:
+                    continue
+                else:
+                    written_ids.add(id_)
+                
+                type_ = d.get("type")
+                name  = d.get("name", "")
+                
+                assert type_, "Error: No 'type' in agrorithm object: " + str(d)
+                
+                id_        = int(id_)
+                clean_name = prepare_name(name)
+                
+                class_ = onto[type_]
+                if not class_:
+                    # make a new class in the ontology
+                    class_ = types.new_class(type_, (Thing, ))
                     
-                    # protection from objects cloned via JSON serialization
-                    # ! need to repair the JSON data at start!
-                    if id_ in written_ids:
-                        continue
-                    else:
-                        written_ids.add(id_)
+                # формируем имя экземпляра в онтологии
+                iri = "{}_{}".format(id_, clean_name)
+                
+                iri = uniqualize_iri(onto, iri)
                     
-                    type_ = d.get("type")
-                    name  = d.get("name", "")
-                    
-                    assert type_, "Error in agrorithm object: "+str(d)
-                    
-                    id_         = int(id_)
-                    clean_name  = prepare_name(name)
-                    
-                    class_ = onto[type_]
-                    if not class_:
-                        # make a new class in the ontology
-                        class_ = types.new_class(type_, (Thing, ))
-                        
-                    # формируем имя экземпляра в онтологии
-                    iri = "{}_{}".format(id_, clean_name)
-                    
-                    iri = uniqualize_iri(onto, iri)
-                        
-                    # сохраняем назад в наш словарь (для привязки к актам трассы) 
-                    d["iri"] = iri
-                    # создаём объект
-                    obj = class_(iri)
-                    # привязываем id
-                    make_triple(obj, onto.id, id_)
-                    # привязываем имя
-                    make_triple(obj, onto.stmt_name, name)
-                    
-                    # make special string link identifying algorithm
-                    if type_ == "algorithm":
-                        prop = onto["algorithm_name"]
-                        if not prop:
-                            with onto:
-                                # новое свойство по заданному имени
-                                prop = types.new_class("algorithm_name", (Thing >> str, ))
-                        make_triple(obj, prop, self.data["algorithm_name"])
-                # else: raise "no id!"
+                # сохраняем назад в наш словарь (для привязки к актам трассы) 
+                d["iri"] = iri
+                # создаём объект
+                obj = class_(iri)
+                # привязываем id
+                make_triple(obj, onto.id, id_)
+                # привязываем имя
+                make_triple(obj, onto.stmt_name, name)
+                
+                # make special string link identifying algorithm
+                if type_ == "algorithm":
+                    prop = onto["algorithm_name"]
+                    if not prop:
+                        with onto:
+                            # новое свойство по заданному имени
+                            prop = types.new_class("algorithm_name", (Thing >> str, ))
+                    make_triple(obj, prop, self.data["algorithm_name"])
             
-            # link the instances
+            # link the instances: repeat the structure completely
             for d in alg_objects:
-                if "id" in d:
-                    for k in d:  # ищем объекты среди полей словаря
-                        v = d[k]
-                        if isinstance(v, dict) and "id" in v and "iri" in v:
-                            link_objects(onto, d["iri"], k, v["iri"], (Thing >> Thing, onto.parent_of,) )
-                        elif isinstance(v, (list, set)):
-                            # make an ordered linked_list for list, unorederd for set
-                            # print("check out list", k, "...")
-                            # сделаем список, если в нём нормальные "наши" объекты
-                            subobject_iri_list = [subv["iri"] for subv in v  if isinstance(subv, dict) and "id" in subv and "iri" in subv]
-                            if not subobject_iri_list:
-                                continue
-                                
-                            iri = d["iri"]
+                if "id" not in d:
+                    continue
+                for k in d:  # ищем объекты среди полей словаря
+                    v = d[k]
+                    if isinstance(v, dict) and "id" in v and "iri" in v:
+                        # connect all the properties of the instance
+                        link_objects(onto, d["iri"], k, v["iri"], (Thing >> Thing, onto.parent_of,) )
+                    elif isinstance(v, (list, set)):
+                        # make an ordered linked_list for list, unorederd for set
+                        # print("check out list", k, "...")
+                        # сделаем список, если в нём нормальные "наши" объекты
+                        subobject_iri_list = [subv["iri"] for subv in v  if isinstance(subv, dict) and "id" in subv and "iri" in subv]
+                        if not subobject_iri_list:
+                            continue
                             
-                            # всякий список (действий, веток, ...) должен быть оформлен как linked_list.
-                            if k == "body" and isinstance(v, list):
-                                # делаем объект последовательностью (нужно для тел циклов, веток, функций)
-                                onto[iri].is_a.append( onto.linked_list )
-                            # else:  # это нормально для других списков
-                            #     print("Warning: key of sequence is '%s' (consider using 'body')" % k)
-                            
-                            
-                            subelem__prop_name = k+"_item"
-                            for i, subiri in enumerate(subobject_iri_list):
-                                # главная связь
-                                link_objects(onto, iri, subelem__prop_name, subiri, (Thing >> Thing, onto.parent_of,) )
-                                if isinstance(v, list):  # for list only
-                                    # последовательность
-                                    if i >= 1:
-                                        prev_iri = subobject_iri_list[i-1]
-                                        link_objects(onto, prev_iri, "next", subiri)
-                                    # первый / последний
-                                    if i == 0:
-                                        # mark as first elem of the list
-                                        onto[subiri].is_a.append(onto.first_item)
-                                    if i == len(subobject_iri_list)-1:
-                                        # mark as last act of the list
-                                        onto[subiri].is_a.append(onto.last_item)
+                        iri = d["iri"]
+                        
+                        # всякий список (действий, веток, ...) должен быть оформлен как linked_list.
+                        if k == "body" and isinstance(v, list):
+                            # делаем объект последовательностью (нужно для тел циклов, веток, функций)
+                            onto[iri].is_a.append( onto.linked_list )
+                        # else:  # это нормально для других списков
+                        #     print("Warning: key of sequence is '%s' (consider using 'body')" % k)
+                        
+                        
+                        subelem__prop_name = k+"_item"
+                        for i, subiri in enumerate(subobject_iri_list):
+                            # главная связь
+                            link_objects(onto, iri, subelem__prop_name, subiri, (Thing >> Thing, onto.parent_of,) )
+                            if isinstance(v, list):  # for list only
+                                # последовательность
+                                if i >= 1:
+                                    prev_iri = subobject_iri_list[i-1]
+                                    link_objects(onto, prev_iri, "next", subiri)
+                                # первый / последний
+                                if i == 0:
+                                    # mark as first elem of the list
+                                    onto[subiri].is_a.append(onto.first_item)
+                                if i == len(subobject_iri_list)-1:
+                                    # mark as last act of the list
+                                    onto[subiri].is_a.append(onto.last_item)
 
         
     def prepare_act_candidates(self, onto, extra_act_entries=0):
@@ -597,18 +602,13 @@ class TraceTester():
         
         assert extra_act_entries == 0, f"extra_act_entries={extra_act_entries}"  # TODO: remove parameter (it is deprecated now)
         
-        alg_id2max_exec_n = {}  # executed stmt id to max exec_time in correct trace
-
+        alg_id2max_exec_n = {st_id:0 for st_id in self.id2obj.keys()}  # executed stmt id to max exec_time of the act
         for act in self.data["correct_trace"]:
             executed_id = act["executes"]
             exec_n = act["n"]
             alg_id2max_exec_n[executed_id] = exec_n  # assume "n"s appear consequently in the trace
             
-        # update the dict by adding extra_act_entries value for each stmt
-        for st_id in self.id2obj.keys():
-            alg_id2max_exec_n[st_id] = extra_act_entries + alg_id2max_exec_n.get(st_id, 0)
-            
-        # ensure that student's acts also exist
+        # ensure that student's acts exist
         for act in self.data["trace"]:
             executed_id = act["executes"]
             exec_n = act.get("n", "1")
@@ -616,7 +616,7 @@ class TraceTester():
                             int(exec_n),  # assume "n"s appear consequently in the trace
                             int(alg_id2max_exec_n[executed_id]))
 
-        entry_stmt_id = self.data["correct_trace"][0]["executes"]
+        entry_stmt_id = self.alg_entry()["id"]
             
         max_act_ID = 1
         def set_id(act_obj):
