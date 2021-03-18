@@ -1,0 +1,22 @@
+// алгоритм alg
+{
+while (not_green)  // waiting
+{  
+	if (red)  // over_color
+	{  
+		wait
+	}  
+	else if (yellow)
+	{  
+		get_ready
+	}  
+}  
+}
+
+
+// alg трасса
+{
+началась программа
+закончилась программа
+}
+
