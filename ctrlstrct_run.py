@@ -549,7 +549,14 @@ class TraceTester():
                             # новое свойство по заданному имени
                             prop = types.new_class("algorithm_name", (Thing >> str, ))
                     make_triple(obj, prop, self.data["algorithm_name"])
-            
+                elif True:  # new experimental feature
+                    # connect begin & end
+                    class_ = onto.boundary
+                    for prop_name in ("begin_of", "end_of"):
+                        bound = class_(prop_name + "_" + iri)
+                        make_triple(bound, onto[prop_name], obj)
+
+
             # link the instances: repeat the structure completely
             for d in alg_objects:
                 if "id" not in d:
@@ -878,7 +885,35 @@ def init_persistent_structure(onto):
         class linked_list(Thing): pass
         
         # ->
-        class sequence(Thing): pass
+        class action(Thing): pass
+
+        ##### Граф между действиями алгоритма
+        class boundary(Thing): pass  # begin or end of an action
+        class begin_of(boundary >> action, ): pass
+        class   end_of(boundary >> action, ): pass
+        # class statement_begin(Thing): pass
+        # class statement_end  (Thing): pass
+
+        class hide_boundaries(action): 
+            """tells a complex action no to show (to skip) begin/end acts in not-collapsed mode."""
+            pass
+
+        # новое свойство consequent - ребро графа переходов, заменяющего правильную трассу
+        class consequent(Thing >> Thing, ): pass
+        
+        class hidden_consequent(consequent): pass
+        class visible_consequent(consequent): pass
+        
+        # class interrupting_consequent(consequent): pass
+        # + subclasses
+        class normal_consequent(consequent): pass
+        class on_true_consequent(normal_consequent): pass
+        class on_false_consequent(normal_consequent): pass
+        ##### Граф между действиями алгоритма
+        
+                
+        # ->
+        class sequence(action): pass
         
         # признак first
         class first_item(Thing, ): pass
@@ -886,37 +921,45 @@ def init_persistent_structure(onto):
         class last_item(Thing, ): pass
 
         # ->
-        class loop(Thing): pass
+        class loop(action): pass
         
         if loop:  # hide a block under code folding
+            # classes that regulate the use of condition in a loop
+            
+            # normal condition effect (false->stop, true->start a body) like in while, do-while, for loop types
+            class conditional_loop(loop): pass
+            
+            # no condition at all: infinite loop like while(true){...}. The only act endlessly executed is the loop body.
+            class unconditional_loop(loop): pass
+            # # inverse condition effect (false->start a body, true->stop) like in do-until loop
+            # inverse_conditional_loop = types.new_class("inverse_conditional_loop", (loop,))
+            
+            # The constraint is not useful so far
+            # AllDisjoint([conditional_loop, unconditional_loop])
+            
+            class infinite_loop(unconditional_loop): pass
+            class ntimes_loop(unconditional_loop): pass
+            
+            
             # classes that regulate a loop execution start (which act should be first)
             #
             # start with cond
-            preconditional_loop = types.new_class("pre_conditional_loop", (loop,))
+            class start_with_cond(conditional_loop): pass
             # start with body
-            postconditional_loop = types.new_class("post_conditional_loop", (loop,))
+            class start_with_body(loop): pass
             # start with init
-            loop_with_initialization = types.new_class("loop_with_initialization", (loop,))
+            class start_with_init(conditional_loop): pass
             
-            AllDisjoint([preconditional_loop, postconditional_loop, loop_with_initialization])
+            # The constraint is not useful so far
+            # AllDisjoint([start_with_cond, start_with_body, start_with_init])
             
-            # classes that regulate the use of condition in a loop
-            #
-            # normal condition effect (false->stop, true->start a body) like in while, do-while, for loop types
-            conditional_loop = types.new_class("conditional_loop", (loop,))
-            # inverse condition effect (false->start a body, true->stop) like in do-until loop
-            inverse_conditional_loop = types.new_class("inverse_conditional_loop", (loop,))
-            # no condition at all: infinite loop like while(true){...}. The only act endlessly executed is the loop body.
-            unconditional_loop = types.new_class("unconditional_loop", (loop, postconditional_loop))  # "postconditional_loop" parent here is a lifehack: the loop starts with body just like "do-while", "postconditional_loop" causes the body to be first act whthin a loop act.
-            
-            AllDisjoint([conditional_loop, inverse_conditional_loop, unconditional_loop])
             
             # classes that regulate the use of "update" step in a for-like loop (both subclasses of "loop_with_initialization" as that loop have "update" step too)
             #
             # update first, then the body, like in foreach loop type
-            pre_update_loop = types.new_class("pre_update_loop", (loop_with_initialization,))
+            class pre_update_loop(conditional_loop): pass
             # body first, then the update, like in for(;;) loop type
-            post_update_loop = types.new_class("post_update_loop", (loop_with_initialization,))
+            class post_update_loop(conditional_loop): pass
             
             AllDisjoint([pre_update_loop, post_update_loop])
             
@@ -928,27 +971,25 @@ def init_persistent_structure(onto):
             #     equivalent_to = [conditional_loop & (Not(pre_update_loop))]
             
             # workaround: do not use the inference, declare explicitly
-            class cond_then_body(loop): pass
-            class body_then_cond(loop): pass
+            class cond_then_body(conditional_loop): pass
+            class body_then_cond(conditional_loop): pass
                 
             # classes that define well-known loops as subclasses of the above defined loop-feature classes. These classes are to be used publicly
-            class while_loop(conditional_loop, preconditional_loop): pass
+            class while_loop(conditional_loop, start_with_cond): pass
             while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
             
-            class do_while_loop(conditional_loop, postconditional_loop): pass
+            class do_while_loop(conditional_loop, start_with_body): pass
             do_while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
             
-            class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
-            do_until_loop.is_a += [body_then_cond]  # workaround
+            # class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
+            # do_until_loop.is_a += [body_then_cond]  # workaround
             
-            class for_loop(conditional_loop, post_update_loop): pass
+            class for_loop(post_update_loop, start_with_init): pass
             for_loop.is_a += [cond_then_body]  # workaround
 
-            class foreach_loop(conditional_loop, pre_update_loop): pass
+            class foreach_loop(pre_update_loop, start_with_cond): pass
             foreach_loop.is_a += [body_then_cond]  # workaround
             
-            class infinite_loop(loop):  
-                equivalent_to = [unconditional_loop]  # reduce an inheritance level: use "equivalent_to" instead of inheritance
               
         
         # -->
@@ -956,9 +997,14 @@ def init_persistent_structure(onto):
 
         # make algorithm elements classes
         for class_name in [
-            "func", "alternative", "expr", 
+            "func", "alternative",
         ]:
-            types.new_class(class_name, (Thing,))
+            types.new_class(class_name, (action,))
+
+        for class_name in [
+            "expr", "stmt", 
+        ]:
+            types.new_class(class_name, (action, hide_boundaries))
 
         for class_name in [
             "if", "else-if", "else", 
@@ -1026,9 +1072,6 @@ def init_persistent_structure(onto):
         class corresponding_end(act_begin >> act_end, ): pass
         class student_corresponding_end(act_begin >> act_end, ): pass
     
-        # # новое свойство target - цель подсчёта числа связей
-        # class target(Counter >> Thing, AsymmetricProperty): pass
-    
         # новое свойство parent_of
         # class parent_of(act_begin >> act, InverseFunctionalProperty): pass
         class parent_of(Thing >> Thing, InverseFunctionalProperty): pass
@@ -1036,9 +1079,6 @@ def init_persistent_structure(onto):
 
         class branches_item(parent_of): pass
 
-        # # новое свойство contains_act < contains_child
-        # class contains_child(Thing >> Thing, ): pass
-        # class contains_act(act_begin >> act, contains_child): pass
         
        # объекты, спровоцировавшие ошибку
         if not onto["Erroneous"]:
