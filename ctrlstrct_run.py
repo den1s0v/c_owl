@@ -649,6 +649,7 @@ class TraceTester():
         make_triple(trace_obj, onto.index, 0)
         make_triple(trace_obj, onto.student_index, 0)
         make_triple(trace_obj, onto.exec_time, 0)  # set to 0 so next is 1
+        make_triple(trace_obj, onto.depth, 0)  # set to 0 so next is 1
         make_triple(trace_obj, onto.in_trace, trace_obj)  # each act belongs to trace
         
         
@@ -754,6 +755,7 @@ class TraceTester():
             i = 0
             # act_index = 0
             trace_acts_list = []
+            trace_acts_list.append(find_act(onto.trace, self.data["algorithm"]["id"], 0))
             for d in trace:
                 i += 1
                 if "id" in d:
@@ -889,8 +891,9 @@ def init_persistent_structure(onto):
 
         ##### Граф между действиями алгоритма
         class boundary(Thing): pass  # begin or end of an action
-        class begin_of(boundary >> action, ): pass
-        class   end_of(boundary >> action, ): pass
+        class boundary_of(boundary >> action, ): pass
+        class begin_of(boundary_of): pass
+        class   end_of(boundary_of): pass
         # class statement_begin(Thing): pass
         # class statement_end  (Thing): pass
 
@@ -901,7 +904,7 @@ def init_persistent_structure(onto):
         # новое свойство consequent - ребро графа переходов, заменяющего правильную трассу
         class consequent(Thing >> Thing, ): pass
         
-        class hidden_consequent(consequent): pass
+        class verbose_consequent(consequent): pass
         class visible_consequent(consequent): pass
         
         # class interrupting_consequent(consequent): pass
@@ -1004,7 +1007,7 @@ def init_persistent_structure(onto):
         for class_name in [
             "expr", "stmt", 
         ]:
-            types.new_class(class_name, (action, hide_boundaries))
+            types.new_class(class_name, (action, ))  ### hide_boundaries
 
         for class_name in [
             "if", "else-if", "else", 
@@ -1053,8 +1056,8 @@ def init_persistent_structure(onto):
 
         # новое свойство exec_time
         prop_exec_time = types.new_class("exec_time", (Thing >> int, FunctionalProperty, ))
-        # # новое свойство depth
-        # prop_depth = types.new_class("depth", (Thing >> int, FunctionalProperty, ))
+        # новое свойство depth
+        class depth(Thing >> int, FunctionalProperty, ): pass
         # # новое свойство correct_depth
         # prop_correct_depth = types.new_class("correct_depth", (Thing >> int, FunctionalProperty, ))
 
