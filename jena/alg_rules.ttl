@@ -1,0 +1,451 @@
+@prefix  rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix  rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+
+
+# An important RDF rules subset
+@include <jena/rdfs4core.rules>.
+
+# @include <RDFS>.
+
+@prefix my: <http://vstu.ru/poas/ctrl_structs_2020-05_v1#> .
+
+# # Converted from SWRL
+# @include <from_swrl.jena_rules> .
+
+# `rdf:type` нельзя заменить на `a`, как в turtle
+
+
+# java -jar jena/Jena.jar jena "test_data/ajax.rdf" "jena/test_native.ttl" "test_data/jena_output.rdf"
+# java -jar jena/Jena.jar jena "test_data/jena_test.ttl" "jena/test_native.ttl" "test_data/jena_output.n3"
+# java -jar jena/Jena.jar jena "jena_in.rdf" "jena/test_native.ttl" "test_data/jena_output.n3"
+# java -jar jena/Jena.jar jena "jena_in.rdf" "jena/test_native.ttl;jena/test_native_trace.ttl" "test_data/jena_output.n3"
+
+
+
+# [make_action_boundaries:
+# 	(?st rdf:type my:action),
+# 	makeSkolem(?b, ?st, "begin"),
+# 	makeSkolem(?e, ?st, "end"),
+# 	 ->
+# 	(?b my:begin_of ?st),
+# 	(?e my:end_of ?st),
+# ]
+
+
+
+[connect_StmtEnd:
+
+	(?st rdf:type my:stmt),
+	(?b my:begin_of ?st),
+	(?e my:end_of ?st),
+	 ->
+	 (?b my:normal_consequent ?e),
+]
+[connect_ExprEnd:
+
+	(?st rdf:type my:expr),
+	(?b my:begin_of ?st),
+	(?e my:end_of ?st),
+	 ->
+	 (?b my:normal_consequent ?e),
+]
+
+
+
+###############################
+# helper
+###############################
+
+
+[branches_item-o-cond-to-parent_of:
+
+	(?a my:branches_item ?b),
+	(?b my:cond ?c)
+	 -> (?a my:parent_of ?c)
+]
+
+[loop-cond-to-parent_of:
+
+	(?Loop rdf:type my:loop),
+	(?Loop my:cond ?c)
+	 -> (?Loop my:parent_of ?c)
+]
+
+##[normal_consequent_to_verbose-a-a:
+
+##	(?x rdf:type my:action),
+##	(?y rdf:type my:action),
+##	(?x my:normal_consequent ?y),
+##	(?ex my:end_of ?x),
+##	(?by my:begin_of ?y),
+
+##	 ->
+##	 (?ex my:verbose_consequent ?by),
+##]
+##
+##[normal_consequent_to_verbose-a-b:
+
+##	(?x rdf:type my:action),
+##	(?y rdf:type my:boundary),
+##	(?x my:normal_consequent ?y),
+##	(?ex my:end_of ?x),
+###	(?by my:begin_of ?y),
+
+##	 ->
+##	 (?ex my:verbose_consequent ?y),
+##]
+##
+##[normal_consequent_to_verbose-e-a:
+
+##	(?x rdf:type my:boundary),
+##	(?y rdf:type my:action),
+##	(?x my:normal_consequent ?y),
+#	(?ex my:end_of ?x),
+##	(?by my:begin_of ?y),
+
+##	 ->
+##	 (?x my:verbose_consequent ?by),
+##]
+##
+##[normal_consequent_to_verbose-e-b:
+
+##	(?x rdf:type my:boundary),
+##	(?y rdf:type my:boundary),
+##	(?x my:normal_consequent ?y),
+##	 ->
+##	 (?x my:verbose_consequent ?y),
+##]
+
+
+
+
+
+
+###############################
+# entry_point and sequence
+###############################
+
+
+[start__to__GlobalCode__rule_g4:
+
+#	print("Entry point is ..."),
+	(?alg my:entry_point ?gc ),
+	(?gc rdf:type my:sequence ),
+	(?b my:begin_of ?gc),
+
+	 ->
+	 (?alg my:normal_consequent ?b),
+]
+
+[connect_SequenceBegin_rule_g2:
+
+	(?block rdf:type my:sequence),
+	(?b my:begin_of ?block),
+
+	(?block my:body_item ?st),
+	(?st rdf:type my:first_item),
+	(?b2 my:begin_of ?st),
+
+	 ->
+	 (?b my:normal_consequent ?b2),
+]
+
+[connect_SequenceNext:
+
+	(?block rdf:type my:sequence),
+	(?block my:body_item ?st),
+	(?st my:next ?st2),
+	(?e my:end_of ?st),
+	(?b my:begin_of ?st2),
+
+	 ->
+	 (?e my:normal_consequent ?b),
+]
+
+[connect_SequenceEnd:
+
+	(?block rdf:type my:sequence),
+	(?e my:end_of ?block),
+	(?block my:body_item ?st),
+	(?st rdf:type my:last_item),
+	(?e1 my:end_of ?st),
+
+	 ->
+	 (?e1 my:normal_consequent ?e),
+]
+
+
+
+
+
+
+###############################
+# alternative
+###############################
+
+
+[connect_AltBegin:
+
+	(?alt rdf:type my:alternative),
+	(?b my:begin_of ?alt),
+	(?alt my:branches_item ?br),
+	(?br rdf:type my:first_item),
+
+	(?br my:cond ?cnd),
+	(?b2 my:begin_of ?cnd),
+
+	 ->
+	 (?b my:normal_consequent ?b2),
+]
+
+[connect_AltBranchBegin_CondTrue:
+	(?cnd rdf:type my:expr),
+
+#	(?a my:expr_value "true"^^xsd:boolean),
+	(?br my:cond ?cnd),
+	(?br rdf:type my:alt_branch),
+
+	(?e my:end_of ?cnd),
+	(?b my:begin_of ?br),
+
+	 ->
+	 (?e my:on_true_consequent ?b),
+]
+
+[connect_NextAltCondition:
+	(?cnd rdf:type my:expr),
+
+#	(?a my:expr_value "false"^^xsd:boolean),
+
+	(?br my:cond ?cnd),
+	(?br rdf:type my:alt_branch),
+
+	(?br my:next ?br2),
+	(?br2 my:cond ?cnd2),
+
+	(?e my:end_of ?cnd),
+	(?b my:begin_of ?cnd2),
+	 ->
+	 (?e my:on_false_consequent ?b),
+]
+
+[connect_AltElseBranch:
+	(?cnd rdf:type my:expr),
+
+#	(?a my:expr_value "false"^^xsd:boolean),
+
+	(?br my:cond ?cnd),
+	(?br rdf:type my:alt_branch),
+
+	(?br my:next ?br2),
+	(?br2 rdf:type my:else),
+
+	(?e my:end_of ?cnd),
+	(?b my:begin_of ?br2),
+	 ->
+	 (?e my:on_false_consequent ?b),
+]
+
+[connect_AltEndAllFalse:
+	(?cnd rdf:type my:expr),
+
+#	(?a my:expr_value "false"^^xsd:boolean),
+
+	(?br my:cond ?cnd),
+	(?br rdf:type my:alt_branch),
+
+	(?br rdf:type my:last_item),
+	(?alt rdf:type my:alternative),
+	(?e my:end_of ?alt),
+
+	(?e1 my:end_of ?cnd),
+	 ->
+	 (?e1 my:on_false_consequent ?e),
+]
+
+[connect_AltEndAfterBranch:
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+	(?e my:end_of ?alt),
+
+	(?e1 my:end_of ?br),
+	 ->
+	 (?e1 my:normal_consequent ?e),
+]
+
+
+
+
+
+###############################
+# loop
+###############################
+
+[connect_LoopBegin-cond:
+	(?Loop rdf:type my:start_with_cond),
+	(?Loop my:cond ?cnd),
+	(?b my:begin_of ?Loop),
+
+	(?b2 my:begin_of ?cnd),
+	 ->
+	 (?b my:normal_consequent ?b2),
+]
+
+[connect_LoopBegin-body:
+	(?Loop rdf:type my:start_with_body),
+	(?Loop my:body ?st),
+	(?b my:begin_of ?Loop),
+
+	(?b2 my:begin_of ?st),
+	 ->
+	 (?b my:normal_consequent ?b2),
+]
+
+[connect_LoopCond1-BodyBegin:
+	(?Loop rdf:type my:cond_then_body),
+	(?Loop my:cond ?cnd),
+	(?Loop my:body ?st),
+
+	(?e my:end_of ?cnd),
+	(?b my:begin_of ?st),
+	 ->
+	 (?e my:on_true_consequent ?b),
+]
+
+# Rule: connect_LoopCond0-body [correct & loop]
+# ...
+
+[connect_LoopCond1-update:
+	(?Loop rdf:type my:pre_update_loop),
+	(?Loop my:cond ?cnd),
+	(?Loop my:update ?upd),
+
+	(?e my:end_of ?cnd),
+	(?b my:begin_of ?upd),
+	 ->
+	 (?e my:on_true_consequent ?b),
+]
+
+[connect_LoopUpdate-body:
+	(?Loop rdf:type my:pre_update_loop),
+	(?Loop my:update ?upd),
+	(?Loop my:body ?st),
+
+	(?e my:end_of ?upd),
+	(?b my:begin_of ?st),
+	 ->
+	 (?e my:normal_consequent ?b),
+]
+
+[connect_LoopCond0-LoopEnd:
+	(?Loop rdf:type my:conditional_loop),
+	(?Loop my:cond ?cnd),
+	(?e my:end_of ?Loop),
+
+	(?e1 my:end_of ?cnd),
+	 ->
+	 (?e1 my:on_false_consequent ?e),
+]
+
+# Rule: connect_LoopCond1-LoopEnd [correct & loop]
+# ...
+
+[connect_LoopBody-cond:
+	(?Loop rdf:type my:body_then_cond),
+	(?Loop my:body ?st),
+	(?Loop my:cond ?cnd),
+
+	(?e my:end_of ?st),
+	(?b my:begin_of ?cnd),
+	 ->
+	 (?e my:normal_consequent ?b),
+]
+
+[connect_LoopBegin-init:
+	(?Loop rdf:type my:start_with_init),
+	(?Loop my:init ?st),
+	(?b my:begin_of ?Loop),
+
+	(?b2 my:begin_of ?st),
+	 ->
+	 (?b my:normal_consequent ?b2),
+]
+
+[connect_LoopInit-cond:
+	(?Loop rdf:type my:start_with_init),
+	(?Loop my:init ?st),
+	(?Loop my:cond ?cnd),
+
+	(?e my:end_of ?st),
+	(?b my:begin_of ?cnd),
+	 ->
+	 (?e my:normal_consequent ?b),
+]
+
+[connect_LoopBody-update:
+	(?Loop rdf:type my:post_update_loop),
+	(?Loop my:body ?st),
+	(?Loop my:update ?upd),
+
+	(?e my:end_of ?st),
+	(?b my:begin_of ?upd),
+	 ->
+	 (?e my:normal_consequent ?b),
+]
+
+[connect_LoopUpdate-cond:
+	(?Loop rdf:type my:post_update_loop),
+	(?Loop my:update ?upd),
+	(?Loop my:cond ?cnd),
+
+	(?e my:end_of ?upd),
+	(?b my:begin_of ?cnd),
+	 ->
+	 (?e my:normal_consequent ?b),
+]
+
+
+
+
+#[start__to__GlobalCode__rule_g4:
+#
+#	print("Entry point is ..."),
+#
+#	(?a rdf:type my:trace ),
+#	(?a rdf:type my:act_begin ),
+#	(?a my:executes ?alg ),
+#	(?alg my:entry_point ?gc ),
+#	(?gc rdf:type my:sequence ),
+#
+#### (?b rdf:type my:act_begin),
+#### (?a my:next_sibling ?b),
+#### (?b my:executes ?gc),
+#
+## noValue(?a, my:next_act ),
+#	print(" *-*-*-*- Entry point found: ", ?a),
+#	makeSkolem(?b, ?a, "next_act"),
+#
+#	 ->
+#	 (?a my:next_act ?b),
+#	 (?b rdf:type owl:NamedIndividual),
+#	 (?b rdf:type my:GlobalCodeBegin),
+#	 (?b rdf:type my:normal_flow_correct_act),
+#	 (?b rdf:type my:act_begin),
+#	 (?b my:executes ?gc),
+#]
+#
+
+
+
+
+
+
+## Rule: test noValue
+#[
+#	(?x rdf:type my:action),
+#	noValue(?x rdf:type my:expr),
+#
+#	 ->
+#	 (?x rdf:label "not an expr"),
+#]
+

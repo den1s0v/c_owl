@@ -1,0 +1,467 @@
+@prefix  rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix  rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+
+# An important RDF rules subset
+@include <jena/rdfs4core.rules>.
+
+
+@prefix my: <http://vstu.ru/poas/ctrl_structs_2020-05_v1#> .
+
+
+
+###############################
+# trace helper
+###############################
+
+# Rule: student_DepthIncr_rule_s6 [helper & mistake]
+[student_DepthIncr_rule_s6:
+	(?a rdf:type my:act_begin),
+	(?a my:student_next ?b),
+	(?b rdf:type my:act_begin),
+	(?a my:depth ?ad),
+	addOne(?ad, ?bd),
+	 ->
+	 (?a my:student_parent_of ?b),
+	 (?b my:depth ?bd),
+]
+
+[student_DepthSame_b-e_rule_s7:
+	(?a rdf:type my:act_begin),
+	(?a my:student_next ?b),
+	(?b rdf:type my:act_end),
+	(?p my:student_parent_of ?a),
+	(?a my:depth ?ad),
+	 ->
+	(?p my:student_parent_of ?b),
+	(?a my:student_corresponding_end ?b),
+	(?b my:depth ?ad),
+]
+
+[student_DepthSame_e-b_rule_s8:
+	(?a rdf:type my:act_end),
+	(?a my:student_next ?b),
+	(?b rdf:type my:act_begin),
+	(?p my:student_parent_of ?a),
+	(?a my:depth ?ad),
+	 ->
+	(?p my:student_parent_of ?b),
+	(?b my:depth ?ad),
+]
+
+[student_DepthDecr_rule_s9:
+	(?a rdf:type my:act_end),
+	(?a my:student_next ?b),
+	(?b rdf:type my:act_end),
+	(?p my:student_parent_of ?a),
+	(?a my:depth ?ad),
+	difference(?ad, 1, ?bd),
+	 ->
+	(?p my:student_corresponding_end ?b),
+	(?b my:depth ?bd),
+]
+
+[student_SameParentOfCorrActs_rule_s10:
+	(?a my:student_corresponding_end ?b),
+	(?p my:student_parent_of ?a),
+	 ->
+	 (?p my:student_parent_of ?b)
+]
+
+
+
+
+
+
+###############################
+# trace mistake
+###############################
+
+
+# Rule: GenericMisconception_Error [mistake]
+[
+	(?a my:student_next ?b),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+#	prevent match before algorithm is prepared (if this rule is mixed with algorithm processing rules)!
+	(?bx my:consequent ?some),
+	noValue(?bx my:consequent ?by),
+#	print("not a consequent: ",?bx,"--",?by),
+
+	(?bx my:boundary_of ?x),
+#	(?by my:boundary_of ?y),
+#	Not a choice
+	noValue(?x rdf:type my:expr),
+#	print("     not an expr: ",?x),
+	 ->
+	 (?b rdf:type my:Erroneous),
+	 (?b my:should_be ?some),
+	 (?b my:precursor ?a),
+]
+
+# Rule: GenericMisconceptionWhenTrue_Error [mistake]
+[
+	(?a my:student_next ?b),
+	(?a my:expr_value "true"^^xsd:boolean),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+#	 prevent match before algorithm is prepared!
+##	(?bx my:consequent ?some),
+	noValue(?bx my:consequent ?by),
+
+	(?bx my:boundary_of ?x),
+#	(?by my:boundary_of ?y),
+#	  a choice
+	(?x rdf:type my:expr),
+	(?bx my:on_true_consequent ?on1),
+	 ->
+	 (?b rdf:type my:Erroneous),
+	 (?b my:should_be ?on1),
+	 (?b my:precursor ?a),
+]
+
+# Rule: GenericMisconceptionWhenFalse_Error [mistake]
+[
+	(?a my:student_next ?b),
+	(?a my:expr_value "false"^^xsd:boolean),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+	noValue(?bx my:consequent ?by),
+
+	(?bx my:boundary_of ?x),
+#	(?by my:boundary_of ?y),
+#	  a choice
+	(?x rdf:type my:expr),
+	(?bx my:on_false_consequent ?on0),
+	 ->
+	 (?b rdf:type my:Erroneous),
+	 (?b my:should_be ?on0),
+	 (?b my:precursor ?a),
+]
+
+
+# Rule: GoFalseWhenTrue_Error [mistake]
+[GoFalseWhenTrue_Error:
+	(?a my:student_next ?b),
+	(?a my:expr_value "true"^^xsd:boolean),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+	(?bx my:on_false_consequent ?by),
+	(?bx my:on_true_consequent ?on1),
+	 ->
+	 (?b rdf:type my:ConditionMisuse),
+	 (?b my:should_be ?on1),
+	 (?b my:precursor ?a),
+]
+
+# Rule: GoTrueWhenFalse_Error [mistake]
+[GoTrueWhenFalse_Error:
+	(?a my:student_next ?b),
+	(?a my:expr_value "false"^^xsd:boolean),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+	(?bx my:on_true_consequent ?by),
+	(?bx my:on_false_consequent ?on0),
+	 ->
+	 (?b rdf:type my:ConditionMisuse),
+	 (?b my:should_be ?on0),
+	 (?b my:precursor ?a),
+]
+
+## Rule: test noValue
+#[
+#	(?x rdf:type my:action),
+#	noValue(?x rdf:type my:expr),
+#
+#	 ->
+#	 (?x rdf:label "not an expr"),
+#]
+
+# Rule: CorrespondingEndMismatched-Error [mistake]
+[
+	(?a my:student_corresponding_end ?b), 
+	(?a my:executes ?s1),
+	(?b my:executes ?s2),
+
+	(?s1 my:boundary_of ?st),
+	noValue(?s2 my:boundary_of ?st),
+	 -> 
+	 (?b rdf:type my:CorrespondingEndMismatched), 
+	 (?b my:cause ?a)
+]
+
+# Rule: GenericWrongStmtParent_Error [mistake]
+[
+	(?p my:student_parent_of ?a),
+	(?p my:executes ?bp),
+	(?a my:executes ?ba),
+	
+	(?bp my:boundary_of ?sp),
+	(?ba my:boundary_of ?sa),
+	
+	noValue(?sp my:parent_of ?sa),
+	(?pa my:parent_of ?sa),
+	 -> 
+##	 ??
+	 (?a my:precursor ?p),
+	 (?a my:context_should_be ?pa),     
+	 (?a rdf:type my:WrongContext)
+]
+
+# Rule: OneLevelShallower-Error [mistake]
+[
+	(?a rdf:type my:WrongContext),
+	(?a my:context_should_be ?pa),     
+	(?p my:student_parent_of ?a),
+	
+	(?p my:executes ?bp),
+	(?bp my:begin_of ?sp),
+	
+	(?sp my:parent_of ?pa),
+#	(?pa my:parent_of ?sp),
+	 -> 
+	 (?a rdf:type my:OneLevelShallower)
+]
+
+# Rule: EndedDeeper-error [mistake]
+[
+	(?a rdf:type my:CorrespondingEndMismatched),
+	(?b my:student_corresponding_end ?a),
+	(?b my:executes ?bb),
+	(?a my:executes ?ba),
+
+	(?bb my:boundary_of ?sb),
+	(?ba my:boundary_of ?sa),
+	         
+	(?sa my:hasPartTransitive ?sb),
+	 -> 
+#	 (?a my:cause ?b2),
+	 (?a rdf:type my:EndedDeeper)
+]
+
+# Rule: EndedShallower-error [mistake]
+[
+	(?a rdf:type my:CorrespondingEndMismatched),
+	(?b my:student_corresponding_end ?a),
+	(?b my:executes ?bb),
+	(?a my:executes ?ba),
+
+	(?bb my:boundary_of ?sb),
+	(?ba my:boundary_of ?sa),
+	         
+	(?sb my:hasPartTransitive ?sa),
+	 -> 
+#	 (?a my:cause ?b2),
+	 (?a rdf:type my:EndedShallower)
+]
+
+
+
+
+###############################
+# sequence mistake
+###############################
+
+
+# Rule: DuplicateOfAct-seq_Error (b,e) [mistake & sequence]
+[
+#	(?a2 rdf:type my:act_begin),
+#	(?a1 rdf:type my:act_begin),
+	(?p my:student_parent_of ?a1),
+	(?p my:student_parent_of ?a2),
+	
+	(?p my:executes ?bb),
+	(?bb my:boundary_of ?block),
+	(?block rdf:type my:sequence),
+	(?block my:body_item ?st),
+	(?bnd my:boundary_of ?st),
+	(?a1 my:executes ?bnd),
+	(?a2 my:executes ?bnd),
+
+		(?a1 my:student_index ?i1),
+		(?a2 my:student_index ?i2),
+		lessThan(?i1, ?i2),
+	 -> 
+	 (?a2 my:cause ?a1), 
+	 (?a2 rdf:type my:DuplicateOfAct)
+]
+
+# Rule: DisplacedAct-Seq_error [mistake & sequence]
+# ...
+
+
+# ????
+# Rule: DisplacedAct-Seq_error [mistake & sequence]
+[
+	(?c1 rdf:type my:ExtraAct), 
+	(?c1 rdf:type my:MissingAct), 
+	 -> (?c1 rdf:type my:DisplacedAct)
+]
+
+
+# Rule: NoFirstOfSequence-Seq_error [mistake & sequence]
+# (-)
+
+
+# Rule: TooEarlyInSequence-Seq_error [mistake & sequence]
+[
+	(?b rdf:type my:Erroneous), 
+	(?b my:should_be ?correct_bnd), (?correct_bnd my:boundary_of ?correct_b), 
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b), 
+	
+	(?p my:student_parent_of ?b),
+	(?p my:executes ?bnd_p), (?bnd_p my:boundary_of ?seq), 
+	(?seq rdf:type my:sequence),
+
+		(?correct_b my:item_index ?index_c),
+		(?st_b my:item_index ?index_b),
+		lessThan(?index_c, ?index_b),
+	 -> (?b my:should_be_after ?correct_b), 
+	 (?b rdf:type my:TooEarlyInSequence)
+]
+
+# Rule: TooLateInSequence-Seq_error [mistake & sequence]
+[
+	(?b rdf:type my:Erroneous), 
+	(?a my:student_next ?b), 
+	
+	(?p my:student_parent_of ?a),
+	(?p my:student_parent_of ?b),
+	(?p my:executes ?bnd_p), (?bnd_p my:boundary_of ?seq), 
+	(?seq rdf:type my:sequence),
+
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?st_a), 
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b), 
+		(?st_a my:item_index ?index_a),
+		(?st_b my:item_index ?index_b),
+		greaterThan(?index_a, ?index_b),
+	 -> (?b my:should_be_before ?st_a), 
+	 (?b rdf:type my:TooLateInSequence)
+]
+# does not work good >
+## Rule: TooLateInSequence-Seq_error [mistake & sequence]
+#[
+#	(?b rdf:type my:Erroneous), 
+#	(?b my:should_be ?correct_bnd), (?correct_bnd my:boundary_of ?correct_b), 
+#	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b), 
+#	
+#	(?p my:student_parent_of ?b),
+#	(?p my:executes ?bnd_p), (?bnd_p my:boundary_of ?seq), 
+#	(?seq rdf:type my:sequence),
+#
+#		(?correct_b my:item_index ?index_c),
+#		(?st_b my:item_index ?index_b),
+#		greaterThan(?index_c, ?index_b),
+#	 -> (?b my:should_be_after ?correct_b), 
+#	 (?b rdf:type my:TooLateInSequence)
+#]
+
+
+
+# [mistake & sequence & helper]
+[_FindWhatChildrenExecute_Propagate1:
+	(?par_b my:gather_child_exec_till ?par_e),
+	noValue(?par_e my:gathered_child_exec_till ?par_e),
+	(?child1_act my:gathered_child_exec_till ?par_e),
+	(?child1_act my:student_next ?child2_act),
+	(?par_b my:student_parent_of ?child2_act),
+		(?child2_act my:student_index ?i1),
+		(?par_e my:student_index ?i2),
+		lessThan(?i1, ?i2),
+	(?child2_act my:executes ?bound),
+	 ->
+	 (?par_b my:child_executes ?bound),
+	 (?child2_act my:gathered_child_exec_till ?par_e),
+]
+# [mistake & sequence & helper]
+[_FindWhatChildrenExecute_Propagate2:
+	(?par_b my:gather_child_exec_till ?par_e),
+	noValue(?par_e my:gathered_child_exec_till ?par_e),
+	(?child1_act my:gathered_child_exec_till ?par_e),
+	(?child1_act my:student_corresponding_end ?child2_act),
+	(?par_b my:student_parent_of ?child2_act),
+		(?child2_act my:student_index ?i1),
+		(?par_e my:student_index ?i2),
+		lessThan(?i1, ?i2),
+	(?child2_act my:executes ?bound),
+	 ->
+	 (?par_b my:child_executes ?bound),
+	 (?child2_act my:gathered_child_exec_till ?par_e),
+]
+# [mistake & sequence & helper]
+[_FindWhatChildrenExecute_Finalize:
+	(?par_b my:gather_child_exec_till ?par_e),
+	noValue(?par_e my:gathered_child_exec_till ?par_e),
+	(?child1_act my:gathered_child_exec_till ?par_e),
+	(?child1_act my:student_next ?par_e),
+	 ->
+	 (?par_e my:gathered_child_exec_till ?par_e),
+#	 remove gather_child_exec_till
+	 drop(0)
+]
+# [mistake & sequence & helper]
+[_FindWhatChildrenExecute_Cleanup:
+	(?child_act my:gathered_child_exec_till ?par_e),
+#	gathering completed
+	(?par_b my:gather_child_exec_till ?par_e),
+#	do not remove final mark
+		(?child_act my:student_index ?i1),
+		(?par_e my:student_index ?i2),
+		lessThan(?i1, ?i2),
+#	print("_FindWhatChildrenExecute_Cleanup", ?child_act)
+	 ->
+#	 remove gathered_child_exec_till
+	 drop(0)
+]
+
+
+# Rule: SequenceFinishedTooEarly-init1-Seq_error [mistake & sequence]
+[
+	(?b rdf:type my:act_end),
+	(?b my:executes ?seq_e),
+	(?seq_e my:boundary_of ?seq),
+	(?seq rdf:type my:sequence),
+	
+	(?a my:student_corresponding_end ?b),
+	(?a my:student_parent_of ?child_act),
+	(?child_act rdf:type my:TooEarlyInSequence),
+	print("SequenceFinishedTooEarly-init1", ?b),
+	 -> 
+#	 find which children acts were executed till the end of seq
+	 (?a my:gather_child_exec_till ?b),
+]
+# Rule: SequenceFinishedTooEarly-init2-Seq_error [mistake & sequence]
+[
+	(?b rdf:type my:act_end),
+	(?b my:executes ?seq_e),
+	(?seq_e my:boundary_of ?seq),
+	(?seq rdf:type my:sequence),
+	
+	(?a my:student_corresponding_end ?b),
+	(?b rdf:type my:Erroneous),
+	print("SequenceFinishedTooEarly-init2", ?b),
+	 -> 
+#	 find which children acts were executed till the end of seq
+	 (?a my:gather_child_exec_till ?b),
+]
+# Rule: SequenceFinishedTooEarly-finish-Seq_error [mistake & sequence]
+[
+	(?b rdf:type my:act_end),
+	(?b my:executes ?seq_e),
+	(?seq_e my:boundary_of ?seq),
+	(?seq rdf:type my:sequence),
+
+#	check that gathering completed
+	(?a my:student_corresponding_end ?b),
+	(?b my:gathered_child_exec_till ?b),
+#	get a boundary of seq action (that was not executed)
+	(?seq my:body_item ?some_st),
+##	(?some_st_bnd my:boundary_of ?some_st),
+	(?some_st_bnd my:begin_of ?some_st),
+#	check that some bounds are not in gathered
+	noValue(?a my:child_executes ?some_st_bnd),
+#	print("SequenceFinishedTooEarly-finish", ?b),
+	 -> 
+	 (?b my:should_be_after ?some_st_bnd),
+	 (?b rdf:type my:SequenceFinishedTooEarly),
+]
+
