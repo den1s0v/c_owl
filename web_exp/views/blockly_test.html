@@ -11,10 +11,10 @@
   	<!-- or point to local files -->
   <script src="{{ url_for('static', filename='blockly/blockly_compressed.js') }}"></script>
   <script src="{{ url_for('static', filename='blockly/blocks_compressed.js') }}"></script>
-  
+
   <!-- https://semantic-ui.com/elements/icon.html#audio--video -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-  
+
   <!-- inject Blockly localization (EN/RU): pick one -->
   	<!-- With "unpkg.com/blockly/blockly.min.js" en.js is redudant here -->
   <!-- <script src="../../msg/js/en.js"></script> -->
@@ -27,9 +27,9 @@
 
   <!-- Custom configuration for Blockly -->
   <script src="{{ url_for('static', filename='blockly/init_blockly.js') }}"></script>
-  
+
     <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
-  
+
   <style>
     html, body {
       height: 100%;
@@ -61,7 +61,7 @@
     </colgroup>
     <tr>
       <td>
-        <h1>Based on <a href="https://developers.google.com/blockly/">Blockly</a> 
+        <h1>Based on <a href="https://developers.google.com/blockly/">Blockly</a>
         	&gt; <a href="https://github.com/google/blockly/blob/master/demos/resizable/overlay.html">Resizable Blockly Demo</a></h1>
 
         <!-- <p>&rarr; More info on <a href="https://developers.google.com/blockly/guides/configure/web/resizable">injecting resizable Blockly</a>&hellip;</p> -->
@@ -70,14 +70,14 @@
   {% else %}
         Modified standard blocks are used here. Вы можете переключиться на <a href="{{ url_for('blockly_test', lang='ru') }}">Русскую версию</a>.
   {% endif %}
-  
+
       </td>
       <td>
 <!--   		<br/>
         <button onclick="export_xml_to_console()">Export XML to console</button> -->
         <i class="play icon"></i>
         <button onclick="send_xml_to_endpoint()">Show Preview</button>
-      	
+
 	    <select id="syntaxSelector">
 	        <option value="" style="display:none">Choose the  syntax</option>
 	        <option value="1">C</option>
@@ -86,7 +86,7 @@
 	    </select>
       </td>
     </tr>
-    <tr>
+    <tr style="vertical-align:top">
       <td id="blocklyArea">
       </td>
       <td>
@@ -115,13 +115,13 @@
 		span.builtin { color: #30a; }
 		span.link { color: #762; }
 		span.error { background-color: #fdd; }
-		
+
 		span:hover .alg_button {
 		  cursor: pointer;
 		  border: 1px dotted black;
 		  margin: -1px;
 		}
-		
+
 		.code-block {
 		  border-left: 1px solid transparent;
 		}
@@ -144,13 +144,13 @@
     var workspace = null;
     var algorithm_json = null;
     var trace_json = null;
-    
-    
+
+
     function body_onload() {
         // user config
         init_blockly_environment();
-        
-        
+
+
         workspace = Blockly.inject(blocklyDiv,
             {media: 'https://github.com/google/blockly/raw/master/media/',
              // toolbox: document.getElementById('toolbox')
@@ -176,41 +176,41 @@
         window.addEventListener('resize', onresize, false);
         onresize();
         Blockly.svgResize(workspace);
-        
+
         // user config
         setup_blockly_workspace(workspace);
-        
+
         xml_text = load_xml()
         if (xml_text)
         {
 	        var xml = Blockly.Xml.textToDom(xml_text);
 			Blockly.Xml.domToWorkspace(xml, workspace);
         }
-    }    
-    
+    }
+
     function export_xml_to_console() {
-    	var xml = Blockly.Xml.workspaceToDom(workspace); 
+    	var xml = Blockly.Xml.workspaceToDom(workspace);
     	// var xml_text = Blockly.Xml.domToText(xml);  // compact form
     	var xml_text = Blockly.Xml.domToPrettyText(xml);  // easy-readable form
     	console.log(xml_text);
     }
 
     function send_xml_to_endpoint() {
-    	var xml = Blockly.Xml.workspaceToDom(workspace); 
+    	var xml = Blockly.Xml.workspaceToDom(workspace);
     	// var xml_text = Blockly.Xml.domToText(xml);  // compact form
     	var xml_text = Blockly.Xml.domToPrettyText(xml);  // easy-readable form
     	save_xml(xml_text)
     	// console.log(xml_text);
-    	
+
     	var syntax = $('#syntaxSelector option:selected').text();
     	// console.log(syntax);
-    	
+
     	var data = {"user_language": which_language(), "algorithm_text": xml_text,
     		syntax: syntax}
-    	
+
     	result_id = 0;
         $.ajax({
-            url: "/creating_task", 
+            url: "/creating_task",
             method: 'post',
             dataType: 'json',
             contentType: "application/json",
@@ -238,12 +238,12 @@
 	        console.log("An ajax error occurred...)");
 	        return
 	    }
-	    
+
 	    // OK response
 	    // console.log("<pre>" + response + "</pre>");
 	    console.log("response received. "); // + response.length);
 	    // response = JSON.parse(response)
-	    
+
 	    if (response.algorithm_json) {
 		    algorithm_json = response.algorithm_json;
 	    }
@@ -254,7 +254,7 @@
 	    received_trace_json = response.full_trace_json || response.trace_json
 	    if (response.algorithm_as_html && received_trace_json) {
 	    	let html = response.algorithm_as_html;
-	    	
+
 	    	for (const act_json of received_trace_json) {
 	    		html += '<br>' + act_json.as_html;
 	    		if (act_json.is_final) {
@@ -266,7 +266,7 @@
 		  			html += ['', ...act_json.explanations].join('<br>&diams; ')
 	  			html += '</i>]'
 	    	}
-	    	
+
 	    	$("#algorithmArea").html(html)
 	    	bindAlgorithmButtons();
 	    	// decorate_algorithm_elements(response.algorithm_button_tips)
@@ -286,22 +286,22 @@
 	// 	}
 	// 	// $('.slide-link[data-slide="0"]').addClass('active');
 	// }
-	
+
 	function bindAlgorithmButtons(argument) {
 	    $('.alg_button').click(on_algorithm_element_clicked);
     }
     // bindAlgorithmButtons();
-    
+
 	function on_algorithm_element_clicked(event) {
 		// console.log({event, this: this});
 		elem = (event && event.currentTarget) || this;
 		act_type = elem.getAttribute('act_type');
 		algorithm_element_id = parseInt(elem.getAttribute('algorithm_element_id'));
 		console.log("clicked: ", {algorithm_element_id, act_type});
-		
+
 		// заменим кнопки на часики: hourglass half
 		$('#algorithmArea .icon').removeClass("alg_button tooltip play stop").addClass("hourglass half");
-		
+
 		send_clicked_act_to_endpoint(algorithm_element_id, act_type);
 	}
     function send_clicked_act_to_endpoint(algorithm_element_id, act_type) {
@@ -309,11 +309,11 @@
     		console.warn("Empty algorithm_json or trace_json!");
     		return;
     	}
-    	
+
     	/// console.log(trace_json)
-    		
+
     	var data = {
-    		user_language: which_language(), 
+    		user_language: which_language(),
     		algorithm_json: algorithm_json,
     		algorithm_element_id: algorithm_element_id,
     		act_type: act_type,
@@ -321,10 +321,10 @@
     		syntax: $('#syntaxSelector option:selected').text()
 
     	};
-    	
+
     	result_id = 0;
         $.ajax({
-            url: "/verify_trace_act", 
+            url: "/verify_trace_act",
             method: 'post',
             dataType: 'json',
             contentType: "application/json",
@@ -336,7 +336,7 @@
                 processing_callback(result_id, "fail")
             }
         });
-    }	
+    }
 
 
     // Local Storage
