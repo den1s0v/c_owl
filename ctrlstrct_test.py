@@ -33,13 +33,13 @@ EVALUATE = False
 
 # global log storage
 LOG = []
-	
-	
+
+
 def log_print(*args, sep=" ", end="\n"):
 	s = sep.join(map(str, args)) + end
 	print(s, end="")
 	LOG.append(s)
-	
+
 # def replace_print()	:
 # 	pass
 
@@ -55,34 +55,34 @@ def object_to_hashable(obj, discard_dict_keys=()):
 			data.append(key)
 			data.append( object_to_hashable(obj[key], discard_dict_keys) )
 		return tuple(data)
-	
+
 def compare_mistakes(expected, actual, ignored_fields=("name",)):
 	"""Precise but configurable list of dicts comparison"""
 	assert isinstance(expected, list), "mistakes list expected"
 	assert isinstance(actual, list), "mistakes list expected"
-	
+
 	# проверка совпадения количества
 	if len(expected) != len(actual):
 		return False, "%d mistakes (expected %d)" % (len(actual), len(expected))
-	
+
 	# проверка совпадения полей
 	def unified_fields(dicts_list):
 		return {
 			tuple(sorted(
 				set(d.keys()) - set(ignored_fields)
-			)) 
+			))
 			for d in dicts_list
 		}
-	
+
 	keys_set_e = unified_fields(expected)
 	keys_set_a = unified_fields(actual)
-	
+
 	if keys_set_e != keys_set_a:
 		extra = keys_set_a - keys_set_e
 		missing = keys_set_e - keys_set_a
 		if 1:  # extra or missing:
 			return False, "Mistakes' fields do not match: %d missing: (%s), %d extra (%s)" % (len(missing), str(missing), len(extra), str(extra), )
-	
+
 	# проверка совпадения значений полей
 	data_e = (object_to_hashable(expected, ignored_fields))
 	data_a = (object_to_hashable(actual  , ignored_fields))
@@ -91,9 +91,9 @@ def compare_mistakes(expected, actual, ignored_fields=("name",)):
 		print(data_e)
 		print(data_a)
 		return False, "Mistakes' data mismatch <...TODO...>"
-	
+
 	return True, "ok"
-	
+
 def resolve_path(fname, directory='.'):
 	for case_path in [
 		os.path.join(directory, fname),
@@ -106,9 +106,9 @@ def resolve_path(fname, directory='.'):
 
 def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 	"Находит расхождения в определении ошибочных строк трассы"
-	
+
 	# print(f"mistakes: {mistakes}")
-	
+
 	# extract erroneous acts provided by trace
 	def error_description(comment_str) -> list:
 		if "error" in comment_str or "ошибк" in comment_str:
@@ -119,15 +119,15 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 				err_names = m.group(1).strip()
 				return re.split(r"\s*,?\s+", err_names)
 		return None
-	
+
 	text_lines = [d["text_line"] for d in trace]
 	error_descrs = {d["text_line"]: error_description(d["comment"]) for d in trace}
 
-	
+
 	# extract erroneous acts and messages from error instances (inferred)
 	err_objs = []
 	err_obj_id2msgs = {}
-	
+
 	# get text lines of the inferred erroneous acts
 	inferred_error_lines = [dct["text_line"] for dct in mistakes]
 	inferred_error_lines = [arr[0] if arr else None for arr in inferred_error_lines]
@@ -136,22 +136,22 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 		if line in text_lines:  # ignore unrelated errors (possibly related to another trace)
 			err_objs.append(dct)
 			err_obj_id2msgs[id(dct)] = dct["classes"]
-			
+
 	inferred_error_lines = [dct["text_line"][0] for dct in err_objs]  # reassign from filtered array
-	
+
 	# do check
 	differences = []
-	
+
 	def _compare_mistakes(expected: list, inferred: list, line_i) -> str or None:
 		if not expected and not inferred:
 			return None
-		
+
 		if expected and not inferred:
 			return f"Erroneous line {line_i} hasn't been recognized by the ontology. Expected mistakes: {', '.join(expected)}"
-			
+
 		if not expected and inferred:
 			return f"Correct line {line_i} has been recognized by the ontology as erroneous. Inferred mistakes: {', '.join(inferred)}"
-			
+
 		(recognized, not_recognized, extra) = ([], [], inferred[:])
 		for err_word in expected:
 			for inferred_descr in extra[:]:
@@ -161,14 +161,14 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 					break
 			else:
 				not_recognized.append(err_word)
-		
+
 		if not not_recognized and not extra:
 			return None
-		
+
 		m = f"Erroneous line {line_i} has been recognized by the ontology partially only ({', '.join(recognized) or 'None in common'}). Expected but not recognized - {len(not_recognized)} ({', '.join(not_recognized) or None}). Inferred but not expected - {len(extra)} ({', '.join(extra) or None})."
 		return m
-			
-				
+
+
 	# first_err_line = None  # из размеченных комментариями в трассе
 	for line_i in text_lines:
 		descr_messages = []
@@ -183,78 +183,78 @@ def validate_mistakes(trace:list, mistakes:list, onto) -> (bool, str):
 			for inferred_line_i, err_obj in zip(inferred_error_lines, err_objs):
 				if line_i == inferred_line_i:
 					inferred_messages |= set(err_obj_id2msgs[id(err_obj)])
-		
+
 		m = _compare_mistakes(descr_messages, list(inferred_messages), line_i)
 		if m:
 			differences.append(m)
-				
+
 	if differences:
 		return False, "\n\t> ".join(["",*differences])
 	return True, "Validation ok."
 
 def process_algorithm_and_trace_from_text(text: str, process_kwargs=dict(reasoning="jena")):
 	feedback = {"messages": []}
-	
+
 	try:
 		alg_trs = parse_algorithms_and_traces_from_text(text)
 	except Exception as ex:
 		alg_trs = None
 		feedback["messages"] += [str(ex)]
-	
+
 	if not alg_trs:
 		feedback["messages"] += ["Nothing to process: no valid algorithm / trace found."]
 		return feedback
-		
-	mistakes, err_msg = process_algorithms_and_traces(alg_trs, process_kwargs)	
-	
+
+	mistakes, err_msg = process_algorithms_and_traces(alg_trs, process_kwargs)
+
 	if err_msg:
 		feedback["messages"] += [err_msg]
 	else:
 		feedback["messages"] += ["Processing of algorithm & trace finished OK."]
 		feedback["mistakes"] = mistakes
-	
+
 	return feedback
 
 def process_algorithm_and_trace_from_json(alg_tr: dict, process_kwargs=dict(reasoning="jena")):
 	feedback = {"messages": []}
-	
+
 	# validate input alg_tr
 	# {
 	#     "trace_name"    : str,
 	#     "algorithm_name": str,
 	#     "trace"         : list,
 	#     "algorithm"     : dict,
-	#     "header_boolean_chain" : list of bool, 
+	#     "header_boolean_chain" : list of bool,
 	# }
 	try:
 		assert alg_tr, f"Empty data"
-		assert type(alg_tr) == dict, f"'JSON data is not a dict!"; 
-		key = "trace_name"; t = str; 
+		assert type(alg_tr) == dict, f"'JSON data is not a dict!";
+		key = "trace_name"; t = str;
 		assert key in alg_tr, f"Key '{key}' is missing"; assert type(alg_tr[key]) == t, f"'{key}' -> is not a {str(t)}";
 		key = "algorithm_name";  t = str;
 		assert key in alg_tr, f"Key '{key}' is missing"; assert type(alg_tr[key]) == t, f"'{key}' -> is not a {str(t)}";
-		key = "trace";  t = list; 
+		key = "trace";  t = list;
 		assert key in alg_tr, f"Key '{key}' is missing"; assert type(alg_tr[key]) == t, f"'{key}' -> is not a {str(t)}";
-		key = "algorithm";  t = dict; 
+		key = "algorithm";  t = dict;
 		assert key in alg_tr, f"Key '{key}' is missing"; assert type(alg_tr[key]) == t, f"'{key}' -> is not a {str(t)}";
 	except Exception as e:
 		feedback["messages"] += [f"JSON error: {str(e)}\n{alg_tr}"]
 		return feedback
 
 	alg_trs = [alg_tr]
-	
+
 	if not alg_trs:
 		feedback["messages"] += ["Nothing to process: no valid algorithm / trace found."]
 		return feedback
-		
-	mistakes, err_msg = process_algorithms_and_traces(alg_trs, process_kwargs)	
-	
+
+	mistakes, err_msg = process_algorithms_and_traces(alg_trs, process_kwargs)
+
 	if err_msg:
 		feedback["messages"] += [err_msg]
 	else:
 		feedback["messages"] += ["Processing of algorithm & trace finished OK."]
 		feedback["mistakes"] = mistakes
-	
+
 	return feedback
 
 
@@ -268,16 +268,16 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 	# existing_trace_json
 	existing_trace_json = existing_trace_json or ()
 	existing_trace_list = [act for act in existing_trace_json if act["is_valid"] == True]
-	
+
 	### print(algorithm_element_id, act_type, *existing_trace_list, sep='\n')
-	
+
 	try:
 		elem = algorithm_json["id2obj"].get(str(algorithm_element_id), None)
-		
+
 		assert elem, f"No element with id={algorithm_element_id} in given algorithm."
-		
+
 		max_id = max(a['id'] for a in existing_trace_list) if existing_trace_list else 100 - 1
-		
+
 		result_acts = []
 		if len(existing_trace_list) == 0 and elem['id'] != algorithm_json["entry_point"]['id']:
 			# создать строку "program began"
@@ -295,28 +295,28 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 				'n': 1,
 				'is_valid': True  # в начале трассы акт всегда такой
 				})
-		
+
 		exec_time = 1 + len([a for a in existing_trace_list if a['executes'] == algorithm_element_id and a['phase'] == act_type])
-		
+
 		### print("exec_time:", exec_time)
-		
+
 		expr_value = None
 		if elem['type'] == "expr" and act_type in ('finished', 'performed'):
 			name = elem['name']
 			expr_list = algorithm_json['expr_values'].get(name, None)
-			
+
 			assert expr_list is not None, f"No expression values provided for expression '{name}' in given algorithm."
-			
+
 			expr_value = get_ith_expr_value(expr_list, exec_time - 1)
-			
+
 			# assert expr_value is not None, f"Not enough expression values provided for expression '{name}': '{expr_list}' provided, # {exec_time} requested."
 			if expr_value is None:
 				expr_value = False
 				print(f"Info: use default value: {expr_value} for expression '{name}'.")
-		
+
 		act_text = act_line_for_alg_element(
-			elem, 
-			phase=act_type, 
+			elem,
+			phase=act_type,
 			lang=user_language,
 			expr_value=expr_value,
 			use_exec_time=exec_time,
@@ -337,9 +337,9 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 		}
 		if expr_value is not None:
 			act_json['value'] = expr_value
-			
+
 		result_acts.append(act_json)
-		
+
 		# print(result_acts)
 		return existing_trace_list + result_acts
 	except Exception as e:
@@ -351,22 +351,22 @@ def add_styling_to_trace(algorithm_json, trace_json, user_language=None) -> list
 	'''Adds text line, tags and html form for each act in given trace and returns the same reference to the trace list'''
 	try:
 		assert isinstance(trace_json, (list, tuple)), "The trace was not correctly constructed: " + str(trace_json)
-		
+
 		for act_dict in trace_json:
-			
+
 			algorithm_element_id = act_dict['executes']
 			elem = algorithm_json["id2obj"].get(algorithm_element_id, algorithm_json["id2obj"].get(str(algorithm_element_id), None))
-			
+
 			assert elem, f"No element with id={algorithm_element_id} in given algorithm."
-			
+
 			if elem['id'] == algorithm_json["entry_point"]['id']:
 				# создать строку типа "program began"
-				# act_text = act_line_for_alg_element(algorithm_json, phase='started', lang=user_language, )  # передаём сам корень 
+				# act_text = act_line_for_alg_element(algorithm_json, phase='started', lang=user_language, )  # передаём сам корень
 				elem = algorithm_json
-				
+
 			act_text = act_line_for_alg_element(
-				elem, 
-				phase=act_dict['phase'], 
+				elem,
+				phase=act_dict['phase'],
 				lang=user_language,
 				expr_value=act_dict.get('value', None),
 				use_exec_time=act_dict['n'],
@@ -378,7 +378,7 @@ def add_styling_to_trace(algorithm_json, trace_json, user_language=None) -> list
 					'as_html': styling.to_html(html_tags),
 			}
 			act_dict.update(add_json)
-	
+
 		return trace_json
 	except Exception as e:
 		# raise e
@@ -386,13 +386,13 @@ def add_styling_to_trace(algorithm_json, trace_json, user_language=None) -> list
 
 
 def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=False, process_kwargs=dict(reasoning="jena", debug_rdf_fpath=None and 'test_data/ajax.rdf')) -> ('mistakes', 'error_message: str or None'):
-		
+
 	try:
 		_onto, mistakes = process_algtraces(alg_trs_list, verbose=0, mistakes_as_objects=False, **process_kwargs)
-		
+
 		# from pprint import pprint
 		# pprint(mistakes)
-		
+
 		if write_mistakes_to_acts and len(alg_trs_list) == 1:
 			trace = alg_trs_list[0]['trace']
 			for mistake in mistakes:
@@ -403,25 +403,25 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 						act_obj["explanations"] = ["Ошибка обнаружена, но вид ошибки не определён."]
 					act_obj["is_valid"] = False
 					break
-					
+
 			# Apply correctness mark to other acts:  act_obj["is_valid"] = True
 			for act_obj in trace:
 				if act_obj["is_valid"] is None:
 					act_obj["is_valid"] = True
-			
+
 			# Признак окончания трассы
 			# set act_obj["is_final"] = True for end of the topmost statement
 			top_stmts = set()
 			for alg_obj in find_by_keyval_in("type", "algorithm", alg_trs_list):
 				top_stmts.add(alg_obj["entry_point"]["body"][-1]["id"])
 			assert top_stmts, top_stmts
-					
+
 			for act_obj in trace:
 				if (act_obj["is_valid"] == True
 						and act_obj["phase"] in ('finished', "performed")
 						and act_obj["executes"] in top_stmts):
 					act_obj["is_final"] = True
-			
+
 		return mistakes, None
 	except Exception as e:
 		msg = "Exception occured in process_algorithms_and_traces(): %s: %s"%(str(type(e)), str(e))
@@ -431,45 +431,45 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 
 
 def run_tests(directory="test_data/", process_kwargs={}):
-	
+
 	files = search_text_trace_files(directory="handcrafted_traces/")
-	
+
 	### Отладочная заглушка !
 	# files = [f for f in files if "example" in f]
 	# files = [f for f in files if "correct_branching" in f]
-	
+
 	alg_trs = parse_text_files(files)
-	
+
 	### Отладочная заглушка !
 	# alg_trs = alg_trs[:1]
-	
+
 	test_count = len(alg_trs)
-	
+
 	if test_count == 0:
 		print("Nothing to test: no valid traces found.")
 		return True
-	
+
 	success_all = True
 	failed = 0
 	mistakes = []
-	
+
 	try:
 		if True:
 			if SAVE_RDF:
 				ontology_file = "test_make_trace" + "_output.rdf"
 				ontology_fpath = os.path.join(directory, ontology_file)
-				
+
 			else:
 				ontology_fpath = None
-				
+
 			if not EVALUATE:
-				onto, mistakes = process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True, **process_kwargs)
+				onto, mistakes = process_algtraces(alg_trs, verbose=1, debug_rdf_fpath=ontology_fpath, mistakes_as_objects=True, **process_kwargs)
 			else:  # EVALUATE !
 				dataset = os.path.splitext(os.path.split(files[0])[1])[0]
 				eval_results = []
 				# 46
 				for n in sorted({
-					# 11 , 12 , 14 , 17 , 18 , 21 , 23 , 24 , 26 , 27 , 29 , 32 , 33 , 36 , 38 , 39 , 41 , 42 , 44 , 47 , 48 , 51 , 53 , 54 , 56 , 57 , 59 , 62 , 63 , 66 , 68 , 69 , 71 , 72 , 74 , 77 , 78 , 81 , 83 , 84 , 86 , 87 , 89 , 91 , 92 , 93 , 94 , 105 , 115 , 125 
+					# 11 , 12 , 14 , 17 , 18 , 21 , 23 , 24 , 26 , 27 , 29 , 32 , 33 , 36 , 38 , 39 , 41 , 42 , 44 , 47 , 48 , 51 , 53 , 54 , 56 , 57 , 59 , 62 , 63 , 66 , 68 , 69 , 71 , 72 , 74 , 77 , 78 , 81 , 83 , 84 , 86 , 87 , 89 , 91 , 92 , 93 , 94 , 105 , 115 , 125
 									# *range(1, 9 + 1, 1),
 									# *range(5, 100 + 1, 5),
 									# *range(100, 201 + 1, 10),
@@ -490,49 +490,49 @@ def run_tests(directory="test_data/", process_kwargs={}):
 					# reasoners = ("clingo", "jena", "prolog", "sparql")
 					for reasoning_type in reasoners:
 						process_kwargs["reasoning"] = reasoning_type
-						
+
 						print(' >  >  >  >  >  >  >  >  >  >  >  >  > ')
 						print(f"  Running {n} traces with {reasoning_type}")
 						print(' <  <  <  <  <  <  <  <  <  <  <  <  < ')
-						
+
 						eval_result = process_algtraces(alg_trs, verbose=0, debug_rdf_fpath=None, mistakes_as_objects=True, _eval_max_traces=n, **process_kwargs)
-						
+
 						eval_item = {
 							'dataset': dataset,
 							'reasoner': reasoning_type,
 							'count': n,
 						}
 						eval_item.update(eval_result)
-						
+
 						# dump current result
 						with open('partial_eval.txt', "a") as file:
 							file.write(str(eval_item))
 							file.write('\n')
-						
+
 						eval_results.append(eval_item)
-						
+
 					# break
-						
+
 				# dump full result
 				with open('full_eval.txt', "a") as file:
 					for eval_item in eval_results:
 						file.write(str(eval_item))
 						file.write('\n')
-						
-				print(' ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^ ')	
-				print("Eval finished.")	
+
+				print(' ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^ ')
+				print("Eval finished.")
 				exit()
 		# else:
 		# 	for i, test_data in enumerate(alg_trs):
 		# 		try:
 		# 			assert "trace_name"     in test_data, "trace_name"
 		# 			assert "algorithm_name" in test_data, "algorithm_name"
-		# 			assert "trace"          in test_data, "trace"         
-		# 			assert "algorithm"      in test_data, "algorithm"     
+		# 			assert "trace"          in test_data, "trace"
+		# 			assert "algorithm"      in test_data, "algorithm"
 		# 		except Exception as e:
 		# 			log_print("Fix me: field is missing:", e)
 		# 			continue
-				
+
 		# 		# log_print("Running test %2d/%d for trace: " % (i+1, test_count), test_data["trace_name"])
 		# 		log_print("%2d/%d  " % (i+1, test_count), end="")
 		# 		success = run_test_for_alg_trace(test_data)
@@ -547,7 +547,7 @@ def run_tests(directory="test_data/", process_kwargs={}):
 		msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % "test_all") + ":\t" + msg
 		log_print(msg)
 		raise e
-		
+
 	# test the results
 	for tr_dict in alg_trs:
 		ok, msg = validate_mistakes(tr_dict["trace"], mistakes, onto)
@@ -556,12 +556,12 @@ def run_tests(directory="test_data/", process_kwargs={}):
 			success_all = False
 		msg = ("[  ok]" if ok else "[FAIL]") + (" '%s'" % tr_dict["trace_name"]) + ":\t" + msg
 		log_print(msg)
-			
+
 	log_print()
 	log_print("="*40)
 	log_print("Tests passed:", success_all)
 	log_print(f"tests failed: {failed} of {test_count}.")
-			
+
 	return success_all
 
 
@@ -569,19 +569,19 @@ def test_make_act_line():
 	import json
 	with open('trace_gen/alg_test.json') as file:
 		alg_data = json.load(file)
-		
-	result = make_act_json(algorithm_json=alg_data, algorithm_element_id=23, 
-		act_type='performed', 
-		# act_type='started', 
-		# act_type='finished', 
+
+	result = make_act_json(algorithm_json=alg_data, algorithm_element_id=23,
+		act_type='performed',
+		# act_type='started',
+		# act_type='finished',
 		existing_trace_json=[],
 		user_language='en',
 		# user_language='ru',
 		)
-	result = make_act_json(algorithm_json=alg_data, algorithm_element_id=23, 
-		act_type='performed', 
-		# act_type='started', 
-		# act_type='finished', 
+	result = make_act_json(algorithm_json=alg_data, algorithm_element_id=23,
+		act_type='performed',
+		# act_type='started',
+		# act_type='finished',
 		existing_trace_json=result,
 		user_language='en',
 		# user_language='ru',
@@ -615,7 +615,7 @@ STYLE_HEAD = '''<style type="text/css" media="screen">
 	span.warning { background-color: #ff9; }
 	span.error { background-color: #fdd; }
 	span.button { background-color: #add; }
-	
+
 </style>
 '''
 
@@ -623,19 +623,19 @@ def test_algorithm_to_tags():
 	import json
 	with open('trace_gen/alg_test.json') as file:
 		alg_data = json.load(file)
-		
+
 	from trace_gen.styling import algorithm_to_tags, to_html, get_button_tips
-	
+
 	tags = algorithm_to_tags(alg_data, 'ru')
 	tips = get_button_tips()
 	from pprint import pprint
 	pprint(tips)
-	
+
 	with open('web_exp/alg_test.htm', 'w') as file:
 		file.write(STYLE_HEAD)
 		file.write(to_html(tags))
-	
-	
+
+
 
 if __name__ == '__main__':
 
@@ -647,24 +647,24 @@ if __name__ == '__main__':
 		print('Exit as in custom debug mode.')
 		exit()
 		###
-	
+
 	success_all = run_tests(process_kwargs=dict(
-		# reasoning=None, 
-		# reasoning="pellet", 
-		# reasoning="clingo", 
-		# reasoning="dlv", 
-		reasoning="jena", 
-		# reasoning="prolog", 
-		# reasoning="sparql", 
-		# reasoning="stardog", 
+		# reasoning=None,
+		# reasoning="pellet",
+		# reasoning="clingo",
+		# reasoning="dlv",
+		reasoning="jena",
+		# reasoning="prolog",
+		# reasoning="sparql",
+		# reasoning="stardog",
 		extra_act_entries=0
 		)
 	)
-	
+
 	# save LOG
 	fpath = os.path.join(TEST_DIR, REPORT_FNM)
 	with open(fpath, "w", encoding="utf8") as f:
 		f.write("\n".join(LOG))
-		
+
 	# indicate tests success with exit code
 	exit(0 if success_all else 1)
