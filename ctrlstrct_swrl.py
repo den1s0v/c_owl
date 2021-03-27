@@ -20,7 +20,7 @@ def strip_comments_out(text):
 
 
 class DomainRule:
-	"An SWRL rule wit name and tags"
+	"An SWRL rule with name and tags"
 	def __init__(self, swrl, name="", tags={}):
 		self.name = str(name)
 		self._original_swrl = swrl
@@ -360,7 +360,7 @@ RULES.append(DomainRule(name="connect_ExprEnd",
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), ExprEnd(?b)
 """))
 
-#  [works with Pellet]
+# Конец следования [works with Pellet]
 # Вслед за концом акта некоторого действия в следовании, и если оно является в следовании последним, должен закончиться и весь объемлющий акт следования
 RULES.append(DomainRule(name="connect_SequenceEnd", 
 	tags={'correct', 'sequence'},
@@ -721,7 +721,7 @@ RULES.append(DomainRule(name="connect_LoopBody-cond",
 """))
 
 
-# Начало цикла с инициализацией (for, foreach) [works]
+# Начало цикла с инициализацией (for, foreach??) [works]
 RULES.append(DomainRule(name="connect_LoopBegin-init", 
 	tags={'correct', 'loop'},
 	swrl="""
@@ -740,7 +740,7 @@ RULES.append(DomainRule(name="connect_LoopBegin-init",
 	 -> normal_flow_correct_act(?b), next_act(?a, ?b), LoopWithInitBegin(?b)
 """))
 
-# После инициализации цикла - условие (for, foreach) [works]
+# После инициализации цикла - условие (for, foreach??) [works]
 RULES.append(DomainRule(name="connect_LoopInit-cond", 
 	tags={'correct', 'loop'},
 	swrl="""
