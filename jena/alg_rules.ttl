@@ -347,6 +347,22 @@
 	 (?e1 my:on_false_consequent ?e),
 ]
 
+[connect_LoopCond0-LoopEnd-expl:
+	(?Loop rdf:type my:conditional_loop),
+	(?Loop my:cond ?cnd),
+	(?e1 my:end_of ?cnd),
+	(?e2 my:end_of ?Loop),
+	makeSkolem(?trs, ?e1, "on_false_consequent", ?e2)
+	 ->
+	 (?e1 my:on_false_consequent ?e2),
+	 (?trs rdf:type rdf:Statement),
+	 (?trs rdf:subject ?e1),
+	 (?trs rdf:predicate my:on_false_consequent),
+	 (?trs rdf:object ?e2),
+	 (?trs rdf:type my:NormalLoopEnd),
+]
+
+
 # Rule: connect_LoopCond1-LoopEnd [correct & loop]
 # ...
 
