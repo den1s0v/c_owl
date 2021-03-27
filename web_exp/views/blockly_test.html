@@ -261,10 +261,12 @@
 	    			alert("Трасса выполнения программы построена верно!\nПоследний акт трассы:\n" + act_json.as_string)
 	    		}
  				///
-	  			html += ' [<i>' + act_json.is_valid
-	  			if (act_json.explanations)
-		  			html += ['', ...act_json.explanations].join('<br>&diams; ')
-	  			html += '</i>]'
+ 				if (act_json.is_valid === false) {
+		  			html += ' [<i>' + 'Error:'
+		  			if (act_json.explanations)
+			  			html += ['', ...act_json.explanations].join('<br>&diams; ')
+		  			html += '</i>]'
+		  		}
 	    	}
 
 	    	$("#algorithmArea").html(html)

@@ -68,7 +68,7 @@ def get_leaf_classes(classes) -> set:
 		return set(classes) - get_base_classes(classes)
 
 
-def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, include_line_index=True, case='nomn', quote="'"):
+def format_full_name(a: 'act or stmt', include_phase=False, include_type=True, include_line_index=False, case='nomn', quote="'"):
 	""" -> begin of loop waiting (at line 45) """
 	try:
 
@@ -106,6 +106,7 @@ def format_full_name(a: 'act or stmt', include_phase=True, include_type=True, in
 			# тело цикла XYZ
 			# body of loop XYZ
 			stmt_name = tr("body of loop", case) + " " + quote + stmt_name.replace("_loop_body", '') + quote
+			include_type = False
 		else:
 			stmt_name = quote + stmt_name + quote
 
@@ -286,9 +287,10 @@ def register_explanation_handlers():
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
-		nested = get_relation_object(a, onto.precursor)
+		prev_act = get_relation_object(a, onto.precursor)
+		nested = get_relation_subject(onto.student_parent_of, prev_act)
 		return {
-			'<A>': format_full_name(a, 0,0,0),
+			'<A>': format_full_name(a, 0,1,0),
 			'<B>': format_full_name(nested, 0,1,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
@@ -311,7 +313,7 @@ def register_explanation_handlers():
 
 
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
-	spec = """OneLevelShallower Через-уровень	<B> не может выполняться в рамках <EX>, потому что <B> является элементом <A>, начните сначала <A>.	<B> cannot be executed within <EX> because <B> is an element of <A>, so start <A> first."""
+	spec = """OneLevelShallower Через-уровень	<B> не может выполняться в рамках <EX>, потому что <B> является элементом <A>, начните сначала <Anomn>.	<B> cannot be executed within <EX> because <B> is an element of <A>, so start <Anomn> first."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -320,6 +322,7 @@ def register_explanation_handlers():
 
 		return {
 			'<A>': format_full_name(correct_parent_act, 0,1,0, case='gent'),
+			'<Anomn>': format_full_name(correct_parent_act, 0,1,0, case='nomn'),
 			'<B>': format_full_name(a, 0,0,0),
 			'<EX>': format_full_name(wrong_parent_act, 0,1,0) if wrong_parent_act else "__",
 			}
@@ -610,11 +613,12 @@ def register_explanation_handlers():
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
-		alt_act = get_relation_subject(onto.student_parent_of, a)
+		cond_act = get_relation_object(a, onto.precursor)
+		alt_act = get_relation_subject(onto.student_parent_of, cond_act)
 		should_be = get_relation_object(a, onto.should_be)
 		return {
 			'<A>': format_full_name(alt_act, 0,0,0),
-			'<B>': format_full_name(a, 0,0,0),
+			'<B>': format_full_name(cond_act, 0,0,0),
 			'<C>': format_full_name(should_be, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
@@ -654,7 +658,8 @@ def register_explanation_handlers():
 	def _param_provider(a: 'act_instance'):
 		branch = get_executes(a)
 		cond = get_relation_object(branch, onto.cond)
-		alt_act = get_relation_subject(onto.student_parent_of, a)
+		alt_act = get_relation_subject(onto.branches_item, branch)
+		# alt_act = get_relation_subject(onto.student_parent_of, a)
 		return {
 			'<A>': format_full_name(alt_act, 0,0,0),
 			'<B>': format_full_name(cond, 0,0,0),
@@ -861,7 +866,7 @@ def register_explanation_handlers():
 
 		return {
 			'<A>': format_full_name(loop, 0,0,0),
-			'<B>': format_full_name(cond_act, 0,0,1),
+			'<B>': format_full_name(cond_act, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
 
@@ -883,7 +888,7 @@ def register_explanation_handlers():
 
 		return {
 			'<WHILE/DO/FOREACH>': loop_type,
-			'<A>': format_full_name(loop, 0,1,0) if loop else '',
+			'<A>': format_full_name(loop, 0,0,0) if loop else '',
 			'<B>': format_full_name(cond, 0,0,0) if cond else '',
 			}
 	register_handler(class_name, format_str, _param_provider)
@@ -907,7 +912,7 @@ def register_explanation_handlers():
 		return {
 			'<WHILE/DO/FOREACH>': loop_type,
 			'<A>': format_full_name(loop, 0,0,0) if loop else '',
-			'<B>': format_full_name(cond, 0,0,1) if cond else '',
+			'<B>': format_full_name(cond, 0,0,0) if cond else '',
 			}
 	register_handler(class_name, format_str, _param_provider)
 
@@ -981,11 +986,12 @@ def register_explanation_handlers():
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
-		loop_act = get_relation_subject(onto.student_parent_of, a)
+		# loop_act = get_relation_subject(onto.student_parent_of, a)
 		update = get_relation_object(a, onto.should_be)
+		loop = get_relation_subject(onto.update, update)
 
 		return {
-			'<A>': format_full_name(loop_act, 0,0,0),
+			'<A>': format_full_name(loop, 0,0,0),
 			'<B>': format_full_name(update, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
