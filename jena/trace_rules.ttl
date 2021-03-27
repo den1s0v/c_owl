@@ -92,9 +92,10 @@
 #	Not a choice
 	noValue(?x rdf:type my:expr),
 #	print("     not an expr: ",?x),
+	(?some my:boundary_of ?some_st),
 	 ->
 	 (?b rdf:type my:Erroneous),
-	 (?b my:should_be ?some),
+	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
 ]
 
@@ -113,9 +114,10 @@
 #	  a choice
 	(?x rdf:type my:expr),
 	(?bx my:on_true_consequent ?on1),
+	(?on1 my:boundary_of ?some_st),
 	 ->
 	 (?b rdf:type my:Erroneous),
-	 (?b my:should_be ?on1),
+	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
 ]
 
@@ -132,9 +134,10 @@
 #	  a choice
 	(?x rdf:type my:expr),
 	(?bx my:on_false_consequent ?on0),
+	(?on0 my:boundary_of ?some_st),
 	 ->
 	 (?b rdf:type my:Erroneous),
-	 (?b my:should_be ?on0),
+	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
 ]
 
@@ -147,9 +150,10 @@
 	(?b my:executes ?by),
 	(?bx my:on_false_consequent ?by),
 	(?bx my:on_true_consequent ?on1),
+	(?on1 my:boundary_of ?some_st),
 	 ->
 	 (?b rdf:type my:ConditionMisuse),
-	 (?b my:should_be ?on1),
+	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
 ]
 
@@ -161,9 +165,10 @@
 	(?b my:executes ?by),
 	(?bx my:on_true_consequent ?by),
 	(?bx my:on_false_consequent ?on0),
+	(?on0 my:boundary_of ?some_st),
 	 ->
 	 (?b rdf:type my:ConditionMisuse),
-	 (?b my:should_be ?on0),
+	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
 ]
 
@@ -178,14 +183,14 @@
 
 # Rule: CorrespondingEndMismatched-Error [mistake]
 [
-	(?a my:student_corresponding_end ?b), 
+	(?a my:student_corresponding_end ?b),
 	(?a my:executes ?s1),
 	(?b my:executes ?s2),
 
 	(?s1 my:boundary_of ?st),
 	noValue(?s2 my:boundary_of ?st),
-	 -> 
-	 (?b rdf:type my:CorrespondingEndMismatched), 
+	 ->
+	 (?b rdf:type my:CorrespondingEndMismatched),
 	 (?b my:cause ?a)
 ]
 
@@ -194,31 +199,31 @@
 	(?p my:student_parent_of ?a),
 	(?p my:executes ?bp),
 	(?a my:executes ?ba),
-	
+
 	(?bp my:boundary_of ?sp),
 	(?ba my:boundary_of ?sa),
-	
+
 	noValue(?sp my:parent_of ?sa),
 	(?pa my:parent_of ?sa),
-	 -> 
+	 ->
 ##	 ??
-	 (?a my:precursor ?p),
-	 (?a my:context_should_be ?pa),     
+	 (?a my:cause ?p),
+	 (?a my:context_should_be ?pa),
 	 (?a rdf:type my:WrongContext)
 ]
 
 # Rule: OneLevelShallower-Error [mistake]
 [
 	(?a rdf:type my:WrongContext),
-	(?a my:context_should_be ?pa),     
+	(?a my:context_should_be ?pa),
 	(?p my:student_parent_of ?a),
-	
+
 	(?p my:executes ?bp),
 	(?bp my:begin_of ?sp),
-	
+
 	(?sp my:parent_of ?pa),
 #	(?pa my:parent_of ?sp),
-	 -> 
+	 ->
 	 (?a rdf:type my:OneLevelShallower)
 ]
 
@@ -231,9 +236,9 @@
 
 	(?bb my:boundary_of ?sb),
 	(?ba my:boundary_of ?sa),
-	         
+
 	(?sa my:hasPartTransitive ?sb),
-	 -> 
+	 ->
 #	 (?a my:cause ?b2),
 	 (?a rdf:type my:EndedDeeper)
 ]
@@ -247,12 +252,18 @@
 
 	(?bb my:boundary_of ?sb),
 	(?ba my:boundary_of ?sa),
-	         
+
 	(?sb my:hasPartTransitive ?sa),
-	 -> 
+	 ->
 #	 (?a my:cause ?b2),
 	 (?a rdf:type my:EndedShallower)
 ]
+
+
+
+
+
+
 
 
 
@@ -268,7 +279,7 @@
 #	(?a1 rdf:type my:act_begin),
 	(?p my:student_parent_of ?a1),
 	(?p my:student_parent_of ?a2),
-	
+
 	(?p my:executes ?bb),
 	(?bb my:boundary_of ?block),
 	(?block rdf:type my:sequence),
@@ -280,8 +291,8 @@
 		(?a1 my:student_index ?i1),
 		(?a2 my:student_index ?i2),
 		lessThan(?i1, ?i2),
-	 -> 
-	 (?a2 my:cause ?a1), 
+	 ->
+	 (?a2 my:cause ?a1),
 	 (?a2 rdf:type my:DuplicateOfAct)
 ]
 
@@ -290,68 +301,72 @@
 
 
 # ????
-# Rule: DisplacedAct-Seq_error [mistake & sequence]
-[
-	(?c1 rdf:type my:ExtraAct), 
-	(?c1 rdf:type my:MissingAct), 
-	 -> (?c1 rdf:type my:DisplacedAct)
-]
+## Rule: DisplacedAct-Seq_error [mistake & sequence]
+#[
+#	(?c1 rdf:type my:ExtraAct),
+#	(?c1 rdf:type my:MissingAct),
+#	 -> (?c1 rdf:type my:DisplacedAct)
+#]
 
 
 # Rule: NoFirstOfSequence-Seq_error [mistake & sequence]
 # (-)
-
+[ -> ]
 
 # Rule: TooEarlyInSequence-Seq_error [mistake & sequence]
-[
-	(?b rdf:type my:Erroneous), 
-	(?b my:should_be ?correct_bnd), (?correct_bnd my:boundary_of ?correct_b), 
-	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b), 
-	
-	(?p my:student_parent_of ?b),
-	(?p my:executes ?bnd_p), (?bnd_p my:boundary_of ?seq), 
-	(?seq rdf:type my:sequence),
+[TooEarlyInSequence:
+	(?b rdf:type my:Erroneous),
+	(?b my:should_be ?correct_b),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
 
+	(?p my:student_parent_of ?b),
+	(?p my:executes ?bnd_p), (?bnd_p my:boundary_of ?seq),
+	(?seq rdf:type my:sequence),
+	(?seq my:body_item ?correct_b),
 		(?correct_b my:item_index ?index_c),
 		(?st_b my:item_index ?index_b),
 		lessThan(?index_c, ?index_b),
-	 -> (?b my:should_be_after ?correct_b), 
+	 ->
+	 (?b my:should_be_after ?correct_b),
 	 (?b rdf:type my:TooEarlyInSequence)
 ]
 
 # Rule: TooLateInSequence-Seq_error [mistake & sequence]
-[
-	(?b rdf:type my:Erroneous), 
-	(?a my:student_next ?b), 
-	
+[TooLateInSequence:
+	(?b rdf:type my:Erroneous),
+	(?a my:student_next ?b),
+
 	(?p my:student_parent_of ?a),
 	(?p my:student_parent_of ?b),
-	(?p my:executes ?bnd_p), (?bnd_p my:boundary_of ?seq), 
+	(?p my:executes ?bnd_p), (?bnd_p my:boundary_of ?seq),
 	(?seq rdf:type my:sequence),
+	(?seq my:body_item ?st_a),
+	(?seq my:body_item ?st_b),
 
-	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?st_a), 
-	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b), 
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?st_a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
 		(?st_a my:item_index ?index_a),
 		(?st_b my:item_index ?index_b),
 		greaterThan(?index_a, ?index_b),
-	 -> (?b my:should_be_before ?st_a), 
+	 ->
+	 (?b my:should_be_before ?st_a),
 	 (?b rdf:type my:TooLateInSequence)
 ]
 # does not work good >
 ## Rule: TooLateInSequence-Seq_error [mistake & sequence]
 #[
-#	(?b rdf:type my:Erroneous), 
-#	(?b my:should_be ?correct_bnd), (?correct_bnd my:boundary_of ?correct_b), 
-#	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b), 
-#	
+#	(?b rdf:type my:Erroneous),
+#	(?b my:should_be ?correct_bnd), (?correct_bnd my:boundary_of ?correct_b),
+#	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
+#
 #	(?p my:student_parent_of ?b),
-#	(?p my:executes ?bnd_p), (?bnd_p my:boundary_of ?seq), 
+#	(?p my:executes ?bnd_p), (?bnd_p my:boundary_of ?seq),
 #	(?seq rdf:type my:sequence),
 #
 #		(?correct_b my:item_index ?index_c),
 #		(?st_b my:item_index ?index_b),
 #		greaterThan(?index_c, ?index_b),
-#	 -> (?b my:should_be_after ?correct_b), 
+#	 -> (?b my:should_be_after ?correct_b),
 #	 (?b rdf:type my:TooLateInSequence)
 #]
 
@@ -420,12 +435,12 @@
 	(?b my:executes ?seq_e),
 	(?seq_e my:boundary_of ?seq),
 	(?seq rdf:type my:sequence),
-	
+
 	(?a my:student_corresponding_end ?b),
 	(?a my:student_parent_of ?child_act),
 	(?child_act rdf:type my:TooEarlyInSequence),
-	print("SequenceFinishedTooEarly-init1", ?b),
-	 -> 
+#	print("SequenceFinishedTooEarly-init1", ?b),
+	 ->
 #	 find which children acts were executed till the end of seq
 	 (?a my:gather_child_exec_till ?b),
 ]
@@ -435,19 +450,18 @@
 	(?b my:executes ?seq_e),
 	(?seq_e my:boundary_of ?seq),
 	(?seq rdf:type my:sequence),
-	
+
 	(?a my:student_corresponding_end ?b),
 	(?b rdf:type my:Erroneous),
-	print("SequenceFinishedTooEarly-init2", ?b),
-	 -> 
+#	print("SequenceFinishedTooEarly-init2", ?b),
+	 ->
 #	 find which children acts were executed till the end of seq
 	 (?a my:gather_child_exec_till ?b),
 ]
 # Rule: SequenceFinishedTooEarly-finish-Seq_error [mistake & sequence]
 [
 	(?b rdf:type my:act_end),
-	(?b my:executes ?seq_e),
-	(?seq_e my:boundary_of ?seq),
+	(?b my:executes ?seq_e), (?seq_e my:boundary_of ?seq),
 	(?seq rdf:type my:sequence),
 
 #	check that gathering completed
@@ -460,8 +474,640 @@
 #	check that some bounds are not in gathered
 	noValue(?a my:child_executes ?some_st_bnd),
 #	print("SequenceFinishedTooEarly-finish", ?b),
-	 -> 
-	 (?b my:should_be_after ?some_st_bnd),
+	 ->
+	 (?b my:should_be_after ?some_st),
 	 (?b rdf:type my:SequenceFinishedTooEarly),
 ]
+
+
+# Rule: SequenceFinishedNotInOrder-Seq_error [mistake & sequence]
+[
+	(?b rdf:type my:act_end),
+	(?b my:executes ?seq_e), (?seq_e my:boundary_of ?seq),
+	(?seq rdf:type my:sequence),
+
+	(?st_b my:consequent ?seq_e),
+
+	(?a my:student_next ?b),
+	noValue(?a my:executes ?st_b),
+
+	(?st_b my:boundary_of ?st),
+	 ->
+	 (?b my:should_be_after ?st),
+	 (?b rdf:type my:SequenceFinishedNotInOrder),
+]
+
+
+
+
+
+
+
+
+
+
+###############################
+# alternative mistake
+###############################
+
+
+# Rule: NoFirstCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?bnd), (?bnd my:begin_of ?alt),
+	(?alt rdf:type my:alternative),
+
+#	(?alt my:branches_item ?br),
+#	(?br rdf:type my:first_item),
+#	(?br my:cond ?cnd),
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous),
+#		(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
+#		(?cnd my:id ?i1),
+#		(?st_b my:id ?i2),
+#		notEqual(?i1, ?i2),
+	 ->
+#	 (?b my:precursor ?a),
+	 (?b rdf:type my:NoFirstCondition)
+]
+
+### when different cond used
+# Rule: ConditionTooEarly-atAltBegin-alt_Error [alternative & mistake]
+[
+	(?b rdf:type my:NoFirstCondition),
+	(?b my:executes ?bnd), (?bnd my:begin_of ?cnd),
+
+	(?br my:cond ?cnd),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+
+	(?br my:item_index ?br_i),
+	greaterThan(?br_i, 0),
+	 ->
+#	 (?b my:precursor ?a),
+	 (?b rdf:type my:ConditionTooEarly)
+]
+
+# Rule: BranchOfFalseCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:expr_value "false"^^xsd:boolean),
+
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?cnd),
+	(?cnd rdf:type my:expr),
+
+	(?alt_act my:student_parent_of ?a),
+	(?alt_act my:student_parent_of ?b),
+	(?b rdf:type my:act_begin),
+
+	(?br my:cond ?cnd),
+#	(?br rdf:type my:alt_branch),
+	(?alt my:branches_item ?br),
+
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?br),
+#	cond appears before the branch
+	(?a my:student_index ?i1),
+	(?b my:student_index ?i2),
+	lessThan(?i1, ?i2),
+	 ->
+	 (?b my:should_be ?alt),
+#	 (?b my:precursor ?a),
+	 (?b my:cause ?a),
+	 (?b rdf:type my:BranchOfFalseCondition)
+]
+
+## Rule: WrongBranch-alt_Error [alternative & mistake]
+#[
+#	(?a rdf:type my:act_begin),
+#	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?br),
+#	(?alt my:branches_item ?br),
+#	(?alt rdf:type my:alternative),
+#
+#	(?b rdf:type my:act_begin),
+#	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?br2),
+#	(?alt my:branches_item ?br2),
+#		(?br my:id ?i),
+#		(?br2 my:id ?i2),
+#		notEqual(?i, ?i2),
+## 	основывается на правильной трассе !!
+#	(?alt_act my:parent_of ?a),
+#	(?alt_act my:student_parent_of ?b),
+#	 -> (?b my:should_be ?a),
+#	 (?b my:precursor ?a),
+#	 (?b rdf:type my:WrongBranch)
+#]
+
+# Rule: BranchWithoutCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+
+	(?b my:student_next ?a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st),
+
+	(?br my:cond ?cnd),
+
+		(?st my:id ?i),
+		(?cnd my:id ?i2),
+		notEqual(?i, ?i2),
+	 ->
+	 (?a my:should_be_after ?cnd),
+	 (?a my:precursor ?b),
+	 (?a my:context_should_be ?alt),
+	 (?a rdf:type my:BranchWithoutCondition)
+]
+
+# Rule: BranchNotNextToCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:BranchWithoutCondition),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?br),
+	(?br my:cond ?cnd),
+
+	(?alt_act my:student_parent_of ?a),
+	(?c my:executes ?bnd_b), (?bnd_b my:boundary_of ?cnd),
+	(?a my:in_trace ?trace),
+	(?c my:in_trace ?trace),
+#	^ можно переделать на student_parent_of ??
+
+		(?alt_act my:student_index ?ia),
+		(?c my:student_index ?ic),
+		lessThan(?ia, ?ic),
+
+		(?a my:student_index ?ib),
+		lessThan(?ic, ?ib),
+	 ->
+	 (?a rdf:type my:BranchNotNextToCondition)
+]
+
+# Rule: ElseBranchNotNextToLastCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?br),
+	(?br rdf:type my:else),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+
+	(?b my:student_next ?a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st),
+
+	(?br1 my:next ?br),
+	(?br1 my:cond ?cnd),
+
+		(?st my:id ?i),
+		(?cnd my:id ?i2),
+		notEqual(?i, ?i2),
+	 ->
+	 (?a my:should_be_after ?cnd),
+	 (?a my:precursor ?b),
+	 (?a my:context_should_be ?alt),
+	 (?a rdf:type my:ElseBranchNotNextToLastCondition)
+]
+
+# Rule: ElseBranchAfterTrueCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?br),
+	(?br rdf:type my:else),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+
+	(?br1 my:next ?br),
+	(?br1 my:cond ?cnd),
+
+	(?b my:student_next ?a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?cnd),
+
+	(?b my:expr_value "true"^^xsd:boolean),
+
+	 -> (?a my:should_be_after ?cnd),
+	 (?a my:precursor ?b),
+	 (?a my:context_should_be ?alt),
+	 (?a rdf:type my:ElseBranchAfterTrueCondition)
+]
+
+# Rule: CondtionNotNextToPrevCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),
+	(?alt my:branches_item ?br2),
+	(?alt rdf:type my:alternative),
+	(?br2 my:cond ?cnd2),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?cnd2),
+
+	(?b my:student_next ?a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st),
+
+	(?br1 my:next ?br2),
+	(?br1 my:cond ?cnd1),
+
+		(?st my:id ?i),
+		(?cnd1 my:id ?i2),
+		notEqual(?i, ?i2),
+	 ->
+	 (?a my:should_be_after ?cnd1),
+	 (?a my:precursor ?b),
+	 (?a my:context_should_be ?alt),
+	 (?a rdf:type my:CondtionNotNextToPrevCondition)
+]
+
+#	specify ^ as 2: the condition is too early/too late
+# Rule: ConditionTooEarly-afterCond-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:CondtionNotNextToPrevCondition),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?cnd2),
+	(?br2 my:cond ?cnd2),
+	(?alt my:branches_item ?br2),
+	(?alt rdf:type my:alternative),
+
+	(?b my:student_next ?a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?cnd1),
+	(?br1 my:cond ?cnd1),
+	(?alt my:branches_item ?br1),
+
+	(?br1 my:item_index ?br1_i),
+	(?br2 my:item_index ?br2_i),
+	greaterThan(?br2_i, ?br1_i),
+	 ->
+#	 (?a my:precursor ?b),
+	 (?a rdf:type my:ConditionTooEarly)
+]
+# Rule: ConditionTooLate-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:CondtionNotNextToPrevCondition),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?cnd2),
+	(?br2 my:cond ?cnd2),
+	(?alt my:branches_item ?br2),
+	(?alt rdf:type my:alternative),
+
+	(?b my:student_next ?a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?cnd1),
+	(?br1 my:cond ?cnd1),
+	(?alt my:branches_item ?br1),
+
+	(?br1 my:item_index ?br1_i),
+	(?br2 my:item_index ?br2_i),
+	lessThan(?br2_i, ?br1_i),
+	 ->
+#	 (?a my:precursor ?b),
+	 (?a rdf:type my:ConditionTooLate)
+]
+# Rule: DuplicateOfCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:CondtionNotNextToPrevCondition),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?cnd),
+	(?br2 my:cond ?cnd),
+	(?alt my:branches_item ?br2),
+	(?alt rdf:type my:alternative),
+#	not only next
+	(?p my:student_parent_of ?a),
+	(?p my:student_parent_of ?b),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?cnd),
+#	later act only
+	(?b my:student_index ?i1),
+	(?a my:student_index ?i2),
+	lessThan(?i1, ?i2),
+	 ->
+#	 (?a my:precursor ?b),
+	 (?a rdf:type my:DuplicateOfCondition)
+]
+
+# Rule: ConditionAfterBranch-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?cnd),
+	(?cnd rdf:type my:expr),
+
+	 ->
+	 (?b my:should_be ?alt),
+#	 (?b my:precursor ?a),
+	 (?b rdf:type my:ConditionAfterBranch)
+]
+
+# Rule: AnotherExtraBranch-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?br2),
+	(?alt my:branches_item ?br2),
+
+	(?alt_act my:student_parent_of ?a),
+	(?alt_act my:student_parent_of ?b),
+
+	(?a my:student_index ?sia),
+	(?b my:student_index ?sib),
+	greaterThan(?sib, ?sia),
+	 ->
+	 (?b my:cause ?a),
+	 (?b rdf:type my:AnotherExtraBranch)
+]
+
+# Rule: NoBranchWhenConditionIsTrue-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?cnd),
+	(?cnd rdf:type my:expr),
+
+	(?a my:expr_value "true"^^xsd:boolean),
+
+	(?br my:cond ?cnd),
+	(?br rdf:type my:alt_branch),
+
+	(?a my:student_next ?b),
+#	(?b rdf:type my:Erroneous),
+	(?b my:executes ?bnd_b),
+	noValue(?bnd_b my:boundary_of ?br),
+#		(?st my:id ?i),
+#		(?br my:id ?i2),
+#		notEqual(?i, ?i2),
+	 ->
+	 (?b my:should_be ?br),
+#	 (?b my:precursor ?a),
+	 (?b rdf:type my:NoBranchWhenConditionIsTrue)
+]
+
+# Rule: LastConditionIsFalseButNoElse-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?cnd),
+	(?cnd rdf:type my:expr),
+	(?a my:expr_value "false"^^xsd:boolean),
+
+	(?br my:cond ?cnd),
+	(?br my:next ?br2),
+	(?br2 rdf:type my:else),
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous),
+#	(?b my:executes ?st),
+#		(?st my:id ?i),
+#		(?br2 my:id ?i2),
+#		notEqual(?i, ?i2),
+	 ->
+	 (?b my:should_be ?br2),
+#	 (?b my:precursor ?a),
+	 (?b rdf:type my:LastConditionIsFalseButNoElse)
+]
+
+# Rule: NoNextCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?cnd),
+	(?cnd rdf:type my:expr),
+
+	(?a my:expr_value "false"^^xsd:boolean),
+	(?br my:cond ?cnd),
+	(?br my:next ?br2),
+	(?br2 my:cond ?cnd2),
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous),
+
+#	(?b my:executes ?st),
+#		(?st my:id ?i),
+#		(?cnd2 my:id ?i2),
+#		notEqual(?i, ?i2),
+	 ->
+	 (?b my:should_be ?cnd2),
+#	 (?b my:precursor ?a),
+	 (?b rdf:type my:NoNextCondition)
+]
+
+# Rule: LastFalseNoEnd-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?cnd rdf:type my:expr),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),
+	(?br my:cond ?cnd),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+	(?br rdf:type my:last_item),
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous),
+#	(?b my:executes ?st),
+#		(?st my:id ?i),
+#		(?alt my:id ?i2),
+#		notEqual(?i, ?i2),
+	 ->
+	 (?b my:precursor ?a),
+#	 (?b my:should_be ?alt),
+	 (?b rdf:type my:LastFalseNoEnd)
+]
+
+# Rule: NoAlternativeEndAfterBranch-alt_Error [alternative & mistake]
+[
+
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?br),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous),
+#	(?b my:executes ?st),
+#		(?st my:id ?i),
+#		(?alt my:id ?i2),
+#		notEqual(?i, ?i2),
+	 ->
+	 (?b my:should_be ?alt),
+#	 (?b my:precursor ?a),
+	 (?b rdf:type my:NoAlternativeEndAfterBranch)
+]
+
+# Rule: AlternativeEndAfterTrueCondition-alt_Error [alternative & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:expr_value "true"^^xsd:boolean),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?cnd),
+	(?br my:cond ?cnd),
+	(?alt my:branches_item ?br),
+	(?alt rdf:type my:alternative),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?alt),
+	 ->
+	 (?b my:should_be ?br),
+	 (?b my:precursor ?a),
+	 (?b rdf:type my:AlternativeEndAfterTrueCondition)
+]
+
+
+
+
+
+
+
+
+###############################
+# loop mistake
+###############################
+
+# Rule: LoopStartIsNotCondition-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?Loop),
+	(?Loop rdf:type my:start_with_cond),
+	(?Loop my:cond ?cnd),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+#	not loop end
+	noValue(?bnd_b my:boundary_of ?Loop),
+#	not loop's cond
+	noValue(?bnd_b my:boundary_of ?cnd),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:LoopStartIsNotCondition)
+]
+
+# Rule: LoopStartIsNotIteration-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_begin),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?Loop),
+	(?Loop rdf:type my:start_with_body),
+	(?Loop my:body ?Body),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+#	not loop end
+	noValue(?bnd_b my:boundary_of ?Loop),
+#	not loop's body
+	noValue(?bnd_b my:boundary_of ?Body),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:LoopStartIsNotIteration)
+]
+
+# Rule: NoIterationAfterSuccessfulCondition-1-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?cnd),
+	(?Loop my:cond ?cnd),
+	(?Loop rdf:type my:cond_then_body),
+
+	(?a my:expr_value "true"^^xsd:boolean),
+
+	(?a my:student_next ?b),
+	(?Loop my:body ?Body),
+	(?b my:executes ?bnd_b),
+	noValue(?bnd_b my:boundary_of ?Body),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:NoIterationAfterSuccessfulCondition)
+]
+
+# Rule: LoopEndAfterSuccessfulCondition-1-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?cnd),
+	(?Loop my:cond ?cnd),
+	(?Loop rdf:type my:cond_then_body),
+
+	(?a my:expr_value "true"^^xsd:boolean),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+	(?bnd_b my:end_of ?Loop),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:LoopEndAfterSuccessfulCondition)
+]
+
+# Rule: NoIterationAfterSuccessfulCondition-0-loop_Error [loop & mistake]
+# ...
+
+# Rule: NoLoopEndAfterFailedCondition-0-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?Loop rdf:type my:loop),
+	(?Loop my:cond ?cnd),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?cnd),
+
+	(?a my:expr_value "false"^^xsd:boolean),
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:Erroneous),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:NoLoopEndAfterFailedCondition)
+]
+
+# Rule: LoopEndsWithoutCondition-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:act_end),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?Loop),
+	(?Loop rdf:type my:conditional_loop),
+
+	(?a my:student_next ?b),
+#	(?b rdf:type my:Erroneous),
+	(?Loop my:cond ?cnd),
+	(?a my:executes ?bnd_a),
+	noValue(?bnd_a my:boundary_of ?cnd),
+	 ->
+	 (?b rdf:type my:LoopEndsWithoutCondition)
+]
+
+# Rule: LoopContinuedAfterFailedCondition-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:NoLoopEndAfterFailedCondition),
+	(?b rdf:type my:ConditionMisuse),
+	 -> (?b rdf:type my:LoopContinuedAfterFailedCondition)
+]
+
+# Rule: IterationAfterFailedCondition-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:NoLoopEndAfterFailedCondition),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?bnd), (?bnd my:boundary_of ?st),
+	(?L my:body ?st),
+	(?L rdf:type my:cond_then_body),
+	 -> (?b rdf:type my:IterationAfterFailedCondition)
+]
+
+# Rule: NoConditionAfterIteration-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?Loop rdf:type my:body_then_cond),
+	(?Loop my:body ?st),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?st),
+	(?Loop my:cond ?cnd),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+	noValue(?bnd_b my:boundary_of ?cnd),
+	 ->
+	 (?b rdf:type my:NoConditionAfterIteration)
+]
+
+# Rule: NoConditionBetweenIterations-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?Loop rdf:type my:body_then_cond),
+	(?Loop my:body ?st),
+	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?st),
+
+	(?a my:student_next ?b),
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st),
+#	страховка >
+#	(?b rdf:type my:Erroneous),
+	(?Loop my:cond ?cnd),
+	 ->
+	 (?b my:should_be_after ?cnd),
+	 (?b rdf:type my:NoConditionBetweenIterations)
+]
+
 
