@@ -2,7 +2,7 @@ A list of errors & explanation templates
 https://docs.google.com  !  /spreadsheets/d/1ex2ZoqpyhaHF8JWvUnW4IwE6azig8P9LFY8aWwHQr-s/edit#gid=0
 
 
-2   
+2
 Begin_then_end (act a)
 +1   ActStartsAfterItsEnd / ActEndsWithoutStart (act a, act b)
 +2   ActEndsDifferent = CorrespondingEndMismatched (act a, act b) Открылся один акт, а закрылся другой
@@ -16,6 +16,7 @@ IS_containment (act a_i, IS act a)
 3    MisplacedBeforeAndAfter ?
 (+)4    MisplacedWithout === WrongContext после фильтрации подклассами
 +5    MisplacedDeeper
++6   OneLevelShallower
 
 
 1
@@ -35,7 +36,7 @@ LinearOrder (Sequence A)
 +2  TooEarlyInSequence
             should_be_after [acts]
 
-    
+
 5 (5.1)
 Alternative
 +1    AllFalseNoElse (Alternative act a)  // ни одна ветка не выполнилась
@@ -60,20 +61,20 @@ Alternative
         - Branch - ?
         - Condition - ?
         - Alternative - ?
-        
+
     MisplacedBefore - вне объемлющего акта, ДО:
         - В каком акте непосредственно содержится проблемный акт?
         - Где начинается непосредственно содержащий акт?
 
 
-22 
+22
 ConditionalLoop (Loop act L)    # Общие правила для циклов с Условием (For, ForEach, While и Do)
   Допустимые действия на уровне цикла:
     {
         Condition
         Iteration
     }
-    
+
 1   NoCondition (L) (условие не проверяется ни разу; ни одного условия)
 +2  NoIterationAfterSuccessfulCondition    (L, condition act c)    (при истинном условии продолжения нет итерации; нет итерации после истинного условия)
 3   MissingIterationBetweenLoopConditions   (L, condition act с1, condition act c2) (дубликат условия; пропуск итерации между условиями)
@@ -102,7 +103,7 @@ For_Loop (ForLoop act L)
         Iteration
         Update/ForUpdate
     }
-    
+
 -1  MissingInitActInForLoop (L)  (пропущена инициализация цикла For)
 -2  DuplicatesOfForInit (L, for_init act init)  (несколько актов инициализации цикла For)
 -2   MissingConditionAfterForInit (L, i) === NoCondition (L) (цикл не начинается после Init; ни одной проверки условия)
@@ -110,7 +111,7 @@ For_Loop (ForLoop act L)
  -- 4,5 - проверки в конце цикла
 -4   MissingForUpdateAfterIteration (L, iteration i)  (пропущен переход цикла For)
 -5  MissingConditionAfterForUpdate  (L, for_update act u)  (пропущена проверка условия после перехода цикла For; нет условия после перехода)
-    
+
  -- 6,7,8 - в дополнение к 4,5 (для обработки ошибок цикличности "в толще" итераций)
 6   Missing ForUpdate Between Iteration and Condition (L, iteration i, condition act c)  (подряд итерация и условие)
 7   Missing Iteration Between Condition and ForUpdate (L, condition act c, update act u)  (подряд условие и переход)
@@ -127,7 +128,7 @@ Foreach_Loop (Foreach_Loop act L)
         Condition (NextExists)
         Update/ForeachUpdate  (FetchNextElement)
     }
-    
+
 1   MissingIsEmptyCheckInForeach === NoCondition (L)  (нет проверки на пустоту коллекции)
 2   DuplicateOfIsEmptyCheckInForeach (L, check c1, c2)  (дубликат проверки на пустоту коллекции)
 3   ExtraActsBetweenFalseIsNotEmptyCheckAndForeachEnd   (L, check act c, extra act e)  (после завершающей проверки на пустоту коллекции цикл не заканчивается)
@@ -144,8 +145,8 @@ Foreach_Loop (Foreach_Loop act L)
 10  Missing ForeachUpdate Between Iteration and Condition (L, iteration i, condition act c)
 11  Missing Iteration Between Condition and ForeachUpdate (L, condition act c, update act u)
 12  Missing Condition Between ForeachUpdate and Iteration (L, update act u, iteration i)
-   
-   
+
+
 
 
 
@@ -176,6 +177,7 @@ Loop
      +- body_then_cond
      +- start_with_cond
      +- start_with_body
+     +- start_with_init
      |
      +- (LoopWithoutUpdate - skip)
      |   |
@@ -186,7 +188,7 @@ Loop
      |   +- PostconditionalLoop
      |       |
      |       +- DoWhileLoop
-     |    
+     |
      +- LoopWithPreUpdate
      |   |
      |   +- ForeachLoop
@@ -194,8 +196,8 @@ Loop
      +- LoopWithPostUpdate
          |
          +- ForLoop
-      
-         
+
+
 WhileLoop is subclass of:
     - PreconditionalLoop
     - start_with_cond
@@ -250,20 +252,20 @@ body_then_cond
 ForLoop
     LoopStartsNotWithInit
     InitNotAtLoopStart
-    
+
     NoConditionAfterForInit
       +- IterationAfterForInit
-    
+
     NoUpdateAfterIteration
     UpdateNotAfterIteration
-    
+
     NoConditionAfterForUpdate
       +- ForConditionAfterIteration
-    
+
 ForeachLoop
     NoForeachUpdateAfterSuccessfulCondition
     ForeachUpdateNotAfterSuccessfulCondition
-    
+
     NoIterationAfterForeachUpdate
     IterationNotAfterForeachUpdate
-    
+

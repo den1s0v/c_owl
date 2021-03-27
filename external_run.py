@@ -353,7 +353,8 @@ def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena',
 	
 	if not rules_path:
 		rules_path = {  # set defaults
-			'jena': "jena/all.rules",
+			# 'jena': "jena/all.rules",
+			'jena': "jena/alg_rules.ttl;jena/trace_rules.ttl",
 			'sparql': "sparql_from_swrl.ru", 
 		}[reasoning_mode]
 	
