@@ -259,28 +259,28 @@ def register_explanation_handlers():
 # 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """MisplacedBefore Раньше-объемлющего-акта	<B> не может выполняться до начала <A>, потому что <B> входит в <A>.	<B> is a part of <A> so <B> can't be executed before <A> starts"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	# spec = """MisplacedBefore Раньше-объемлющего-акта	<B> не может выполняться до начала <A>, потому что <B> входит в <A>.	<B> is a part of <A> so <B> can't be executed before <A> starts"""
+	# class_name, format_str = class_formatstr(spec.split('\t'))
 
-	def _param_provider(a: 'act_instance'):
-		correct_parent_act = get_relation_object(a, onto.context_should_be)
-		return {
-			'<A>': format_full_name(correct_parent_act, 0,0,0),
-			'<B>': format_full_name(a, 0,0,0),
-			}
-	register_handler(class_name, format_str, _param_provider)
+	# def _param_provider(a: 'act_instance'):
+	# 	correct_parent_act = get_relation_object(a, onto.context_should_be)
+	# 	return {
+	# 		'<A>': format_full_name(correct_parent_act, 0,0,0),
+	# 		'<B>': format_full_name(a, 0,0,0),
+	# 		}
+	# register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """MisplacedAfter Позже-объемлющего-акта	<B> не может выполняться после окончания <A>, потому что <B> входит в <A>	<B> is a part of <A> so <B> can't be executed after <A> ends"""
-	class_name, format_str = class_formatstr(spec.split('\t'))
+	# spec = """MisplacedAfter Позже-объемлющего-акта	<B> не может выполняться после окончания <A>, потому что <B> входит в <A>	<B> is a part of <A> so <B> can't be executed after <A> ends"""
+	# class_name, format_str = class_formatstr(spec.split('\t'))
 
-	def _param_provider(a: 'act_instance'):
-		correct_parent_act = get_relation_object(a, onto.context_should_be)
-		return {
-			'<A>': format_full_name(correct_parent_act, 0,0,0),
-			'<B>': format_full_name(a, 0,0,0),
-			}
-	register_handler(class_name, format_str, _param_provider)
+	# def _param_provider(a: 'act_instance'):
+	# 	correct_parent_act = get_relation_object(a, onto.context_should_be)
+	# 	return {
+	# 		'<A>': format_full_name(correct_parent_act, 0,0,0),
+	# 		'<B>': format_full_name(a, 0,0,0),
+	# 		}
+	# register_handler(class_name, format_str, _param_provider)
 
 	# EndedDeeper: Every act ends exactly when all its nested acts have ended, so act of the body of the loop 'work' cannot end until the end of act of the alternative 'choose' (the alternative 'choose' is included in the body of the loop 'work').
 	spec = """EndedDeeper Конец-внутри-вложенного-акта	Действие не может завершиться до окончания всех вложенных действий, поэтому <A> не может закончиться до окончания действия <B>, которое входит в <A>	An action ends only when all its nested actions have ended, so <A> cannot end until <B> ends as <B> is a part of <A>"""
@@ -370,31 +370,6 @@ def register_explanation_handlers():
 
 	######### Sequence mistakes #########
 	########=====================########
-
-	# spec = """TooEarlyInSequence
-	# <конец акта А> не может находится позже <начало акта Б>, потому что в <следование В><оператор А> находится перед <оператор Б>
-	# Act <A> is placed in sequnce <C> before act <B> so act <A> must finish before act <B> starts"""
-	# class_name, format_str = class_formatstr(spec.split('\n'))
-
-	# def _param_provider(a: 'act_instance'):
-	# 	item = get_executes(a)
-	# 	sequence = get_relation_subject(onto.body_item, item)
-	# 	missing_acts = list(onto.should_be_after[a])
-	# 	stmts = {format_full_name(act, 0,0,0) for act in missing_acts}
-	# 	plur1_s = 's' if len(stmts) > 1 else ''
-	# 	is1_are = 'are' if len(stmts) > 1 else 'is'
-	# 	stmts = ", ".join(stmts)
-	# 	acts = ", ".join("'%s'"%format_full_name(act, 1,0,0, quote='') for act in missing_acts)
-	# 	plur2_s = 's:' if len(stmts) > 1 else ''
-
-	# 	return {
-	# 		'Act <A> is': f"Act{plur1_s} {stmts} {is1_are}",
-	# 		'act <A>': f"act{plur2_s} {acts}",
-	# 		'<B>': format_full_name(a, 0,0,0),
-	# 		'<C>': format_full_name(sequence, 0,0,0),
-	# 		}
-	# register_handler(class_name, format_str, _param_provider)
-
 
 	spec = """TooEarlyInSequence Не-в-порядке-следования-рано	Следование выполняет все свои действия по порядку, поэтому <A> не может выполняться перед <B>.	A sequence performs its nested actions in order, so <A> cannot be executed before <B>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
@@ -683,7 +658,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """LastFalseNoEnd Развилка-не-закончилась	Когда ни одно условие альтернативы не оказалось истинным, выполняется ветка "ИНАЧЕ" (при наличии), и завершается вся развилка. Альтернатива <A> не имеет ветки "ИНАЧЕ", и должна завершиться, так как условие <B> является ложным.	When no condition of an alternative is true, the alternative performs its "ELSE" branch (if exists) and finishes. The alternative <A> does not have an 'else' branch so it must finish because its condition <B> is false."""
+	spec = """LastFalseNoEnd Развилка-не-закончилась	Когда ни одно условие альтернативы не оказалось истинным, выполняется ветка "ИНАЧЕ" (при наличии), и завершается вся развилка. Альтернатива <A> не имеет ветки "ИНАЧЕ" и должна завершиться, так как условие <B> является ложным.	When no condition of an alternative is true, the alternative performs its "ELSE" branch (if exists) and finishes. The alternative <A> does not have an 'else' branch so it must finish because its condition <B> is false."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -948,8 +923,6 @@ def register_explanation_handlers():
 			}
 	register_handler(class_name, format_str, _param_provider)
 
-
-# =========================
 
                 # ForLoop
 	spec = """NoConditionAfterForInit Нет-проверки-условия-после-инициализации-цикла-FOR	Цикл FOR является циклом с предусловием, поэтому сразу после инициализации он проверяет условие продолжения. После инициализации <A> следует проверить условие цикла <B>.	The FOR loop is a preconditioned, so immediately after initialization, the continuation condition is to be evaluated. After the initialization <A> the condition <B> should be evaluated."""

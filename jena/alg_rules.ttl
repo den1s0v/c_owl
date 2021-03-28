@@ -22,15 +22,13 @@
 
 
 
-# [make_action_boundaries:
-# 	(?st rdf:type my:action),
-# 	makeSkolem(?b, ?st, "begin"),
-# 	makeSkolem(?e, ?st, "end"),
-# 	 ->
-# 	(?b my:begin_of ?st),
-# 	(?e my:end_of ?st),
-# ]
 
+
+
+
+###############################
+# simple action - stmt, expr
+###############################
 
 
 [connect_StmtEnd:
@@ -419,49 +417,4 @@
 	 ->
 	 (?e my:normal_consequent ?b),
 ]
-
-
-
-
-#[start__to__GlobalCode__rule_g4:
-#
-#	print("Entry point is ..."),
-#
-#	(?a rdf:type my:trace ),
-#	(?a rdf:type my:act_begin ),
-#	(?a my:executes ?alg ),
-#	(?alg my:entry_point ?gc ),
-#	(?gc rdf:type my:sequence ),
-#
-#### (?b rdf:type my:act_begin),
-#### (?a my:next_sibling ?b),
-#### (?b my:executes ?gc),
-#
-## noValue(?a, my:next_act ),
-#	print(" *-*-*-*- Entry point found: ", ?a),
-#	makeSkolem(?b, ?a, "next_act"),
-#
-#	 ->
-#	 (?a my:next_act ?b),
-#	 (?b rdf:type owl:NamedIndividual),
-#	 (?b rdf:type my:GlobalCodeBegin),
-#	 (?b rdf:type my:normal_flow_correct_act),
-#	 (?b rdf:type my:act_begin),
-#	 (?b my:executes ?gc),
-#]
-#
-
-
-
-
-
-
-## Rule: test noValue
-#[
-#	(?x rdf:type my:action),
-#	noValue(?x rdf:type my:expr),
-#
-#	 ->
-#	 (?x rdf:label "not an expr"),
-#]
 

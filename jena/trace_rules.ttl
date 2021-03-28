@@ -172,15 +172,6 @@
 	 (?b my:precursor ?a),
 ]
 
-## Rule: test noValue
-#[
-#	(?x rdf:type my:action),
-#	noValue(?x rdf:type my:expr),
-#
-#	 ->
-#	 (?x rdf:label "not an expr"),
-#]
-
 # Rule: CorrespondingEndMismatched-Error [mistake]
 [
 	(?a my:student_corresponding_end ?b),
@@ -299,19 +290,8 @@
 # Rule: DisplacedAct-Seq_error [mistake & sequence]
 # ...
 
-
-# ????
-## Rule: DisplacedAct-Seq_error [mistake & sequence]
-#[
-#	(?c1 rdf:type my:ExtraAct),
-#	(?c1 rdf:type my:MissingAct),
-#	 -> (?c1 rdf:type my:DisplacedAct)
-#]
-
-
 # Rule: NoFirstOfSequence-Seq_error [mistake & sequence]
 # (-)
-[ -> ]
 
 # Rule: TooEarlyInSequence-Seq_error [mistake & sequence]
 [TooEarlyInSequence:
@@ -366,7 +346,7 @@
 #		(?correct_b my:item_index ?index_c),
 #		(?st_b my:item_index ?index_b),
 #		greaterThan(?index_c, ?index_b),
-#	 -> (?b my:should_be_after ?correct_b),
+#	 - > (?b my:should_be_after ?correct_b),
 #	 (?b rdf:type my:TooLateInSequence)
 #]
 
@@ -593,7 +573,7 @@
 ## 	основывается на правильной трассе !!
 #	(?alt_act my:parent_of ?a),
 #	(?alt_act my:student_parent_of ?b),
-#	 -> (?b my:should_be ?a),
+#	 - > (?b my:should_be ?a),
 #	 (?b my:precursor ?a),
 #	 (?b rdf:type my:WrongBranch)
 #]
