@@ -374,7 +374,7 @@ def add_styling_to_trace(algorithm_json, trace_json, user_language=None) -> list
 			html_tags = styling.prepare_tags_for_line(act_text)
 			add_json = {
 					'as_string': act_text,
-					'as_tags': html_tags,
+					# 'as_tags': html_tags,
 					'as_html': styling.to_html(html_tags),
 			}
 			act_dict.update(add_json)
@@ -393,16 +393,26 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 		# from pprint import pprint
 		# pprint(mistakes)
 
+		if write_mistakes_to_acts and len(alg_trs_list) != 1:
+			print("** Warning!: write_mistakes_to_acts is inapplicable when traces count =", len(alg_trs_list), "(!=1)")
 		if write_mistakes_to_acts and len(alg_trs_list) == 1:
 			trace = alg_trs_list[0]['trace']
 			for mistake in mistakes:
 				act_id = mistake["id"][0]
-				for act_obj in find_by_keyval_in("id", act_id, trace):
-					act_obj["explanations"] = act_obj.get("explanations", []) + mistake["explanations"]
+				for act_obj in list(find_by_keyval_in("id", act_id, trace)):
+					new_explanations = act_obj.get("explanations", []) + mistake["explanations"]
+					act_obj["explanations"] = sorted(set(new_explanations))
 					if not act_obj["explanations"]:  # был пустой список - запишем хоть что-то
 						act_obj["explanations"] = ["Ошибка обнаружена, но вид ошибки не определён."]
 					act_obj["is_valid"] = False
-					break
+					if 'value' in act_obj:
+						print(" ***** Reset act value.")
+						act_obj["value"] = "not evaluated"
+						# del act_obj["value"]
+						alg_data = alg_trs_list[0]['algorithm']
+						# rewrite this act
+						add_styling_to_trace(alg_data, [act_obj])
+					# break
 
 			# Apply correctness mark to other acts:  act_obj["is_valid"] = True
 			for act_obj in trace:

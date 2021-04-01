@@ -26,8 +26,8 @@ import re
 
 
 def make_lexer():
-	'''create and return lexer function 
-	that recieves a string with tokens 
+	'''create and return lexer function
+	that recieves a string with tokens
 	and returns a 2-tuple:
 		0) count of chars consumed by token
 		1) type of token found or None
@@ -40,7 +40,7 @@ def make_lexer():
 	  # The start state contains the rules that are intially used
 	  'start': [
 		{'regex': keyword_re, 'token': "keyword"},
-		{'regex': re.compile(r"true|false|ложь|истина", re.I), 'token': "atom"},
+		{'regex': re.compile(r"true|false|ложь|истина|not evaluated|не вычислено", re.I), 'token': "atom"},
 		{'regex': re.compile(r"\d+(?:st|nd|rd|th)?", re.I),
 		  # /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
 		 'token': "number"},
@@ -53,7 +53,7 @@ def make_lexer():
 		{'regex': re.compile(r"[\wа-яё\d]+", re.I), 'token': "variable"}
 	  ],
 	}
-	
+
 	state = 'start'
 	def lexer(token) -> (int, str or None):
 		for matcher in simple_mode[state]:
@@ -63,7 +63,7 @@ def make_lexer():
 			# else:
 			#     print("No match for:", matcher['token'], token)
 		return 1, None  # consume 1 char anyway
-	
+
 	return lexer
 
 
@@ -80,14 +80,14 @@ def parse_line(line: str) -> '[(token, style), ...]':
 			tokens.append((tok, style))
 		line = line[L:] # .lstrip()
 	return tokens
-		
+
 
 # def wrap_word(word, style=None) -> str:
 #     if style:
 #         return f'<span class="{style}">{word}</span>'
 #     else:
 #         return word
-		
+
 # def wrap_tags(text) -> str:
 #     html = "<div class=\"\">"
 #     lines = text.splitlines()
@@ -97,7 +97,7 @@ def parse_line(line: str) -> '[(token, style), ...]':
 #         html += '<span class="">'
 #         for word, style in parse_line(line.lstrip()):
 #             html += wrap_word(word, style)
-			
+
 #         html += "</span>\n<br>\n"
 #     return html + "</div>"
 
@@ -127,7 +127,7 @@ def prepare_tags_for_text(multiline_text) -> dict:
 		leading_spaces = len(line) - len(line.lstrip())
 		if leading_spaces > 0:
 			html["content"] += ["&nbsp;" * leading_spaces]
-		
+
 		html["content"] += prepare_tags_for_line(line.lstrip())
 		html["content"] += [{"tag": "br"}]
 	return html
@@ -136,14 +136,14 @@ def prepare_tags_for_text(multiline_text) -> dict:
 def to_html(element: str or dict or list, sep='') -> str:
 	if not element:
 		return ''
-		
+
 	if isinstance(element, (str, int)):
 		return str(element)
-		
+
 	if isinstance(element, (list, tuple)):
 		inner = sep.join(map(to_html, element))
 		return inner
-	
+
 	if isinstance(element, dict):
 		tag = element.get('tag', "")
 		attrs = ''.join(f' %s="%s"' % (k, to_html(v, sep=" ").replace('"', r'')) for k, v in element.get('attributes', {}).items())
@@ -151,7 +151,7 @@ def to_html(element: str or dict or list, sep='') -> str:
 		inner = to_html(element.get('content', ()))
 		if not tag:
 			return inner
-			
+
 		head = f'<{tag}{attrs}'
 		if inner or attrs:
 			# full form
@@ -160,14 +160,14 @@ def to_html(element: str or dict or list, sep='') -> str:
 			# short form
 			html = f'{head} />'
 		return html
-	
+
 	return 'UNKNOWN(%s)' % type(element).__name__
 
 
 
 if __name__ == '__main__':
 	# print(__doc__)
-	
+
 	from pprint import pprint
 	html_tags = prepare_tags_for_line("условие не_зелёный выполнилось 1-й раз - истина")
 	pprint(html_tags)

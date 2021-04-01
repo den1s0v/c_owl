@@ -40,7 +40,7 @@ def tr(word_en, case='nomn'):
 		)
 	if TARGET_LANG != "ru":
 		raise ValueError("TARGET_LANG variable must contain one of {%s}, but has `%s`" % (str(SUPPORTED_LANGS), TARGET_LANG))
-	
+
 	grammemes = ('nomn','gent')
 	assert case in grammemes, "Unknown case: "+case
 	res = {
@@ -70,6 +70,7 @@ def tr(word_en, case='nomn'):
 		False 		: ("ложь", ),
 		"None"		: ("ничего!", ),
 		None		: ("ничего!", ),
+		"not evaluated"		: ("не вычислено", ),
 		"(she) started" 	: ("началась", ),
 		"(she) finished"	: ("закончилась", ),
 		"(he) started" 		: ("начался", ),
@@ -2018,20 +2019,20 @@ def boolean_line_usage_report(boolean_line, visitor_obj):
 	else:  # if c > L:
 		return "%s (auto-expanded from %s)" % (actual_line, (boolean_line or "''"))
 
-		
+
 def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, use_exec_time=0, lang=None) -> dict:
 	''' Produce trace acts strings separately with minimum of config (no whole algorithm tree is required). We tried to maintain maximum flexibility.
 	Not all algorithm structures are covered, but only the most frequently used ones.
 	'''
 	if lang:
 		set_target_lang(lang)
-	
+
 	elem_type = alg_element["type"]
 	elem_type = elem_type.replace('-', ' ')
 	suffix = '_loop'
 	if elem_type.endswith(suffix):
 		elem_type = elem_type.replace(suffix, '').replace("_", " ")
-		
+
 	node = None
 	parent = None
 	is_iteration = False
@@ -2044,25 +2045,25 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
 	if not node:  # elem_type in ("if", "else if"):
 		tro = find_tro_for_act_type(elem_type)
 		assert tro, "act_line_for_alg_element(): node type not found: alg_element['type'] == " + alg_element["type"]
-		
+
 		class_ = tro.callback
 		kwargs = {}
 		if 'then' in tro.mandatory:  # "if", "else if"
 			kwargs[elem_type] = alg_element["cond"]["name"]
 			kwargs['then'] = "dummy"
-			
+
 		if 'else' in tro.mandatory:  # "else"
 			kwargs['else'] = "dummy"
-			
+
 		if 'alternative' in tro.mandatory:
 			kwargs[elem_type] = alg_element["name"]
 			# kwargs['branches'] = ["dummy"]
-			
+
 		if 'body' in tro.mandatory:
 			kwargs[elem_type] = alg_element["cond"]["name"]
 			kwargs['name'] = alg_element["name"]
 			kwargs['body'] = "dummy"
-			
+
 		if 'sequence' == elem_type:  # in tro.mandatory:
 			name = alg_element["name"]
 			if not name.endswith('_loop_body'):
@@ -2077,33 +2078,33 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
 				kwargs['name'] = name.replace('_loop_body', '')
 				kwargs['body'] = "dummy"
 				pass
-			
+
 		if 'algorithm' == elem_type:
 			kwargs[elem_type] = ["dummy"]
-		
-			
+
+
 		# print("### creating element of type:", class_)
 		node = class_(jn_type=elem_type, **kwargs)
-		
+
 		if isinstance(node, ConditionalAlternativeBranch):
 			parent = AlternativeJN("alternative", branches=[node])
-			
+
 		if parent:
 			node.setup(parent)
-	
+
 	assert node, "act_line_for_alg_element(): Not implemented for: alg_element['type'] == " + elem_type
-	
+
 	if is_iteration:
 		text_trace = node.make_iteration_act_line(phase, n=use_exec_time)
 	else:
 		# universal way to make strimg of trace line (except sequences *_loop_body)
 		text_trace = node.make_act_line(phase, n=use_exec_time, value=tr(expr_value))
-	
+
 	# boolean_line = [expr_value]
-	
+
 	# tr_v = TraceTextVisitor(boolean_line)
 	# node.accept(tr_v)
-	
+
 	# if phase != 'performed':
 	# 	# limit generated lines to desired one only
 	# 	index = {
@@ -2111,23 +2112,23 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
 	# 		'finished': -1,
 	# 	}.get(phase)
 	# 	tr_v.lines = [tr_v.lines[index]]
-	
+
 	# assert len(tr_v.lines) == 1, tr_v.lines
 	# text_trace = str(tr_v)
-	
+
 	text_trace = text_trace.strip()
-	
+
 	# # set exec_time
 	# if use_exec_time > 1:
 	# 	text_trace = text_trace.replace('1th time', '%sth time' % use_exec_time)
 	# 	text_trace = text_trace.replace('1-й раз', '%s-й раз' % use_exec_time)
-	
+
 	return patch_trace(text_trace)
 
 	# tr_v = TraceJsonVisitor(boolean_line)
 	# node.accept(tr_v)
 	# json_trace = tr_v.root.to_dict()
-	
+
 	# json_trace['as_string'] = text_trace
 
 	# return json_trace
@@ -2138,7 +2139,7 @@ def find_tro_for_act_type(act_type: str):
 		if tro.args["jn_type"] == act_type:
 			return tro
 	return None
-	
+
 
 def patch_trace(trace: str) -> str:
 	# apply patches
@@ -2161,21 +2162,21 @@ def patch_trace(trace: str) -> str:
 
 	# remove "sequence global_code" lines
 	trace = re.sub(r"^\s*sequence\s+global_code.*?\s*^", "", trace, flags=re.M)
-		
-	# move <phase word> to the end of line on iteration line 
+
+	# move <phase word> to the end of line on iteration line
 	trace = re.sub(r"(began|ended|executed)\s+(iteration)(.+?)loop(.+?)$", r"\2\3of loop\4 \1", trace, flags=re.M)
 
 	# replace "executed" to "evaluated" (for condition lines only)
 	trace = re.sub(r"(condition[^\n\r]+)executed", r"\1evaluated", trace, flags=re.M)
 
 	return trace
-	
+
 
 def get_text_trace(alg_root_node, boolean_line) -> (str, TraceTextVisitor):
 	tr_v = TraceTextVisitor(boolean_line)
 	alg_root_node.accept(tr_v)
 	trace = str(tr_v)
-	
+
 	return patch_trace(trace), tr_v
 
 
@@ -2238,7 +2239,7 @@ if __name__ == "__main__":
 					print("Switched to language `%s`." % lang)
 				else:
 					print("Warning: invalid content of language-target file `%s` (one of %s is expected). Defaulting to `%s`." % (speak_lang_file,str(SUPPORTED_LANGS),TARGET_LANG))
-				
+
 
 		if os.path.exists(input_alg_file):
 			with open(input_alg_file, encoding='utf-8') as f:
@@ -2265,29 +2266,29 @@ if __name__ == "__main__":
 			for boolean_line in tr_boolean_lines:
 				boolean_line = boolean_line.strip()
 				trace, tr_v = get_text_trace(r, boolean_line)
-					
+
 				f.write("\n\n// " + boolean_line_usage_report(boolean_line,tr_v) + '\n' + trace)
 
 
 		alg = stringify(r.to_dict_4onto(), False)
 		with open(output_alg_json_file, "w", encoding='utf-8') as f:
 			f.write(alg)
-		
+
 		print("Saved: ", "algorithm as json")
-			
+
 		for boolean_line in tr_boolean_lines:
 			boolean_line = boolean_line.strip()
 			tr_v = TraceJsonVisitor(boolean_line)
 			r.accept(tr_v)
 			trace = stringify(tr_v.root.to_dict())
-			
+
 			actual_fname = output_trace_json_template.format(boolean_line_usage_actual(boolean_line,tr_v))
 			with open(actual_fname, "w", encoding='utf-8') as f:
 				f.write(trace)
-			
+
 			print("Saved: ", "trace as json", " file:", actual_fname)
 
-			
+
 
 		print("Completed: ", len(tr_boolean_lines), 'trace(s)')
 
