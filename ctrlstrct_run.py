@@ -627,7 +627,7 @@ class TraceTester():
 
         entry_stmt_id = self.alg_entry()["id"]
 
-        max_act_ID = 1
+        max_act_ID = 1000
         def set_id(act_obj):
             nonlocal max_act_ID
             max_act_ID += 1
@@ -801,7 +801,7 @@ class TraceTester():
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
-                            make_triple(obj, onto.id, uniqualize_id(onto, id_))  # нужно убедиться, что все ID уникальны
+                            make_triple(obj, onto.id, id_)  # ID могут быть не уникальны, но должны соответствовать id актов из GIU
                             if iteration_n:
                                 make_triple(obj, onto.student_iteration_n, iteration_n)
 
@@ -820,7 +820,7 @@ class TraceTester():
                                 obj.is_a.append(class_)
                             # привязываем нужные свойства
                             make_triple(obj, onto.text_line, text_line)
-                            make_triple(obj, onto.id, uniqualize_id(onto, id_))  # нужно убедиться, что все ID уникальны
+                            make_triple(obj, onto.id, id_)  # ID могут быть не уникальны, но должны соответствовать id актов из GIU
                             if expr_value is not None:
                                 make_triple(obj, onto.expr_value, expr_value)
                             if iteration_n:
@@ -1208,10 +1208,10 @@ def init_persistent_structure(onto):
 
         # make correct_act subclasses
         for class_name in [
-            "DebugObj",
-            "FunctionBegin",
-            "FunctionEnd",
-            "FunctionBodyBegin",
+            # "DebugObj",
+            # "FunctionBegin",
+            # "FunctionEnd",
+            # "FunctionBodyBegin",
             "GlobalCodeBegin",
             "SequenceBegin",
             "SequenceNext",

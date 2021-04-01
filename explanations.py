@@ -297,7 +297,7 @@ def register_explanation_handlers():
 
 
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
-	spec = """WrongContext Вне-контекста	<B> не может выполняться в рамках <EX>, потому что <B> не является непосредственной частью <EX>	<B> can't be executed inside of <EX> because <B> is not a direct part of "<EX>\""""
+	spec = """WrongContext Вне-контекста	<B> не может выполняться в рамках <EX>, потому что <B> не является непосредственной частью <EX>	<B> can't be executed inside of <EX> because <B> is not a direct part of "<EX>"."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -313,7 +313,7 @@ def register_explanation_handlers():
 
 
 	# WrongContext is left not replaced in case if absence of correct act (-> MisplacedWithout)
-	spec = """OneLevelShallower Через-уровень	<B> не может выполняться в рамках <EX>, потому что <B> является элементом <A>, начните сначала <Anomn>.	<B> cannot be executed within <EX> because <B> is an element of <A>, so start <Anomn> first."""
+	spec = """OneLevelShallower Через-уровень	<B> не может выполняться в рамках <EX>, потому что <B> является элементом <A_gent>, начните сначала <A>.	<B> cannot be executed within <EX> because <B> is an element of <A>, so start <A> first."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -321,8 +321,8 @@ def register_explanation_handlers():
 		wrong_parent_act = get_relation_object(a, onto.cause)
 
 		return {
-			'<A>': format_full_name(correct_parent_act, 0,1,0, case='gent'),
-			'<Anomn>': format_full_name(correct_parent_act, 0,1,0, case='nomn'),
+			'<A_gent>': format_full_name(correct_parent_act, 0,1,0, case='gent'),
+			'<A>': format_full_name(correct_parent_act, 0,1,0, case='nomn'),
 			'<B>': format_full_name(a, 0,0,0),
 			'<EX>': format_full_name(wrong_parent_act, 0,1,0) if wrong_parent_act else "__",
 			}
@@ -330,8 +330,7 @@ def register_explanation_handlers():
 
 
 	# spec = """ExtraAct Лишний-акт
-	# Не должно быть здесь
-	# <A> must not happen here due to previous error(s)"""
+	# Не должно быть здесь   <A> must not happen here due to previous error(s)"""
 	# class_name, format_str = class_formatstr(spec.split('\n'))
 
 	# def _param_provider(a: 'act_instance'):
@@ -342,8 +341,7 @@ def register_explanation_handlers():
 
 
 	# spec = """TooEarly
-	# <A> следует выполнить позже, после некоторых пропущенных актов
-	# <A> must happen later, after some missing acts"""
+	# <A> следует выполнить позже, после некоторых пропущенных актов    <A> must happen later, after some missing acts"""
 	# class_name, format_str = class_formatstr(spec.split('\n'))
 
 	# def _param_provider(a: 'act_instance'):
@@ -354,8 +352,7 @@ def register_explanation_handlers():
 
 
 	# spec = """DisplacedAct Перемещённый-акт
-	# <A> должно произойти перед <B>, но не здесь
-	# <A> must happen before <B> but not here"""
+	# <A> должно произойти перед <B>, но не здесь    <A> must happen before <B> but not here"""
 	# class_name, format_str = class_formatstr(spec.split('\n'))
 
 	# def _param_provider(a: 'act_instance'):
