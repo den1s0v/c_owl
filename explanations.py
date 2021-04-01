@@ -368,7 +368,7 @@ def register_explanation_handlers():
 	######### Sequence mistakes #########
 	########=====================########
 
-	spec = """TooEarlyInSequence Не-в-порядке-следования-рано	Следование выполняет все свои действия по порядку, поэтому <A> не может выполняться перед <B>.	A sequence performs its nested actions in order, so <A> cannot be executed before <B>"""
+	spec = """TooEarlyInSequence Не-в-порядке-следования-рано	Следование выполняет все свои действия по порядку, поэтому <A> не может выполняться перед <B>.	A sequence executes its nested actions in order, so <A> cannot be executed before <B>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -384,7 +384,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """TooLateInSequence Не-в-порядке-следования-поздно	Следование выполняет все свои действия по порядку, поэтому <A> не может выполняться после <B>.	A sequence performs its nested actions in order, so <A> cannot be executed after <B>"""
+	spec = """TooLateInSequence Не-в-порядке-следования-поздно	Следование выполняет все свои действия по порядку, поэтому <A> не может выполняться после <B>.	A sequence executes its nested actions in order, so <A> cannot be executed after <B>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -417,7 +417,7 @@ def register_explanation_handlers():
 
 
 	# SequenceFinishedTooEarly: A sequence performs all its actions from the first through the last, so it's too early to finish the sequence of the body of the loop 'work' because not all actions of the sequence have completed (ex. alternative 'choose').
-	spec = """SequenceFinishedTooEarly Следование-прервано	Следование выполняет все свои действия: нельзя закончить следование <A> не выполнив действия: <B1..Bn>.	A sequence always performs all its actions. The sequence <A> cannot finish until actions: <B1..Bn> are executed."""
+	spec = """SequenceFinishedTooEarly Следование-прервано	Следование выполняет все свои действия: нельзя закончить следование <A> не выполнив действия: <B1..Bn>.	A sequence always executes all its actions. The sequence <A> cannot finish until actions: <B1..Bn> are executed."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -432,7 +432,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """DuplicateOfAct Дубликат (sequence only)	Следование выполняет все свои действия ровно по 1 разу, поэтому во время выполнения действия <A> действие <B> должно выполниться ровно один раз.	A sequence performs each its action once, so each execution of <A> can contain only one execution of <B>"""
+	spec = """DuplicateOfAct Дубликат (sequence only)	Следование выполняет все свои действия ровно по 1 разу, поэтому во время выполнения действия <A> действие <B> должно выполниться ровно один раз.	A sequence executes each its action once, so each execution of <A> can contain only one execution of <B>"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -450,7 +450,7 @@ def register_explanation_handlers():
 	######### Alternative mistakes #########
 	########========================########
 
-	spec = """NoFirstCondition Нет-первого-условия	Развилка проверяет все свои условия по порядку до обнаружения первого истинного. Поэтому выполнение развилки <A> должно начинаться с проверки своего первого условия <B>.	An alternative evaluates its conditions in order until the first true condition. The alternative <A> should start with evaluating its first condition <B>."""
+	spec = """NoFirstCondition Нет-первого-условия	Развилка проверяет все свои условия по порядку до первого истинного. Поэтому выполнение развилки <A> должно начинаться с проверки её первого условия <B>.	An alternative evaluates its conditions in order until the first true condition. The alternative <A> should start with evaluating its first condition <B>."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -485,7 +485,7 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """BranchNotNextToCondition Ветка-не-после-условия	Альтернатива выполняет ветку только тогда, когда соответствующее условие истинно. Альтернативная ветка <C> не может начаться, условие условие <B> не проверено прямо перед этим.	The alternative performs a branch only if the corresponding condition is true. The alternative <A> cannot execute the branch <C> unless its condition <B> is evaluated immediately before it."""
+	spec = """BranchNotNextToCondition Ветка-без-условия	Развилка выполняет ветку, только если условие этой ветки истинно. Ветка <C> не может начаться, так как условие <B> еще не вычислено.	The alternative executes a branch only if the branch condition is true. The alternative <A> cannot execute the branch <C> because its condition <B> is not evaluated yet."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -499,7 +499,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """ElseBranchNotNextToLastCondition Ветка-иначе-без-условия	Альтернатива выполняет ветку "ИНАЧЕ" только тогда, когда ни одно условие не оказалось истинным. Альтернативная ветка (ветка "ИНАЧЕ") не может начаться, пока условие <B> не проверено.	An alternative performs its "ELSE" branch only if no condition is true. The alternative <A> cannot execute the "ELSE" branch until its condition <B> is evaluated"""
+	spec = """ElseBranchNotNextToLastCondition Ветка-иначе-без-условия	Развилка выполняет ветку "ИНАЧЕ", только если все условия были ложными. Альтернативная ветка <C> не может начаться, пока условие <B> не вычислено.	An alternative executes its "ELSE" branch only if all its conditions are false. The alternative <A> cannot execute the branch <C> until its condition <B> is evaluated"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -513,7 +513,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """ElseBranchAfterTrueCondition Ветка-иначе-после-успешного-условия	Альтернатива выполняет ветку "ИНАЧЕ" только тогда, когда ни одно условие не оказалось истинным. Альтернативная ветка (ветка "ИНАЧЕ") не должна начинаться, поскольку условие <B> истинно.	An alternative performs its "ELSE" branch only if no condition is true. The alternative <A> must not execute the "ELSE" branch since the condition <B> is true"""
+	spec = """ElseBranchAfterTrueCondition Ветка-иначе-после-успешного-условия	Развилка выполняет ветку "ИНАЧЕ", только если все условия были ложными. Альтернативная ветка (ветка "ИНАЧЕ") не должна начинаться, поскольку условие <B> истинно.	An alternative executes its "ELSE" branch only if all its conditions are false. The alternative <A> must not execute the "ELSE" branch since the condition <B> is true"""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -527,7 +527,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """CondtionNotNextToPrevCondition Условие-не-по-порядку	Альтернатива проверяет все условия по порядку до первого истинного. Во время выполнения альтернативы <A> условие <C> должно быть проверено сразу после условия <B>, в случае если оно приняло значение "ложь".	An alternative evaluates its conditions in order until one is true. The alternative <A> should evaluate its condition <C> immediately after the condition <B> if it has evaluated to false"""
+	spec = """CondtionNotNextToPrevCondition Условие-не-по-порядку	Развилка проверяет свои условия по порядку до первого истинного. При выполнении развилки <A> условие <C> должно быть вычислено сразу после условия <B>, т.к. условие <B> ложно.	An alternative evaluates its conditions in order up to the first true condition. The alternative <A> should evaluate its condition <C> immediately after the condition <B> as <B> is false."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -541,7 +541,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """ConditionTooEarly Условие-слишком-рано	Альтернатива проверяет все условия по порядку до первого истинного. Во время выполнения альтернативы <A> условие <C> нельзя проверить, пока условие <B> не проверено (и не приняло значение "ложь")	An alternative evaluates its conditions in order until one is true. The alternative <A> cannot evaluate its condition <C> until the condition <B> is evaluated (and yielded false)"""
+	spec = """ConditionTooEarly Условие-слишком-рано	Развилка проверяет свои условия по порядку до первого истинного. При выполнении развилки <A> условие <C> рано проверять, т.к. условие <B> еще не вычислено.	An alternative evaluates its conditions in order up to the first true condition. The alternative <A> cannot evaluate its condition <C> until the condition <B> is evaluated."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -555,7 +555,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """ConditionAfterBranch Условие-после-ветки	Выполнив не более одного из альтернативных действий, развилка завершается. Во время выполнения альтернативы <A> условие <B> не должно проверяться, потому что ветка <D> уже выполнена.	Each alternative performs no more than one alternative action and terminates. The alternative <A> must not evaluate its condition <B> because the branch <D> has already been executed."""
+	spec = """ConditionAfterBranch Условие-после-ветки	Выполнив одну ветку, развилка завершается. При выполнении развилки <A> условие <B> не должно проверяться, потому что ветка <D> уже выполнена.	Each alternative executes no more than one alternative action and finishes. The alternative <A> must not evaluate its condition <B> because the branch <D> was executed."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -569,7 +569,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """DuplicateOfCondition Повтор-условия	Альтернатива проверяет все условия по порядку до первого истинного. Во время выполнения альтернативы <A> условие <B> не должно проверяться повторно.	An alternative evaluates its conditions in order until one is true. The alternative <A> must not evaluate its condition <B> again."""
+	spec = """DuplicateOfCondition Повтор-условия	Развилка проверяет все условия по порядку до первого истинного. При выполнении развилки <A> условие <B> не должно проверяться повторно.	An alternative evaluates its conditions in order up to the first true condition. The alternative <A> must not evaluate its condition <B> twice."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -581,7 +581,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """NoNextCondition Нет-следующего-условия	Альтернатива проверяет все условия по порядку до первого истинного. Во время выполнения альтернативы <A> условие <B> ложно, и должно провериться условие <C>.	An alternative evaluates its conditions in order until one is true. The alternative <A> should evaluate its condition <C> because the condition <B> is false."""
+	spec = """NoNextCondition Нет-следующего-условия	Развилка проверяет все условия по порядку до первого истинного. При выполнении развилки <A> следующим должно проверяться условие <C>, так как условие <B> ложно.	An alternative evaluates its conditions in order up to the first true condition. The alternative <A> should evaluate its condition <C> next because the condition <B> is false."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -596,7 +596,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """BranchOfFalseCondition Ветка-при-ложном-условии	Альтернатива выполняет ветку только тогда, когда соответствующее условие истинно. Во время выполнения альтернативы <A> не должна выполниться ветка <C>, потому что условие <B> ложно.	An alternative performs a branch only if the corresponding condition is true. The alternative <A> must not execute the branch <C> because its condition <B> is false."""
+	spec = """BranchOfFalseCondition Ветка-при-ложном-условии	Развилка выполняет ветку, только если ее условие истинно. При выполнении развилки <A> не должна выполниться ветка <C>, потому что условие <B> ложно.	An alternative executes a branch only if its condition is true. The alternative <A> must not execute the branch <C> because its condition <B> is false."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -610,7 +610,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AnotherExtraBranch Лишняя-вторая-ветка	Выполнив не более одного из альтернативных действий, развилка завершается. Во время выполнения альтернативы <A> ветка <B> не должна начаться, потому что ветка <D> уже выполняется.	Each alternative performs no more than one alternative action and terminates. The alternative <A> must not start its branch <B> because the branch <D> has already been executed."""
+	spec = """AnotherExtraBranch Лишняя-вторая-ветка	Выполнив одну ветку, развилка завершается. При выполнении развилки <A> ветка <B> не должна начаться, потому что ветка <D> уже выполнилась.	An alternative executes only one branch. The alternative <A> must not start its branch <B> because the branch <D> was executed."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -624,7 +624,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """BranchWithoutCondition Ветка-без-условия	Альтернатива выполняет ветку тогда, когда соответствующее условие проверено и истинно. Во время выполнения альтернативы <A> ветка <C> не может начаться, потому что условие <B> не проверено.	An alternative performs its branch when the corresponding condition is evaluated to true. The alternative <A> must not execute the branch <C> as long as its condition <B> is not evaluated."""
+	spec = """BranchWithoutCondition Ветка-без-условия	Развилка выполняет ветку, только если условие этой ветки истинно. При выполнении развилки <A> ветка <C> не может начаться, потому что условие <B> не вычислено.	An alternative executes its branch when the branch condition valuates to true. The alternative <A> must not execute the branch <C> without evaluating its condition <B> first."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -640,7 +640,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """NoBranchWhenConditionIsTrue Нет-ветки-при-истинном-условии	Альтернатива выполняет ветку тогда, когда соответствующее условие истинно. Во время выполнения альтернативы <A> должна выполниться ветка <C>, потому что условие <B> истинно.	An alternative performs its branch when the corresponding condition is true. The alternative <A> must execute the branch <C> because its condition <B> is true."""
+	spec = """NoBranchWhenConditionIsTrue Нет-ветки-при-истинном-условии	Развилка выполняет ветку, только если условие этой ветки истинно. При выполнении развилки <A> должна выполниться ветка <C>, потому что условие <B> истинно.	An alternative executes its branch when the corresponding condition is true. The alternative <A> must execute the branch <C> because its condition <B> is true."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -655,7 +655,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """LastFalseNoEnd Развилка-не-закончилась	Когда ни одно условие альтернативы не оказалось истинным, выполняется ветка "ИНАЧЕ" (при наличии), и завершается вся развилка. Альтернатива <A> не имеет ветки "ИНАЧЕ" и должна завершиться, так как условие <B> является ложным.	When no condition of an alternative is true, the alternative performs its "ELSE" branch (if exists) and finishes. The alternative <A> does not have an 'else' branch so it must finish because its condition <B> is false."""
+	spec = """LastFalseNoEnd Развилка-не-закончилась	Если все условия ложны и ветка "ИНАЧЕ" отсутствует, то развилка не выполнит ничего. Развилка <A>  должна завершиться, так как услови<е/я> <B1...Bn> ложн<о/ы> и ветка "ИНАЧЕ" отсутствует.	When all condtions of an alternative are false and "ELSE" branch does not exist, the alternative does not do anything. The alternative <A> does not have an 'else' branch so it must finish because its condition<s> <B1...Bn> <is/are> false."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -671,7 +671,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """AlternativeEndAfterTrueCondition Развилка-закончилась-после-истиннного-условия	Когда одно из условий альтернативы оказалось истинным, выполняется сответствующая ветка и завершается вся развилка. Альтернатива <A> не должна завершиться, пока ветка устинного условия <B> не выполнена.	When a condition of an alternative is true, the alternative performs the corresponding branch and finishes. The alternative <A> should not finish until the branch of successful condition <B> is performed."""
+	spec = """AlternativeEndAfterTrueCondition Развилка-закончилась-после-истиннного-условия	Когда вычисленное условие развилки истинно, выполняется сответствующая ветка. Развилка <A> не должна завершиться, пока ветка <C> истинного условия <B> не выполнена.	When a condition of an alternative evaluates to true, the alternative executes the corresponding branch. The alternative <A> should not finish until the branch <C> of successful condition <B> is executed."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -688,7 +688,7 @@ def register_explanation_handlers():
 
 
 	# NoAlternativeEndAfterBranch: Each alternative performs no more than one alternative action and terminates. The alternative 'choose' has executed the 'if-ready' branch and should finish.
-	spec = """NoAlternativeEndAfterBranch Развилка-не-закончена-после-ветки	Всякая альтернатива выполняет не более одного альтернативного действия и завершается. Альтернатива <A> выполнила ветку <B> и должна завершиться.	Each alternative performs no more than one alternative action and terminates. The alternative <A> has executed its branch <B> and should finish."""
+	spec = """NoAlternativeEndAfterBranch Развилка-не-закончена-после-ветки	Развилка завершается, выполнив одну ветку. Развилка <A> выполнила ветку <B> и должна завершиться.	Each alternative finishes after executing one branch. The alternative <A> executed its branch <B> and should finish."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -704,7 +704,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """LastConditionIsFalseButNoElse Нет-ветки-иначе	Альтернатива выполняет ветку "ИНАЧЕ" только тогда, когда ни одно условие не оказалось истинным. Во время выполнения альтернативы <A> условие <B> ложно, поэтому должна выполниться ветка "ИНАЧЕ".	An alternative performs its "ELSE" branch only if no condition is true. The alternative <A> must execute its branch "ELSE" because the condition <B> is false."""
+	spec = """LastConditionIsFalseButNoElse Нет-ветки-иначе	Развилка выполняет ветку "ИНАЧЕ", только если все условия ложны. При выполнении развилки <A> услови<е/я> <B1...Bn> ложн<о/ы>, поэтому должна выполниться ветка "ИНАЧЕ".	An alternative executes its "ELSE" branch only if all conditions are false. The alternative <A> must execute its branch "ELSE" because the condition<s> <B1...Bn> <is/are> false."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -722,7 +722,7 @@ def register_explanation_handlers():
 	########=================########
 
                 # cond_then_body (-> true)
-	spec = """NoIterationAfterSuccessfulCondition Нет-итерации	Если условие продолжения цикла истинно, то цикл должен продолжиться, т.е. начаться итерация цикла. Поэтому, раз условие <B> истинно, должно начаться тело цикла <A>.	Each time the loop continuation condition is true, the loop continues, meaning an iteration must start. A new iteration of the loop <A> must start because its condition <B> is true."""
+	spec = """NoIterationAfterSuccessfulCondition Нет-итерации	Когда условие продолжения цикла истинно, цикл должен продолжиться: начинается новая итерация цикла. Поскольку условие <B> истинно, должна начаться новая итерация цикла <A>.	If the loop continuation condition is true, the loop continues: its new iteration must begin. A new iteration of the loop <A> must begin because its condition <B> is true."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -739,7 +739,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """LoopEndAfterSuccessfulCondition Конец-цикла-при-истинном-условии	Если условие продолжения цикла истинно, то цикл должен продолжиться, т.е. начаться итерация цикла. Поэтому, раз условие <B> истинно, цикл <A> заканчивать рано.	Each time the loop continuation condition is true, the loop continues, meaning an iteration must start. It's too early to finish the loop <A> because its condition <B> is true."""
+	spec = """LoopEndAfterSuccessfulCondition Конец-цикла-при-истинном-условии	Когда условие продолжения цикла истинно, цикл должен продолжиться: начинается новая итерация цикла. Поэтому, раз условие <B> истинно, цикл <A> заканчивать рано.	If the loop continuation condition is true, the loop continues: its new iteration must begin. It's too early to finish the loop <A> because its condition <B> is true."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -757,7 +757,7 @@ def register_explanation_handlers():
 
 
                 # a general conditional Loop
-	spec = """NoLoopEndAfterFailedCondition Нет-конца-цикла	Цикл заканчивается, как только условие продолжения стало ложным. Поэтому, раз условие <B> ложно, цикл <A> должен завершиться.	A loop ends as soon as its continuation condition becomes false. Since the condition <B> is false, the loop <A> must end."""
+	spec = """NoLoopEndAfterFailedCondition Нет-конца-цикла	Цикл заканчивается, как только условие продолжения стало ложным. Так как условие <B> ложно, цикл <A> должен завершиться.	A loop ends when its continuation condition becomes false. Since the condition <B> is false, the loop <A> must end."""
                 # a general conditional Loop
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
@@ -774,7 +774,7 @@ def register_explanation_handlers():
 
 
                 # a general conditional Loop
-	spec = """LoopEndsWithoutCondition Конец-цикла-без-проверки-условия	Цикл заканчивается только тогда, когда условие продолжения стало ложным. Поэтому, чтобы цикл <A> мог завершиться, условие <B> дожно быть проверено и быть ложно.	A loop ends as soon as its continuation condition becomes false. As the condition <B> is not evaluated yet, the loop <A> cannot end."""
+	spec = """LoopEndsWithoutCondition Конец-цикла-без-проверки-условия	Цикл заканчивается, только если условие продолжения стало ложным. Поэтому цикл <A> не должен завершиться, пока условие <B> не вычислено.	A loop ends only when its condition becomes false. Since the condition <B> is not evaluated yet, the loop <A> must not end."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -789,7 +789,7 @@ def register_explanation_handlers():
 
 
                 # start_with_cond
-	spec = """LoopStartIsNotCondition Цикл-начался-не-с-проверки-условия	Цикл <WHILE/FOREACH> является циклом с предусловием. Поэтому начать цикл <A> следует с проверки условия <B>.	The <WHILE/FOREACH> loop is a preconditioned. Therefore, the <A> loop should start with a check of its condition <B>."""
+	spec = """LoopStartIsNotCondition Цикл-начался-не-с-проверки-условия	Цикл <WHILE/FOREACH> является циклом с предусловием. Поэтому начать цикл <A> следует с проверки условия <B>.	The <WHILE/FOREACH> loop is a preconditioned. So the loop <A> should first evaluate its condition <B>."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -811,7 +811,7 @@ def register_explanation_handlers():
 
 
                 # start_with_body
-	spec = """LoopStartIsNotIteration Цикл-начался-не-с-итерации	Цикл DO является циклом с постусловием. Поэтому начать цикл <A> следует с выполнения тела цикла.	The DO loop is post-conditioned. Therefore, the loop <A> should perform its body first."""
+	spec = """LoopStartIsNotIteration Цикл-начался-не-с-итерации	Цикл DO является циклом с постусловием. Поэтому цикл <A> следует начинать сразу с итерации.	The DO loop is post-conditioned. Therefore, the loop <A> should begin with a new iteration."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -828,7 +828,7 @@ def register_explanation_handlers():
 
 
                 # a general Loop
-	spec = """IterationAfterFailedCondition Итерация-при-ложном-условии	Как только условие продолжения стало ложным, цикл заканчивается. Поэтому, раз условие <B> ложно, итерация цикла <A> не может начаться.	A loop terminates as soon as the continuation condition becomes false. Since the condition <B> is false, the iteration of the loop <A> cannot start."""
+	spec = """IterationAfterFailedCondition Итерация-при-ложном-условии	Цикл заканчивается, когда условие продолжения стало ложным. Итерация цикла <A> не может начаться, потому что условие <B> ложно.	A loop ends when its condition becomes false. Since the condition <B> is false, the iteration of the loop <A> cannot start."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -844,7 +844,7 @@ def register_explanation_handlers():
 
 
                 # body_then_cond
-	spec = """NoConditionAfterIteration Нет-проверки-условия	После очередной итерации цикла <WHILE/DO/FOREACH> нужно проверить условие цикла, чтобы решить, продолжать ли цикл или закончить его. После итерации цикла <A> следует проверить условие <B>.	After an iteration of the <WHILE/DO/FOREACH> loop, its condition must be checked to determine whether to continue the loop or finish it. After the iteration of loop <A>, its condition <B> should be checked."""
+	spec = """NoConditionAfterIteration Нет-проверки-условия	После очередной итерации цикла <WHILE/DO/FOREACH> нужно вычислить условие цикла, чтобы решить, продолжать ли цикл или закончить его. После итерации цикла <A> следует вычислить условие <B>.	After an iteration of the <WHILE/DO/FOREACH> loop, its condition must be evaluated to determine whether to continue the loop or finish it. After the iteration of loop <A>, its condition <B> should be evaluated."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -867,7 +867,9 @@ def register_explanation_handlers():
 
 
                 # body_then_cond
-	spec = """NoConditionBetweenIterations Нет-проверки-условия-между-итерациями	После очередной итерации цикла <WHILE/DO/FOREACH> нужно проверить условие, чтобы продолжить цикл или закончить его. Перед тем как перейти к следующей итерации цикла <A>, нужно проверить условие <B>.	After an iteration of the <WHILE/DO/FOREACH> loop, its condition is checked to see if the loop continues or ends. Before proceeding to the next iteration of loop <A>, its condition <B> should be checked."""
+                # for тоже подходит!
+                # conditional loop !
+	spec = """NoConditionBetweenIterations Нет-проверки-условия-между-итерациями	После очередной итерации цикла <WHILE/DO/FOREACH> нужно решить, продолжать ли цикл или закончить его. Перед тем как перейти к следующей итерации цикла <A>, нужно вычислить условие <B>.	After an iteration of the <WHILE/DO/FOREACH> loop, it is to determine whether the loop continues or ends. Before proceeding to the next iteration of loop <A>, its condition <B> should be evaluated."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -891,7 +893,7 @@ def register_explanation_handlers():
 
 
                 # ForLoop
-	spec = """LoopStartsNotWithInit Цикл-FOR-начался-не-с-инициализации	Прежде чем начать основную цикла FOR, следует сначала инициализировать переменную цикла. В начале выполнения цикла <A> нужно выполнить инициализацию <B>.	Before starting the main part of a FOR loop it should be initialized. After starting the loop <A> it is necessary to perform its initialization <B>."""
+	spec = """LoopStartsNotWithInit Цикл-FOR-начался-не-с-инициализации	Прежде чем начать цикл FOR, следует сначала выполнить инициализацию. В начале выполнения цикла <A> нужно выполнить инициализацию <B>.	Before starting a FOR loop it should be initialized. After starting the loop <A> it is necessary to execute its initialization <B>."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -907,7 +909,7 @@ def register_explanation_handlers():
 
 
                 # ForLoop
-	spec = """InitNotAtLoopStart Инициализация-FOR-не-в-начале-цикла	Инициализация цикла FOR выполняется один раз в самом начале цикла. После <A> инициализацию <B> выполнять не следует.	The initialization of the FOR loop is performed once at the beginning of the loop. The initialization <B> should not be performed after <A>."""
+	spec = """InitNotAtLoopStart Инициализация-FOR-не-в-начале-цикла	Инициализация цикла FOR выполняется один раз в самом начале цикла. После <A> инициализацию <B> выполнять не следует.	The initialization of the FOR loop is executed once at the beginning of the loop. The initialization <B> should not be executed after <A>."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -922,7 +924,7 @@ def register_explanation_handlers():
 
 
                 # ForLoop
-	spec = """NoConditionAfterForInit Нет-проверки-условия-после-инициализации-цикла-FOR	Цикл FOR является циклом с предусловием, поэтому сразу после инициализации он проверяет условие продолжения. После инициализации <A> следует проверить условие цикла <B>.	The FOR loop is a preconditioned, so immediately after initialization, the continuation condition is to be evaluated. After the initialization <A> the condition <B> should be evaluated."""
+	spec = """NoConditionAfterForInit Нет-проверки-условия-после-инициализации-цикла-FOR	Цикл FOR является циклом с предусловием, т.е. он должен вычислить условие перед итерацией. После инициализации <A> следует вычислить условие цикла <B>.	The FOR loop is preconditioned, so it should evaluate its condition before a new iteration. After the initialization <A> the condition <B> should be evaluated."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -937,7 +939,7 @@ def register_explanation_handlers():
 
 
                 # ForLoop
-	spec = """IterationAfterForInit Итерация-после-инициализации-цикла-FOR	Цикл FOR является циклом с предусловием, поэтому прежде чем начать возможную итерацию, необходимо проверить условие цикла. После инициализации <A> следует проверить условие цикла <B>.	The FOR loop is a preconditioned, so it is necessary to check the loop condition before starting a possible iteration. After the initialization <A> the condition <B> should be evaluated."""
+	spec = """IterationAfterForInit Итерация-после-инициализации-цикла-FOR	Цикл FOR является циклом с предусловием, поэтому перед чем началом итерации необходимо вычислить условие цикла. После инициализации <A> следует вычислить условие цикла <B>.	The FOR loop is preconditioned, so it should evaluate its condition before starting a new iteration. After the initialization <A> the condition <B> should be evaluated."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -952,7 +954,7 @@ def register_explanation_handlers():
 
 
                 # ForLoop
-	spec = """NoUpdateAfterIteration Нет-перехода-после-итерации-цикла-FOR	Цикл FOR может иметь команду инкремента, и, при её наличии, после каждой итерации следует инкрементировать значение переменной цикла. После итерации цикла <A> следует выполнить переход <B>.	A FOR loop may have an increment command, and if it is present, the value of the loop variable should be incremented after each iteration. After iteration of the loop <A> its update command <B> should be executed."""
+	spec = """NoUpdateAfterIteration Нет-перехода-после-итерации-цикла-FOR	Цикл FOR имеет команду инкремента, которая обновляет значение переменной цикла. После итерации цикла <A> следует выполнить переход <B>.	The FOR loop has an increment command that updates the loop variable. After iteration of the loop <A> its update command <B> should be executed."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -968,7 +970,7 @@ def register_explanation_handlers():
 
 
                 # ForLoop
-	spec = """UpdateNotAfterIteration Нет-перехода-после-итерации-цикла-FOR	Цикл FOR может иметь команду инкремента, и, при её наличии, инкрементировать значение переменной цикла следует только после итерации. После итерации цикла <A> следует выполнить переход <B>.	A FOR loop may have an increment command and, if so, the loop variable value should be incremented only after the iteration. After iteration of the loop <A> its update command <B> should be executed."""
+	spec = """UpdateNotAfterIteration Нет-перехода-после-итерации-цикла-FOR	Цикл FOR имеет команду инкремента, которая обновляет значение переменной цикла.  Переход <B> следует выполнять только после итерации цикла <A>.	The FOR loop has an increment command that updates the loop variable. After iteration of the loop <A> its update command <B> should be executed. The update command <B> should only be executed after the iteration of the loop <A>."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -983,7 +985,7 @@ def register_explanation_handlers():
 
 
                 # ForLoop
-	spec = """ForConditionAfterIteration Условие-после-итерации-цикла-FOR	Цикл FOR может иметь команду инкремента, и, при её наличии, следует сначала обновить значение переменной цикла, и только затем проверять условие цикла. После итерации цикла <A> следует выполнить переход <B>.	A FOR loop may have an increment command and, if so, the value of the loop variable should be updated first, and only then the loop condition should be checked.  After iteration of the loop <A> its update command <B> should be executed."""
+	spec = """ForConditionAfterIteration Условие-после-итерации-цикла-FOR	Цикл FOR имеет команду инкремента, которая обновляет значение переменной цикла перед вычислением условия цикла. После итерации цикла <A> следует выполнить переход <B>.	The FOR loop has an increment command that updates the loop variable before the loop condition is evaluated. After iteration of the loop <A> its update command <B> should be executed."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -1000,7 +1002,7 @@ def register_explanation_handlers():
 
 
                 # ForLoop
-	spec = """NoConditionAfterForUpdate Нет-условия-после-перехода-цикла-FOR	Цикл FOR может иметь команду инкремента, и после её выполнения необходимо проверить условие продолжения цикла. После перехода <A> следует проверить условие <B>.	The FOR loop can have an increment command, and after its execution the continuation condition of the loop must be evaluated. After the transition <A> the condition <B> should be evaluated."""
+	spec = """NoConditionAfterForUpdate Нет-условия-после-перехода-цикла-FOR	Цикл FOR имеет команду инкремента, которая обновляет значение переменной цикла перед вычислением условия цикла. После перехода <A> следует вычислить условие <B>.	The FOR loop has an increment command that updates the loop variable before the loop condition is evaluated. After the update command <A> the condition <B> should be evaluated."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
