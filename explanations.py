@@ -624,7 +624,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """BranchWithoutCondition Ветка-без-условия	Развилка выполняет ветку, только если условие этой ветки истинно. При выполнении развилки <A> ветка <C> не может начаться, потому что условие <B> не вычислено.	An alternative executes its branch when the branch condition valuates to true. The alternative <A> must not execute the branch <C> without evaluating its condition <B> first."""
+	spec = """BranchWithoutCondition Ветка-без-условия	Развилка выполняет ветку, только если условие этой ветки истинно. При выполнении развилки <A> ветка <C> не может начаться, потому что условие <B> не вычислено.	An alternative executes its branch when the branch condition evaluates to true. The alternative <A> must not execute the branch <C> without evaluating its condition <B> first."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
