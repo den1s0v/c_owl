@@ -14,10 +14,9 @@ var COLOR3 = {};
 COLOR3[OUTER] = '#eeffee';
 COLOR3[INNER] = '#ddffdd';
 
-function relative_coords(docX, docY) {
-	var bb = canvas.getBoundingClientRect()
-	return [docX - bb.left, docY - bb.top]
-}
+// Both PaperScript and JavaScript have access to the Window scope, therefore you can use window.globals<code> from the JavaScript and <code>globals<code> from PaperScript to pass information back and forth.
+globals = {};
+
 function relative_coords(docX, docY) {
 	var bb = canvas.getBoundingClientRect()
 	return [docX - bb.left, docY - bb.top]
@@ -51,6 +50,73 @@ function draw_around(rectangle, inner_color, outer_color) {
     return rectangle;
 }
 
+function draw_shape(type, position) {
+	if (["arrow"].includes(type)) {
+		path = new Path(position);
+		path.strokeColor = 'red';
+		// path.dashArray = [10, 10];
+		return
+	}
+	if (["path"].includes(type)) {
+		// position['strokeColor'] = 'red';
+		position['strokeColor'] = 'lightgrey';
+		// position['strokeCap'] = 'butt';
+		position['strokeCap'] = 'square';
+		if (position.fillColor)
+			position['fillColor'] = 'lightgrey';
+		path = new Path(position);
+		// path.strokeColor = 'red';
+		// path.dashArray = [10, 10];
+		// path.smooth();
+		return;
+	}
+
+
+	var path = null;
+	if (["SequenceArea", "AlternativeArea"].includes(type)) {
+		return
+		path = new Path.Rectangle(new Rectangle(position));
+		path.strokeColor = 'black';
+		path.dashArray = [10, 10];
+	}
+	else if (type === "BoxArea") {
+		path = new Path.Rectangle(new Rectangle(position), 5);
+		path.fillColor = 'grey';
+	}
+	else if (type === "Slot") {
+		path = new Path.Circle(position, 3);
+		path.strokeColor = 'black';
+		path.fillColor = 'yellow';
+	}
+	else if ("ConditionDiamond" === type) {
+		position = new Rectangle(position)
+		path = new Path();
+		path.add(position.topCenter);
+		path.add(position.rightCenter);
+		path.add(position.bottomCenter);
+		path.add(position.leftCenter);
+		path.closePath()
+		path.fillColor = 'grey';
+	}
+	else if ("TransitDiamond" === type) {
+		path = new Path.Rectangle(new Rectangle(position));
+		// position = new Rectangle(position)
+		// path = new Path();
+		// path.add(position.topCenter);
+		// path.add(position.rightCenter);
+		// path.add(position.bottomCenter);
+		// path.add(position.leftCenter);
+		// path.closePath()
+		// path.fillColor = 'lightgrey';
+		path.fillColor = 'white';
+		path.strokeColor = 'grey';
+	}
+	else {
+		console.log("Do not draw: " + type);
+	}
+}
+globals.draw_shape = draw_shape
+
 function main() {
     // console.log("main() started")
 
@@ -67,7 +133,7 @@ function main() {
  //    bb = span.getBoundingClientRect()
 
  	var h = Math.max(10, (rect1.top - rect2.bottom) / 2);
- 	console.log(h)
+ 	// console.log(h)
  	var up = new Point(0, -h);
  	var down = new Point(0, h);
  	// var right = new Point(h, 0);
@@ -180,5 +246,5 @@ console.log(d)
 */
 
 console.log("main() is starting ...")
-// main();
+main();
 console.log("main() completed.")
