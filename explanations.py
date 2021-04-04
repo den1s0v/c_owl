@@ -485,7 +485,7 @@ def register_explanation_handlers():
 	# register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """BranchNotNextToCondition Ветка-без-условия	Развилка выполняет ветку, только если условие этой ветки истинно. Ветка <C> не может начаться, так как условие <B> еще не вычислено.	The alternative executes a branch only if the branch condition is true. The alternative <A> cannot execute the branch <C> because its condition <B> is not evaluated yet."""
+	spec = """BranchNotNextToCondition Ветка-без-условия	Развилка выполняет ветку, только если условие этой ветки истинно. Ветка <C> не может начаться, так как условие <B> еще не вычислено.	The alternative executes its branch only if the branch condition is true. The alternative <A> cannot execute the branch <C> because its condition <B> is not evaluated yet."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -596,7 +596,7 @@ def register_explanation_handlers():
 	register_handler(class_name, format_str, _param_provider)
 
 
-	spec = """BranchOfFalseCondition Ветка-при-ложном-условии	Развилка выполняет ветку, только если ее условие истинно. При выполнении развилки <A> не должна выполниться ветка <C>, потому что условие <B> ложно.	An alternative executes a branch only if its condition is true. The alternative <A> must not execute the branch <C> because its condition <B> is false."""
+	spec = """BranchOfFalseCondition Ветка-при-ложном-условии	Развилка выполняет ветку, только если ее условие истинно. При выполнении развилки <A> не должна выполниться ветка <C>, потому что условие <B> ложно.	An alternative executes its branch only if its condition is true. The alternative <A> must not execute the branch <C> because its condition <B> is false."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -604,7 +604,7 @@ def register_explanation_handlers():
 		alt_act = get_relation_subject(onto.student_parent_of, a)
 		return {
 			'<A>': format_full_name(alt_act, 0,0,0),
-			'<B>': format_full_name(cond_act, 0,1,0),
+			'<B>': format_full_name(cond_act, 0,0,0),
 			'<C>': format_full_name(a, 0,0,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
