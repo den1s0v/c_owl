@@ -173,7 +173,7 @@ def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 			localized_class_name = CLASS_NAMES[class_name].get(get_target_lang(), None) or class_name
 			result.append(f"{localized_class_name}: {expl}")
 		else:
-			print("Skipping explanation for:", class_name)
+			print("<> Skipping explanation for: <>", class_name, "<>")
 
 	# if not result and _auto_register:
 	# 	register_explanation_handlers()
@@ -715,6 +715,8 @@ def register_explanation_handlers():
 			'<B>': format_full_name(cond_act, 0,1,0),
 			}
 	register_handler(class_name, format_str, _param_provider)
+
+
 
 
 

@@ -94,9 +94,36 @@
 #	print("     not an expr: ",?x),
 	(?some my:boundary_of ?some_st),
 	 ->
-	 (?b rdf:type my:Erroneous),
+	 (?b rdf:type my:WrongNext),
 	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
+]
+
+# Rule: UpcomingNeighbour-Error [mistake]
+[
+	(?b rdf:type my:WrongNext),
+	(?a my:student_next ?b),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+#	check it
+	(?bx my:has_upcoming ?by),
+	 ->
+	 (?b rdf:type my:UpcomingNeighbour),
+]
+
+# Rule: NotNeighbour-not-cond-Error [mistake]
+[
+	(?b rdf:type my:WrongNext),
+	(?a my:student_next ?b),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+#	a is not condition
+	(?bx my:only_consequent ?some_bnd),
+#	noValue(?a my:type my:expr),
+#	check it
+	noValue(?bx my:has_upcoming ?by),
+	 ->
+	 (?b rdf:type my:NotNeighbour),
 ]
 
 # Rule: GenericMisconceptionWhenTrue_Error [mistake]
@@ -116,9 +143,23 @@
 	(?bx my:on_true_consequent ?on1),
 	(?on1 my:boundary_of ?some_st),
 	 ->
-	 (?b rdf:type my:Erroneous),
+	 (?b rdf:type my:WrongNext),
 	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
+]
+
+# Rule: UpcomingNeighbour-whenTrue-Error [mistake]
+[
+	(?b rdf:type my:WrongNext),
+	(?a my:student_next ?b),
+	(?a my:expr_value "true"^^xsd:boolean),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+	(?bx my:on_true_consequent ?on1),
+#	check it
+	(?on1 my:has_upcoming ?by),
+	 ->
+	 (?b rdf:type my:UpcomingNeighbour),
 ]
 
 # Rule: GenericMisconceptionWhenFalse_Error [mistake]
@@ -136,9 +177,23 @@
 	(?bx my:on_false_consequent ?on0),
 	(?on0 my:boundary_of ?some_st),
 	 ->
-	 (?b rdf:type my:Erroneous),
+	 (?b rdf:type my:WrongNext),
 	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
+]
+
+# Rule: UpcomingNeighbour-whenFalse-Error [mistake]
+[
+	(?b rdf:type my:WrongNext),
+	(?a my:student_next ?b),
+	(?a my:expr_value "false"^^xsd:boolean),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+	(?bx my:on_false_consequent ?on0),
+#	check it
+	(?on0 my:has_upcoming ?by),
+	 ->
+	 (?b rdf:type my:UpcomingNeighbour),
 ]
 
 
@@ -148,14 +203,34 @@
 	(?a my:expr_value "true"^^xsd:boolean),
 	(?a my:executes ?bx),
 	(?b my:executes ?by),
+#	immediatly next
 	(?bx my:on_false_consequent ?by),
 	(?bx my:on_true_consequent ?on1),
 	(?on1 my:boundary_of ?some_st),
 	 ->
-	 (?b rdf:type my:ConditionMisuse),
+	 (?b rdf:type my:WrongCondNeighbour),
 	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
 ]
+# Rule: WrongCondNeighbour-whenTrue-Error [mistake]
+[
+	(?b rdf:type my:WrongNext),
+	(?a my:student_next ?b),
+	(?a my:expr_value "true"^^xsd:boolean),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+	(?bx my:on_false_consequent ?on0),
+	(?bx my:on_true_consequent ?on1),
+	(?on1 my:boundary_of ?some_st),
+#	check it
+#	2+ transitive next
+	(?on0 my:has_upcoming ?by),
+	 ->
+	 (?b rdf:type my:WrongCondNeighbour),
+	 (?b my:should_be ?some_st),
+	 (?b my:precursor ?a),
+]
+
 
 # Rule: GoTrueWhenFalse_Error [mistake]
 [GoTrueWhenFalse_Error:
@@ -167,10 +242,49 @@
 	(?bx my:on_false_consequent ?on0),
 	(?on0 my:boundary_of ?some_st),
 	 ->
-	 (?b rdf:type my:ConditionMisuse),
+	 (?b rdf:type my:WrongCondNeighbour),
 	 (?b my:should_be ?some_st),
 	 (?b my:precursor ?a),
 ]
+# Rule: WrongCondNeighbour-whenFalse-Error [mistake]
+[
+	(?b rdf:type my:WrongNext),
+	(?a my:student_next ?b),
+	(?a my:expr_value "false"^^xsd:boolean),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+	(?bx my:on_false_consequent ?on0),
+	(?bx my:on_true_consequent ?on1),
+	(?on0 my:boundary_of ?some_st),
+#	check it
+#	2+ transitive next
+	(?on1 my:has_upcoming ?by),
+	 ->
+	 (?b rdf:type my:WrongCondNeighbour),
+	 (?b my:should_be ?some_st),
+	 (?b my:precursor ?a),
+]
+
+# Rule: NotNeighbour-cond-Error [mistake]
+[
+	(?b rdf:type my:WrongNext),
+	(?a my:student_next ?b),
+#	(?a my:expr_value ?value___),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+	(?bx my:on_false_consequent ?on0),
+	(?bx my:on_true_consequent ?on1),
+#	check it: not next and not in any "branch"
+	noValue(?bx my:consequent ?by),
+#	2+ transitive next
+	noValue(?on0 my:has_upcoming ?by),
+	noValue(?on1 my:has_upcoming ?by),
+	 ->
+	 (?b rdf:type my:NotNeighbour),
+#	 (?b my:precursor ?a),
+]
+
+
 
 # Rule: CorrespondingEndMismatched-Error [mistake]
 [
@@ -295,7 +409,7 @@
 
 # Rule: TooEarlyInSequence-Seq_error [mistake & sequence]
 [TooEarlyInSequence:
-	(?b rdf:type my:Erroneous),
+	(?b rdf:type my:WrongNext),
 	(?b my:should_be ?correct_b),
 	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
 
@@ -313,7 +427,7 @@
 
 # Rule: TooLateInSequence-Seq_error [mistake & sequence]
 [TooLateInSequence:
-	(?b rdf:type my:Erroneous),
+	(?b rdf:type my:WrongNext),
 	(?a my:student_next ?b),
 
 	(?p my:student_parent_of ?a),
@@ -335,7 +449,7 @@
 # does not work good >
 ## Rule: TooLateInSequence-Seq_error [mistake & sequence]
 #[
-#	(?b rdf:type my:Erroneous),
+#	(?b rdf:type my:WrongNext),
 #	(?b my:should_be ?correct_bnd), (?correct_bnd my:boundary_of ?correct_b),
 #	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
 #
@@ -502,7 +616,7 @@
 #	(?br my:cond ?cnd),
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous),
+	(?b rdf:type my:WrongNext),
 #		(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
 #		(?cnd my:id ?i1),
 #		(?st_b my:id ?i2),
@@ -804,7 +918,7 @@
 	(?br rdf:type my:alt_branch),
 
 	(?a my:student_next ?b),
-#	(?b rdf:type my:Erroneous),
+#	(?b rdf:type my:WrongNext),
 	(?b my:executes ?bnd_b),
 	noValue(?bnd_b my:boundary_of ?br),
 #		(?st my:id ?i),
@@ -828,7 +942,7 @@
 	(?br2 rdf:type my:else),
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous),
+	(?b rdf:type my:WrongNext),
 #	(?b my:executes ?st),
 #		(?st my:id ?i),
 #		(?br2 my:id ?i2),
@@ -851,7 +965,7 @@
 	(?br2 my:cond ?cnd2),
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous),
+	(?b rdf:type my:WrongNext),
 
 #	(?b my:executes ?st),
 #		(?st my:id ?i),
@@ -876,7 +990,7 @@
 	(?br rdf:type my:last_item),
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous),
+	(?b rdf:type my:WrongNext),
 #	(?b my:executes ?st),
 #		(?st my:id ?i),
 #		(?alt my:id ?i2),
@@ -896,7 +1010,7 @@
 	(?alt rdf:type my:alternative),
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous),
+	(?b rdf:type my:WrongNext),
 #	(?b my:executes ?st),
 #		(?st my:id ?i),
 #		(?alt my:id ?i2),
@@ -1019,7 +1133,7 @@
 	(?a my:expr_value "false"^^xsd:boolean),
 
 	(?a my:student_next ?b),
-	(?b rdf:type my:Erroneous),
+	(?b rdf:type my:WrongNext),
 	 ->
 #	 (?b my:cause ?a),
 	 (?b rdf:type my:NoLoopEndAfterFailedCondition)
