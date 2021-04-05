@@ -922,15 +922,19 @@ def init_persistent_structure(onto):
         # новое свойство consequent - ребро графа переходов, заменяющего правильную трассу
         class consequent(Thing >> Thing, ): pass
 
-        class verbose_consequent(consequent): pass
-        class visible_consequent(consequent): pass
+        # class verbose_consequent(consequent): pass
+        # class visible_consequent(consequent): pass
+
+        # окрестность - ближайшее будушее, до условия
+        class has_upcoming(boundary >> boundary, TransitiveProperty): pass
 
         # class interrupting_consequent(consequent): pass
         # + subclasses
         class normal_consequent(consequent): pass
+        class only_consequent(normal_consequent, has_upcoming): pass
         class on_true_consequent(normal_consequent): pass
         class on_false_consequent(normal_consequent): pass
-        ##### Граф между действиями алгоритма
+        ##### Граф связей между действиями алгоритма
 
 
         # ->
@@ -1117,12 +1121,14 @@ def init_persistent_structure(onto):
             for class_name in [
                 # Sequence mistakes ...
                 "CorrespondingEndMismatched",
+                "WrongNext",
+
                 # "CorrespondingEndPerformedDifferentTime",
                 # "WrongExecTime",
                 # "ActStartsAfterItsEnd", "ActEndsWithoutStart",
                 # "AfterTraceEnd",
                 # "DuplicateActInSequence",
-                "ConditionMisuse",
+                ("ConditionMisuse", ["WrongNext"]),
 
                 "WrongContext",
                 # ("MisplacedBefore", ["WrongContext"]),
@@ -1132,13 +1138,18 @@ def init_persistent_structure(onto):
                 ("EndedShallower", ["WrongContext", "CorrespondingEndMismatched"]), # не возникнет для первой ошибки в трассе.
                 ("OneLevelShallower", ["WrongContext"]), # +
 
-                "ExtraAct",
+                ("NeighbourhoodError", ["WrongNext"]),  # check that one of the following is determined
+                ("UpcomingNeighbour", ["NeighbourhoodError"]), #
+                ("NotNeighbour", ["NeighbourhoodError"]), # disjoint with UpcomingNeighbour
+                ("WrongCondNeighbour", ["NotNeighbour", "ConditionMisuse"]), #
+
+                ("ExtraAct", ["WrongNext"]),
                 ("DuplicateOfAct", ["ExtraAct"]),
                 # "MissingAct",
                 # "TooEarly", # right after missing acts
                 # ("DisplacedAct", ["TooEarly","ExtraAct","MissingAct"]), # act was moved somewhere
-                "TooLateInSequence", # +
-                "TooEarlyInSequence", # +
+                ("TooLateInSequence", ["WrongNext"]), # +
+                ("TooEarlyInSequence", ["WrongNext"]), # +
                 "SequenceFinishedNotInOrder",  # выполнены все действия, но в конце не последнее; не возникнет для первой ошибки в трассе.
                 ("SequenceFinishedTooEarly", ["SequenceFinishedNotInOrder"]), # +
 
@@ -1264,7 +1275,7 @@ def load_swrl_rules(onto, rules_list, rules_filter=None):
     return onto
 
 
-def extact_mistakes(onto, as_objects=False, group_by=("text_line",)) -> dict:
+def extact_mistakes(onto, as_objects=False, group_by=("text_line",), filter_by_level=False) -> dict:
     """Searches for instances of trace_error class and constructs a dict of the following form:
         "<error_instance1_name>": {
             "classes": ["list", "of", "class", "names", ...],
@@ -1294,37 +1305,47 @@ def extact_mistakes(onto, as_objects=False, group_by=("text_line",)) -> dict:
             values.append(getattr(inst, prop_name) if hasattr(inst, prop_name) else None)
         return tuple(values)
 
+    categories = [
+        onto.UpcomingNeighbour,
+        onto.WrongCondNeighbour,
+        onto.NotNeighbour,
+        onto.Erroneous
+    ] if filter_by_level else [onto.Erroneous]
+
     mistakes = {}
 
-    # The .instances() class method can be used to iterate through all Instances of a Class (including its subclasses). It returns a generator.
-    for inst in onto.Erroneous.instances():
+    for error_class in categories:
+        # The .instances() class method can be used to iterate through all Instances of a Class (including its subclasses). It returns a generator.
+        for inst in error_class.instances():
 
-        ###
-        print("Erroneous instance:", inst.name)
-        key = inst_keys(inst)
-        d = mistakes.get(key, {})
-        mistakes[key] = d
+            ###
+            print("Erroneous instance:", inst.name)
+            key = inst_keys(inst)
+            d = mistakes.get(key, {})
+            mistakes[key] = d
 
-        for prop in properties_to_extract:
-            values = []
-            # fill values ...
-            if isinstance(prop, str):
-                prop_name = prop
-                values.append(getattr(inst, prop_name))
-            else:
-                prop_name = prop.name
-                for s,o in prop.get_relations():
-                    if s == inst:
-                        if not as_objects:
-                            o = o.name if hasattr(o, "name") else o
-                        values.append(o)
+            for prop in properties_to_extract:
+                values = []
+                # fill values ...
+                if isinstance(prop, str):
+                    prop_name = prop
+                    values.append(getattr(inst, prop_name))
+                else:
+                    prop_name = prop.name
+                    for s,o in prop.get_relations():
+                        if s == inst:
+                            if not as_objects:
+                                o = o.name if hasattr(o, "name") else o
+                            values.append(o)
 
-            d[prop_name] = values
+                d[prop_name] = values
 
-        classes = get_leaf_classes((set(inst.is_a) | set(d.get("classes", {}))) & error_classes)
-        d["classes"] = [class_.name for class_ in classes]
-        explanations = format_explanation(onto, inst)
-        d["explanations"] = sorted(set(d.get("explanations", []) + explanations))
+            classes = get_leaf_classes((set(inst.is_a) | set(d.get("classes", {}))) & error_classes)
+            d["classes"] = [class_.name for class_ in classes]
+            explanations = format_explanation(onto, inst)
+            d["explanations"] = sorted(set(d.get("explanations", []) + explanations))
+        if mistakes:
+            break
 
     return mistakes
 
@@ -1345,7 +1366,7 @@ def create_ontology_tbox() -> "onto":
 
 
 def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
-                      mistakes_as_objects=False, extra_act_entries=0,
+                      mistakes_as_objects=False, filter_by_level=False, extra_act_entries=0,
                       rules_filter=None, reasoning="jena", on_done=None, _eval_max_traces=None) -> "onto, mistakes_list":
     """Write number of algorithm - trace pair to an ontology, perform extended reasoning and then extract and return the mistakes found.
       reasoning: None or "stardog" or "pellet" or "prolog" or "jena" or "sparql" or "clingo" or "dlv"
@@ -1512,7 +1533,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     # return onto, []  ### Debug exit
     # exit()
 
-    mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects)
+    mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects, filter_by_level=filter_by_level)
 
     return onto, list(mistakes.values())
 

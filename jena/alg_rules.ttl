@@ -37,7 +37,7 @@
 	(?b my:begin_of ?st),
 	(?e my:end_of ?st),
 	 ->
-	 (?b my:normal_consequent ?e),
+	 (?b my:only_consequent ?e),
 ]
 [connect_ExprEnd:
 
@@ -45,7 +45,7 @@
 	(?b my:begin_of ?st),
 	(?e my:end_of ?st),
 	 ->
-	 (?b my:normal_consequent ?e),
+	 (?b my:only_consequent ?e),
 ]
 
 
@@ -132,7 +132,7 @@
 	(?b my:begin_of ?gc),
 
 	 ->
-	 (?alg my:normal_consequent ?b),
+	 (?alg my:only_consequent ?b),
 ]
 
 [connect_SequenceBegin_rule_g2:
@@ -145,7 +145,7 @@
 	(?b2 my:begin_of ?st),
 
 	 ->
-	 (?b my:normal_consequent ?b2),
+	 (?b my:only_consequent ?b2),
 ]
 
 [connect_SequenceNext:
@@ -157,7 +157,7 @@
 	(?b my:begin_of ?st2),
 
 	 ->
-	 (?e my:normal_consequent ?b),
+	 (?e my:only_consequent ?b),
 ]
 
 [connect_SequenceEnd:
@@ -169,7 +169,7 @@
 	(?e1 my:end_of ?st),
 
 	 ->
-	 (?e1 my:normal_consequent ?e),
+	 (?e1 my:only_consequent ?e),
 ]
 
 
@@ -193,7 +193,7 @@
 	(?b2 my:begin_of ?cnd),
 
 	 ->
-	 (?b my:normal_consequent ?b2),
+	 (?b my:only_consequent ?b2),
 ]
 
 [connect_AltBranchBegin_CondTrue:
@@ -268,7 +268,7 @@
 
 	(?e1 my:end_of ?br),
 	 ->
-	 (?e1 my:normal_consequent ?e),
+	 (?e1 my:only_consequent ?e),
 ]
 
 
@@ -286,7 +286,7 @@
 
 	(?b2 my:begin_of ?cnd),
 	 ->
-	 (?b my:normal_consequent ?b2),
+	 (?b my:only_consequent ?b2),
 ]
 
 [connect_LoopBegin-body:
@@ -296,7 +296,7 @@
 
 	(?b2 my:begin_of ?st),
 	 ->
-	 (?b my:normal_consequent ?b2),
+	 (?b my:only_consequent ?b2),
 ]
 
 [connect_LoopCond1-BodyBegin:
@@ -332,7 +332,7 @@
 	(?e my:end_of ?upd),
 	(?b my:begin_of ?st),
 	 ->
-	 (?e my:normal_consequent ?b),
+	 (?e my:only_consequent ?b),
 ]
 
 [connect_LoopCond0-LoopEnd:
@@ -372,7 +372,7 @@
 	(?e my:end_of ?st),
 	(?b my:begin_of ?cnd),
 	 ->
-	 (?e my:normal_consequent ?b),
+	 (?e my:only_consequent ?b),
 ]
 
 [connect_LoopBegin-init:
@@ -382,7 +382,7 @@
 
 	(?b2 my:begin_of ?st),
 	 ->
-	 (?b my:normal_consequent ?b2),
+	 (?b my:only_consequent ?b2),
 ]
 
 [connect_LoopInit-cond:
@@ -393,7 +393,7 @@
 	(?e my:end_of ?st),
 	(?b my:begin_of ?cnd),
 	 ->
-	 (?e my:normal_consequent ?b),
+	 (?e my:only_consequent ?b),
 ]
 
 [connect_LoopBody-update:
@@ -404,7 +404,7 @@
 	(?e my:end_of ?st),
 	(?b my:begin_of ?upd),
 	 ->
-	 (?e my:normal_consequent ?b),
+	 (?e my:only_consequent ?b),
 ]
 
 [connect_LoopUpdate-cond:
@@ -415,6 +415,6 @@
 	(?e my:end_of ?upd),
 	(?b my:begin_of ?cnd),
 	 ->
-	 (?e my:normal_consequent ?b),
+	 (?e my:only_consequent ?b),
 ]
 
