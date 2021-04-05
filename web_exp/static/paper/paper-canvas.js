@@ -50,66 +50,72 @@ function draw_around(rectangle, inner_color, outer_color) {
     return rectangle;
 }
 
-function draw_shape(type, position) {
-	if (["arrow"].includes(type)) {
-		path = new Path(position);
-		path.strokeColor = 'red';
-		// path.dashArray = [10, 10];
-		return
-	}
-	if (["path"].includes(type)) {
-		// position['strokeColor'] = 'red';
-		position['strokeColor'] = 'lightgrey';
-		// position['strokeCap'] = 'butt';
-		position['strokeCap'] = 'square';
-		if (position.fillColor)
-			position['fillColor'] = 'lightgrey';
-		path = new Path(position);
+function draw_shape(type, config) {
+	// if (["arrow"].includes(type)) {
+	// 	path = new Path(config);
+	// 	path.strokeColor = 'red';
+	// 	// path.dashArray = [10, 10];
+	// 	return
+	// }
+	if ("path" === type) {
+		// config['strokeColor'] = 'red';
+		config['strokeColor'] = 'lightgrey';
+		// config['strokeCap'] = 'butt';
+		config['strokeCap'] = 'square';
+		if (config.fillColor)
+			config['fillColor'] = 'lightgrey';
+		path = new Path(config);
 		// path.strokeColor = 'red';
 		// path.dashArray = [10, 10];
 		// path.smooth();
 		return;
 	}
-
+	if ("text" === type) {
+		var text = new PointText(config);
+		return;
+	}
 
 	var path = null;
 	if (["SequenceArea", "AlternativeArea"].includes(type)) {
 		return
-		path = new Path.Rectangle(new Rectangle(position));
-		path.strokeColor = 'black';
-		path.dashArray = [10, 10];
+		// path = new Path.Rectangle(new Rectangle(config));
+		// path.strokeColor = 'black';
+		// path.dashArray = [10, 10];
 	}
 	else if (type === "BoxArea") {
-		path = new Path.Rectangle(new Rectangle(position), 5);
+		path = new Path.Rectangle(new Rectangle(config), 5);
 		path.fillColor = 'grey';
 	}
 	else if (type === "Slot") {
-		path = new Path.Circle(position, 3);
+		path = new Path.Circle(config, 3);
 		path.strokeColor = 'black';
 		path.fillColor = 'yellow';
 	}
 	else if ("ConditionDiamond" === type) {
-		position = new Rectangle(position)
+		config = new Rectangle(config)
 		path = new Path();
-		path.add(position.topCenter);
-		path.add(position.rightCenter);
-		path.add(position.bottomCenter);
-		path.add(position.leftCenter);
+		path.add(config.topCenter);
+		path.add(config.rightCenter);
+		path.add(config.bottomCenter);
+		path.add(config.leftCenter);
 		path.closePath()
 		path.fillColor = 'grey';
 	}
 	else if ("TransitDiamond" === type) {
-		path = new Path.Rectangle(new Rectangle(position));
-		// position = new Rectangle(position)
+		path = new Path.Rectangle(config.rectangle);
+		// config = new Rectangle(config)
 		// path = new Path();
-		// path.add(position.topCenter);
-		// path.add(position.rightCenter);
-		// path.add(position.bottomCenter);
-		// path.add(position.leftCenter);
+		// path.add(config.topCenter);
+		// path.add(config.rightCenter);
+		// path.add(config.bottomCenter);
+		// path.add(config.leftCenter);
 		// path.closePath()
-		// path.fillColor = 'lightgrey';
-		path.fillColor = 'white';
-		path.strokeColor = 'grey';
+		if (config.hidden) {
+			path.fillColor = 'lightgrey';
+		} else {
+			path.fillColor = 'white';
+			path.strokeColor = 'grey';
+		}
 	}
 	else {
 		console.log("Do not draw: " + type);
