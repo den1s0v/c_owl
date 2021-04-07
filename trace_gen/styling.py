@@ -18,6 +18,10 @@ The resulting HTML should be something like this:
 
 
 See also: `to_html()` function below for how to convert html_tags to HTML string.
+
+Discovered later: Stan - HTML construction with Python code http://docs.g-vo.org/meetstan.html
+Found there: https://wiki.python.org/moin/Templating
+
 '''
 
 
