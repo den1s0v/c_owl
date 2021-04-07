@@ -1,11 +1,11 @@
 // diagram.js
 
-const U = 25;  // Unit of length, in pixels (scale base)
+const U = 24;  // Unit of length, in pixels (scale base)
 
 const LINE_WIDTH = U * 0.33;
 const ANGLE_OFFSET = U * 0.4;  // sorten right angles
 
-const ARROW_WIDTH = LINE_WIDTH * 2;
+const ARROW_WIDTH = LINE_WIDTH * 2.3;
 const ARROW_LENGTH = ARROW_WIDTH * 0.86;
 
 const FONT_SIZE = U * 0.5;
@@ -39,11 +39,132 @@ function test() {
 	delete algorithm_json;
 
 	// var node = entry_point.body[0].body.body[0].branches[0];
-	var node = entry_point.body[0].body;
+	var node = entry_point;
 	// console.log(node);
 	var alg = create_alg_for(node);
-	alg.rebase(new paper.Point(300, 10));
+
+	/// <->
+	// link_ids(10, 'out', 9, "in", {
+	// 	flex: true, arrow: true,
+	// 	// text:"arbitrary",
+	// 	color:'red',
+	// 	dashArray: [5, LINE_WIDTH*2],
+	// 	strokeCap: 'round',
+	// });
+
+	const highlight_color = '#9fb';
+	for (let id of [3,4,5,6,7,8,9,10,11].slice(2, )) {
+		for(let link of get_links_connecting(id, null)) {
+			console.log(link);
+			link.config.color = highlight_color;
+			for (let diamond of [link.from.owner, link.to.owner])
+				if (diamond instanceof TransitDiamond) {
+					diamond.config.color = highlight_color;
+				}
+		}
+		// for(let link of get_links_connecting(null, id)) {
+		// 	// console.log(link);
+		// 	link.config.color = highlight_color;
+		// 	for (let diamond of [link.from.owner, link.to.owner])
+		// 		if (diamond instanceof TransitDiamond) {
+		// 			diamond.config.color = highlight_color;
+		// 		}
+		// }
+	}
+	/// </>
+
+	alg.rebase(new paper.Point(350, 10));
 	alg.draw();
+
+
+	// /// bring flex arrow to front
+	for (link of g_allLinks) {
+		if (link.config.flex)
+			link.draw();
+	}
+
+}
+
+function get_links_connecting(from_id, to_id) {
+	let res = [];
+	for (link of g_allLinks) {
+		if (
+			(!from_id || link.from.owner.alg_id == from_id) &&
+			(!to_id   || link.to.owner.alg_id   == to_id)
+		) {
+			res.push(...link.search_adjacent_links(to_id, true));
+			// res.push(link);
+		}
+	}
+	return res;
+}
+// function get_adjacent_links(base_link, to_id, _partial_result) {
+// 	let res = _partial_result || [base_link];
+// 	let link, links, proceed;
+// 	let diamond, diamond2; /// = base_link.to.owner;
+// 	let stack = [diamond];
+// 	// find all consequent links
+// 	proceed = true;
+// 	// while (proceed && diamond instanceof TransitDiamond) {
+// 	while (stack.length>0) {
+// 		diamond = stack.pop();
+// 		if (!(diamond instanceof TransitDiamond))
+// 			continue;
+// 		// proceed = false;
+// 		/// console.log(diamond)
+// 		for (direction in diamond.slots)
+// 		for (link of diamond.slots[direction].links_out) {
+// 			if (!res.includes(link)) {
+// 				console.log('>', link)
+// 				res.push(link);
+// 				// res.push(...get_adjacent_links(link, res));
+// 				diamond2 = link.to.owner;
+// 				if (diamond2 instanceof TransitDiamond)
+// 					stack.push(diamond2);
+// 			}
+// 		}
+// 	}
+
+// 	diamond = base_link.from.owner;
+// 	// find all precedent links
+// 	proceed = true;
+// 	while (stack.length>0) {
+// 		diamond = stack.pop();
+// 		if (!(diamond instanceof TransitDiamond))
+// 			continue;
+// 		// proceed = false;
+// 		for (direction in diamond.slots)
+// 		for (link of diamond.slots[direction].links_in) {
+// 			if (!res.includes(link)) {
+// 				console.log('<', link)
+// 				res.push(link);
+// 				// res.push(...get_adjacent_links(link, res));
+// 				diamond2 = link.to.owner;
+// 				if (diamond2 instanceof TransitDiamond)
+// 					stack.push(diamond2);
+// 			}
+// 		}
+// 	}
+// 	return res;
+// }
+function link_ids(from_id, from_phase, to_id, to_phase, config) {
+	// debug
+	// for (alg_id of Object.keys(g_allAlgAreas)) {
+	// 	console.log(alg_id)
+	// }
+
+	let from_node = g_allAlgAreas[from_id];
+	let to_node   = g_allAlgAreas[  to_id];
+	if (!from_node || !to_node) {
+		console.warn("No valid node(s) for ids:", from_id, to_id, ": ==> ", from_node, to_node);
+		return;
+	}
+	let slot_from = from_node.find_slot(from_phase, 0);
+	let slot_to   = to_node  .find_slot(to_phase, 180);
+	// let slot_from = from_node.slot(270);
+	// let slot_to   = to_node  .slot(180);
+	/// console.log(slot_from.direction, slot_to.direction)
+	to_node.links.push(new Link(slot_from, slot_to, config));
 }
 
 /*!
@@ -76,18 +197,82 @@ class Link {
 
 		// store globally
 		g_allLinks.push(this);
+
+		if (this.config.propagate_arrow) {
+			this.propagate_arrow(this.from.direction)
+		}
+	}
+	propagate_arrow(direction) {
+		// // return true if propagated ?
+		let diamond = this.to.owner;
+		if (!(diamond instanceof TransitDiamond))
+			diamond = diamond.inner[0];
+		if (diamond instanceof TransitDiamond) {
+			diamond.actualize_config();
+			if (diamond.config.hidden && diamond.slots[direction]) {
+				diamond.slots[direction].links_out[0].propagate_arrow(direction)
+				delete this.config.propagate_arrow;
+				return;  // return true;
+			} /// else console.log("Not hidden")
+		} /// else console.log("Not TransitDiamond:", this.to.owner)
+		// set arrow to this
+		this.config.arrow = true;
+		delete this.config.propagate_arrow;
+		// return false;
+	}
+	search_adjacent_links(to_id, can_turn, enter_child) {  /// , backward
+		if (this.to.owner.alg_id === to_id)
+			return [this];
+
+		// let slot_field = backward? "from" : "to";
+		// .slice(-1)[0]
+		let found_links = [];
+		let expected_direction = (this.to.direction + 180) % 360;
+		let diamond = this.to.owner;
+		if (enter_child && !(diamond instanceof TransitDiamond))
+			diamond = diamond.inner[0];
+		if (diamond instanceof TransitDiamond) {
+			// diamond.actualize_config();
+			for (let d in diamond.slots) {
+				if (!can_turn && d != expected_direction)
+					continue;
+				let slot = diamond.slots[d];
+				for (let link of slot.links_out) {
+					found_links.push(...link.search_adjacent_links(to_id, can_turn));
+				}
+			} /// else console.log("Not hidden")
+		} /// else console.log("Not TransitDiamond:", this.to.owner)
+		// anything is valid if no target specified
+		if (found_links.length > 0 || !to_id)
+			found_links.unshift(this);
+		return found_links;
 	}
 	draw() {
+		// refresh slots first
+		this.from.owner.actualize_config && this.from.owner.actualize_config();
+		this.to  .owner.actualize_config && this.to  .owner.actualize_config();
+
 		const path_data = {
 			segments: connection_segments(this.from, this.to, this.config),
 			strokeWidth: LINE_WIDTH,
+			strokeColor: this.config.color,
+			...this.config,
 		};
 		draw_shape("path", path_data);
+
+		if (this.config.arrow) {
+			const path_data = {
+				segments: make_arrow_head(this.to),
+				strokeWidth: 0,
+				fillColor: this.config.color || true,
+			};
+			draw_shape("path", path_data);
+		}
 
 		if (this.config.text) {
 			let p1 = path_data.segments[0];
 			let p2 = path_data.segments[1];
-			let point = new paper.Rectangle(p1, p2.point || p2).center;
+			let point = new paper.Rectangle(p1.point || p1, p2.point || p2).center;
 			point.y += FONT_SIZE / 3;  // vertical centering workaround
 			draw_shape("text", {
 				point: point,
@@ -101,18 +286,8 @@ class Link {
 				shadowColor: "white",
 				// Set the shadow blur radius to 12:
 				shadowBlur: 12,
-
 			});
 			// console.log("text drawn: ", this.config.text, point);
-		}
-
-		if (this.config.arrow) {
-			const path_data = {
-				segments: make_arrow_head(this.to),
-				strokeWidth: 0,
-				fillColor: true,
-			};
-			draw_shape("path", path_data);
 		}
 	}
 }
@@ -184,8 +359,8 @@ class AlgArea extends Location {
 		return slot;
 	}
 	find_slot(in_out, preferred_direction) {  // find slot for in or out connection
-		if (this.slots[preferred_direction])
-			return this.slots[preferred_direction];
+		if (this.slots[preferred_direction] || in_out == "whole")
+			return this.slot(preferred_direction);
 
 		var links_field = null;
 		if (in_out.includes('in')) {
@@ -198,8 +373,9 @@ class AlgArea extends Location {
 			console.warn("*.find_slot(): bad in_out parameter");
 		}
 		for (let d in this.slots) {
-			if (this.slots[d][links_field])  // not empty
+			if (this.slots[d][links_field].length > 0)  // not empty
 				return this.slots[d];
+			/// else console.log(d, "does not suit for", in_out);
 		}
 		// use default
 		return this.slot(preferred_direction);
@@ -228,12 +404,16 @@ class AlgArea extends Location {
 		// furthermore, apply padding
 		padding = padding || this.padding || new paper.Size(U * 0.5, 0);
 		bbox = bbox.expand(padding);
-		// move origin if required
-		if (!this.corner.equals(bbox.topLeft)) {
-			// this.rebase(this.corner, bbox.topLeft);
-			// this.rebase(bbox.topLeft, this.corner);
-			this.corner = bbox.topLeft;
-		}
+		// // move origin if required
+		// if (!this.corner.equals(bbox.topLeft)) {
+		// 	// this.rebase(this.corner, bbox.topLeft);
+		// 	// this.rebase(bbox.topLeft, this.corner);
+		// 	// this.corner = bbox.topLeft;
+		// }
+		// set origin so left top is zero
+		let zero = new paper.Point(0,0)
+		this.rebase(bbox.topLeft, zero);
+		this.corner = zero;
 		// save the calculated size
 		this.size = bbox.size;
 	}
@@ -243,6 +423,22 @@ class AlgArea extends Location {
 	}
 	draw_self() {
 		draw_shape(this.constructor.name, this.position_self());
+		/// debug
+		return
+		if (this.alg_name)
+			draw_shape("text", {
+				point: this.corner,
+				content: this.alg_name,
+				justification: 'right',
+				// fillColor: '#f48',
+				// // fontFamily: 'Courier New',
+				// fontWeight: 'bold',
+				// fontSize: FONT_SIZE,
+				// // Set the shadow color of the circle to RGB black:
+				// shadowColor: "white",
+				// // Set the shadow blur radius to 12:
+				// shadowBlur: 12,
+			});
 	}
 	position_self() {
 		return this.bbox();
@@ -254,18 +450,21 @@ class AlgArea extends Location {
 		for (let a of this.inner) {
 			a.draw();
 		}
+		/// debug connection point
 		// for (let a in this.slots) {
 		// 	this.slots[a].draw();
 		// }
 	}
 }
 
-class TransitDiamond extends AlgArea {  // two slots vertically
+class TransitDiamond extends AlgArea {  // links connection
 	constructor(corner, config) {
 		super(corner, config);
 		this.side = LINE_WIDTH / 2;
 		// leave zero size -- ???
 		this.size = new paper.Size(0, 0);
+		// this.config.hidden = true;
+		// this.config.color = 'red';
 	}
 	_create_side_slot(direction) {  // creator
 		let point = null;
@@ -277,10 +476,32 @@ class TransitDiamond extends AlgArea {  // two slots vertically
 		this.slots[direction] = slot;
 		return slot;
 	}
+	actualize_config() {
+		// actualize "hidden" setting
+		let hidden = true;
+		var size = Object.keys(this.slots).length;  // https://stackoverflow.com/questions/5223/length-of-a-javascript-object
+		if (size > 2) {
+			hidden = false;
+		} else {
+			const keys = Object.keys(this.slots);
+			const is_straight = (180 == Math.abs(
+				this.slots[keys[0]].direction -
+				this.slots[keys[1]].direction))
+
+			hidden = is_straight;
+		}
+		this.config.hidden = hidden;
+		/// this.config.hidden = false;
+	}
+	draw() {
+		// actualize "hidden" setting
+		this.actualize_config();
+		super.draw();
+	}
 	position_self() {
 		return {
 			rectangle: new paper.Rectangle(
-				this.corner.subtract([this.side, this.side]),
+				this.corner.subtract(this.side),
 				new paper.Size(this.side * 2, this.side * 2)),
 			...this.config,
 		};
@@ -289,20 +510,38 @@ class TransitDiamond extends AlgArea {  // two slots vertically
 
 class SequenceArea extends AlgArea {
 	fit(alg_node) {
+		let node = null;
+		let plug_point = this.corner;
+
+		if (alg_node.body.length === 1) {
+			// short laconic mode: equal to only one child
+			let st = alg_node.body[0];
+			node = create_alg_for(st);
+
+			node.rebase(node.corner, plug_point);
+			this.inner.push(node);
+
+			// input of whole node
+			this.create_slot(90, node.slot(90));
+			// output of whole node
+			this.create_slot(270, node.slot(270));
+
+			this.size = node.size.clone();
+			return;
+		}
+
 		const sep = U * 0.4;
 		const offset = new paper.Point(0, sep);
-		let plug_point = this.corner;
-		let node = null;
 		let current_slot = null;
 
-		/// add visual begin/end mark
-		node = new TransitDiamond(plug_point)
+		/// begin of whole node
+		node = new TransitDiamond(plug_point);
 		this.inner.push(node);
 		// input of whole node
 		this.create_slot(90, node.slot(90));
 
 		let last_slot = node.slot(270);
-		plug_point = plug_point.add(offset)
+		plug_point = plug_point.add(offset);
 
 		// add all as vertial stack and align each by X coordinate
 		for (let st of alg_node.body) {
@@ -312,7 +551,6 @@ class SequenceArea extends AlgArea {
 				// link a stmt
 				this.links.push(new Link(last_slot, current_slot));
 				const top = current_slot.corner;
-				// node.rebase(plug_point, top);
 				node.rebase(top, plug_point);
 				this.inner.push(node);
 
@@ -391,7 +629,7 @@ class AlternativeArea extends AlgArea {
 			if (branch.cond) {
 				// link cond with its branch
 				this.inner.push(branch.cond);
-				this.links.push(new Link(branch.cond.slot(270), branch.slot(90), {text: LBL[1], arrow: true}));
+				this.links.push(new Link(branch.cond.slot(270), branch.slot(90), {text: LBL[1], propagate_arrow: true}));
 
 				// position the cond
 				plug_point = branch.slot(90).corner.clone();
@@ -405,7 +643,7 @@ class AlternativeArea extends AlgArea {
 					// the first (IF) branch is currently processed
 					// make the input of whole node
 					plug_point = branch.cond.slot(90).corner.subtract(offsetv);
-					input_diamond = new TransitDiamond(plug_point)
+					input_diamond = new TransitDiamond(plug_point);
 					this.inner.push(input_diamond);
 					// input of whole node
 					this.create_slot(90, input_diamond.slot(90));
@@ -426,7 +664,7 @@ class AlternativeArea extends AlgArea {
 
 					// make the output of whole node
 					plug_point = join_diamond.slot(270).corner.add(offsetv);
-					output_diamond = new TransitDiamond(plug_point)
+					output_diamond = new TransitDiamond(plug_point);
 					this.inner.push(output_diamond);
 					// output of whole node
 					this.create_slot(270, output_diamond.slot(270));
@@ -472,10 +710,86 @@ class AlternativeArea extends AlgArea {
 	}
 }
 
+class WhileLoopArea extends AlgArea {
+	fit(alg_node) {
+
+		const cond = create_alg_for(alg_node.cond);
+		const body = create_alg_for(alg_node.body);
+
+		this.inner.push(cond);
+		this.inner.push(body);
+
+		const seph = U * 1.0;
+		const sepv = U * 0.6;
+		const offseth = new paper.Point(seph, 0);
+		const offsetv = new paper.Point(0, sepv);
+		let plug_point = this.corner;
+		let current_slot = null;
+
+		const input_diamond = new TransitDiamond(plug_point);
+		this.inner.push(input_diamond);
+		// input of whole node
+		this.create_slot(90, input_diamond.slot(90));
+
+		plug_point = plug_point.add(offsetv);
+
+		// link cond
+		cond.rebase(cond.slot(90).corner, plug_point);
+		this.links.push(new Link(input_diamond.slot(270), cond.slot(90)));
+
+		plug_point = cond.slot(270).corner.add(offsetv);
+
+		// link body
+		body.rebase(body.slot(90).corner, plug_point);
+		this.links.push(new Link(cond.slot(270), body.slot(90), {text: LBL[1]}));
+
+		const body_bbox = body.bbox();
+
+		// link up to cond by left side ...
+		const helper_vertex_left = new TransitDiamond(new paper.Point(body_bbox.topLeft.subtract(offseth)), {hidden: true});
+		this.inner.push(helper_vertex_left);
+
+		// rotate body's output lo left
+		/// ???
+		let body_out = body.slot(270);
+		body_out.direction = 180;
+
+		// link from body to cond
+		this.links.push(new Link(body_out, helper_vertex_left.slot(270)));
+		this.links.push(new Link(helper_vertex_left.slot(90), cond.slot(180), {arrow: true}));
+
+		plug_point = body_out.corner.add(offsetv);
+
+		const join_diamond = new TransitDiamond(plug_point);
+		this.inner.push(join_diamond);
+
+		// link down to join_diamond by right side ...
+		const helper_vertex_right = new TransitDiamond(new paper.Point(body_bbox.bottomRight.add(offseth)), {hidden: true});
+		this.inner.push(helper_vertex_right);
+
+		// link from cond to the join_diamond
+		this.links.push(new Link(cond.slot(0), helper_vertex_right.slot(90), {text: LBL[0]}));
+		this.links.push(new Link(helper_vertex_right.slot(270), join_diamond.slot(0), {arrow: true}));
+
+		plug_point = plug_point.add(offsetv);
+
+		const output_diamond = new TransitDiamond(plug_point);
+		this.inner.push(output_diamond);
+		// output of whole node
+		this.create_slot(270, output_diamond.slot(270));
+
+		// link join_diamond to the output
+		this.links.push(new Link(join_diamond.slot(270), output_diamond.slot(90)));
+
+		this.actualize_rect();
+	}
+}
+
+
 class BoxArea extends AlgArea {
 	fit(alg_node) {
-		this.alg_node = alg_node;  // ???
-		this.size = new paper.Size(U * 2, U * 1.41);
+		// this.alg_node = alg_node;  // ???
+		this.size = new paper.Size(U * 2, U * 0.81);
 	}
 }
 
@@ -485,6 +799,7 @@ function create_alg_for(alg_node) {
 	if (["sequence", "if", "else", "else-if"].includes(alg_node.type)) {
 		a = new SequenceArea();
 		if (alg_node.cond) {
+			// the sequence is alternative branch
 			a.cond = create_alg_for(alg_node.cond);
 		}
 	}
@@ -497,6 +812,9 @@ function create_alg_for(alg_node) {
 	if (alg_node.type == "alternative") {
 		a = new AlternativeArea();
 	}
+	if (alg_node.type == "while_loop") {
+		a = new WhileLoopArea();
+	}
 	// if (alg_node.type == "sequence") {
 	// 	a = new SequenceArea();
 	// }
@@ -506,9 +824,11 @@ function create_alg_for(alg_node) {
 		a.alg_id = alg_node.id;
 		a.alg_name = alg_node.name;
 		// store globally
-		if (a.alg_id !== undefined)
+		if (a.alg_id !== undefined) {
 			g_allAlgAreas[a.alg_id] = a;
-		//
+			/// console.debug(a.alg_id)
+		}
+		// create a tree for alg_node
 		a.fit(alg_node);
 	} else {
 		console.warn("No handler for node type: " + alg_node.type);
@@ -520,14 +840,35 @@ function create_alg_for(alg_node) {
 // helpers
 
 function connection_segments(from, to, config) {
-	// make segments for linear or right angle link
-	/// console.log(from.direction, to.direction)
 
 	let end = to.corner
-	if (config.arrow) {
+	if (config.arrow && !to.owner.config.hidden) {
+		// if the link is too short, draw nothing
+		if (end.getDistance(from.corner) < ARROW_LENGTH-1) {
+			// link should not be shown
+			return [];
+		}
+
 		// shrink the end so that arrow will look good
 		end = end.add(new paper.Point(ARROW_LENGTH-1, 0).rotate(-to.direction))
 	}
+
+	if (config.flex) {
+		const offset_vec = new paper.Point(ANGLE_OFFSET * 15, 0);
+		return [
+			new paper.Segment({
+				point: from.corner,
+				handleOut: offset_vec.rotate(-from.direction + 30),
+			}),
+			new paper.Segment({
+				point: end,
+				handleIn: offset_vec.rotate(-to.direction - 5),
+			}),
+		];
+	}
+
+	// make segments for linear or right angle link
+	/// console.log(from.direction, to.direction)
 
 	if (180 == Math.abs(from.direction - to.direction)) {
 		// opposite direction
@@ -554,7 +895,7 @@ function connection_segments(from, to, config) {
 				handleOut: offset_vec.multiply(0.5).rotate(-from.direction),
 			}),
 			new paper.Segment({
-				point: middle.subtract(offset_vec.rotate(-to.direction)),
+				point: middle.subtract(offset_vec.rotate( -to.direction)),
 				handleIn: offset_vec.multiply(0.5).rotate(-to.direction),
 			}),
 			end,

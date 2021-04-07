@@ -58,16 +58,34 @@ function draw_shape(type, config) {
 	// 	return
 	// }
 	if ("path" === type) {
-		// config['strokeColor'] = 'red';
-		config['strokeColor'] = 'lightgrey';
-		// config['strokeCap'] = 'butt';
-		config['strokeCap'] = 'square';
-		if (config.fillColor)
-			config['fillColor'] = 'lightgrey';
+		// config.strokeColor = 'red';
+		config.strokeColor = config.strokeColor || 'lightgrey';
+		if (config.fillColor === true)
+			config.fillColor = 'lightgrey';
+		// config.strokeCap = 'butt';
+		config.strokeCap = config.strokeCap || 'square';
 		path = new Path(config);
 		// path.strokeColor = 'red';
 		// path.dashArray = [10, 10];
 		// path.smooth();
+
+		///
+		if (config.flex) {
+			// path.bringToFront()  // не помогает, т.к. объекты создаются и позже
+			// path.reverse()
+			path.tweenTo(
+			    // { dashOffset: 50 },
+			    { dashOffset: -20 },
+			    2000
+			).then(function() {
+			    // ...tween color back to blue.
+			    path.tweenTo({ dashOffset: 0 }, 2000)
+				.then(function() {
+				    // ...set solid line.
+				    path.dashArray = [10, 0]
+			})});
+		}
+		/// </>
 		return;
 	}
 	if ("text" === type) {
@@ -76,7 +94,13 @@ function draw_shape(type, config) {
 	}
 
 	var path = null;
-	if (["SequenceArea", "AlternativeArea"].includes(type)) {
+	if (["WhileLoopArea", "AlternativeArea"].includes(type)) {
+		// return
+		// path = new Path.Rectangle(new Rectangle(config));
+		// path.strokeColor = 'black';
+		// path.dashArray = [10, 10];
+	}
+	else if (type === "SequenceArea") {
 		return
 		// path = new Path.Rectangle(new Rectangle(config));
 		// path.strokeColor = 'black';
@@ -87,7 +111,7 @@ function draw_shape(type, config) {
 		path.fillColor = 'grey';
 	}
 	else if (type === "Slot") {
-		path = new Path.Circle(config, 3);
+		path = new Path.Circle(config, 2);
 		path.strokeColor = 'black';
 		path.fillColor = 'yellow';
 	}
@@ -111,11 +135,14 @@ function draw_shape(type, config) {
 		// path.add(config.leftCenter);
 		// path.closePath()
 		if (config.hidden) {
-			path.fillColor = 'lightgrey';
+			path.fillColor = config.color || 'lightgrey';
 		} else {
 			path.fillColor = 'white';
 			path.strokeColor = 'grey';
 		}
+		// if (config.color)
+		// 	path.fillColor = config.color;
+
 	}
 	else {
 		console.log("Do not draw: " + type);
