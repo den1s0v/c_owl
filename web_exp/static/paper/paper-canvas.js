@@ -2,17 +2,17 @@
 
 var canvas = null;
 var P = 4;
-OUTER = 'outer'
-INNER = 'inner'
-var COLOR = {};
-COLOR[OUTER] = '#ffeeee';
-COLOR[INNER] = '#ffdddd';
-var COLOR2 = {};
-COLOR2[OUTER] = '#eeeeff';
-COLOR2[INNER] = '#ddddff';
-var COLOR3 = {};
-COLOR3[OUTER] = '#eeffee';
-COLOR3[INNER] = '#ddffdd';
+// OUTER = 'outer'
+// INNER = 'inner'
+// var COLOR = {};
+// COLOR[OUTER] = '#ffeeee';
+// COLOR[INNER] = '#ffdddd';
+// var COLOR2 = {};
+// COLOR2[OUTER] = '#eeeeff';
+// COLOR2[INNER] = '#ddddff';
+// var COLOR3 = {};
+// COLOR3[OUTER] = '#eeffee';
+// COLOR3[INNER] = '#ddffdd';
 
 // Both PaperScript and JavaScript have access to the Window scope, therefore you can use window.globals<code> from the JavaScript and <code>globals<code> from PaperScript to pass information back and forth.
 globals = {};
@@ -104,7 +104,7 @@ function draw_shape(type, config) {
 	}
 
 	var path = null;
-	if (["WhileLoopArea", "AlternativeArea"].includes(type)) {
+	if (["DoLoopArea", "WhileLoopArea", "AlternativeArea"].includes(type)) {
 		// return
 		// path = new Path.Rectangle(new Rectangle(config));
 		// path.strokeColor = 'black';
@@ -150,14 +150,19 @@ function draw_shape(type, config) {
 }
 globals.draw_shape = draw_shape
 
-function main() {
+function paper_init() {
     // console.log("main() started")
 
     // Get a reference to the canvas object
     canvas = document.getElementById('myCanvas');
+	globals.project = project;
+}
+globals.paper_init = paper_init;
+
+
+function main() {
     // Create an empty project and a view for the canvas:
     // setup(canvas);
-
     // algorithm_element_id="36"
     var span1 = $("span[algorithm_element_id='33']").parent()[0];
     var rect1 = span_bbox(span1);
@@ -278,6 +283,9 @@ d = new Diamond([12,15], [0,0, 100,100])
 console.log(d)
 */
 
-console.log("main() is starting ...")
-main();
-console.log("main() completed.")
+console.log("paper is ready ...")
+// console.log("main() is starting ...")
+// main();
+// console.log("main() completed.")
+
+// globals.paper_on_load();

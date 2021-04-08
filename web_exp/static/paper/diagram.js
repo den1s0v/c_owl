@@ -23,8 +23,12 @@ var g_allAlgAreas = {};  // {id -> object}
 var g_allLinks = [];
 
 
-function test() {
+function diagram_init() {
 	draw_shape = window.globals.draw_shape;
+}
+
+function test() {
+	diagram_init();
 
 	// let r = new paper.Rectangle([2,2], [7,7]);
 	// console.log(r);
@@ -906,7 +910,7 @@ class DoLoopArea extends AlgArea {
 		body.rebase(body.slot(90).corner, plug_point);
 		this.links.push(new Link(join_diamond.slot(270), body.slot(90)));
 
-		plug_point = body_out.corner.add(offsetv);
+		plug_point = body.slot(270).corner.add(offsetv);
 
 		// link cond
 		cond.rebase(cond.slot(90).corner, plug_point);
@@ -971,6 +975,9 @@ function create_alg_for(alg_node, parent) {
 	}
 	if (alg_node.type == "while_loop") {
 		a = new WhileLoopArea();
+	}
+	if (alg_node.type == "do_while_loop") {
+		a = new DoLoopArea();
 	}
 	// if (alg_node.type == "sequence") {
 	// 	a = new SequenceArea();
@@ -1084,5 +1091,5 @@ function make_arrow_head(slot) {
 
 
 function on_load() {
-	test();
+	// test();
 }
