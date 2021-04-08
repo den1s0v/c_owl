@@ -9,14 +9,15 @@ const ARROW_WIDTH = LINE_WIDTH * 2.3;
 const ARROW_LENGTH = ARROW_WIDTH * 0.86;
 
 const FONT_SIZE = U * 0.5;
-// get the reference later
-var draw_shape = null;
+const ALLOW_SQUEEZE = true;  // ex. hide borders of single-action sequence
 
 let LBL = {
 	1: "true",
 	0: "false",
 };
 
+// get the reference later
+var draw_shape = null;
 
 var g_allAlgAreas = {};  // {id -> object}
 var g_allLinks = [];
@@ -53,9 +54,18 @@ function test() {
 	// });
 
 	const highlight_color = '#9fb';
-	for (let id of [3,4,5,6,7,8,9,10,11].slice(2, )) {
-		for(let link of get_links_connecting(id, null)) {
-			console.log(link);
+	for (let id of [3,4,5,6,7,8,9,10,11].slice(1, )) {
+	// for (let id of [7]) {
+		let found_links = get_links_connecting(id, null);
+		// let found_links = get_links_connecting(null, id);
+		// if (found_links.length === 0 || !(found_links[0].from.owner instanceof ConditionDiamond))
+		// 	continue;
+		let cond_link = found_links[0] //.from.owner.output_link_by_cond(0);
+		// if (cond_link)
+		for (cond_link of found_links)
+		for(let link of cond_link.search_adjacent_links(null, 0,1))
+		{
+			// console.log(link);
 			link.config.color = highlight_color;
 			for (let diamond of [link.from.owner, link.to.owner])
 				if (diamond instanceof TransitDiamond) {
@@ -92,8 +102,8 @@ function get_links_connecting(from_id, to_id) {
 			(!from_id || link.from.owner.alg_id == from_id) &&
 			(!to_id   || link.to.owner.alg_id   == to_id)
 		) {
-			res.push(...link.search_adjacent_links(to_id, true));
-			// res.push(link);
+			// res.push(...link.search_adjacent_links(to_id, true, true));
+			res.push(link);
 		}
 	}
 	return res;
@@ -220,31 +230,48 @@ class Link {
 		delete this.config.propagate_arrow;
 		// return false;
 	}
-	search_adjacent_links(to_id, can_turn, enter_child) {  /// , backward
+	search_adjacent_links(to_id, can_turn, through_hierarchy) {  /// , backward
 		if (this.to.owner.alg_id === to_id)
 			return [this];
 
-		// let slot_field = backward? "from" : "to";
-		// .slice(-1)[0]
+		// search forward only
 		let found_links = [];
-		let expected_direction = (this.to.direction + 180) % 360;
+		const reversed_direction = this.to.direction;
+		const expected_direction = (reversed_direction + 180) % 360;
+
 		let diamond = this.to.owner;
-		if (enter_child && !(diamond instanceof TransitDiamond))
+
+		// if first
+		if (through_hierarchy && diamond && !(diamond instanceof TransitDiamond)) {
+			// console.debug("Moving  deeper:", diamond)
 			diamond = diamond.inner[0];
-		if (diamond instanceof TransitDiamond) {
-			// diamond.actualize_config();
-			for (let d in diamond.slots) {
-				if (!can_turn && d != expected_direction)
-					continue;
-				let slot = diamond.slots[d];
-				for (let link of slot.links_out) {
-					found_links.push(...link.search_adjacent_links(to_id, can_turn));
-				}
-			} /// else console.log("Not hidden")
-		} /// else console.log("Not TransitDiamond:", this.to.owner)
+			// console.debug("diamond deeper:", diamond)
+		} ///else console.debug("not TransitDiamond (3):", diamond)
+
+		// const in_slots = this.from.owner.find_slots('in');
+		if (diamond) {
+			const out_slots = diamond.find_slots('out');
+			if (diamond instanceof TransitDiamond || through_hierarchy && (
+				// if last
+				Object.values(out_slots).includes(this.to)
+				// Object.values(in_slots).includes(this.from) ||
+				)) {
+				// console.debug(".search_adjacent_links():", diamond)
+				for (let d in out_slots) {
+					if (!can_turn && d != expected_direction && d != reversed_direction)  // reversed_direction ??
+						continue;
+					// let slot = diamond.slots[d];
+					let slot = out_slots[d];
+					for (let link of slot.links_out) {
+						found_links.push(...link.search_adjacent_links(to_id, can_turn, through_hierarchy));
+					}
+				} /// else console.log("Not hidden")
+			} /// else console.log("Not TransitDiamond:", this.to.owner)
+		}
 		// anything is valid if no target specified
 		if (found_links.length > 0 || !to_id)
 			found_links.unshift(this);
+		// console.debug(".search_adjacent_links():", found_links)
 		return found_links;
 	}
 	draw() {
@@ -304,10 +331,12 @@ class Location {
 }
 
 class Slot extends Location {
-	constructor(corner, direction, owner) {
+	constructor(corner, direction, owner, role) {
 		super(corner, [0, 0]);
 		this.direction = direction;  // 0 90 180 270
 		this.owner = owner;
+		console.assert(role);
+		this.role = role;
 		this.links_in  = [];
 		this.links_out = [];
 	}
@@ -316,37 +345,42 @@ class Slot extends Location {
 	}
 	clone() {
 		// do not copy owner and links !
-		return new Slot(this.corner, this.direction, null);
+		return new Slot(this.corner, this.direction, null, this.role);
 	}
 }
 
 class AlgArea extends Location {
-	constructor(corner, config) {
+	constructor(corner, config, parent) {
 		super(corner);
 		this.inner = [];
 		this.slots = {};  // {angle: Slot_obj}
 		this.links = [];
+		this.parent = parent;
 		this.config = config || {};
 		this.alg_id = false;    // assigned in create_alg_for()
 		this.alg_name = false;  // assigned in create_alg_for()
 	}
-	slot(direction) {  // getter & default creator
+	slot(direction, role) {  // getter & default creator
 		if (!this.slots[direction])
-			return this.create_slot(direction);
+			return this.create_slot(direction, null, role);
 		return this.slots[direction];
 	}
-	create_slot(direction, foreign_slot) {  // creator
+	create_slot(direction, foreign_slot, role) {  // creator
 		if (foreign_slot) {
 			// adapt slot created for other node
 			let slot = foreign_slot.clone();
 			slot.owner = this;
+			if (role) slot.role = role;
 			this.slots[direction] = slot;
 			return slot;
 		} else {
-			return this._create_side_slot(direction);
+			return this._create_side_slot(direction, role);
 		}
 	}
-	_create_side_slot(direction) {  // creator
+	_guess_slot_role(direction) {  // returns "in" or "out"
+		return ([0, 270].includes(direction))? "out" : "in";
+	}
+	_create_side_slot(direction, role) {  // creator
 		// create a new slot at middle of bbox side
 		const bbox = this.bbox();
 		let point = null;
@@ -354,7 +388,12 @@ class AlgArea extends Location {
 		else if (270 === direction) point = bbox.bottomCenter;
 		else if (  0 === direction) point = bbox.rightCenter;
 		else if (180 === direction) point = bbox.leftCenter;
-		let slot = new Slot(point, direction, this);
+		if (!role) {
+			role = this._guess_slot_role(direction);
+			if ([0,180].includes(direction))
+				console.debug("fallback slot role to:", role, "for direction", direction, ", for object:", this);
+		}
+		let slot = new Slot(point, direction, this, role);
 		this.slots[direction] = slot;
 		return slot;
 	}
@@ -362,23 +401,33 @@ class AlgArea extends Location {
 		if (this.slots[preferred_direction] || in_out == "whole")
 			return this.slot(preferred_direction);
 
-		var links_field = null;
+		let found_slots = this.find_slots(in_out);
 		if (in_out.includes('in')) {
-			links_field = "links_in";
 			preferred_direction = 90;
-		} else if (in_out.includes('out')) {
-			links_field = "links_out";
-			preferred_direction = 270;
 		} else {
-			console.warn("*.find_slot(): bad in_out parameter");
+			preferred_direction = 270;
 		}
-		for (let d in this.slots) {
-			if (this.slots[d][links_field].length > 0)  // not empty
-				return this.slots[d];
-			/// else console.log(d, "does not suit for", in_out);
+		for (let d in found_slots) {
+			return found_slots[d];
 		}
 		// use default
 		return this.slot(preferred_direction);
+	}
+	find_slots(in_out) {
+		let found_slots = {}
+		// let links_field = null;
+		// if (in_out.includes('in')) {
+		// 	links_field = "links_in";
+		// } else if (in_out.includes('out')) {
+		// 	links_field = "links_out";
+		// } else {
+		// 	console.warn("*.find_slots(): bad in_out parameter:", in_out);
+		// }
+		for (let d in this.slots) {
+			if (this.slots[d].role == in_out)  // direct comparison
+				found_slots[d] = (this.slots[d]);
+		}
+		return found_slots;
 	}
 	bbox() {
 		return new paper.Rectangle(this.corner, this.size);
@@ -458,21 +507,26 @@ class AlgArea extends Location {
 }
 
 class TransitDiamond extends AlgArea {  // links connection
-	constructor(corner, config) {
-		super(corner, config);
+	constructor(corner, parent, config) {
+		super(corner, config, parent);
 		this.side = LINE_WIDTH / 2;
 		// leave zero size -- ???
 		this.size = new paper.Size(0, 0);
 		// this.config.hidden = true;
 		// this.config.color = 'red';
 	}
-	_create_side_slot(direction) {  // creator
+	_create_side_slot(direction, role) {  // creator
 		let point = null;
 		if (90 === direction) 		point = this.corner.add([0, -this.side]);
 		else if (270 === direction) point = this.corner.add([0,  this.side]);
 		else if (  0 === direction) point = this.corner.add([ this.side, 0]);
 		else if (180 === direction) point = this.corner.add([-this.side, 0]);
-		let slot = new Slot(point, direction, this);
+		if (!role) {
+			role = this._guess_slot_role(direction);
+			if ([0,180].includes(direction))
+				console.debug("fallback slot role to:", role, "for direction", direction, ", for object:", this);
+		}
+		let slot = new Slot(point, direction, this, role);
 		this.slots[direction] = slot;
 		return slot;
 	}
@@ -516,15 +570,20 @@ class SequenceArea extends AlgArea {
 		if (alg_node.body.length === 1) {
 			// short laconic mode: equal to only one child
 			let st = alg_node.body[0];
-			node = create_alg_for(st);
+			node = create_alg_for(st, this);
+
+			// input of whole node
+			this.create_slot(90, node.slot(90));
+
+			this.links.push(new Link(this.slot(90), node.slot(90)));
 
 			node.rebase(node.corner, plug_point);
 			this.inner.push(node);
 
-			// input of whole node
-			this.create_slot(90, node.slot(90));
 			// output of whole node
 			this.create_slot(270, node.slot(270));
+
+			this.links.push(new Link(node.slot(270), this.slot(270)));
 
 			this.size = node.size.clone();
 			return;
@@ -534,18 +593,20 @@ class SequenceArea extends AlgArea {
 		const offset = new paper.Point(0, sep);
 		let current_slot = null;
 
-		/// begin of whole node
-		node = new TransitDiamond(plug_point);
-		this.inner.push(node);
 		// input of whole node
-		this.create_slot(90, node.slot(90));
+		let diamond = new TransitDiamond(plug_point, this);
+		this.inner.push(diamond);
+		this.create_slot(90, diamond.slot(90));
+		// connect through
+		this.links.push(new Link(this.slot(90), diamond.slot(90)));
 
-		let last_slot = node.slot(270);
+
+		let last_slot = diamond.slot(270);
 		plug_point = plug_point.add(offset);
 
 		// add all as vertial stack and align each by X coordinate
 		for (let st of alg_node.body) {
-			node = create_alg_for(st);
+			node = create_alg_for(st, this);
 			if (node) {
 				const current_slot = node.slot(90);
 				// link a stmt
@@ -561,15 +622,16 @@ class SequenceArea extends AlgArea {
 		}
 
 		/// add visual begin/end mark
-		node = new TransitDiamond(plug_point, {hidden: true})
-		this.inner.push(node);
-		current_slot = node.slot(90);
+		diamond = new TransitDiamond(plug_point, this, {hidden: true})
+		this.inner.push(diamond);
+		current_slot = diamond.slot(90);
 		// link end of sequence
 		this.links.push(new Link(last_slot, current_slot));
-		// const current_slot = new Slot(plug_point, 270);
 
 		// output of whole node
-		this.create_slot(270, node.slot(270));
+		this.create_slot(270, diamond.slot(270));
+		// connect through
+		this.links.push(new Link(diamond.slot(270), this.slot(270)));
 
 		this.actualize_rect();
 	}
@@ -585,6 +647,17 @@ class ConditionDiamond extends AlgArea {  // two slots vertically
 		const h = U * 1;
 		this.size = new paper.Size(w, h);
 	}
+	output_link_by_cond(cond_val) {
+		cond_val = cond_val? 1 : 0;
+		const text = LBL[cond_val];
+		let found_slots = this.find_slots('out');
+		for (let d in found_slots) {
+			let link = found_slots[d].links_out[0];
+			if (link.config.text === text)
+				return link;
+		}
+		return null;
+	}
 }
 
 class AlternativeArea extends AlgArea {
@@ -598,15 +671,21 @@ class AlternativeArea extends AlgArea {
 		let plug_point = this.corner;
 		// let node = null;
 		let branch = null;
+		let input_diamond = null;
+
+		// make the input of whole node
+		input_diamond = new TransitDiamond(null, this);
+		this.inner.push(input_diamond);
 
 		// size occupied by all branches - to be found
 		let branches_area = new paper.Rectangle(this.corner, [0,0]);
 
 		// align all branches hor centered, and get max size
 		for (let st of alg_node.branches) {
-			branch = create_alg_for(st);
+			branch = create_alg_for(st, this);
 			if (branch) {
 				this.branches.push(branch)
+				if (branch.cond) this.inner.push(branch.cond);
 				this.inner.push(branch);
 
 				let branch_bbox = branch.bbox();
@@ -622,13 +701,12 @@ class AlternativeArea extends AlgArea {
 
 		// position all condition diamonds above their branches
 		let last_cond = null;
-		let input_diamond = null;
 		let join_diamond = null;
 		let output_diamond = null;
 		for (branch of this.branches) {
 			if (branch.cond) {
 				// link cond with its branch
-				this.inner.push(branch.cond);
+				// this.inner.push(branch.cond);
 				this.links.push(new Link(branch.cond.slot(270), branch.slot(90), {text: LBL[1], propagate_arrow: true}));
 
 				// position the cond
@@ -641,12 +719,12 @@ class AlternativeArea extends AlgArea {
 
 				if (!last_cond) {
 					// the first (IF) branch is currently processed
-					// make the input of whole node
 					plug_point = branch.cond.slot(90).corner.subtract(offsetv);
-					input_diamond = new TransitDiamond(plug_point);
-					this.inner.push(input_diamond);
+					input_diamond.rebase(plug_point);
 					// input of whole node
 					this.create_slot(90, input_diamond.slot(90));
+					// connect through
+					this.links.push(new Link(this.slot(90), input_diamond.slot(90)));
 
 					// link input to the first cond
 					let cond_slot = branch.cond.slot(90);
@@ -664,13 +742,16 @@ class AlternativeArea extends AlgArea {
 
 					// make the output of whole node
 					plug_point = join_diamond.slot(270).corner.add(offsetv);
-					output_diamond = new TransitDiamond(plug_point);
+					output_diamond = new TransitDiamond(plug_point, this);
 					this.inner.push(output_diamond);
 					// output of whole node
 					this.create_slot(270, output_diamond.slot(270));
 
 					// link join_diamond to the output
 					this.links.push(new Link(join_diamond.slot(270), output_diamond.slot(90)));
+
+					// connect end through
+					this.links.push(new Link(output_diamond.slot(270), this.slot(270)));
 				} else {
 					// some "else-if" branch is currently processed
 
@@ -689,7 +770,7 @@ class AlternativeArea extends AlgArea {
 				this.links.push(new Link(last_cond.slot(0), branch.slot(90), {text: LBL[0], arrow: true}));
 
 				// link current branch to the join_diamond
-				this.links.push(new Link(branch.slot(270), join_diamond.slot(0), {arrow: true}));
+				this.links.push(new Link(branch.slot(270), join_diamond.slot(0, "in"), {arrow: true}));
 			}
 		}
 		if (branch.cond) {
@@ -697,12 +778,12 @@ class AlternativeArea extends AlgArea {
 			// link from prev cond to the join_diamond
 			const cond_slot = last_cond.slot(0);
 
-			const helper_vertex = new TransitDiamond(new paper.Point(branch.bbox().rightCenter.add(offseth)), {hidden: true});
+			const helper_vertex = new TransitDiamond(new paper.Point(branch.bbox().rightCenter.add(offseth)), this, {hidden: true});
 			this.inner.push(helper_vertex);
 
 			// link from prev cond to the join_diamond
 			this.links.push(new Link(cond_slot, helper_vertex.slot(90), {text: LBL[0]}));
-			this.links.push(new Link(helper_vertex.slot(270), join_diamond.slot(0), {arrow: true}));
+			this.links.push(new Link(helper_vertex.slot(270), join_diamond.slot(0, "in"), {arrow: true}));
 
 		}
 
@@ -713,25 +794,26 @@ class AlternativeArea extends AlgArea {
 class WhileLoopArea extends AlgArea {
 	fit(alg_node) {
 
-		const cond = create_alg_for(alg_node.cond);
-		const body = create_alg_for(alg_node.body);
-
-		this.inner.push(cond);
-		this.inner.push(body);
-
 		const seph = U * 1.0;
 		const sepv = U * 0.6;
 		const offseth = new paper.Point(seph, 0);
 		const offsetv = new paper.Point(0, sepv);
-		let plug_point = this.corner;
 		let current_slot = null;
+		let plug_point = this.corner;
+		plug_point = plug_point.add(offsetv);
 
-		const input_diamond = new TransitDiamond(plug_point);
+		const input_diamond = new TransitDiamond(plug_point, this);
 		this.inner.push(input_diamond);
 		// input of whole node
 		this.create_slot(90, input_diamond.slot(90));
+		// connect through
+		this.links.push(new Link(this.slot(90), input_diamond.slot(90)));
 
-		plug_point = plug_point.add(offsetv);
+		const cond = create_alg_for(alg_node.cond, this);
+		const body = create_alg_for(alg_node.body, this);
+
+		this.inner.push(cond);
+		this.inner.push(body);
 
 		// link cond
 		cond.rebase(cond.slot(90).corner, plug_point);
@@ -746,40 +828,115 @@ class WhileLoopArea extends AlgArea {
 		const body_bbox = body.bbox();
 
 		// link up to cond by left side ...
-		const helper_vertex_left = new TransitDiamond(new paper.Point(body_bbox.topLeft.subtract(offseth)), {hidden: true});
+		const helper_vertex_left = new TransitDiamond(new paper.Point(body_bbox.topLeft.subtract(offseth)), this, {hidden: true});
 		this.inner.push(helper_vertex_left);
 
 		// rotate body's output lo left
 		/// ???
-		let body_out = body.slot(270);
+		let body_out = body.slot(270, "out");
 		body_out.direction = 180;
 
 		// link from body to cond
-		this.links.push(new Link(body_out, helper_vertex_left.slot(270)));
-		this.links.push(new Link(helper_vertex_left.slot(90), cond.slot(180), {arrow: true}));
+		this.links.push(new Link(body_out, helper_vertex_left.slot(270, "in")));
+		this.links.push(new Link(helper_vertex_left.slot(90, "out"), cond.slot(180), {arrow: true}));
 
 		plug_point = body_out.corner.add(offsetv);
 
-		const join_diamond = new TransitDiamond(plug_point);
+		const join_diamond = new TransitDiamond(plug_point, this);
 		this.inner.push(join_diamond);
 
 		// link down to join_diamond by right side ...
-		const helper_vertex_right = new TransitDiamond(new paper.Point(body_bbox.bottomRight.add(offseth)), {hidden: true});
+		const helper_vertex_right = new TransitDiamond(new paper.Point(body_bbox.bottomRight.add(offseth)), this, {hidden: true});
 		this.inner.push(helper_vertex_right);
 
 		// link from cond to the join_diamond
 		this.links.push(new Link(cond.slot(0), helper_vertex_right.slot(90), {text: LBL[0]}));
-		this.links.push(new Link(helper_vertex_right.slot(270), join_diamond.slot(0), {arrow: true}));
+		this.links.push(new Link(helper_vertex_right.slot(270), join_diamond.slot(0, "in"), {arrow: true}));
 
 		plug_point = plug_point.add(offsetv);
 
-		const output_diamond = new TransitDiamond(plug_point);
+		const output_diamond = new TransitDiamond(plug_point, this);
 		this.inner.push(output_diamond);
 		// output of whole node
 		this.create_slot(270, output_diamond.slot(270));
+		// connect end through
+		this.links.push(new Link(output_diamond.slot(270), this.slot(270)));
 
 		// link join_diamond to the output
 		this.links.push(new Link(join_diamond.slot(270), output_diamond.slot(90)));
+
+		this.actualize_rect();
+	}
+}
+
+class DoLoopArea extends AlgArea {
+	fit(alg_node) {
+
+		const seph = U * 1.0;
+		const sepv = U * 0.6;
+		const offseth = new paper.Point(seph, 0);
+		const offsetv = new paper.Point(0, sepv);
+		let current_slot = null;
+		let plug_point = this.corner;
+		plug_point = plug_point.add(offsetv);
+
+		const input_diamond = new TransitDiamond(plug_point, this);
+		this.inner.push(input_diamond);
+		// input of whole node
+		this.create_slot(90, input_diamond.slot(90));
+		// connect through
+		this.links.push(new Link(this.slot(90), input_diamond.slot(90)));
+
+		const cond = create_alg_for(alg_node.cond, this);
+		const body = create_alg_for(alg_node.body, this);
+
+		this.inner.push(cond);
+		this.inner.push(body);
+
+		plug_point = plug_point.add(offsetv);
+
+		// upper join_diamond, above the body
+		const join_diamond = new TransitDiamond(plug_point, this);
+		this.inner.push(join_diamond);
+		this.links.push(new Link(input_diamond.slot(270), join_diamond.slot(90)));
+
+		plug_point = plug_point.add(offsetv);
+
+		// link body
+		body.rebase(body.slot(90).corner, plug_point);
+		this.links.push(new Link(join_diamond.slot(270), body.slot(90)));
+
+		plug_point = body_out.corner.add(offsetv);
+
+		// link cond
+		cond.rebase(cond.slot(90).corner, plug_point);
+		this.links.push(new Link(body.slot(270), cond.slot(90)));
+
+		const body_bbox = body.bbox();
+
+		// link up to cond by left side ...
+		const helper_vertex_left = new TransitDiamond(new paper.Point(body_bbox.topLeft.subtract(offseth)), this, {hidden: true});
+		this.inner.push(helper_vertex_left);
+
+		// link from cond to join_diamond
+		this.links.push(new Link(cond.slot(180, "out"), helper_vertex_left.slot(270, "in"), {text: LBL[1]}));
+		this.links.push(new Link(helper_vertex_left.slot(90, "out"), join_diamond.slot(180), {arrow: true}));
+
+		plug_point = cond.slot(270).corner.add(offsetv);
+
+		/// // add one more diamond to connect break arrow to ? ...
+		/// ...
+		/// plug_point = plug_point.add(offsetv);
+
+		const output_diamond = new TransitDiamond(plug_point, this);
+		this.inner.push(output_diamond);
+		// output of whole node
+		this.create_slot(270, output_diamond.slot(270));
+		// connect end through
+		this.links.push(new Link(output_diamond.slot(270), this.slot(270)));
+
+		// link join_diamond to the output
+		this.links.push(new Link(cond.slot(270), output_diamond.slot(90), {text: LBL[0]}));
 
 		this.actualize_rect();
 	}
@@ -794,13 +951,13 @@ class BoxArea extends AlgArea {
 }
 
 
-function create_alg_for(alg_node) {
+function create_alg_for(alg_node, parent) {
 	let a = null;
 	if (["sequence", "if", "else", "else-if"].includes(alg_node.type)) {
 		a = new SequenceArea();
 		if (alg_node.cond) {
 			// the sequence is alternative branch
-			a.cond = create_alg_for(alg_node.cond);
+			a.cond = create_alg_for(alg_node.cond, parent);
 		}
 	}
 	if (alg_node.type == "stmt") {
@@ -823,10 +980,14 @@ function create_alg_for(alg_node) {
 		// more config
 		a.alg_id = alg_node.id;
 		a.alg_name = alg_node.name;
+		if (parent) {
+			/// console.log("parent", parent)
+			a.parent = parent;
+		}
 		// store globally
 		if (a.alg_id !== undefined) {
 			g_allAlgAreas[a.alg_id] = a;
-			/// console.debug(a.alg_id)
+			console.debug(a.alg_id, '  \t- ', a.alg_name)
 		}
 		// create a tree for alg_node
 		a.fit(alg_node);
@@ -840,6 +1001,11 @@ function create_alg_for(alg_node) {
 // helpers
 
 function connection_segments(from, to, config) {
+
+	if (to.corner.getDistance(from.corner) < 1) {
+		// link should not be shown
+		return [];
+	}
 
 	let end = to.corner
 	if (config.arrow && !to.owner.config.hidden) {

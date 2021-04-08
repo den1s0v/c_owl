@@ -50,6 +50,16 @@ function draw_around(rectangle, inner_color, outer_color) {
     return rectangle;
 }
 
+function PathDiamond(rect) {
+	path = new Path();
+	path.add(rect.topCenter);
+	path.add(rect.rightCenter);
+	path.add(rect.bottomCenter);
+	path.add(rect.leftCenter);
+	path.closePath()
+	return path;
+}
+
 function draw_shape(type, config) {
 	// if (["arrow"].includes(type)) {
 	// 	path = new Path(config);
@@ -116,27 +126,17 @@ function draw_shape(type, config) {
 		path.fillColor = 'yellow';
 	}
 	else if ("ConditionDiamond" === type) {
-		config = new Rectangle(config)
-		path = new Path();
-		path.add(config.topCenter);
-		path.add(config.rightCenter);
-		path.add(config.bottomCenter);
-		path.add(config.leftCenter);
-		path.closePath()
+		path = PathDiamond(new Rectangle(config));
 		path.fillColor = 'grey';
 	}
 	else if ("TransitDiamond" === type) {
-		path = new Path.Rectangle(config.rectangle);
-		// config = new Rectangle(config)
-		// path = new Path();
-		// path.add(config.topCenter);
-		// path.add(config.rightCenter);
-		// path.add(config.bottomCenter);
-		// path.add(config.leftCenter);
-		// path.closePath()
+		// path = new Path.Rectangle(config.rectangle);
 		if (config.hidden) {
+			path = PathDiamond(config.rectangle);
 			path.fillColor = config.color || 'lightgrey';
+			// path.strokeColor = 'grey'; ///
 		} else {
+			path = new Path.Rectangle(config.rectangle);
 			path.fillColor = 'white';
 			path.strokeColor = 'grey';
 		}
