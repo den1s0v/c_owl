@@ -111,6 +111,20 @@
 	 (?b rdf:type my:UpcomingNeighbour),
 ]
 
+# Rule: UpcomingNeighbour-find-all-missing-Error [mistake]
+[
+	 (?b rdf:type my:UpcomingNeighbour),
+	(?a my:student_next ?b),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+#	prevent match before algorithm is prepared (if this rule is mixed with algorithm processing rules)!
+	(?bx   my:has_upcoming ?some),
+	(?some my:has_upcoming ?by),
+	 ->
+# connecting boundary, not action !
+	 (?b my:should_be_after ?some),
+]
+
 # Rule: NotNeighbour-not-cond-Error [mistake]
 [
 	(?b rdf:type my:WrongNext),
@@ -210,7 +224,7 @@
 	 ->
 	 (?b rdf:type my:WrongCondNeighbour),
 	 (?b my:should_be ?some_st),
-	 (?b my:precursor ?a),
+	 (?b my:has_causing_condition ?a),
 ]
 # Rule: WrongCondNeighbour-whenTrue-Error [mistake]
 [
@@ -228,7 +242,7 @@
 	 ->
 	 (?b rdf:type my:WrongCondNeighbour),
 	 (?b my:should_be ?some_st),
-	 (?b my:precursor ?a),
+	 (?b my:has_causing_condition ?a),
 ]
 
 
@@ -244,7 +258,7 @@
 	 ->
 	 (?b rdf:type my:WrongCondNeighbour),
 	 (?b my:should_be ?some_st),
-	 (?b my:precursor ?a),
+	 (?b my:has_causing_condition ?a),
 ]
 # Rule: WrongCondNeighbour-whenFalse-Error [mistake]
 [
@@ -262,7 +276,7 @@
 	 ->
 	 (?b rdf:type my:WrongCondNeighbour),
 	 (?b my:should_be ?some_st),
-	 (?b my:precursor ?a),
+	 (?b my:has_causing_condition ?a),
 ]
 
 # Rule: NotNeighbour-cond-Error [mistake]

@@ -1234,7 +1234,7 @@ def init_persistent_structure(onto):
                     make_triple(created_class, error_priority, priority)
 
 
-        for prop_name in ("precursor", "cause", "cause2", "should_be", "should_be_before", "should_be_after", "context_should_be"):
+        for prop_name in ("precursor", "cause", "has_causing_condition", "should_be", "should_be_before", "should_be_after", "context_should_be"):
             if not onto[prop_name]:
                 types.new_class(prop_name, (onto["Erroneous"] >> Thing,))
 
