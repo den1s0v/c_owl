@@ -106,15 +106,15 @@ function draw_shape(type, config) {
 	var path = null;
 	if (["DoLoopArea", "WhileLoopArea", "AlternativeArea"].includes(type)) {
 		// return
-		// path = new Path.Rectangle(new Rectangle(config));
-		// path.strokeColor = 'black';
-		// path.dashArray = [10, 10];
+		path = new Path.Rectangle(new Rectangle(config));
+		path.strokeColor = '#0006';
+		path.dashArray = [10, 10];
 	}
 	else if (type === "SequenceArea") {
 		return
-		// path = new Path.Rectangle(new Rectangle(config));
-		// path.strokeColor = 'black';
-		// path.dashArray = [10, 10];
+		path = new Path.Rectangle(new Rectangle(config));
+		path.strokeColor = '#0006';
+		path.dashArray = [3, 3];
 	}
 	else if (type === "BoxArea") {
 		path = new Path.Rectangle(new Rectangle(config), 5);

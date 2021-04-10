@@ -3,7 +3,7 @@
 const U = 24;  // Unit of length, in pixels (scale base)
 
 const LINE_WIDTH = U * 0.33;
-const ANGLE_OFFSET = U * 0.4;  // sorten right angles
+const ANGLE_OFFSET = LINE_WIDTH * 0.95;  // sorten right angles
 
 const ARROW_WIDTH = LINE_WIDTH * 2.3;
 const ARROW_LENGTH = ARROW_WIDTH * 0.86;
@@ -476,22 +476,28 @@ class AlgArea extends Location {
 	}
 	draw_self() {
 		draw_shape(this.constructor.name, this.position_self());
-		/// debug
-		return
-		if (this.alg_name)
-			draw_shape("text", {
-				point: this.corner,
-				content: this.alg_name,
-				justification: 'right',
-				// fillColor: '#f48',
-				// // fontFamily: 'Courier New',
-				// fontWeight: 'bold',
-				// fontSize: FONT_SIZE,
-				// // Set the shadow color of the circle to RGB black:
-				// shadowColor: "white",
-				// // Set the shadow blur radius to 12:
-				// shadowBlur: 12,
-			});
+		/// debug return
+		if (this.name_visible && this.alg_name)
+			this.draw_name()
+	}
+	draw_name() {
+		const slot_in = this.find_slot("in");
+		let point = slot_in.corner;
+		draw_shape("text", {
+			// point: this.corner,
+			// point: [this.corner.x + this.size.width - 2, this.corner.y + FONT_SIZE],
+			point: [point.x + LINE_WIDTH, point.y + FONT_SIZE * 1.3],
+			content: this.alg_name,
+			justification: 'left',
+			// fillColor: '#f48',
+			// // fontFamily: 'Courier New',
+			// fontWeight: 'bold',
+			// fontSize: FONT_SIZE,
+			// // Set the shadow color of the circle to RGB black:
+			// shadowColor: "white",
+			// // Set the shadow blur radius to 12:
+			// shadowBlur: 12,
+		});
 	}
 	position_self() {
 		return this.bbox();
@@ -644,6 +650,7 @@ class SequenceArea extends AlgArea {
 class ConditionDiamond extends AlgArea {  // two slots vertically
 	constructor(corner) {
 		super(corner);
+		this.name_visible = true;
 	}
 	fit(alg_node) {
 		// this.alg_node = alg_node;  // ???
@@ -662,10 +669,27 @@ class ConditionDiamond extends AlgArea {  // two slots vertically
 		}
 		return null;
 	}
+	draw_name() {
+		draw_shape("text", {
+			// point: this.corner,
+			point: [this.corner.x + this.size.width/2, this.corner.y + this.size.height/2 + FONT_SIZE/3],
+			content: "?",
+			justification: 'center',
+			// fillColor: '#f48',
+			// // fontFamily: 'Courier New',
+			// fontWeight: 'bold',
+			// fontSize: FONT_SIZE,
+			// // Set the shadow color of the circle to RGB black:
+			// shadowColor: "white",
+			// // Set the shadow blur radius to 12:
+			// shadowBlur: 12,
+		});
+	}
 }
 
 class AlternativeArea extends AlgArea {
 	fit(alg_node) {
+		this.name_visible = true;
 		this.branches = []
 
 		const seph = U * 1.0;
@@ -797,14 +821,14 @@ class AlternativeArea extends AlgArea {
 
 class WhileLoopArea extends AlgArea {
 	fit(alg_node) {
-
-		const seph = U * 1.0;
+		this.name_visible = true;
+		const seph = U * 1.4;
 		const sepv = U * 0.6;
 		const offseth = new paper.Point(seph, 0);
 		const offsetv = new paper.Point(0, sepv);
 		let current_slot = null;
 		let plug_point = this.corner;
-		plug_point = plug_point.add(offsetv);
+		// plug_point = plug_point.add(offsetv);
 
 		const input_diamond = new TransitDiamond(plug_point, this);
 		this.inner.push(input_diamond);
@@ -812,6 +836,8 @@ class WhileLoopArea extends AlgArea {
 		this.create_slot(90, input_diamond.slot(90));
 		// connect through
 		this.links.push(new Link(this.slot(90), input_diamond.slot(90)));
+
+		plug_point = plug_point.add(offsetv);
 
 		const cond = create_alg_for(alg_node.cond, this);
 		const body = create_alg_for(alg_node.body, this);
@@ -834,17 +860,18 @@ class WhileLoopArea extends AlgArea {
 		// link up to cond by left side ...
 		const helper_vertex_left = new TransitDiamond(new paper.Point(body_bbox.topLeft.subtract(offseth)), this, {hidden: true});
 		this.inner.push(helper_vertex_left);
+		const helper_vertex_bottom = new TransitDiamond(new paper.Point(body_bbox.bottomLeft.add(offsetv)), this, {hidden: true});
+		this.inner.push(helper_vertex_bottom);
 
-		// rotate body's output lo left
-		/// ???
 		let body_out = body.slot(270, "out");
-		body_out.direction = 180;
 
 		// link from body to cond
-		this.links.push(new Link(body_out, helper_vertex_left.slot(270, "in")));
+		this.links.push(new Link(body_out, helper_vertex_bottom.slot(0, "in")));
+		this.links.push(new Link(helper_vertex_bottom.slot(180, "out"), helper_vertex_left.slot(270, "in")));
 		this.links.push(new Link(helper_vertex_left.slot(90, "out"), cond.slot(180), {arrow: true}));
 
 		plug_point = body_out.corner.add(offsetv);
+		plug_point = plug_point.add(offsetv);
 
 		const join_diamond = new TransitDiamond(plug_point, this);
 		this.inner.push(join_diamond);
@@ -875,14 +902,13 @@ class WhileLoopArea extends AlgArea {
 
 class DoLoopArea extends AlgArea {
 	fit(alg_node) {
-
-		const seph = U * 1.0;
-		const sepv = U * 0.6;
+		this.name_visible = true;
+		const seph = U * 1.1;
+		const sepv = U * 0.5;
 		const offseth = new paper.Point(seph, 0);
 		const offsetv = new paper.Point(0, sepv);
 		let current_slot = null;
 		let plug_point = this.corner;
-		plug_point = plug_point.add(offsetv);
 
 		const input_diamond = new TransitDiamond(plug_point, this);
 		this.inner.push(input_diamond);
@@ -951,6 +977,7 @@ class BoxArea extends AlgArea {
 	fit(alg_node) {
 		// this.alg_node = alg_node;  // ???
 		this.size = new paper.Size(U * 2, U * 0.81);
+		// this.name_visible = true;
 	}
 }
 
