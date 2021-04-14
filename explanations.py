@@ -860,7 +860,7 @@ def register_explanation_handlers():
 
 
 				# start_with_cond
-	spec = """LoopStartIsNotCondition Цикл-начался-не-с-проверки-условия	Цикл <WHILE/FOREACH> является циклом с предусловием. Поэтому начать цикл <A> следует с проверки условия <B>.	The <WHILE/FOREACH> loop is a preconditioned. So the loop <A> should first evaluate its condition <B>."""
+	spec = """LoopStartIsNotCondition Цикл-начался-не-с-проверки-условия	Цикл <WHILE/FOREACH> является циклом с предусловием. Поэтому начать цикл <A> следует с проверки условия <B>.	The <WHILE/FOREACH> loop is preconditioned. So the loop <A> should first evaluate its condition <B>."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -915,7 +915,7 @@ def register_explanation_handlers():
 
 
 				# body_then_cond
-	spec = """NoConditionAfterIteration Нет-проверки-условия	После очередной итерации цикла <WHILE/DO/FOREACH> нужно вычислить условие цикла, чтобы решить, продолжать ли цикл или закончить его. После итерации цикла <A> следует вычислить условие <B>.	After an iteration of the <WHILE/DO/FOREACH> loop, its condition must be evaluated to determine whether to continue the loop or finish it. After the iteration of loop <A>, its condition <B> should be evaluated."""
+	spec = """NoConditionAfterIteration Нет-проверки-условия	После итерации цикла <WHILE/DO/FOREACH> нужно решить, продолжать ли цикл или закончить его. После итерации цикла <A> следует вычислить условие <B>.	After an iteration of the <WHILE/DO/FOREACH> loop, its condition must be evaluated to determine whether to continue the loop or finish it. After the iteration of loop <A>, its condition <B> should be evaluated."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -1041,7 +1041,7 @@ def register_explanation_handlers():
 
 
 				# ForLoop
-	spec = """UpdateNotAfterIteration Нет-перехода-после-итерации-цикла-FOR	Цикл FOR имеет команду инкремента, которая обновляет значение переменной цикла.  Переход <B> следует выполнять только после итерации цикла <A>.	The FOR loop has an increment command that updates the loop variable. After iteration of the loop <A> its update command <B> should be executed. The update command <B> should only be executed after the iteration of the loop <A>."""
+	spec = """UpdateNotAfterIteration Нет-перехода-после-итерации-цикла-FOR	Цикл FOR имеет команду инкремента, которая обновляет значение переменной цикла.  Переход <B> следует выполнять только после итерации цикла <A>.	The FOR loop has an increment command that updates the loop variable. The update command <B> should only be executed after the iteration of the loop <A>."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
@@ -1090,7 +1090,7 @@ def register_explanation_handlers():
 
 
 				# ForeachLoop
-	spec = """NoForeachUpdateAfterSuccessfulCondition Нет-перехода-после-условия-цикла-FOREACH	Цикл FOREACH обходит коллекцию или перебирает итератор, и при наличии очередного элемента должен перейти к этому элементу. Так как проверка на следующий элемент успешна (истина), следует получить очередной элемент и начать итерацию цикла <B>.	The FOREACH loop traverses a collection or iterates over an iterator and, if the next element is present, should go to that element. Since the check for the next element is successful (true), the next element should be retrieved and the iteration of the <B> loop should begin."""
+	spec = """NoForeachUpdateAfterSuccessfulCondition Нет-перехода-после-условия-цикла-FOREACH	Цикл FOREACH обходит коллекцию или перебирает итератор, переходя к очередному элементу при его наличии. Так как проверка на следующий элемент успешна (условие истинно), следует получить очередной элемент и начать итерацию цикла <B>.	The FOREACH loop traverses a collection or iterates over an iterator and proceeds to the next element is one exists. Since the check for the next element is successful (the condition is true), the next element should be retrieved and the iteration of the <B> loop should begin."""
 	class_name, format_str = class_formatstr(spec.split('\t'))
 
 	def _param_provider(a: 'act_instance'):
