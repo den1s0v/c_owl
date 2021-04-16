@@ -132,7 +132,7 @@
 	(?a my:executes ?bx),
 	(?b my:executes ?by),
 #	a is not condition
-	(?bx my:only_consequent ?some_bnd),
+	(?bx my:always_consequent ?some_bnd),
 #	noValue(?a my:type my:expr),
 #	check it
 	noValue(?bx my:has_upcoming ?by),

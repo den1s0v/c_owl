@@ -931,7 +931,7 @@ def init_persistent_structure(onto):
         # class interrupting_consequent(consequent): pass
         # + subclasses
         class normal_consequent(consequent): pass
-        class only_consequent(normal_consequent, has_upcoming): pass
+        class always_consequent(normal_consequent, has_upcoming): pass
         class on_true_consequent(normal_consequent): pass
         class on_false_consequent(normal_consequent): pass
         ##### Граф связей между действиями алгоритма
