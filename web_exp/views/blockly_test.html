@@ -204,7 +204,7 @@
           blocklyDiv.style.left = x + 'px';
           blocklyDiv.style.top = y + 'px';
           blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
-          blocklyDiv.style.height = (hide_blockly? 10 : blocklyArea.offsetHeight) + 'px';
+          blocklyDiv.style.height = (hide_blockly? 1 : blocklyArea.offsetHeight) + 'px';
           Blockly.svgResize(workspace);
         };
         window.addEventListener('resize', onresize, false);
@@ -228,10 +228,10 @@
 
     // paper
     function paper_on_load() {
-		console.log("paper_on_load() ...")
+		// console.log("paper_on_load() ...")
         window.globals.paper_init();
         diagram_init();
-		console.log("paper_on_load() OK.")
+		// console.log("paper_on_load() OK.")
     }
     // /paper
 
@@ -323,7 +323,7 @@
 	    	// decorate_algorithm_elements(response.algorithm_button_tips)
 
 	    	// paper
-	    	redraw_activity_diagram(algorithm_json);
+	    	redraw_activity_diagram(algorithm_json, trace_json);
 	    	// /paper
 
 	    } else {

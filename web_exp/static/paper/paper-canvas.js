@@ -60,6 +60,15 @@ function PathDiamond(rect) {
 	return path;
 }
 
+var COL_LINE = "#77f";
+var COL_BOX_BORDER = "#333";
+var BOX_BORDER_WIDTH = 3;
+var COL_BOX_FILL = "white";
+var COL_BLOCK_BORDER = '#0006';
+
+var COL_LINE_HIGHLIGHT = '#55ff77';
+var COL_BOX_HIGHLIGHT = '#ccccff';
+
 function draw_shape(type, config) {
 	// if (["arrow"].includes(type)) {
 	// 	path = new Path(config);
@@ -69,11 +78,16 @@ function draw_shape(type, config) {
 	// }
 	if ("path" === type) {
 		// config.strokeColor = 'red';
-		config.strokeColor = config.strokeColor || 'lightgrey';
+		config.strokeColor = config.strokeColor || COL_LINE;
 		if (config.fillColor === true)
-			config.fillColor = 'lightgrey';
+			config.fillColor = COL_LINE;
 		// config.strokeCap = 'butt';
 		config.strokeCap = config.strokeCap || 'square';
+		if (config.highlighted) {
+			config[config.highlight_field] = COL_LINE_HIGHLIGHT;
+			/// experiment:
+			config.strokeWidth *= 1.15;
+		}
 		path = new Path(config);
 		// path.strokeColor = 'red';
 		// path.dashArray = [10, 10];
@@ -99,26 +113,42 @@ function draw_shape(type, config) {
 		return;
 	}
 	if ("text" === type) {
-		var text = new PointText(config);
+		var text;
+		if (config.outline_offset) {
+			// draw several times with offset to mimic text outline
+			var config_clone = Object.assign({}, config);
+			config_clone.fillColor = config.shadowColor || "white";
+			var d = config.outline_offset;
+			var shift = new Point(d, 0);
+
+			for (var angle = 0; angle < 360; angle += 90) {
+				config_clone.point = config.point + shift.rotate(angle);
+				text = new PointText(config_clone);
+			}
+		}
+		// draw the text
+		text = new PointText(config);
 		return;
 	}
 
 	var path = null;
 	if (["DoLoopArea", "WhileLoopArea", "AlternativeArea"].includes(type)) {
-		// return
-		path = new Path.Rectangle(new Rectangle(config));
-		path.strokeColor = '#0006';
+		path = new Path.Rectangle(new Rectangle(config.rectangle));
+		path.strokeColor = COL_BLOCK_BORDER;
 		path.dashArray = [10, 10];
 	}
 	else if (type === "SequenceArea") {
-		return
-		path = new Path.Rectangle(new Rectangle(config));
-		path.strokeColor = '#0006';
-		path.dashArray = [3, 3];
+		if (config.highlighted) {
+			path = new Path.Rectangle(new Rectangle(config.rectangle));
+			path.strokeColor = COL_BLOCK_BORDER;
+			path.dashArray = [3, 3];
+		}
 	}
 	else if (type === "BoxArea") {
-		path = new Path.Rectangle(new Rectangle(config), 5);
-		path.fillColor = 'grey';
+		path = new Path.Rectangle(new Rectangle(config.rectangle));
+		path.strokeColor = COL_BOX_BORDER;
+		path.strokeWidth = BOX_BORDER_WIDTH;
+		path.fillColor = config.highlighted ? COL_BOX_HIGHLIGHT : COL_BOX_FILL;
 	}
 	else if (type === "Slot") {
 		path = new Path.Circle(config, 2);
@@ -126,19 +156,24 @@ function draw_shape(type, config) {
 		path.fillColor = 'yellow';
 	}
 	else if ("ConditionDiamond" === type) {
-		path = PathDiamond(new Rectangle(config));
-		path.fillColor = 'grey';
+		path = PathDiamond(new Rectangle(config.rectangle));
+		path.strokeColor = COL_BOX_BORDER;
+		path.strokeWidth = BOX_BORDER_WIDTH;
+		path.fillColor = config.highlighted ? COL_BOX_HIGHLIGHT : COL_BOX_FILL;
 	}
 	else if ("TransitDiamond" === type) {
 		// path = new Path.Rectangle(config.rectangle);
 		if (config.hidden) {
 			path = PathDiamond(config.rectangle);
-			path.fillColor = config.color || 'lightgrey';
+			if (config.visible !== undefined) {
+				path.visible = config.visible;
+			}
+			path.fillColor = config.highlighted ? COL_LINE_HIGHLIGHT : config.color || COL_LINE;
 			// path.strokeColor = 'grey'; ///
 		} else {
 			path = new Path.Rectangle(config.rectangle);
-			path.fillColor = 'white';
-			path.strokeColor = 'grey';
+			path.fillColor = config.highlighted ? COL_LINE_HIGHLIGHT : 'white';
+			path.strokeColor = COL_LINE;
 		}
 		// if (config.color)
 		// 	path.fillColor = config.color;
