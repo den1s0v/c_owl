@@ -33,8 +33,8 @@ def tr(word_en, case='nomn'):
 		"do_while_loop"		: ("цикл", "цикла", ),
 		"body of loop"		: ("тело цикла", "тела цикла", ),
 		"ex."				: ("например,", ),
-		"is true"			: ("истинно,", ),
-		"is false"			: ("ложно,", ),
+		"is true"			: ("истинно", ),
+		"is false"			: ("ложно", ),
 	}.get(word_en, ())
 	try:
 		return res[grammemes.index(case)]
@@ -296,11 +296,11 @@ def register_explanation_handlers():
 
 	def _param_provider(a: 'act_instance'):
 		cond_act = get_relation_object(a, onto.has_causing_condition)
-		cond_val = get_relation_object(cond_act, onto.expr_value, cond_act)
+		cond_val = get_relation_object(cond_act, onto.expr_value)
 		return {
 			'<A>': format_full_name(a, 0,1,0),
 			'<C>': format_full_name(a, 0,0,0),
-			'<TrueFalse>': tr("is " + str(cond_val)),
+			'<TrueFalse>': tr("is " + str(cond_val).lower()),
 			}
 	register_handler(class_name, format_str, _param_provider)
 
