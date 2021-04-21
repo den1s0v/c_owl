@@ -130,6 +130,10 @@ function draw_shape(type, config) {
 		text = new PointText(config);
 		return;
 	}
+	if ("circle" === type) {
+		var path = new Path.Circle(config);
+		return;
+	}
 
 	var path = null;
 	if (["DoLoopArea", "WhileLoopArea", "AlternativeArea"].includes(type)) {

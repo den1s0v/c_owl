@@ -11,7 +11,7 @@ function redraw_activity_diagram(algorithm_json, trace_json, options) {
 	let alg = create_alg_for(entry_point);
 
 
-	alg.rebase(new paper.Point(140, 70));
+	alg.rebase(new paper.Point(100, 82));
 
 	// console.debug(" About to clear the canvas ...")
 	if (globals.project) {
@@ -24,7 +24,7 @@ function redraw_activity_diagram(algorithm_json, trace_json, options) {
 	if (trace_json && trace_json.length >= 2) {
 		// const last_act = trace_json.slice(-1)[0];
 		let [second_last_act, last_act] = trace_json.slice(-2);
-		console.log("second_last_act, last_act:", second_last_act, last_act)
+		// console.log("second_last_act, last_act:", second_last_act, last_act)
 		highlight_or_connect(second_last_act, last_act);
 
 	}

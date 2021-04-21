@@ -1,6 +1,6 @@
 // diagram.js
 
-const U = 24;  // Unit of length, in pixels (scale base)
+const U = 26;  // Unit of length, in pixels (scale base)
 
 const LINE_WIDTH = U * 0.33;
 const ANGLE_OFFSET = LINE_WIDTH * 0.95;  // sorten right angles
@@ -423,8 +423,7 @@ class AlgArea extends Location {
 	highlight(propagate_through) {
 		this.config.highlighted = true;
 
-		///
-		console.log("highlighted:", this)
+		/// console.log("highlighted:", this)
 
 		if (propagate_through !== false) {
 			let diamond = this.inner[0];
@@ -661,6 +660,35 @@ class SequenceArea extends AlgArea {
 		this.links.push(new Link(diamond.slot(270), this.slot(270)));
 
 		this.actualize_rect();
+	}
+	draw() {
+		super.draw();
+		if (! this.parent) {
+			// draw diagram start/end circles
+			const R = LINE_WIDTH * 1.0;
+			let config = {
+				center: this.find_slot("in").corner,
+				radius: R * 0.9,
+				fillColor: 'black',
+				// strokeWidth: 3,
+			};
+			draw_shape('circle', config);
+			let end_point = this.find_slot("out").corner;
+			config = {
+				center: end_point,
+				radius: R,
+				fillColor: 'white',
+				strokeColor: 'black',
+				strokeWidth: 1.5,
+			};
+			draw_shape('circle', config);
+			config = {
+				center: end_point,
+				radius: R * 0.7,
+				fillColor: 'black',
+			};
+			draw_shape('circle', config);
+		}
 	}
 }
 
