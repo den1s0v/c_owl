@@ -18,7 +18,7 @@ FALSE_ALIASES_re = re.compile("|".join(FALSE_ALIASES))
 def make_translation(**lang_to_msg_dict, ):
     return lang_to_msg_dict
 
-    
+
 
 def parse_expr_value(s: str):
     value = s
@@ -35,11 +35,11 @@ def parse_expr_values(s: str) -> list:
     '1 0 1'           -> (True, False, True)
     'true FalsE TRUE' -> (True, False, True)
     'ДА Нет 1'        -> (True, False, True)
-    
+
     Допустимы скобочки повторения (как в периодических дробях):
     1(0)  means  100000...  -> (True, "(", False, ")")
     (001)  means  001001001...   -> ("(", False, False, True, ")")
-    
+
     """
     values = []
     s = s.lower()
@@ -74,22 +74,22 @@ def get_ith_expr_value(expr_values: tuple, i: int):
     # print(i, "from expr_values:", expr_values)
     if "(" not in expr_values:
         return expr_values[i] if i < len(expr_values) else None
-        
+
     b_i = expr_values.index("(")
     if i < b_i:
         return expr_values[i]
-    
+
     repeat_i = i - b_i
-    
+
     b_i += 1  # skip the "(" element itself
     assert expr_values[-1] == ")", str(expr_values)
     e_i = expr_values.index(")")
     repeat_len = e_i - b_i
-    if repeat_len <= 0:  # in the case of stupid empty repeat: (True, "(", ")") 
+    if repeat_len <= 0:  # in the case of stupid empty repeat: (True, "(", ")")
         return None
-    
+
     return expr_values[b_i + repeat_i % repeat_len]
-    
+
 
 
 class AlgorithmParser:
@@ -98,19 +98,21 @@ class AlgorithmParser:
         self._maxID = max(start_id - 1, _maxAlgID)
         self.verbose = verbose
         self.clear()
+        # if True:  ### for converting questions only
+        #     self.algorithm['text'] = '\n'.join(line_list)
         if line_list:
             self.parse(line_list)
 
 
     def clear(self):
         self.name2id = {}
-        
+
         self.algorithm = {
               "id": self.newID("algorithm"),
               "type": "algorithm",
               "name": "algorithm",
               "functions": [],
-              "global_code" : {   #  stmts -> global_code  !!! 
+              "global_code" : {   #  stmts -> global_code  !!!
                     "id": self.newID("global_code"),
                     "type": "sequence",
                     "name": "global_code",
@@ -169,9 +171,9 @@ class AlgorithmParser:
             Функции автоматически добавляются в self.algorithm["functions"].
             Глобальный код возввращается списком statement'ов верхнего уровня.
         """
-        
+
         parse_algorithm = self.parse_algorithm_ids  # синоним для простоты написания
-        
+
         def make_loop_body(loop_name, stmt_List):
             name = loop_name + "_loop_body"
             return {
@@ -228,7 +230,7 @@ class AlgorithmParser:
                       "act_name": make_translation(ru=f"функция '{name}'", en=f"function '{name}'"),
                       "is_entry": name == "main",
                       "param_list": [],
-                      "body" : {   #  stmts -> global_code  !!! 
+                      "body" : {   #  stmts -> global_code  !!!
                             "id": self.newID(body_name),
                             "type": "sequence",
                             "name": body_name,
@@ -249,14 +251,14 @@ class AlgorithmParser:
                 \s+
                 (\(.+\)|\S+)  # 1 cond_name
                 (?:
-                    \s+ - >?    # - or ->   
+                    \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
                 )?
                 \s* (?://|\#)\s*(\S+)  # 3 name
                 """, current_line, re.I|re.VERBOSE)
             if not m:
                 if 'if' in current_line: suggest_corrections.append(
-                    'if color==green -> true,false,true // my-alt-1') 
+                    'if color==green -> true,false,true // my-alt-1')
                 elif 'если' in current_line: suggest_corrections.append(
                     'если цвет==зелёный ->  да,нет,да // моя-развилка-1')
             if m:
@@ -297,13 +299,13 @@ class AlgorithmParser:
                 )
                 \s+(\(.+\)|\S+) # 1 cond_name
                 (?:
-                    \s+ - >?    # - or ->   
+                    \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
                 )?
                 """, current_line, re.I|re.VERBOSE)
             if not m:
                 if 'else' in current_line and 'if' in current_line: suggest_corrections.append(
-                    'else if color==green -> true,false,true') 
+                    'else if color==green -> true,false,true')
                 elif 'иначе' in current_line and 'если' in current_line: suggest_corrections.append(
                     'иначе если цвет==зелёный ->  да,нет,да')
             if m:
@@ -331,7 +333,7 @@ class AlgorithmParser:
             m = re.match(r"(?:else|иначе)", current_line, re.I)
             if not m:
                 if 'else' in current_line and not suggest_corrections: suggest_corrections.append(
-                    'else') 
+                    'else')
                 elif 'иначе' in current_line and not suggest_corrections: suggest_corrections.append(
                     'иначе')
             if m:
@@ -358,7 +360,7 @@ class AlgorithmParser:
                 \s+
                 (\(.+\)|\S+)    # 1 cond_name
                 (?:
-                    \s+ - >?    # - or ->   
+                    \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
                 )?
                 \s* (?://|\#)
@@ -366,7 +368,7 @@ class AlgorithmParser:
                 """, current_line, re.I|re.VERBOSE)
             if not m:
                 if 'while' in current_line: suggest_corrections.append(
-                    'while my-condition-2   -> 101 // my-while-2') 
+                    'while my-condition-2   -> 101 // my-while-2')
                 elif 'пока' in current_line: suggest_corrections.append(
                     'пока условие-цикла-1  // мой-цикл-1')
             if m:
@@ -391,8 +393,8 @@ class AlgorithmParser:
             # делать   // my-dowhile-2
             #    ...
             # пока dowhile-cond-2
-            # 
-            # 
+            #
+            #
             # do   // my-dowhile-3
             #    ...
             # while dowhile-cond-3  -> 100011100
@@ -402,13 +404,13 @@ class AlgorithmParser:
                 \s+
                 (\(.+\)|\S+)  # 1 cond_name
                 (?:
-                    \s+ - >?    # - or ->   
+                    \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
                 )?
                 """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
             if not m  or  m and not m2:
                 if 'do' in current_line: suggest_corrections.append(
-                    'do  // my-dowhile-2\n\t...\nwhile (condition) -> 11100') 
+                    'do  // my-dowhile-2\n\t...\nwhile (condition) -> 11100')
                 elif 'делать' in current_line: suggest_corrections.append(
                     'делать условие-цикла-1  // мой-цикл-пока-с-постусловием-1\n\t...\nпока (условие) -> 11100')
             if m and m2:
@@ -433,8 +435,8 @@ class AlgorithmParser:
             # делать   // my-dountil-2
             #    ...
             # до dountil-cond-2
-            # 
-            # 
+            #
+            #
             # do   // my-dountil-3
             #    ...
             # until dountil-cond-3  -> 100011100
@@ -444,13 +446,13 @@ class AlgorithmParser:
                 \s+
                 (\(.+\)|\S+)  # 1 cond_name
                 (?:
-                    \s+ - >?    # - or ->   
+                    \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
                 )?
                 """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
             if not m  or  m and not m2:
                 if 'do' in current_line: suggest_corrections.append(
-                    'do  // my-dountil-2\n\t...\nuntil (condition) -> 00111') 
+                    'do  // my-dountil-2\n\t...\nuntil (condition) -> 00111')
                 elif 'делать' in current_line: suggest_corrections.append(
                     'делать условие-цикла-1  // мой-цикл-до-тех-пор-1\n\t...\nдо (условие) -> 00011')
             if m and m2:
@@ -480,7 +482,7 @@ class AlgorithmParser:
                             (?:to|до)\s+([-+]?\d*.?\d+)\s+     # 3 to
                             (?:step|с\s+шагом)\s+([-+]?\d*.?\d+) # 4 step
                             (?:
-                                \s+ - >?    # - or ->   
+                                \s+ - >?    # - or ->
                                 \s+ (\S+)   # 5 optional values
                             )?
                             \s* (?://|\#)\s*(\S+)         # 6 name
@@ -518,7 +520,7 @@ class AlgorithmParser:
                 \s+ (\S+)             # 1 var
                 \s+ (?:in|в)\s+((?:array\s+|массив\w*\s+)?\S+)  # 2 in (container name)
                 (?:
-                    \s+ - >?    # - or ->   
+                    \s+ - >?    # - or ->
                     \s+ (\S+)   # 3 optional values
                 )?
                 \s* (?://|\#)\s*(\S+)  # 4 name
@@ -567,9 +569,9 @@ class AlgorithmParser:
             m = re.match(r"(\S+)$", current_line, re.I)
             if not m:
                 if not suggest_corrections and re.search('[a-z]+', current_line, re.I): suggest_corrections.append(
-                    'one-word-name-of-some-action') 
+                    'one-word-name-of-some-action')
                 elif not suggest_corrections and re.search('[а-яё]+', current_line, re.I): suggest_corrections.append(
-                    'имя-действия-из-одного-слова') 
+                    'имя-действия-из-одного-слова')
             if m:
                 if self.verbose: print("action")
                 name = m.group(1)
@@ -616,15 +618,15 @@ class TraceParser:
         else:
             self.alg_dict = None
             self.name2id = None
-        
+
         self.name2id_no_whitespace = None
-        
+
         self.trace = []
         self.boolean_chain = []
-        
+
         if line_list and self.alg_dict:
             self.parse(line_list, self.alg_dict, self.name2id, start_line, end_line)
-            
+
     def get_alg_node_id(self, name, node_type=None):
         """ `node_type` is useful to force "expr" type of returned node """
         if isinstance(name, (list, set, tuple)):
@@ -645,7 +647,7 @@ class TraceParser:
                     self.name2id_no_whitespace = { n.replace(' ',''):v for n,v in self.name2id.items() }
                 # поищем без пробелов
                 r = self.name2id_no_whitespace.get(name, None)
-    
+
         if node_type:  # and node_type == "expr":
             name = name.replace('(','').replace(')','')
 
@@ -655,7 +657,7 @@ class TraceParser:
                 expr = nodes[0]
                 return expr["id"]
 
-        elif r is not None:            
+        elif r is not None:
             # check if the node is expr
             criterion = lambda d: (type(d) is dict and "id" in d and d["id"] == r and d["type"] == "expr")
             expr = list(find_by_predicate(self.alg_dict, criterion, find_one=True))
@@ -672,7 +674,7 @@ class TraceParser:
                 else:
                     print(f"cannot find parent statement for '{name}'!")
         return r
-            
+
     def newID(self, what=None, owerwrite=False):
         self._maxID += 1
         global _maxTrID; _maxTrID = self._maxID
@@ -692,38 +694,38 @@ class TraceParser:
         self.name2id = self.name2id or name2id
         assert self.name2id
         self.iteration_count_dict = {}
-        
+
         self.trace += self.parse_trace_by_alg(line_list, start_line, end_line)
-        
+
         return self
-        
+
     def parse_trace_by_alg(self, line_list: "list(str)", start_line=0, end_line=None) -> list:
         """Формирует плоский список объектов трассы в формате trace.json для ctrlstrct_run.py
         """
-        
+
         # parse_trace = self.parse_trace_by_alg  # синоним для простоты написания
 
         result = []
-        
+
         ci = start_line  # index of line
         end_line = end_line or len(line_list)
-        
+
         for line in line_list[ci:]:
-        
+
             if ci >= end_line or not line:
                 break
 
             ci += 1  # increment before any usage to match 1-based enumeration
-        
+
             line = line.strip()
-            
+
             # ...  // comment
             m = re.search(r"(?://|#)\s*(.+)$", line, re.I)
             comment = m and m.group(1) or ""
 
             if m and m.start() == 0:
                 continue
-        
+
             BEGAN_ru = "(?:начал[оа]?с[ья])"
             ENDED_ru = "(?:закончил[оа]?с[ья])"
             EXECUTED_ru = "(?:выполнил[оа]?с[ья])"
@@ -737,25 +739,25 @@ class TraceParser:
             Ith1_en = r"(?:\s+(\d+)(?:st|nd|rd|th)?\s+time)"
             Ith1 = r"(?:\s+(\d+)(?:st|nd|rd|th|[-_]й)?\s+(?:time|раз))"
             Ith1_femn = r"(?:\s+(\d+)(?:st|nd|rd|th|[-_]я)?)"  # 1-я [итерация]
-            PHASE_dict = dict(BEGAN=BEGAN, ENDED=ENDED, EXECUTED=EXECUTED, 
-                BEGAN_ru=BEGAN_ru, ENDED_ru=ENDED_ru, EXECUTED_ru=EXECUTED_ru, 
-                BEGAN_en=BEGAN_en, ENDED_en=ENDED_en, EXECUTED_en=EXECUTED_en, 
+            PHASE_dict = dict(BEGAN=BEGAN, ENDED=ENDED, EXECUTED=EXECUTED,
+                BEGAN_ru=BEGAN_ru, ENDED_ru=ENDED_ru, EXECUTED_ru=EXECUTED_ru,
+                BEGAN_en=BEGAN_en, ENDED_en=ENDED_en, EXECUTED_en=EXECUTED_en,
                 Ith1=Ith1, Ith1_femn=Ith1_femn, )
             BEGAN_re = re.compile(BEGAN, re.I)
             ENDED_re = re.compile(ENDED, re.I)
             EXECUTED_re = re.compile(EXECUTED, re.I)
-            
+
             def get_phase_by_str(phase_str):
                 if BEGAN_re.match(phase_str):
-                    return "started"  
+                    return "started"
                 elif ENDED_re.match(phase_str):
-                    return "finished"  
+                    return "finished"
                 elif EXECUTED_re.match(phase_str):
                     return "performed"
                 else:
                     return "U-N-K-N-O-W-N"
-                
-        
+
+
             # началась программа
             # закончилась программа
             # program began
@@ -781,12 +783,12 @@ class TraceParser:
                       "text_line": ci,
                       "comment": comment,
                 })
-                
+
                 if phase == "finished":
                     break  # трасса построена до конца!
-                
+
                 continue  # with next act
-        
+
             # началось следование global_code 1-й раз
             # закончилось следование global_code 1-й раз
             # начался цикл my-while-1 1-й раз
@@ -796,8 +798,8 @@ class TraceParser:
             # alternative over_color began 1st time
             #     alternative by_response ended 1st time
             m = re.match(r"""(?:({BEGAN_ru}|{ENDED_ru}|{EXECUTED_ru})\s+)?  # 1 phase (ru)
-                (следование|развилка|цикл|функция|sequence|alternative|loop|function)   # 2 struct 
-                \s+(\S+)                     # 3 name 
+                (следование|развилка|цикл|функция|sequence|alternative|loop|function)   # 2 struct
+                \s+(\S+)                     # 3 name
                 (?:\s+({BEGAN_en}|{ENDED_en}|{EXECUTED_en}))?  # 4 phase (en)
                 {Ith1}?   # 5 ith  (optional)
                 """.format(**PHASE_dict), line, re.I | re.VERBOSE)
@@ -808,9 +810,9 @@ class TraceParser:
                 if self.verbose: print("{} {}".format(phase_str, struct_str))
                 #   {"id": 32, "action": "программа", "executes": 25, "gen": "she", "phase": "started", "n": null},
                 struct = {
-                            "следование": "sequence", 
-                            "развилка": "alternative", 
-                            "цикл": "loop", 
+                            "следование": "sequence",
+                            "развилка": "alternative",
+                            "цикл": "loop",
                             "функция": "func",
                             "function": "func",
                          }.get(struct_str, struct_str)
@@ -832,7 +834,7 @@ class TraceParser:
                       "comment": comment,
                 })
                 continue  # with next act
-        
+
             # условие развилки (цвет==зелёный) выполнилось 1-й раз - истина
             # условие цикла (while-cond-1) выполнилось 1-й раз - истина
             # условие (while-cond-1) выполнилось 1-й раз - ложь
@@ -861,7 +863,7 @@ class TraceParser:
                     # имя не позволяет найти элемент алгоритма
                     # поищем вверх начало ближайшей развилки и/или цикла
                     criterion = lambda d: (type(d) is dict and "id" in d and (
-                            d["type"] in struct or 
+                            d["type"] in struct or
                             "loop" in struct and "loop" in d["type"]
                         ))
                     nodes = list(find_by_predicate(self.alg_dict, criterion, find_one=False))
@@ -873,9 +875,9 @@ class TraceParser:
                             print()
                             print(f'warning: condition "{name}" at line {ci} resolved as {node["cond"]["name"]} (of {node["type"]}: {node["name"]})')
                             break
-                    
+
                 assert cond_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
-                
+
                 # convert value to true / false if matches so
                 value = parse_expr_value(value)
                 # value = {
@@ -886,7 +888,7 @@ class TraceParser:
                 #     }.get(value.lower(), value)
                 if isinstance(value, bool):
                     self.boolean_chain.append(value)
-                
+
                 result.append({
                       "id": self.newID(name),
                       # "expr": name,
@@ -899,7 +901,7 @@ class TraceParser:
                       "comment": comment,
                 })
                 continue  # with next act
-            
+
             # ветка иначе началась 1-й раз
             # ветка иначе закончилась 1-й раз
             # else branch began 1st time
@@ -989,7 +991,7 @@ class TraceParser:
                       "comment": comment,
                 })
                 continue  # with next act
-                
+
             # началась итерация 1 цикла my-while-1
             # началась итерация 1 цикла ожидание
             # началась 1-я итерация цикла my-while-1
@@ -1017,13 +1019,13 @@ class TraceParser:
                 loop_dict = next(find_by_keyval_in("id", alg_obj_id, self.alg_dict))
                 alg_obj_id = loop_dict["body"]["id"]
                 assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
-                
+
                 count_dict = self.iteration_count_dict.get(alg_obj_id, {})
                 ith = count_dict.get(phase, 0) + 1
                 count_dict.update({phase: ith})
                   # Временное решение! Не работает с рекурсией (считает все вхождения, идентично exec_time). Нужно отталкиваться от акта начала цикла, и запоминать все связанные непосредственно с ним итерации.
                 self.iteration_count_dict[alg_obj_id] = count_dict
-                
+
                 result.append({
                       "id": self.newID(name),
                       # "loop_name": name,
@@ -1037,7 +1039,7 @@ class TraceParser:
                       "comment": comment,
                 })
                 continue  # with next act
-            
+
             # выполнилась инициализация (день = 1) 1-й раз
             # выполнился переход (день=день+1) 1-й раз
             m = re.match(r"""
@@ -1081,10 +1083,10 @@ class TraceParser:
                       "comment": comment,
                 })
                 continue  # with next act
-            
-                
+
+
             # что-то выполнилось 1-й раз
-            # greet executed 1st time 
+            # greet executed 1st time
             m = re.match(r"""
                 (\S+)   # 1 name
                 \s+
@@ -1111,13 +1113,13 @@ class TraceParser:
                 })
                 continue  # with next act
 
-            
+
             # print("Warning: unknown trace line structure at line %d: "%ci, line)
             raise ValueError("TraceError: unknown trace line structure at line %d: %s"%(ci, line))
 
         return result
-       
-    
+
+
 # TraceParser(test_tr_lines, ap).trace
 
 
@@ -1196,7 +1198,7 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         "algorithm_name": str,
         "trace"         : list,
         "algorithm"     : dict,
-        "header_boolean_chain" : list of bool, 
+        "header_boolean_chain" : list of bool,
     }
     collected from specified file_path.
     """
@@ -1212,22 +1214,22 @@ def parse_text_file(txt_file_path, encoding="utf8"):
     print("Parsing algorithms and traces from".center(40))
     print(txt_file_path.center(40))
     print("="*40)
-    
+
     valid_alg_trs = parse_algorithms_and_traces_from_text(text)
 
     print()
     print("Total in file (%s):" % txt_file_path)
     print("  Number of effective algorithms:", len( {
-        trdct["algorithm_name"] 
-        for trdct in valid_alg_trs 
+        trdct["algorithm_name"]
+        for trdct in valid_alg_trs
         # if "erroneous" not in trdct["algorithm"]
         } ))
     print("  Number of valid traces:", len(valid_alg_trs))
     print()
-    
+
     return valid_alg_trs
-    
-    
+
+
 def parse_algorithms_and_traces_from_text(text: str):
     """Returns list of dicts like
     {
@@ -1235,7 +1237,7 @@ def parse_algorithms_and_traces_from_text(text: str):
         "algorithm_name": str,
         "trace"         : list,
         "algorithm"     : dict,
-        "header_boolean_chain" : list of bool, 
+        "header_boolean_chain" : list of bool,
     }
     collected from specified text data.
     """
@@ -1243,10 +1245,10 @@ def parse_algorithms_and_traces_from_text(text: str):
     text = text.replace("\t", " "*4)  # expand tabs to spaces (if any)
     lines = text.split("\n")
     text = None
-    
-    
+
+
     # Алгоритмы ...
-    
+
     last_line = len(lines)-2
     alg_data = {}
 
@@ -1264,8 +1266,11 @@ def parse_algorithms_and_traces_from_text(text: str):
                         # найдено
                         name = extract_alg_name(lines[i])
                         alg_data[name] = {
-                            "lines": (i+1, j)  # строки текста алгоритма (вкл-но)
+                            "lines": (i+1, j),  # строки текста алгоритма (вкл-но)
                         }
+                        ## ### !!! save the text
+                        ## if True:
+                        ##     alg_data[name]['text'] = lines[i+1:j+1]
                         # print("line", i, name)  # , lines[i])
                     # иначе - не найдено
                     else:
@@ -1275,16 +1280,16 @@ def parse_algorithms_and_traces_from_text(text: str):
 
 
     # Трассы ....
-                    
+
     last_line = len(lines)-1
-    
-    
+
+
     print("Algorithm names:", *list(alg_data.keys()))
-    
+
     # регулярка для всех имён алгоритмов: одно целое слово (имя одного из алгоритмов) должно быть найдено в заголовке трассы
     alg_names_rgx = "|".join([r"\b%s\b" % re.escape(w) for w in alg_data.keys()])
     alg_names_rgx = re.compile(alg_names_rgx)
-    
+
     tr_data = {}
 
     for i in range(0, last_line):
@@ -1299,7 +1304,7 @@ def parse_algorithms_and_traces_from_text(text: str):
                     alg_name = m.group(0)
                     # отбрасываем комментарий / strip comment out
                     name = re.sub(r"^\s*(?:/\*|//|#)\s*", "", lines[j])
-                    
+
                     # найти цепочку из 0 и 1, стоящую за именем алгоритма (если есть)
                     boolean_chain = None # слово за именем алгоритма
                     words = name.split()
@@ -1310,7 +1315,7 @@ def parse_algorithms_and_traces_from_text(text: str):
                             boolean_chain_str = re.sub(r"[^01]", "", boolean_chain_str)
                             boolean_chain = list(map({"0":False, "1":True}.get, boolean_chain_str))  # convert to boolean list
                     break
-    
+
             if not name:
                 print("Ignored (no reference to an algorithm found): line", i, lines[i])
                 continue
@@ -1333,9 +1338,9 @@ def parse_algorithms_and_traces_from_text(text: str):
                     break
 
     # Парсинг трасс совместно с алгоритмами, указывая строки в файле ...
-    
+
     for tr_name, tr_dict in tr_data.items():
-        
+
         print()
         alg_name = tr_dict["alg_name"]
         if "alg_parser" not in alg_data[alg_name] and "erroneous" not in alg_data[alg_name]:
@@ -1350,59 +1355,59 @@ def parse_algorithms_and_traces_from_text(text: str):
                 print("Error parsing algorithm:", alg_name, ":")
                 print(" ", e)
                 raise e
-        
+
         if "alg_parser" not in alg_data[alg_name]:
             print("Skipping trace:", tr_name, ", because the corresponding algorithm could not be parsed:", alg_name)
             continue
-            
+
         print("Parsing trace:", tr_name, "...", end='\t')
         try:
             b,e = tr_dict["lines"]
             tr_dict["trace_parser"] = TraceParser(lines, alg_data[alg_name]["alg_parser"], start_line=b)
-            
+
             # store boolean chain
-            
+
             print("Success")
-            
+
         except Exception as e:
             print("Error !")
             print("Error parsing trace:", tr_name, ":")
             print(" ", repr(e))
             raise e
-            
-            
+
+
     valid_alg_trs = [{
         "trace_name"    : nm,
         "algorithm_name": trdct["alg_name"],
         "trace"         : trdct["trace_parser"].trace,
         "algorithm"     : alg_data[trdct["alg_name"]]["alg_parser"].algorithm,
-        "header_boolean_chain" : trdct["boolean_chain"], 
-        
+        "header_boolean_chain" : trdct["boolean_chain"],
+
     } for nm, trdct in tr_data.items() if "trace_parser" in trdct]
-    
+
     # print()
     # print("Total in file (%s):" % txt_file_path)
     # print("  Number of valid algorithms:", len( {nm for nm,adct in alg_data.items() if "erroneous" not in adct} ))
     # print("  Number of valid traces:", len(valid_alg_trs))
     # print()
-    
+
     return valid_alg_trs
-            
+
 
 def parse_text_files(file_paths, encoding="utf8"):
     """Returns concatenation of lists of traces collected from specified file paths.
     """
-    
+
     alg_trs = []
-    
+
     for fpath in file_paths:
         alg_trs += parse_text_file(fpath, encoding=encoding)
-    
+
     print("Number of traces with algorithms collected from", len(file_paths), "text file(s):", len(alg_trs))
     print()
-    
+
     return alg_trs
-            
+
 def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=(".txt", ".tr"), skip_starting_with_hypen=True, filter_file="filter.inf"):
     import os
     result_list = []
@@ -1419,21 +1424,21 @@ def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=
 
     if search_in_dir:
         file_list = os.listdir(directory)
-    
+
     for fname in file_list:
         if not fname.endswith(file_extensions):
             continue
-            
+
         if skip_starting_with_hypen and fname.startswith("-"):
             continue
-            
+
         fpath = os.path.join(directory, fname)
         if not os.path.exists(fpath):
             # print("path does not exist: ", fpath)
             continue
-            
+
         result_list.append(fpath)
-    
+
     return result_list
 
 def main():
@@ -1442,7 +1447,7 @@ def main():
 	# parse_text_file("../handcrafted_traces/err_loops.txt")
 	# parse_text_file("../handcrafted_traces/correct_branching.txt")
 	# parse_text_file("../handcrafted_traces/correct_loops.txt")
-    
+
     # parse_text_files([
     #     # "../handcrafted_traces/err_branching.txt",
     #     # "../handcrafted_traces/err_loops.txt",
@@ -1455,11 +1460,11 @@ def main():
     result = parse_text_files( search_text_trace_files() )
     from pprint import pprint
     pprint(result)
-    
+
 
 if __name__ == '__main__':
 	main()
-    
+
     # v = get_ith_expr_value(
     #         ("(", 1, 2, 3, 4, ")", ), 16
     #     )

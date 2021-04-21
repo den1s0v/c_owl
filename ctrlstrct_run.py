@@ -864,6 +864,35 @@ def make_trace_for_algorithm(alg_dict):
         return str(e)
 
 
+def algorithm_only_to_onto(alg_tr, onto):
+    '''just a wrapper for TraceTester.inject_algorithm_to_ontology() method:
+        inject only the algorithm, omit any trace-related triples'''
+    try:
+        alg_dict = alg_tr["algorithm"]
+        trace_data = {
+            "algorithm": alg_dict,
+            "algorithm_name": alg_tr["algorithm_name"],
+            "header_boolean_chain": None,
+        }
+        tt = TraceTester(trace_data)
+        tt.prepare_id2obj()
+        tt.inject_algorithm_to_ontology(onto)
+
+        # Очистить словарь alg_dict["id2obj"] от рекурсивной ссылки на сам alg_dict
+        for key in alg_dict["id2obj"]:
+            if alg_dict["id2obj"][key] is alg_dict:
+                del alg_dict["id2obj"][key]
+                break
+
+        return tt.data["algorithm"]
+    except Exception as e:
+        print("Error !")
+        print("Error injecting algorithm:")
+        print(" ", e)
+        raise e  # useful for debugging
+        return str(e)
+
+
 
 def init_persistent_structure(onto):
         # types.new_class(temp_name, (domain >> range_, ))  # , Property
@@ -1002,10 +1031,10 @@ def init_persistent_structure(onto):
             class body_then_cond(conditional_loop): pass
 
             # classes that define well-known loops as subclasses of the above defined loop-feature classes. These classes are to be used publicly
-            class while_loop(conditional_loop, start_with_cond): pass
+            class while_loop(start_with_cond): pass
             while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
 
-            class do_while_loop(conditional_loop, start_with_body): pass
+            class do_while_loop(start_with_body): pass
             do_while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
 
             # class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
@@ -1053,7 +1082,7 @@ def init_persistent_structure(onto):
         prop_expr_value = types.new_class("expr_value", (DataProperty, FunctionalProperty, ))
 
         # новое свойство stmt_name
-        prop_stmt_name = types.new_class("stmt_name", (Thing >> str, DataProperty, ))
+        prop_stmt_name = types.new_class("stmt_name", (Thing >> str, DataProperty, FunctionalProperty))
 
         # новое свойство next
         types.new_class("next", (Thing >> Thing, ))
@@ -1557,6 +1586,23 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects, filter_by_level=filter_by_level)
 
     return onto, list(mistakes.values())
+
+
+def sync_jena(onto, rules_path=None, reasoning='jena', verbose=1) -> 'new onto':
+    name_in = f"{reasoning}_in.rdf"
+    name_out = f"{reasoning}_out.n3"
+    onto.save(file=name_in, format='rdfxml')
+
+    eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=verbose, rules_path=rules_path)
+
+    clear_ontology(onto, keep_tbox=False)
+
+    # namespace cached so not overwritten workaround:
+    new_world = World()
+    onto = new_world.get_ontology("file://" + name_out).load()
+    ### print("New base_iri:", onto.base_iri)
+
+    return onto
 
 
 def clear_ontology(onto, keep_tbox=False):

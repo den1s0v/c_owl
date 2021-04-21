@@ -10,6 +10,9 @@
 import os
 import re
 
+###
+import ctrlstrct_run
+
 from ctrlstrct_run import process_algtraces
 from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from trace_gen.json2alg2tr import act_line_for_alg_element
@@ -646,12 +649,38 @@ def test_algorithm_to_tags():
 		file.write(to_html(tags))
 
 
+def test_algorithm_to_triples():
+
+	import export2json
+
+	files = search_text_trace_files(directory="handcrafted_traces/")
+
+	alg_trs = parse_text_files(files)
+
+	onto = ctrlstrct_run.create_ontology_tbox()
+
+	###
+	for alg_tr in alg_trs[-1::]:
+		# print(alg_tr)
+
+		# ctrlstrct_run.algorithm_only_to_onto(alg_tr, onto)
+		q_dict = export2json.export_algtr2dict(alg_tr, onto)
+		print(q_dict)
+
+	# skip reasoning: question data is to be solve()'d anyway
+	## apply rules only for algorithm
+	# onto = ctrlstrct_run.sync_jena(onto, rules_path="jena/alg_rules.ttl")
+
+
+
+
 
 if __name__ == '__main__':
 
 	if 0:
 		# test_make_act_line()
-		test_algorithm_to_tags()
+		# test_algorithm_to_tags()
+		test_algorithm_to_triples()
 		###
 		print()
 		print('Exit as in custom debug mode.')
