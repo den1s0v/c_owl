@@ -39,17 +39,17 @@ LinearOrder (Sequence A)
 
 5 (5.1)
 Alternative
-+1    AllFalseNoElse (Alternative act a)  // ни одна ветка не выполнилась
-+2    NoFirstCondition (Alternative act a)
-+3    NoNextCondition (a, condition act c)
++1    AllFalseNoElse (Alternative act a)  (при наличии ветки ИНАЧЕ ни одна ветка не выполнилась до конца развилки)
++2    NoFirstCondition (Alternative act a)  (началась ветка или другое условие вместо первого условия)
++3    NoNextCondition (a, condition act c)	(после ложного условия началось не следующее условие)
 +     WrongBranch (=> BranchOfLaterCondition):
-+4      AnotherExtraBranch (a, branch B)
-+5      BranchOfFalseCondition (a, branch act b, condition act c)
-+6      NoBranchWhenConditionIsTrue (a, branch B, condition act c)
++4      AnotherExtraBranch (a, branch B)	(Лишняя вторая ветка после завершения первой)
++5      BranchOfFalseCondition (a, branch act b, condition act c)	(Начало ветки при ложном условии - сразу после ложного условия)
++6      NoBranchWhenConditionIsTrue (a, branch B, condition act c)	(Нет нужной ветки при истинном условии)
 7    NextConditionAfterTrueCondition (a, condition act c_true, condition act c_extra)  // выполнилось условие после предыдущего истинного
-8    AllFalseNoEnd (a, condition act c)
-9    DuplicateOfCondition  (a, condition act с1, condition act c2)
-10   ConditionsMisorder   (a, condition act с1, condition act c2)
+8    LastFalseNoEnd (a, condition act c)	(Развилка не закончилась, когда все условия ложны)
+9    DuplicateOfCondition  (a, condition act с1, condition act c2)	(Повтор условия в рамках акта развилки)
+10   ConditionsMisorder    (a, condition act с1, condition act c2)
 11   BranchBeforeCondition (a, branch act b, condition act c)
 +12   ConditionAfterBranch (a, branch act b, condition act c)
 
@@ -75,23 +75,23 @@ ConditionalLoop (Loop act L)    # Общие правила для циклов 
         Iteration
     }
 
-1   NoCondition (L) (условие не проверяется ни разу; ни одного условия)
+1   NoCondition (L) (условие не проверяется ни разу; ни одного условия перед окончанием цикла)
 +2  NoIterationAfterSuccessfulCondition    (L, condition act c)    (при истинном условии продолжения нет итерации; нет итерации после истинного условия)
 3   MissingIterationBetweenLoopConditions   (L, condition act с1, condition act c2) (дубликат условия; пропуск итерации между условиями)
 4   NoConditionBetweenIterations   (L, iteration i1, i2)   (дубликат итерации; пропуск условия между итерациями)
-5   [no-break] NoConditionAfterIteration   (L, iteration i)  (нет условия после итерации)
-+6  NoLoopEndAfterFailedCondition  (L, condition act c, extra act e) (после завершающей проверки условия цикл не заканчивается)
-+7  IterationAfterFailedCondition (L, condition act c, extra iteration act e) <|--- NoLoopEndAfterFailedCondition
+5   [no-break] NoConditionAfterIteration   (L, iteration i)  (нет условия после итерации - есть что-то другое)
++6  NoLoopEndAfterFailedCondition  (L, condition act c, extra act e) (после завершающей проверки условия цикл не заканчивается - есть что-то другое)
++7  IterationAfterFailedCondition (L, condition act c, extra iteration act e) () <|--- NoLoopEndAfterFailedCondition
 
 6 (6.1) (+ ConditionalLoop)
 WhileLoop (WhileLoop act L)
--1    MissingConditionBeforeWhileIteration (L, iteration i)  (пропущено первое условие While)
+-1    MissingConditionBeforeWhileIteration (L, iteration i)  (пропущено первое условие While, но итерация уже началась)
 
 
 7 (7.1) (+ ConditionalLoop)
 Do_Loop (DoLoop act L)
--1    NoIterationsInDoLoop (L)  (нет ни одной итерации в цикле Do-While)
--2    MissingDoIterationBeforeCondition (L, condition act c)  (пропущена первая итерация Do-While)
+-1    NoIterationsInDoLoop (L)  (нет ни одной итерации в цикле Do-While перед окончанием цикла)
+-2    MissingDoIterationBeforeCondition (L, condition act c)  (пропущена первая итерация Do-While - есть что-то другое)
 
 
 8 (8.1) (+ ConditionalLoop)
@@ -104,12 +104,12 @@ For_Loop (ForLoop act L)
         Update/ForUpdate
     }
 
--1  MissingInitActInForLoop (L)  (пропущена инициализация цикла For)
--2  DuplicatesOfForInit (L, for_init act init)  (несколько актов инициализации цикла For)
--2   MissingConditionAfterForInit (L, i) === NoCondition (L) (цикл не начинается после Init; ни одной проверки условия)
+-1  MissingInitActInForLoop (L)  (пропущена инициализация цикла For - есть что-то другое)
+-2  DuplicatesOfForInit (L, for_init act init)  (несколько актов инициализации цикла For в пределах одного выполнения цикла)
+-2   MissingConditionAfterForInit (L, i) === NoCondition (L) (цикл не начинается после Init; ни одной проверки условия - после Init есть что-то отличное от условия)
 
  -- 4,5 - проверки в конце цикла
--4   MissingForUpdateAfterIteration (L, iteration i)  (пропущен переход цикла For)
+-4   MissingForUpdateAfterIteration (L, iteration i)  (пропущен переход цикла For после итерации)
 -5  MissingConditionAfterForUpdate  (L, for_update act u)  (пропущена проверка условия после перехода цикла For; нет условия после перехода)
 
  -- 6,7,8 - в дополнение к 4,5 (для обработки ошибок цикличности "в толще" итераций)
@@ -118,7 +118,7 @@ For_Loop (ForLoop act L)
 8   Missing Condition Between ForUpdate and Iteration (L, update act u, iteration i)  (подряд переход и итерация)
 
 
-X (X.x) (+ ConditionalLoop)
+9 (9.1) (+ ConditionalLoop)
 Foreach_Loop (Foreach_Loop act L)
   Допустимые действия на уровне цикла:
     IsEmptyCheck (FirstExists/NotEmptyCondition)
@@ -129,7 +129,7 @@ Foreach_Loop (Foreach_Loop act L)
         Update/ForeachUpdate  (FetchNextElement)
     }
 
-1   MissingIsEmptyCheckInForeach === NoCondition (L)  (нет проверки на пустоту коллекции)
+1   MissingIsEmptyCheckInForeach === NoCondition (L)  (нет ни одной проверки на пустоту коллекции до окончания цикла)
 2   DuplicateOfIsEmptyCheckInForeach (L, check c1, c2)  (дубликат проверки на пустоту коллекции)
 3   ExtraActsBetweenFalseIsNotEmptyCheckAndForeachEnd   (L, check act c, extra act e)  (после завершающей проверки на пустоту коллекции цикл не заканчивается)
 4   MissingForeachInitIfNotEmpty (L) (Init не начинается после IsEmptyCheck; пропущена инициализация цикла Foreach)
@@ -268,4 +268,19 @@ ForeachLoop
 
     NoIterationAfterForeachUpdate
     IterationNotAfterForeachUpdate
+
+
+
+
+
+Ситуации, где ошибка может возникнуть из-за незнания наших соглашений о строении структур:
+
+Начало составной структуры:
+ +- Начало следования с первого действия вместо "{" - ветка развилки, тело цикла/функции
+ +- Начало развилки/цикла с условия вместо начала самой структуры - ветка развилки, тело цикла/функции
+ +- Начало цикла DO с итерации вместо начала самой структуры
+
+Конец составной структуры:
+ +- Пропущен конец структуры - "}"
+
 
