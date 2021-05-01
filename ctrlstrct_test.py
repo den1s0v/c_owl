@@ -651,21 +651,30 @@ def test_algorithm_to_tags():
 
 def test_algorithm_to_triples():
 
+	print("SPECIAL MODE: algorithm_to_triples")
+
 	import export2json
+	import json
 
 	files = search_text_trace_files(directory="handcrafted_traces/")
 
 	alg_trs = parse_text_files(files)
-
 	onto = ctrlstrct_run.create_ontology_tbox()
+	questions = []
+	alg_names = set()
 
-	###
-	for alg_tr in alg_trs[-1::]:
+	### [-1::]
+	for alg_tr in alg_trs:
 		# print(alg_tr)
+		if alg_tr["algorithm_name"] in alg_names:
+			continue
+
+		alg_names.add(alg_tr["algorithm_name"])
 
 		# ctrlstrct_run.algorithm_only_to_onto(alg_tr, onto)
 		q_dict = export2json.export_algtr2dict(alg_tr, onto)
-		print(q_dict)
+		### print(q_dict)
+		questions.append(q_dict)
 
 	# skip reasoning: question data is to be solve()'d anyway
 	## apply rules only for algorithm
@@ -673,11 +682,17 @@ def test_algorithm_to_triples():
 
 
 
+	with open("jena/control-flow-statements-domain-questions.json", "w") as f:
+		json.dump(questions, f, indent=2)
+
+	print('Questions written to JSON !')
+
+
 
 
 if __name__ == '__main__':
 
-	if 0:
+	if 1:
 		# test_make_act_line()
 		# test_algorithm_to_tags()
 		test_algorithm_to_triples()

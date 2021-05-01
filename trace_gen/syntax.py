@@ -109,7 +109,7 @@ def _make_alg_button(alg_mode_id, act_name, state_name, allow_states=None) -> li
 				"class": ["alg_button"],
 				"algorithm_element_id": [str(alg_mode_id)],
 				# for compprehension
-				"id": ["answer_%d-%s" % (alg_mode_id, state_name)],
+				"id": ["answer_%s:%d" % (state_name, alg_mode_id)],
 				"act_type": [state_name],
 				"data-tooltip": [state_tip],
 				"data-position": ["top left"],

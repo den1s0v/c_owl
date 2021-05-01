@@ -29,9 +29,9 @@ TASK_MAP = {
 def main():
 	all_laws = []
 	for fname, config in TASK_MAP.items():
-		laws = read_files_from_file(fname, config)
+		laws = read_laws_from_file(fname, config)
 		all_laws.extend(laws)
-		print(laws)
+		# print(laws)
 		print()
 
 	with open(OUT_FILE, 'w', encoding='utf-8') as f:
@@ -42,7 +42,7 @@ def main():
 
 
 
-def read_files_from_file(fname, config) -> list:
+def read_laws_from_file(fname, config) -> list:
 	with open(fname) as f:
 		lines = f.readlines()
 
@@ -67,13 +67,16 @@ def create_Rule(name, formulation=None):
 	  }
 
 def create_Law(law_config, formulations=None):
-	if "concepts" not in law_config: law_config["concepts"] = []
-	if "tags" not in law_config: law_config["tags"] = []
+	if "concepts" not in law_config: law_config["concepts"] = None
+	if "tags" not in law_config: law_config["tags"] = None
 
-	return  {
+	law = {
 		**law_config,
 		"formulations": formulations or [],
 	  }
+	if not law["concepts"]: law["concepts"] = []
+	if not law["tags"]: law["tags"] = []
+	return law
 
 
 AUTOGEN_N = 0
@@ -122,7 +125,7 @@ class SectionedRulesReader:
 			line = self.lines[self.ci + 1].lstrip("#").strip()
 			name, tags = header2name_and_tags(line)
 			self.law_config["name"] = name
-			self.law_config["tags"] = []  # [{'name': tag} for tag in tags]
+			self.law_config["tags"] = [{'name': tag} for tag in tags]
 			# create law
 			### print(self.law_config)
 			self.laws.append(create_Law(self.law_config))
@@ -144,7 +147,7 @@ class SectionedRulesReader:
 			if m:
 				tags = m[1].replace(" & ", ' ').split()
 				prev_line = prev_line.replace(m[1], '').strip(" ][")
-			name = prev_line
+				name = prev_line
 
 		self.rule_config["name"] = name or gen_name()
 
@@ -167,6 +170,11 @@ class SectionedRulesReader:
 		rule = law["formulations"][-1]
 		rule["formulation"] = (rule["formulation"].rstrip('.') + " " + line).strip() + '.'
 
+		for m in re.finditer(r'rdf:type my:(\w+)', line):
+			concept = m[1]
+			concept = {"name": concept}
+			if concept not in law["concepts"]:
+				law["concepts"].append(concept)
 		# ...
 
 
