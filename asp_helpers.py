@@ -7,41 +7,14 @@ Converting the ontology (structure and data) to ASP and back.
 
 import re
 import string
-from timeit import default_timer as timer
 
 from clyngor import solve  # $ pip install clyngor-with-clingo
 # from owlready2 import *
 
 from upd_onto import make_triple
+from common_helpers import Checkpointer
 
 
-class Checkpointer():  # dict
-    'Measures time between hits. requires default_timer as timer'
-    def __init__(self, start=True):
-        super().__init__()
-        self.first = timer()
-        self.last = self.first
-        # if start:
-        #     self.hit()
-    def reset_now(self):
-        self.__init__(start=False)
-    def hit(self, label=None) -> float:
-        now = timer()
-        delta = now - self.last
-        if label:
-            print((label or 'Checkpoint') + ':', "%.3f" % delta, 's')
-        self.last = now
-        return delta
-    def since_start(self, label=None, hit=False) -> float:
-        now = timer()
-        delta = now - self.first
-        if label:
-            print(label or 'Checkpoint:', "%.3f" % delta, 's')
-        if hit:
-            self.last = now
-        return delta
-        
-        
 ############# Clingo #############
 
 
@@ -61,9 +34,9 @@ def run_clingo_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, {wall_
         with open('clingo_in.asp', 'w') as file:
             file.write(asp)
     # ch.hit("      + ASP saved to file ")
-    
+
     ch.since_start("   ** Preparation took ")
-    
+
     answers = solve(inline=asp, nb_model=1, stats=stats)
     # print(answers)
     answers_list = list(answers)
@@ -77,10 +50,10 @@ def run_clingo_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, {wall_
         time_str = time_str.split('s')[0]
         elapsed_times['exclusive_time'] = float(time_str)
     # ch.hit("      + Obtain answers")
-    
+
     ch.reset_now()
     del asp  # free memory
-    
+
     if not answers_list:
         print("   ** ASP: nothing inferred.")
     answer = answers_list[0]
@@ -89,14 +62,14 @@ def run_clingo_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, {wall_
     # ch.hit("      + Obtain triple sets")
     new_triples = answer_triples - triples_set
     # ch.hit("      + Substract sets")
-    
+
     add_triples_to_ontology(onto, new_triples)
 
     # ch.hit("      + Written to ontology ")
     ch.since_start("   ** Integrating results took ")
 
     return onto, elapsed_times
-    
+
 
 
 RDF_CORE_RULES_asp = '''
@@ -112,7 +85,7 @@ def lower_first_char(s):
 
 def idfy_name(s):
     return re.sub(r'[^\w\d_]', '', s.replace('-', '_'))
-    
+
 NAME2ENTITY_MAP = {}  # name to entity
 ID2NAME_MAP = {}  # id to name (logically, reverse of NAME2ENTITY_MAP)
 ASP_RULES = {}  # filename to textual rules
@@ -121,7 +94,7 @@ ASP_RULES = {}  # filename to textual rules
 def entity_of(s) -> object:
     '''Inverse of string_of(entity): get entity by string `s` or return `s`'''
     return NAME2ENTITY_MAP.get(s, s)
-    
+
 
 def string_of(entity) -> str:
     '''owlready2's entity to string suitable for ASP program (term or double-quoted literal)'''
@@ -150,7 +123,7 @@ def string_of(entity) -> str:
 def triples_from_ontology(onto) -> list:
     NAME2ENTITY_MAP.clear()
     ID2NAME_MAP.clear()  # ??
-    
+
     tbox = []
     abox = []
 
@@ -187,11 +160,11 @@ def add_triples_to_ontology(onto, triples):
                 print("Exception applying inferred triple: ", s, p, o)
                 raise e
 
-    
+
 
 def triples_to_asp(triples) -> str:
     return "\n".join(f't({", ".join(spo)}).' for spo in triples)
-    
+
 
 def get_rules():
     if not ASP_RULES:
@@ -202,15 +175,15 @@ def get_rules():
 def use_rules_file(fp='from_swrl.asp'):
     if fp not in ASP_RULES:
         ASP_RULES.clear()
-        
+
         with open(fp) as f:
             asp = f.read()
-            
+
         ASP_RULES[fp] = asp
-        
+
         print("Loaded ASP rules from file:", fp)
-        
-        
+
+
 
 ############# DLV #############
 
@@ -238,9 +211,9 @@ def run_DLV_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, {wall_tim
     with open(DLV_TEMP_IN_FNM, 'w') as file:
         file.write(asp)
     # ch.hit("      + ASP saved to file ")
-    
+
     ch.since_start("   ** Preparation took ")
-    
+
     answers = run_DLV_solver(DLV_TEMP_IN_FNM)
     answers_list = list(answers)
     elapsed_times['wall_time'] = ch.hit("   ** DLV exclusively took ")
@@ -248,10 +221,10 @@ def run_DLV_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, {wall_tim
     #     time_str = answers.statistics["Time"]
     #     time_str = time_str.split('s')[0]
     #     elapsed_times['exclusive_time'] = float(time_str)
-    
+
     ch.reset_now()
     del asp  # free memory
-    
+
     if not answers_list:
         print("   ** ASP: nothing inferred.")
     answer = answers_list[0]
@@ -259,23 +232,23 @@ def run_DLV_on_ontology(onto, rules_fpath=None, stats=False) -> 'onto, {wall_tim
     triples_set = set(triples)
     # ch.hit("      + Obtain triple sets")
     new_triples = answer_triples - triples_set
-    
+
     add_triples_to_ontology(onto, new_triples)
 
     # ch.hit("      + Written to ontology ")
     ch.since_start("   ** Integrating results took ")
 
     return onto, elapsed_times
-    
+
 
 
 # $ dlv.mingw.exe -n=1 -N=1000 in_1.dl
 def run_DLV_solver(file_in_path, nb_model=1, max_int=DLV_MAX_N) -> 'list of frozensets':
     '''Note: Result of DLV parsing warks normally if nb_model==1'''
     cmd = f"{DLV_EXECUTABLE_PATH} -n={nb_model} -N={max_int} {file_in_path}"
-    
+
     dlv_printout = None
-    
+
     def stdout_handler(stdout, stderr):
         if isinstance(stdout, bytes):
             stdout = stdout.decode('utf8')
@@ -283,22 +256,22 @@ def run_DLV_solver(file_in_path, nb_model=1, max_int=DLV_MAX_N) -> 'list of froz
         if isinstance(stderr, bytes):
             stderr = stderr.decode('utf8')
             # print(stderr)
-            
+
         nonlocal dlv_printout
         dlv_printout = stdout
-        
-    
+
+
     exitcode = invoke_shell(cmd, gather_stats=False, output_handler=stdout_handler)
     # get_process_run_stats()
     if exitcode != 0:
         print("Error: DLV finished with code", exitcode)
         return ''
-    
+
     assert dlv_printout, 'Expected dlv_printout to contain DLV output.'
-    
+
     version, dlv_printout = dlv_printout.split('\n', maxsplit=1)
     assert version.startswith('DLV'), 'Remove this theck if raised'
-    
+
     # return dlv_printout
     dlv_printout = dlv_printout.strip().lstrip('{').rstrip('}').replace(', ', ' ')
 
@@ -310,7 +283,7 @@ if __name__ == '__main__':
     print(res)
     res = res.lstrip('{')
     res = res.rstrip('}')
-    
+
     # >>> Parser(False, True).parse_terms('a(b,c(d))')
     # frozenset({('a', ('b', 'c(d)'))})
 

@@ -16,6 +16,8 @@ import trace_gen.styling as styling
 import trace_gen.syntax as syntax
 from trace_gen.json2alg2tr import set_target_lang
 
+from common_helpers import Checkpointer
+
 from options import DEBUG, RUN_LOCALLY
 
 
@@ -131,16 +133,19 @@ def create_app():
 	@app.route('/verify_trace_act', methods=['POST'])
 	def verify_trace_act():
 		### print(request.json)
+		ch = Checkpointer()
 		try:
 			assert 'algorithm_json' in request.json, 'Bad json: No "algorithm_json" key in JSON payload!'
 
 			user_language = request.json.get('user_language', 'en')
 			set_target_lang(user_language)
+			ch.hit("set target lang")
 
 			# extend the trace
 			res = make_act_json(**{
 				k:v for k,v in request.json.items() if k in ("algorithm_json", "algorithm_element_id", "act_type", "existing_trace_json", "user_language")
 				})
+			ch.hit("make acts")
 
 			# if error
 			assert not isinstance(res, str), res
@@ -162,11 +167,14 @@ def create_app():
 				_mistakes, err_msg = process_algorithms_and_traces([alg_tr], write_mistakes_to_acts=True)
 
 				assert not err_msg, err_msg
+				ch.hit("process algorithms and traces")
 
 				### print("After reasoning: ", *full_trace, sep='\n *\t')
 
 				algorithm_tags = syntax.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', 'C'), existing_trace=full_trace)
 				algorithm_html = styling.to_html(algorithm_tags)
+				ch.hit("HTML prepared")
+				ch.since_start("Finished processing the request in")
 
 				return dict(
 					full_trace_json=full_trace,  ## res,
@@ -174,12 +182,12 @@ def create_app():
 					algorithm_as_html=algorithm_html,
 					processing_errors=(),
 				)
-
 		except Exception as ex:
 			res = f"{type(ex)}: {ex}"
 			print_exception(ex)
 			print("request.json :")
 			print(request.json)
+			ch.since_start("Finished the request with exception in")
 			return dict(
 				processing_errors=(res,),
 				full_trace_json=(),
