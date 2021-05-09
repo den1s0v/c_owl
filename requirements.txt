@@ -1,4 +1,4 @@
-owlready2
+owlready2>=0.30	
 transliterate
 
 ### Web server ###
@@ -8,7 +8,7 @@ waitress
 ### Java (11+, 14) is currently in use ###
 psutil
 
-### Blockly causes ###
+### handling of Blockly's XML ###
 xmltodict
 
 ### ASP support ###
