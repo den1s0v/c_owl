@@ -694,11 +694,11 @@ class TraceTester():
                         make_triple(obj, onto.exec_time, exec_n)
                         make_triple(obj, onto.in_trace, trace_obj)
 
-                        # connect "next_sibling"
-                        if exec_n == 1:
-                          make_triple(trace_obj, onto.next_sibling, obj)
-                        else:
-                          make_triple(mark2act_obj[mark], onto.next_sibling, obj)
+                        # # connect "next_sibling"
+                        # if exec_n == 1:
+                        #   make_triple(trace_obj, onto.next_sibling, obj)
+                        # else:
+                        #   make_triple(mark2act_obj[mark], onto.next_sibling, obj)
 
                         # keep current value for next iteration
                         mark2act_obj[mark] = obj
@@ -1068,7 +1068,7 @@ def init_persistent_structure(onto):
         for class_name in [
             "if", "else-if", "else",
         ]:
-            types.new_class(class_name, (onto.alt_branch,))
+            types.new_class(class_name, (alt_branch,))
 
         # make algorithm elements properties
         for prop_name in ("body", "cond", "init", "update", ):
@@ -1243,24 +1243,24 @@ def init_persistent_structure(onto):
                     bases = tuple((onto[base_name] if type(base_name) is str else base_name) for base_name in base_names)
                     # print(bases)
                     created_class = types.new_class(class_name, bases or (Erroneous,))
-                    if len(class_spec) >= 3:
-                        category = class_spec[2]
-                        if not category2priority:
-                            category2priority = {n:i for i,n in enumerate([
-                                "trace_structure",
-                                "general_wrong",
-                                "wrong_context",
-                                "concrete_wrong_context",
-                                "extra",
-                                "by_different_cond",
-                                "missing",
-                                # "",
-                            ])}
-                    assert category in category2priority, (category, class_name)
-                    priority = category2priority[category]
-                    # set error_priority
-                    ## ??????
-                    make_triple(created_class, error_priority, priority)
+                    # if len(class_spec) >= 3:
+                    #     category = class_spec[2]
+                    #     if not category2priority:
+                    #         category2priority = {n:i for i,n in enumerate([
+                    #             "trace_structure",
+                    #             "general_wrong",
+                    #             "wrong_context",
+                    #             "concrete_wrong_context",
+                    #             "extra",
+                    #             "by_different_cond",
+                    #             "missing",
+                    #             # "",
+                    #         ])}
+                    # assert category in category2priority, (category, class_name)
+                    # priority = category2priority[category]
+                    # # set error_priority
+                    # ## ??????
+                    # make_triple(created_class, error_priority, priority)
 
 
         for prop_name in ("precursor", "cause", "has_causing_condition", "should_be", "should_be_before", "should_be_after", "context_should_be"):
@@ -1415,6 +1415,10 @@ def create_ontology_tbox() -> "onto":
     return onto
 
 
+###
+from common_helpers import Checkpointer
+
+
 def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
                       mistakes_as_objects=False, filter_by_level=False, extra_act_entries=0,
                       rules_filter=None, reasoning="jena", on_done=None, _eval_max_traces=None) -> "onto, mistakes_list":
@@ -1422,7 +1426,11 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
       reasoning: None or "stardog" or "pellet" or "prolog" or "jena" or "sparql" or "clingo" or "dlv"
     """
 
+    ch = Checkpointer()
+
     onto = create_ontology_tbox()
+
+    ch.hit("create ontology tbox")
 
     if verbose: print("... TBox created")
 
@@ -1447,7 +1455,9 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         tt.inject_to_ontology(onto)
         if verbose: print(end=".")
 
-    # после наложения обёртки можно добавлять SWRL-правила
+    ch.hit("fill ontology data")
+
+   # после наложения обёртки можно добавлять SWRL-правила
     if reasoning == "pellet":  # incorporating of SWRL is only necessary for Pellet
         from ctrlstrct_swrl import filtered_rules
         # hardcode so far >
