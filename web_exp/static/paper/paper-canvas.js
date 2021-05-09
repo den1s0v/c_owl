@@ -193,7 +193,7 @@ function paper_init() {
     // console.log("main() started")
 
     // Get a reference to the canvas object
-    canvas = document.getElementById('myCanvas');
+    canvas = document.getElementById('paper_canvas');
 	globals.project = project;
 }
 globals.paper_init = paper_init;

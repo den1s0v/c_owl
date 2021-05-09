@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <style type="text/css">
+        #d{background-color:#111;margin-top:-150px;z-index:999999;}
+    </style>
+    <script type="text/javascript">
+        function load() {
+            var c = document.getElementById("c").getContext("2d");
+            c.fillStyle = "rgba(255, 200, 200, 1)";
+            c.fillRect(0, 0, c.canvas.width, c.canvas.height);
+        }
+    </script>
+</head>
+<body onload="load()">
+    <canvas id="c" width="500" height="300"></canvas>
+    <div id="d" style="width:500px;height:300px"></div>
+</body>
+</html>
