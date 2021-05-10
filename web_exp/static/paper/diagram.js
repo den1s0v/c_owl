@@ -11,6 +11,8 @@ const ARROW_LENGTH = ARROW_WIDTH * 0.86;
 const FONT_SIZE = U * 0.5;
 const ALLOW_SQUEEZE = false;  // ex. hide borders of single-action sequence
 
+// TODO: сделать функцию для умножения U на число и масштабирования всех остальных чисел
+
 let LBL = {
 	1: "true",
 	0: "false",
@@ -47,7 +49,7 @@ function test() {
 	// console.log(algorithm_json)
 
 	entry_point = algorithm_json["entry_point"];
-	delete algorithm_json;
+	algorithm_json = undefined;
 
 	// var node = entry_point.body[0].body.body[0].branches[0];
 	var node = entry_point;
@@ -184,13 +186,13 @@ class Link {
 			diamond.actualize_config();
 			if (diamond.config.hidden && diamond.slots[direction]) {
 				diamond.slots[direction].links_out[0].propagate_arrow(direction)
-				delete this.config.propagate_arrow;
+				this.config.propagate_arrow = undefined;
 				return;  // return true;
 			} /// else console.log("Not hidden")
 		} /// else console.log("Not TransitDiamond:", this.to.owner)
 		// set arrow to this
 		this.config.arrow = true;
-		delete this.config.propagate_arrow;
+		this.config.propagate_arrow = undefined;
 		// return false;
 	}
 	search_adjacent_links(to_id, can_turn, through_hierarchy) {  /// , backward
