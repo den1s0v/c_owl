@@ -67,6 +67,24 @@
 	 (?p my:student_parent_of ?b)
 ]
 
+# executes_id workaround
+[executes_id-to-executes-begin:
+	(?a my:executes_id ?i),
+	(?st my:id ?i),
+	(?a rdf:type my:act_begin),
+	(?bnd my:begin_of ?st),
+	 ->
+	 (?a my:executes ?bnd)
+]
+[executes_id-to-executes-end:
+	(?a my:executes_id ?i),
+	(?st my:id ?i),
+	(?a rdf:type my:act_end),
+	(?bnd my:end_of ?st),
+	 ->
+	 (?a my:executes ?bnd)
+]
+
 
 
 

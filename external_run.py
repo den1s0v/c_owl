@@ -9,7 +9,7 @@ from timeit import default_timer as timer
 # $ pip install psutil
 import psutil
 
-from options import JAVA_PATH
+from options import JAVA_PATH # outcomment this import if loading from a foreign directory
 
 
 # MEASURE_TIME = True
@@ -53,9 +53,9 @@ def ext_stdout_handler(stdout, stderr):
 	if isinstance(stderr, bytes):
 		stderr = stderr.decode('utf8')
 		# print(stderr)
-		
+
 	REASONING_STAT_DICT.clear()
-		
+
 	if OUTPUT_TYPE == 'prolog':
 		# m_0 = re.search(r"Loading the ontology took (\d+) ms\.", stdout)  # reasoning started
 		m = re.search(r"Time it took: (\d+) ms\.", stdout)  # reasoning time
@@ -71,7 +71,7 @@ def ext_stdout_handler(stdout, stderr):
 		m = re.search(r"\d+(?=\siterations)", stdout)  # iterations count
 		if m:
 			REASONING_STAT_DICT["iterations"] = int(m[0])
-			
+
 	elif OUTPUT_TYPE in ('jena', 'sparql'):
 		m = re.search(r"Time spent on reasoning: ([\d.]+) seconds\.", stdout)  # reasoning started
 		if m:
@@ -87,7 +87,7 @@ def ext_stdout_handler(stdout, stderr):
 		ms = re.findall(r"(?<=Iteration:\s)\d+", stdout)  # iterations count
 		if ms:
 			REASONING_STAT_DICT["iterations"] = int(ms[-1])
-			
+
 	elif SHOW_PRINTOUT:
 		print('The printout of the process (%s):' % OUTPUT_TYPE)
 		print(stdout)
@@ -99,35 +99,35 @@ def run_cmd(cmd, measure_time=MEASURE_TIME, repeat_count=REPEAT_COUNT, verbose=F
 	global MIN_WALL_TIME
 	global MIN_EXCLUSIVE_TIME
 	global SHOW_PRINTOUT
-	
+
 	if verbose:
 		print(">_ running cmd:", cmd)
-		
+
 	SHOW_PRINTOUT = verbose
-		
+
 	if repeat_count is not None and repeat_count > 0:
-		
+
 		OUTPUT_TIME_LIST.clear()
 		PROC_STAT_LIST.clear()
-		
+
 		time_list = timeit.repeat(stmt=f"invoke_shell('{cmd}', True, 'run once ...')",
 			repeat=repeat_count, number=1, globals=globals())
 		print(">_ cmd finished.")
-		
+
 		MIN_WALL_TIME =  min(time_list) if time_list else None
 		time_report = "     Wall time measured for %d runs: %s (min: %.3f s.)." % (repeat_count, repr(time_list), MIN_WALL_TIME)
 		print(time_report)
-		
+
 		MIN_EXCLUSIVE_TIME =  min(OUTPUT_TIME_LIST) if OUTPUT_TIME_LIST else None
 		time_report = "Exclusive time measured for %d runs: %s (min: %.3f s.)." % (len(OUTPUT_TIME_LIST), repr(OUTPUT_TIME_LIST), MIN_EXCLUSIVE_TIME or 999999)
 		print(time_report)
-		
+
 		# summarize the results of several runs
 		PROC_STAT_LIST = [summarize_process_stat(PROC_STAT_LIST)]
 
-		
+
 		exitcode = 0
-		
+
 	else:  # Normal run once
 		global OUTPUT_TYPE; OUTPUT_TYPE = None
 		if measure_time:
@@ -137,15 +137,15 @@ def run_cmd(cmd, measure_time=MEASURE_TIME, repeat_count=REPEAT_COUNT, verbose=F
 		if measure_time:
 			end = timer()
 			time_report = "   Time elapsed: %.3f s." % (end - start)
-	
+
 		if verbose:
 			print(">_ cmd finished with code", exitcode)
 		if measure_time:
 			print(time_report)
-		
+
 	return exitcode
 
-	
+
 def invoke_shell(cmd, gather_stats=False, *args, output_handler=ext_stdout_handler):
 	if args:
 		print(*args)
@@ -154,7 +154,7 @@ def invoke_shell(cmd, gather_stats=False, *args, output_handler=ext_stdout_handl
 	cmd_parts = cmd.split()
 	cmd_parts = [p[1:-1] if ('"'==  p[0] == p[-1]) else p for p in cmd_parts]
 	process = psutil.Popen(cmd_parts, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-	
+
 	stdout_accumulator = ''
 	# printout = process.communicate()
 	# print("printout-1:", printout)
@@ -168,9 +168,9 @@ def invoke_shell(cmd, gather_stats=False, *args, output_handler=ext_stdout_handl
 			if stat:
 				stat_list.append(stat)
 			stdout_accumulator += process.stdout.read()  # prevent buffer owerflow
-				
+
 		PROC_STAT_LIST.append(summarize_process_stat(stat_list))
-	
+
 	stdout, stderr = process.communicate()
 	output_handler(stdout_accumulator + stdout, stderr)
 	# process.wait()
@@ -193,33 +193,33 @@ def cpu_mem(p: psutil.Process, interval=0.1):
     except psutil.AccessDenied: pass
     return metrics
 
-    
+
 def summarize_process_stat(stat_list: list) -> dict:
 	'find average CPU and max memory from list of samples'
 	cpu = [metrics["cpu"] for metrics in stat_list if "cpu" in metrics]
 	cpu = sum(cpu) / len(cpu) if cpu else 0.0
-	
+
 	rss = [metrics["rss"] for metrics in stat_list if "rss" in metrics]
 	if stat_list and "rss_peak" in stat_list[-1]:
 		rss.append(stat_list[-1]["rss_peak"])
 	rss = max(rss) if rss else 0.0
-	
+
 	vms = [metrics["vms"] for metrics in stat_list if "vms" in metrics]
 	if stat_list and "vms_peak" in stat_list[-1]:
 		vms.append(stat_list[-1]["vms_peak"])
 	vms = max(vms) if vms else 0.0
-	
+
 	uss = [metrics["uss"] for metrics in stat_list if "uss" in metrics]
 	uss = max(uss) if uss else 0.0
-	
+
 	return {
 		"cpu": cpu,
 		"rss": rss,
 		"vms": vms,
 		"uss": uss,
 	}
-		
-		
+
+
 # from threading import Thread
 import threading
 
@@ -259,9 +259,9 @@ def gather_process_stats(process_attributes=('name', ), chooser_func=None, label
 		# still not found
 		print(f"{label} has not been detected during %.1f seconds!" % max_wait)
 		return 'failed to detect process...'
-		
+
 	process = processes[0]
-		
+
 	# print(f'Found {label}! pid:', process.pid)
 	stat_list = []
 	interval = 0.1
@@ -281,28 +281,28 @@ def gather_process_stats(process_attributes=('name', ), chooser_func=None, label
 	# print(stat_list)
 	print("finished watching, samples obtained: %d" % len(stat_list))
 	PROC_STAT_LIST.append(summarize_process_stat(stat_list))
-	
+
 	return 'success'
 
 
-def measure_stats_for_process_running(max_wait=3, target=None, args=()):	
+def measure_stats_for_process_running(max_wait=3, target=None, args=()):
 	PROC_STAT_LIST.clear()
 	REASONING_STAT_DICT.clear()
 
 	global _WATCHING_THREAD
-	
+
 	_WATCHING_THREAD = threading.Thread(target=target, args=args)  # pass max_wait ?
 	_WATCHING_THREAD.start()
-	
+
 	return 'wait and call get_process_run_stats()'
 
 
 def measure_stats_for_pellet_running(max_wait=3):
 	# '''java -Xmx2000M -cp C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\antlr-3.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\antlr-runtime-3.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\aterm-java-1.6.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\commons-codec-1.6.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\httpclient-4.2.3.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\httpcore-4.2.2.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jcl-over-slf4j-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-arq-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-core-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-iri-0.9.5.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jena-tdb-0.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\jgrapht-jdk1.5.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\log4j-1.2.16.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\owlapi-distribution-3.4.3-bin.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\pellet-2.3.1.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\slf4j-api-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\slf4j-log4j12-1.6.4.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\xercesImpl-2.10.0.jar;C:\D\Work\Python\Python37\lib\site-packages\owlready2\pellet\xml-apis-1.4.01.jar pellet.Pellet realize --loader Jena --input-format N-Triples --infer-prop-values --infer-data-prop-values --ignore-imports {path}'''
-	
+
 	return measure_stats_for_process_running(max_wait, target=gather_pellet_stats)
 
-	
+
 def measure_stats_for_clingo_running(max_wait=3):
 	'Complete copy of measure_stats_for_pellet_running() function but target function'
 	return measure_stats_for_process_running(max_wait, target=gather_clingo_stats)
@@ -311,7 +311,7 @@ def measure_stats_for_dlv_running(max_wait=3):
 	'Complete copy of measure_stats_for_pellet_running() function but target function'
 	return measure_stats_for_process_running(max_wait, target=gather_dlv_stats)
 
-	
+
 
 def get_process_run_stats():
 	global _WATCHING_THREAD
@@ -324,7 +324,7 @@ def get_process_run_stats():
 	del stats['wall_time']
 	del stats['exclusive_time']
 	return stats
-	
+
 
 def run_swiprolog_reasoning(rdf_path_in:str, rdf_path_out:str, verbose=True, command_name="run_ontology"):
 	# C:\D\Work\YDev\CompPr\c_owl>swipl -s run_ontology "test_data/test_make_trace_output.rdf" "test_data/prolog_output.rdf"
@@ -343,21 +343,21 @@ def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena',
 	# java -jar Jena.jar jena "test_data/test_make_trace_output.rdf" "jena/all.rules" "test_data/jena_output.rdf"
 	# How to specify working directory:
 	# subprocess.Popen(r'c:\mytool\tool.exe', cwd=r'd:\test\local')
-	
+
 	if reasoning_mode not in ('sparql', 'jena'):
 		print(' Warning: Unknown reasoning mode:', reasoning_mode)
 		reasoning_mode = 'jena'
 		print(' Defaulting to mode:', reasoning_mode)
-	
+
 	global OUTPUT_TYPE; OUTPUT_TYPE = reasoning_mode
-	
+
 	if not rules_path:
 		rules_path = {  # set defaults
 			# 'jena': "jena/all.rules",
 			'jena': "jena/alg_rules.ttl;jena/trace_rules.ttl",
-			'sparql': "sparql_from_swrl.ru", 
+			'sparql': "sparql_from_swrl.ru",
 		}[reasoning_mode]
-	
+
 	cmd = f'{JAVA_PATH} -jar jena/Jena.jar {reasoning_mode} "{rdf_path_in}" "{rules_path}" "{rdf_path_out}"'
 	run_cmd(cmd, verbose=verbose)
 	# if verbose: print(">_ running cmd:", cmd)
@@ -366,6 +366,6 @@ def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena',
 	# exitcode = process.returncode
 	# if verbose: print(">_ cmd finished with exit code", exitcode)
 	return get_run_stats()
-	
 
-	
+
+
