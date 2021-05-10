@@ -103,7 +103,7 @@ def create_app():
 				# if error
 				assert not isinstance(trace_json, str), trace_json
 
-				algorithm_tags = syntax.algorithm_to_tags(res.algorithm, user_language, request.json.get('syntax', 'C'))
+				algorithm_tags = syntax.algorithm_to_tags(res.algorithm, user_language, request.json.get('syntax', request.json.get('task_lang', 'C')))
 				algorithm_html = styling.to_html(algorithm_tags)
 
 				return dict(

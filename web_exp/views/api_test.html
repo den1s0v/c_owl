@@ -1,14 +1,14 @@
 <head>
     <title>Тестирование API | AlgTutor</title>
-    
+
     <link rel="stylesheet" href="{{ url_for('static', filename='highlight/styles/vs.css') }}">
     <script src="{{ url_for('static', filename='highlight/highlight.pack.js') }}"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    
+
     <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
     <script type="text/javascript">
         console.log('Welcome to API test!')
-        
+
         function send_to(url, textarea_id, result_id, escape_nl=false) {
             text = $('#' + textarea_id).val()
             // looking good text to JSON-readable
@@ -18,9 +18,9 @@
             }
             // console.log(text)
             data = JSON.parse(text)
-            
+
             $.ajax({
-                url: url, 
+                url: url,
                 method: 'post',
                 dataType: 'json',
                 contentType: "application/json",
@@ -37,7 +37,7 @@
             });
 
         }
-        
+
         function processing_callback(result_id, response="wait")
         {
             status_id = '#' + result_id
@@ -51,13 +51,13 @@
                 $(status_id).html("An ajax error occurred...)");
                 return
             }
-            
+
             // $(status_id).html("<pre>" + response + "</pre>");
             $(status_id).html("<plaintext>" + response);
         }
-            
+
     $(document).ready(function(){
-        
+
         // $("#send_creating_task").click(function(){
         $('button').click(function(){
             console.log(this)
@@ -78,7 +78,7 @@
 <body>
 <h1>API test</h1>
 <noscript><h2>Please enable Javascript!</h2></noscript>
-    
+
 <h3> Auxilary: get available syntaxes </h3>
 
 <details open>
@@ -104,7 +104,7 @@ response : json {
 request to 'localhost:2020/creating_task' [method:POST] : json {
     "algorithm_text":         "some multiline text",  // содержимое поля ввода алгоритма
     "user_language":          "string",  // "ru" или "en" ("en" по умолчанию)
-    "syntax":                 "string",  // "C" или "Python" или "Pseudocode" ("C" по умолчанию)
+    "syntax" или "task_lang": "string",  // "C" или "Python" или "Java" или "Pseudocode" ("C" по умолчанию)
 }
     </code></pre>
 </details>
@@ -128,9 +128,9 @@ request to 'localhost:2020/creating_task' [method:POST] : json {
         <ol>
             <li> Алгоритм:
             	<br>* (в виде текста - коррекция ввода пользователя) [new_algorithm_text] - ЗАГЛУШКА
-            	<br>* в виде JSON (понадобится для страницы студента, см. ниже) [algorithm_json], 
+            	<br>* в виде JSON (понадобится для страницы студента, см. ниже) [algorithm_json],
 <!--             	<br>* а также алгоритм в виде вложенных объектов-"тегов" [algorithm_as_tags] и  -->
-            	<br>* отформатированный HTML [algorithm_as_html]. 
+            	<br>* отформатированный HTML [algorithm_as_html].
             </li>
             <li> Трасса в виде JSON - массив актов [trace_json], каждый из которых - также JSON-объект (см. ниже).
             </li>
@@ -149,20 +149,20 @@ response: json {
 <!--     "algorithm_as_tags":      {json},   // те же html-теги, но в виде JSON, для формирования html из них (см. формат html_tag'ов в <a href="https://github.com/den1s0v/c_owl/blob/e70ec8acce56b96a9242e8231472fd94808d6ed0/trace_gen/styling.py#L6">styling.py</a>) -->
 <!--     "algorithm_button_tips":  {ID: {"act_type": "tip message"}},  // для каждого span c классом button - режимы работы кнопок и подсказки к ним:
                               // - либо одно состояние "performed", или пара переключающихся "started"/"finished"
-                              // - ID (int) - значение атрибута "algorithm_element_id" у &lt;span&gt;, к кнопке которого нужно цеплять "tip message" 
+                              // - ID (int) - значение атрибута "algorithm_element_id" у &lt;span&gt;, к кнопке которого нужно цеплять "tip message"
                               //   (он же параметр algorithm_element_id, передаваемый в /verify_trace_act для создания акта) -->
         // (информация для визуализации трассы целиком)
     "trace_json":             [array]*, // отрендерить проверочную трассу (см. описание ниже, под спойлером)
 }
     </code></pre>
 </details>
-    
+
 <details>
     <summary>* {algorithm_json} format</summary>
     Описание структуры алгоритма в JSON. (При сериализации на одни и те же объекты по разным ссылкам выводятся несколько раз, поэтому JSON может быть весьма большим)
     <pre><code class="js">
   {
-    "id":   int,          // уникальный ID, есть у любого узла в дереве алгоритма 
+    "id":   int,          // уникальный ID, есть у любого узла в дереве алгоритма
     "name": "algorithm",  // имя узла (фиксированное значение для этого вида узла)
     "act_name": "message",// метка для подсказки кнопки для создания акта на нужном языке (ru/en) (к этой строке МОЖНО в начале подставить "начать"/"закончить"/"выполнить" через пробел)
     "type": "algorithm",  // тип узла - алгоритм
@@ -190,7 +190,7 @@ response: json {
         // ... один узел (является следованием)
     }
   },
-  
+
   // === Альтернатива (развилка, IF - ELSE-IF - ELSE) ===
   {
     "id": 18,
@@ -216,7 +216,7 @@ response: json {
             "id": 21,
             "name": "ждать",
             "act_name": "действие 'ждать'",  // метка для подсказки
-            "type": "stmt"     // тип узла === Простое действие === 
+            "type": "stmt"     // тип узла === Простое действие ===
           }
         ]
       },
@@ -249,10 +249,10 @@ response: json {
   }
     </code></pre>
 </details>
-    
+
 <details>
     <summary>* [trace_json_array] format</summary>
-    Описание структуры трассы в JSON. 
+    Описание структуры трассы в JSON.
     <pre><code class="js">
   [         // массив актов (трасса)
     ... ,
@@ -263,28 +263,28 @@ response: json {
       "name": "программа", // имя (соответтвует имени узла алгоритма)
       "phase": "finished", // вид акта "started"/"finished"/"performed"
       "value": bool,   // [optional] только для актов условий (type == 'expr') - результат "вычисления" выражения
-      
+
         // (информация для визуализации акта)
       "as_string": "закончилась программа",  // строковое представление строки акта (без форматирования)
       "as_html": "&lt;span class="keyword"&gt;закончилась&lt;/span&gt; &lt;span class="program"&gt;программа&lt;/span&gt;",  // та же строка, форматированные в HTML токены
 <!--       "as_tags": [...],  // те же html-теги, но в виде JSON, для формирования html из них (см. формат html_tag'ов в <a href="https://github.com/den1s0v/c_owl/blob/e70ec8acce56b96a9242e8231472fd94808d6ed0/trace_gen/styling.py#L6">styling.py</a>) -->
-      
+
         // (результаты проверки акта на рассуждателе - этих полей нет для страницы преподавателя, т.е. в response команды /creating_task)
       "is_valid": bool,  // true - акт корректен - сразу добавить в правильную трассу, иначе - false - не добавлять, и этот выбор затрётся следующим выбором акта студентом.
       "explanations": ["array", "of", "strings"], // перечень найденных ошибок для этого акта (пуст, если "is_valid" == true)
-      
+
     },
     ...  // ещё акты
   ]
     </code></pre>
 </details>
-    
+
 <details>
     <summary>Пример и тест API через $.ajax</summary>
-    
-    <p><button 
-        id="send_creating_task" 
-        url="/creating_task" 
+
+    <p><button
+        id="send_creating_task"
+        url="/creating_task"
         payload_id="payload_creating_task"
         result_id="result_creating_task"
         escape_nl
@@ -301,8 +301,8 @@ response: json {
     <div id="result_creating_task" style="background-color: #eeffff;"></div>
     End of response.
 </details>
-    
-    
+
+
 <h2> На странице ученика </h2>
 <h3> Verify new trace act </h3>
 <details open>
@@ -358,13 +358,13 @@ Cм. выше в описании к <code>/creating_task</code>, здесь п�
 </details>
 
 </details>
-    
+
 <details>
     <summary>Пример и тест API через $.ajax</summary>
-    
-    <p><button 
-        id="send_verify_trace_act" 
-        url="/verify_trace_act" 
+
+    <p><button
+        id="send_verify_trace_act"
+        url="/verify_trace_act"
         payload_id="payload_verify_trace_act"
         result_id="result_verify_trace_act"
     >Test /verify_trace_act [POST]</button>
