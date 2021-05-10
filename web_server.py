@@ -171,7 +171,7 @@ def create_app():
 
 				### print("After reasoning: ", *full_trace, sep='\n *\t')
 
-				algorithm_tags = syntax.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', 'C'), existing_trace=full_trace)
+				algorithm_tags = syntax.algorithm_to_tags(algorithm_json, user_language, request.json.get('syntax', request.json.get('task_lang', 'C')), existing_trace=full_trace)
 				algorithm_html = styling.to_html(algorithm_tags)
 				ch.hit("HTML prepared")
 				ch.since_start("Finished processing the request in")

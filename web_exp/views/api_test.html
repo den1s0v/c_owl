@@ -99,12 +99,12 @@ response : json {
 
 <details open>
     <summary>Request format</summary>
-    Алгоритм в виде текста (ввод от пользователя) и код языка: рус/англ.
+    Алгоритм в виде текста (ввод от пользователя), синтаксис языка программирования и код языка: рус/англ.
     <pre><code class="js">
 request to 'localhost:2020/creating_task' [method:POST] : json {
-    "algorithm_text":         "some multiline text",  // содержимое поля ввода алгоритма
+    "algorithm_text":         "some multiline text",  // содержимое поля ввода алгоритма или XML из Blockly
     "user_language":          "string",  // "ru" или "en" ("en" по умолчанию)
-    "syntax" или "task_lang": "string",  // "C" или "Python" или "Java" или "Pseudocode" ("C" по умолчанию)
+    "syntax" или "task_lang": "string",  // "C" или "Java" или "Python" или "Pseudocode" ("C" по умолчанию)
 }
     </code></pre>
 </details>
@@ -315,7 +315,7 @@ request to 'localhost:2020/verify_trace_act' [method:POST] : json {
     "algorithm_element_id":   int,      // поле 'id' из кликнутого элемента алгоритма
     "act_type":               "string", // начало ('started') или конец ('finished') - для составных, 'performed' - для простых (атомарных)
     "existing_trace_json":    [trace_json_array], // вся имеющаяся ПРАВИЛЬНАЯ трасса
-    "syntax":                 "string", // (для перегенерации алгоритма) "C" или "Python" или "Pseudocode" ("C" по умолчанию)
+    "syntax" или "task_lang": "string", // (для перегенерации алгоритма) "C" или "Java" или "Python" или "Pseudocode" ("C" по умолчанию)
 }
 
 response: json {
