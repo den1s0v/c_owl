@@ -19,6 +19,8 @@ from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_key
 from explanations import format_explanation, get_leaf_classes
 from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, measure_stats_for_pellet_running, measure_stats_for_clingo_running, measure_stats_for_dlv_running, get_process_run_stats
 
+from common_helpers import Uniqualizer, delete_file
+
 # ONTOLOGY_maxID = 1
 
 def prepare_name(s):
@@ -1554,8 +1556,9 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
 
 
     if reasoning in ('sparql', 'jena'):
-        name_in = f"{reasoning}_in.rdf"
-        name_out = f"{reasoning}_out.n3"
+        name, uniq_n = Uniqualizer.get(reasoning)
+        name_in = f"{name}_in.rdf"
+        name_out = f"{name}_out.n3"
         onto.save(file=name_in, format='rdfxml')
 
         if 1:  # if 0, do not perform reasoning (rerun in debug)
@@ -1567,23 +1570,21 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
             # print('   Jena elapsed:', eval_stats['wall_time'])  ###
             return eval_stats
 
-        clear_ontology(onto, keep_tbox=True)
+        clear_ontology(onto, keep_tbox=True)  # keep_tbox=??
 
-        # namespace cached so not overwritten workaround:
-        new_world = World()
-        onto = new_world.get_ontology("file://" + name_out).load()
-        print("New base_iri:", onto.base_iri)
+        # read from different file each time, so no caching breaks that
+        onto = get_ontology("file://" + name_out).load()
 
-        if False:  # debugging patch to the ontology
-            print("removing cycles from classes:")
-            for class_ in onto.classes():
-                if class_ in class_.is_a:
-                    class_.is_a.remove(class_)
+        # # namespace cached so not overwritten workaround:
+        # new_world = World()
+        # onto = new_world.get_ontology("file://" + name_out).load()
 
-            print("removing cycles from properties:")
-            for prop in onto.properties():
-                if prop in prop.is_a:
-                    prop.is_a.remove(prop)
+        # print("New base_iri:", onto.base_iri)
+        print("=== Ontology size ===:", len(onto.get_triples()))
+
+        delete_file(name_in)
+        delete_file(name_out)
+        # Uniqualizer.free(reasoning, uniq_n)  # do nor allow the same names in future until normal reload is done!
 
         seconds = eval_stats['wall_time']
 
@@ -1607,6 +1608,7 @@ def sync_jena(onto, rules_path=None, reasoning='jena', verbose=1) -> 'new onto':
 
     clear_ontology(onto, keep_tbox=False)
 
+    ## onto = get_ontology("file://" + name_out).load()
     # namespace cached so not overwritten workaround:
     new_world = World()
     onto = new_world.get_ontology("file://" + name_out).load()
