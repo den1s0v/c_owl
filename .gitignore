@@ -14,6 +14,7 @@ test_data/*/*.rdf
 test_data/*.rdf
 *report*
 *dbg*
+*.ipynb
 
 trace_gen/*out*.*
 trace_gen/*test*.*
