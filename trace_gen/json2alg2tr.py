@@ -94,7 +94,7 @@ def tr(word_en, case='nomn'):
 		"to first element" 			: ("к первому элементу", ),
 		"to next element" 			: ("к следующему элементу", ),
 		"sequence" 			: ("следование", "следования"),
-		"stmt"				: ("команда", "команды", ),
+		"stmt"				: ("действие", "действия", ),
 	}.get(word_en, ())
 	try:
 		return res[grammemes.index(case)]
