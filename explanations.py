@@ -180,8 +180,12 @@ def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 				format_str,
 				**PARAM_PROVIDERS[class_name](act_instance)
 			)
-			localized_class_name = CLASS_NAMES[class_name].get(get_target_lang(), None) or class_name
-			result.append(f"{localized_class_name}: {expl}")
+			## with prefixed error name
+			# localized_class_name = CLASS_NAMES[class_name].get(get_target_lang(), None) or class_name
+			# explanation = f"{localized_class_name}: {expl}"
+			## without error name
+			explanation = expl
+			result.append(explanation)
 		else:
 			print("<> Skipping explanation for: <>", class_name, "<>")
 
