@@ -8,6 +8,10 @@ import trace_gen.syntax as syntax
 
 from pprint import pprint
 
+
+syntax.set_allow_hidden_buttons(False)
+
+
 def export_algtr2dict(alg_tr, onto):
 	ctrlstrct_run.clear_ontology(onto, keep_tbox=True)
 	ctrlstrct_run.algorithm_only_to_onto(alg_tr, onto)

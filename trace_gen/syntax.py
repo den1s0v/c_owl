@@ -19,6 +19,9 @@ COMPLEX_NODE_STARTED = ('started', )
 COMPLEX_NODE_FINISHED = ('finished', )
 EXISTING_TRACE = []
 
+ALLOW_HIDDEN_BUTTONS = True
+
+
 BUTTON_TIP_FREFIX = {
 	"ru": {
 		'performed': 'Выполнится',
@@ -35,6 +38,10 @@ BUTTON_TIP_FREFIX = {
 def set_indent_step(step: int):
 	global INDENT_STEP
 	INDENT_STEP = step
+
+def set_allow_hidden_buttons(allow: bool):
+	global ALLOW_HIDDEN_BUTTONS
+	ALLOW_HIDDEN_BUTTONS = allow
 
 
 # features of: Pseudocode / С / Python / JavaScript / etc.
@@ -98,18 +105,22 @@ def _get_act_button_tip(act_name, phase):
 	act_name = act_name.get(lang, None) or act_name.get("en", "[action]")
 	return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name.replace("'", '"'))
 
-def _make_alg_button(alg_mode_id, act_name, state_name, allow_states=None) -> list or tuple:
-	if allow_states is None or state_name not in allow_states:
+def _make_alg_button(alg_node_id, act_name, state_name, allow_states=None) -> list or tuple:
+	if allow_states is None or (ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states)):
 		return ()
+	if not ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states):
+		state_name = list(allow_states)[0]
+
+	print("_make_alg_button:", state_name, 'of', allow_states)
 	state_tip = _get_act_button_tip(act_name, state_name)
 	return [
 		{
 			"tag": "span",
 			"attributes": {
 				"class": ["alg_button"],
-				"algorithm_element_id": [str(alg_mode_id)],
+				"algorithm_element_id": [str(alg_node_id)],
 				# for compprehension
-				"id": ["answer_%s:%d" % (state_name, alg_mode_id)],
+				"id": ["answer_%s:%d" % (state_name, alg_node_id)],
 				"act_type": [state_name],
 				"data-tooltip": [state_tip],
 				"data-position": ["top left"],
@@ -204,7 +215,7 @@ def _make_block_with_braces(indent, block_json, inner=()):
 				*(SYNTAX["BLOCK_CLOSE"]() or [""]),
 			],
 			states_after=COMPLEX_NODE_FINISHED,
-			trailing_content="&nbsp;" * (INDENT_STEP) # немного пробелов, т.к. сторока короткая
+			trailing_content="&nbsp;" * (INDENT_STEP) # немного пробелов, т.к. строка короткая
 		)),
 	]
 
