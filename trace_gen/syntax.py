@@ -111,7 +111,6 @@ def _make_alg_button(alg_node_id, act_name, state_name, allow_states=None) -> li
 	if not ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states):
 		state_name = list(allow_states)[0]
 
-	print("_make_alg_button:", state_name, 'of', allow_states)
 	state_tip = _get_act_button_tip(act_name, state_name)
 	return [
 		{
