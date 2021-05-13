@@ -1579,8 +1579,8 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         # new_world = World()
         # onto = new_world.get_ontology("file://" + name_out).load()
 
-        # print("New base_iri:", onto.base_iri)
-        print("=== Ontology size ===:", len(onto.get_triples()))
+        ### print("New base_iri:", onto.base_iri)
+        ### print("=== Ontology size ===:", len(onto.get_triples()))
 
         delete_file(name_in)
         delete_file(name_out)
