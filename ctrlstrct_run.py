@@ -536,6 +536,7 @@ class TraceTester():
 
                 # сохраняем назад в наш словарь (для привязки к актам трассы)
                 d["iri"] = iri
+                print('### saving iri back to dict:', iri)
                 # создаём объект
                 obj = class_(iri)
                 # привязываем id
@@ -688,8 +689,6 @@ class TraceTester():
                         boundary = get_relation_subject(boundary_prop, onto[alg_elem["iri"]])
                         # print("boundary:", boundary)
                         make_triple(obj, onto.executes, boundary)
-
-                        # make_triple(obj, onto.executes, onto[alg_elem["iri"]])
 
                         set_id(obj)
                         ### make_triple(obj, onto.index, index)
