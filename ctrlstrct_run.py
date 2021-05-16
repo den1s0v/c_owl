@@ -21,6 +21,8 @@ from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, mea
 
 from common_helpers import Uniqualizer, delete_file
 
+onto_path.append(".")
+
 # ONTOLOGY_maxID = 1
 
 def prepare_name(s):
@@ -1555,6 +1557,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
 
 
     if reasoning in ('sparql', 'jena'):
+        # Jena is main option (the other options are not maintained)
         name, uniq_n = Uniqualizer.get(reasoning)
         name_in = f"{name}_in.rdf"
         name_out = f"{name}_out.n3"
@@ -1569,21 +1572,19 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
             # print('   Jena elapsed:', eval_stats['wall_time'])  ###
             return eval_stats
 
-        clear_ontology(onto, keep_tbox=True)  # keep_tbox=??
+        # Clear curent ontology data
+        ### clear_ontology(onto, keep_tbox=True)  # previous variant
+        onto.destroy()
 
-        # read from different file each time, so no caching breaks that
-        onto = get_ontology("file://" + name_out).load()
-
-        # # namespace cached so not overwritten workaround:
-        # new_world = World()
-        # onto = new_world.get_ontology("file://" + name_out).load()
+        # read from file in force reload mode
+        onto = get_ontology("file://" + name_out).load(reload=True, only_local=True)
 
         ### print("New base_iri:", onto.base_iri)
         ### print("=== Ontology size ===:", len(onto.get_triples()))
 
         delete_file(name_in)
         delete_file(name_out)
-        # Uniqualizer.free(reasoning, uniq_n)  # do nor allow the same names in future until normal reload is done!
+        Uniqualizer.free(reasoning, uniq_n)  # allow reusing of names since correct reload of the ontology works!
 
         seconds = eval_stats['wall_time']
 
