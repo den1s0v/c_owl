@@ -8,6 +8,7 @@
 *.ttl
 *.txt
 *.doc*
+*.json
 ~*.*
 test_data/*/*output*
 test_data/*/*.rdf
