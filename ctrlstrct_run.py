@@ -11,6 +11,8 @@
 import json
 import re
 
+# from pprint import pprint
+
 # from owlready2 import *
 
 from upd_onto import *
@@ -898,16 +900,22 @@ def algorithm_only_to_onto(alg_tr, onto):
 
 
 def init_persistent_structure(onto):
-        # types.new_class(temp_name, (domain >> range_, ))  # , Property
+    # types.new_class(temp_name, (domain >> range_, ))  # , Property
+
+    skos = onto.get_namespace("http://www.w3.org/2004/02/skos/core#")
 
     with onto:
         # Статические определения
+
+        # skos:Concept
+        class Concept(Thing):
+            namespace = skos
 
         # новое свойство id
         if not onto["id"]:
             id_prop = types.new_class("id", (Thing >> int, FunctionalProperty, ))
         # ->
-        class act(Thing): pass  # Thing - временно?
+        class act(Concept): pass
         # -->
         class act_begin(act): pass
         # --->
@@ -920,17 +928,19 @@ def init_persistent_structure(onto):
         class correct_act(act): pass
         # # -->
         class normal_flow_correct_act(correct_act): pass
-        class breaking_flow_correct_act(correct_act): pass
-        AllDisjoint([
-          normal_flow_correct_act,
-          breaking_flow_correct_act
-        ])
+        # hide so far
+        # class breaking_flow_correct_act(correct_act): pass
+        # AllDisjoint([
+        #   normal_flow_correct_act,
+        #   breaking_flow_correct_act
+        # ])
 
         # ->
         class linked_list(Thing): pass
 
         # ->
-        class action(Thing): pass
+        class action(Concept): pass
+        class algorithm(Concept): pass
 
         ##### Граф между действиями алгоритма
         class boundary(Thing): pass  # begin or end of an action
@@ -940,9 +950,10 @@ def init_persistent_structure(onto):
         # class statement_begin(Thing): pass
         # class statement_end  (Thing): pass
 
-        class hide_boundaries(action):
-            """tells a complex action no to show (to skip) begin/end acts in not-collapsed mode."""
-            pass
+        # hide so far
+        # class hide_boundaries(action):
+        #     """tells a complex action no to show (to skip) begin/end acts in not-collapsed mode."""
+        #     pass
 
         # helper
         class gathered_child_exec_till(act >> act): pass
@@ -1270,40 +1281,46 @@ def init_persistent_structure(onto):
             if not onto[prop_name]:
                 types.new_class(prop_name, (onto["Erroneous"] >> Thing,))
 
-        # make correct_act subclasses
-        for class_name in [
+        # make consequent subproperties (always_consequent is default base)
+        for class_spec in [
             # "DebugObj",
             # "FunctionBegin",
             # "FunctionEnd",
             # "FunctionBodyBegin",
+            "StmtEnd",
+            "ExprEnd",
             "GlobalCodeBegin",
             "SequenceBegin",
             "SequenceNext",
             "SequenceEnd",
-            "StmtEnd",
-            "ExprEnd",
             "AltBegin",  # 1st condition
-            "NextAltCondition",
-            "AltBranchBegin",
-            "AltElseBranchBegin",
+            ("AltBranchBegin", on_true_consequent),
+            ("NextAltCondition", on_false_consequent),
+            ("AltElseBranchBegin", on_false_consequent),
+            ("AltEndAllFalse", on_false_consequent),
             "AltEndAfterBranch",
-            "AltEndAllFalse",
             "PreCondLoopBegin",
             "PostCondLoopBegin",
-            "LoopWithInitBegin",
-            "IterationBeginOnTrueCond",
-            "IterationBeginOnFalseCond",
-            "LoopBodyAfterUpdate",
+            ("IterationBeginOnTrueCond", on_true_consequent),
+            # "IterationBeginOnFalseCond",
+            # ("LoopUpdateOnTrueCond", on_true_consequent),
+            # "LoopBodyAfterUpdate",
+            ("LoopEndOnFalseCond", on_false_consequent),
+            # "LoopEndOnTrueCond",  # no rule yet?
             "LoopCondBeginAfterIteration",
-            "LoopCondBeginAfterInit",
-            "LoopCondAfterUpdate",
-            "LoopUpdateAfterIteration",
-            "LoopUpdateOnTrueCond",
-            "NormalLoopEnd",
+            # "LoopWithInitBegin",
+            # "LoopCondBeginAfterInit",
+            # "LoopUpdateAfterIteration",
+            # "LoopCondAfterUpdate",
         ]:
-            # class_name = "reason_" + class_name
-            # types.new_class(class_name, (Thing,))
-            types.new_class(class_name, (correct_act,))
+            # types.new_class(class_name, (correct_act,))
+            if isinstance(class_spec, str):
+                types.new_class(class_spec, (always_consequent,))
+            elif isinstance(class_spec, tuple):
+                class_name, base_names = class_spec[:2]
+                bases = tuple((onto[base_name] if type(base_name) is str else base_name) for base_name in [base_names])
+                # print(bases)
+                created_class = types.new_class(class_name, bases or (always_consequent,))
 
         # for prop_name in ("reason", ):  # for correct acts !
         #     if not onto[prop_name]:
@@ -1649,11 +1666,22 @@ def find_by_type(dict_or_list, types=(dict,), _not_entry=None):
                 yield from find_by_type(v, types, _not_entry)
 
 
-from pprint import pprint
-from stardog_credentails import *
+def save_schema(file_path='jena/schema-only.rdf'):
+    create_ontology_tbox().save(file_path)
+
+    print("Saved as:\t", file_path)
+    print()
+    print("Don't forget to copy the result to:")
+    print(r"c:\D\Work\YDev\CompPr\CompPrehension\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
 
 
 if __name__ == '__main__':
+
+    if 1:
+        print("Special run mode activated:")
+        print("Saving schema only to file.")
+        save_schema()
+        exit()
 
     print("Please run *_test.py script instead!")
     exit()

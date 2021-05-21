@@ -38,6 +38,7 @@
 	(?e my:end_of ?st),
 	 ->
 	 (?b my:always_consequent ?e),
+	 (?b my:StmtEnd ?e),
 ]
 [connect_ExprEnd:
 
@@ -46,6 +47,7 @@
 	(?e my:end_of ?st),
 	 ->
 	 (?b my:always_consequent ?e),
+	 (?b my:ExprEnd ?e),
 ]
 
 
@@ -133,6 +135,7 @@
 
 	 ->
 	 (?alg my:always_consequent ?b),
+	 (?alg my:GlobalCodeBegin ?b),
 ]
 
 [connect_SequenceBegin_rule_g2:
@@ -146,6 +149,7 @@
 
 	 ->
 	 (?b my:always_consequent ?b2),
+	 (?b my:SequenceBegin ?b2),
 ]
 
 [connect_SequenceNext:
@@ -158,6 +162,7 @@
 
 	 ->
 	 (?e my:always_consequent ?b),
+	 (?e my:SequenceNext ?b),
 ]
 
 [connect_SequenceEnd:
@@ -170,6 +175,7 @@
 
 	 ->
 	 (?e1 my:always_consequent ?e),
+	 (?e1 my:SequenceEnd ?e),
 ]
 
 
@@ -194,6 +200,7 @@
 
 	 ->
 	 (?b my:always_consequent ?b2),
+	 (?b my:AltBegin ?b2),
 ]
 
 [connect_AltBranchBegin_CondTrue:
@@ -208,6 +215,7 @@
 
 	 ->
 	 (?e my:on_true_consequent ?b),
+	 (?e my:AltBranchBegin ?b),
 ]
 
 [connect_NextAltCondition:
@@ -225,6 +233,7 @@
 	(?b my:begin_of ?cnd2),
 	 ->
 	 (?e my:on_false_consequent ?b),
+	 (?e my:NextAltCondition ?b),
 ]
 
 [connect_AltElseBranch:
@@ -242,6 +251,7 @@
 	(?b my:begin_of ?br2),
 	 ->
 	 (?e my:on_false_consequent ?b),
+	 (?e my:AltElseBranchBegin ?b),
 ]
 
 [connect_AltEndAllFalse:
@@ -259,6 +269,7 @@
 	(?e1 my:end_of ?cnd),
 	 ->
 	 (?e1 my:on_false_consequent ?e),
+	 (?e1 my:AltEndAllFalse ?e),
 ]
 
 [connect_AltEndAfterBranch:
@@ -269,6 +280,7 @@
 	(?e1 my:end_of ?br),
 	 ->
 	 (?e1 my:always_consequent ?e),
+	 (?e1 my:AltEndAfterBranch ?e),
 ]
 
 
@@ -287,6 +299,7 @@
 	(?b2 my:begin_of ?cnd),
 	 ->
 	 (?b my:always_consequent ?b2),
+	 (?b my:PreCondLoopBegin ?b2),
 ]
 
 [connect_LoopBegin-body:
@@ -297,6 +310,7 @@
 	(?b2 my:begin_of ?st),
 	 ->
 	 (?b my:always_consequent ?b2),
+	 (?b my:PostCondLoopBegin ?b2),
 ]
 
 [connect_LoopCond1-BodyBegin:
@@ -308,32 +322,35 @@
 	(?b my:begin_of ?st),
 	 ->
 	 (?e my:on_true_consequent ?b),
+	 (?e my:IterationBeginOnTrueCond ?b),
 ]
 
 # Rule: connect_LoopCond0-body [correct & loop]
 # ...
 
-[connect_LoopCond1-update:
-	(?Loop rdf:type my:pre_update_loop),
-	(?Loop my:cond ?cnd),
-	(?Loop my:update ?upd),
+#[connect_LoopCond1-update:
+#	(?Loop rdf:type my:pre_update_loop),
+#	(?Loop my:cond ?cnd),
+#	(?Loop my:update ?upd),
+#
+#	(?e my:end_of ?cnd),
+#	(?b my:begin_of ?upd),
+#	 ->
+#	 (?e my:on_true_consequent ?b),
+#	 (?e my:LoopUpdateOnTrueCond ?b),
+#]
 
-	(?e my:end_of ?cnd),
-	(?b my:begin_of ?upd),
-	 ->
-	 (?e my:on_true_consequent ?b),
-]
-
-[connect_LoopUpdate-body:
-	(?Loop rdf:type my:pre_update_loop),
-	(?Loop my:update ?upd),
-	(?Loop my:body ?st),
-
-	(?e my:end_of ?upd),
-	(?b my:begin_of ?st),
-	 ->
-	 (?e my:always_consequent ?b),
-]
+#[connect_LoopUpdate-body:
+#	(?Loop rdf:type my:pre_update_loop),
+#	(?Loop my:update ?upd),
+#	(?Loop my:body ?st),
+#
+#	(?e my:end_of ?upd),
+#	(?b my:begin_of ?st),
+#	 ->
+#	 (?e my:always_consequent ?b),
+#	 (?e my:LoopBodyAfterUpdate ?b),
+#]
 
 [connect_LoopCond0-LoopEnd:
 	(?Loop rdf:type my:conditional_loop),
@@ -343,22 +360,24 @@
 	(?e1 my:end_of ?cnd),
 	 ->
 	 (?e1 my:on_false_consequent ?e),
+	 (?e1 my:LoopEndOnFalseCond ?e),
 ]
 
-[connect_LoopCond0-LoopEnd-expl:
-	(?Loop rdf:type my:conditional_loop),
-	(?Loop my:cond ?cnd),
-	(?e1 my:end_of ?cnd),
-	(?e2 my:end_of ?Loop),
-	makeSkolem(?trs, ?e1, "on_false_consequent", ?e2)
-	 ->
-	 (?e1 my:on_false_consequent ?e2),
-	 (?trs rdf:type rdf:Statement),
-	 (?trs rdf:subject ?e1),
-	 (?trs rdf:predicate my:on_false_consequent),
-	 (?trs rdf:object ?e2),
-	 (?trs rdf:type my:NormalLoopEnd),
-]
+# Deprecated since subclassing `consequent` properties.
+#[connect_LoopCond0-LoopEnd-expl:
+#	(?Loop rdf:type my:conditional_loop),
+#	(?Loop my:cond ?cnd),
+#	(?e1 my:end_of ?cnd),
+#	(?e2 my:end_of ?Loop),
+#	makeSkolem(?trs, ?e1, "on_false_consequent", ?e2)
+#	 ->
+#	 (?e1 my:on_false_consequent ?e2),
+#	 (?trs rdf:type rdf:Statement),
+#	 (?trs rdf:subject ?e1),
+#	 (?trs rdf:predicate my:on_false_consequent),
+#	 (?trs rdf:object ?e2),
+#	 (?trs rdf:type my:NormalLoopEnd),
+#]
 
 
 # Rule: connect_LoopCond1-LoopEnd [correct & loop]
@@ -373,48 +392,53 @@
 	(?b my:begin_of ?cnd),
 	 ->
 	 (?e my:always_consequent ?b),
+	 (?e my:LoopCondBeginAfterIteration ?b),
 ]
 
-[connect_LoopBegin-init:
-	(?Loop rdf:type my:start_with_init),
-	(?Loop my:init ?st),
-	(?b my:begin_of ?Loop),
+#[connect_LoopBegin-init:
+#	(?Loop rdf:type my:start_with_init),
+#	(?Loop my:init ?st),
+#	(?b my:begin_of ?Loop),
+#
+#	(?b2 my:begin_of ?st),
+#	 ->
+#	 (?b my:always_consequent ?b2),
+#	 (?b my:LoopCondBeginAfterInit ?b2),
+#]
 
-	(?b2 my:begin_of ?st),
-	 ->
-	 (?b my:always_consequent ?b2),
-]
+#[connect_LoopInit-cond:
+#	(?Loop rdf:type my:start_with_init),
+#	(?Loop my:init ?st),
+#	(?Loop my:cond ?cnd),
+#
+#	(?e my:end_of ?st),
+#	(?b my:begin_of ?cnd),
+#	 ->
+#	 (?e my:always_consequent ?b),
+#	 (?e my:LoopCondBeginAfterInit ?b),
+#]
 
-[connect_LoopInit-cond:
-	(?Loop rdf:type my:start_with_init),
-	(?Loop my:init ?st),
-	(?Loop my:cond ?cnd),
+#[connect_LoopBody-update:
+#	(?Loop rdf:type my:post_update_loop),
+#	(?Loop my:body ?st),
+#	(?Loop my:update ?upd),
+#
+#	(?e my:end_of ?st),
+#	(?b my:begin_of ?upd),
+#	 ->
+#	 (?e my:always_consequent ?b),
+#	 (?e my:LoopUpdateAfterIteration ?b),
+#]
 
-	(?e my:end_of ?st),
-	(?b my:begin_of ?cnd),
-	 ->
-	 (?e my:always_consequent ?b),
-]
-
-[connect_LoopBody-update:
-	(?Loop rdf:type my:post_update_loop),
-	(?Loop my:body ?st),
-	(?Loop my:update ?upd),
-
-	(?e my:end_of ?st),
-	(?b my:begin_of ?upd),
-	 ->
-	 (?e my:always_consequent ?b),
-]
-
-[connect_LoopUpdate-cond:
-	(?Loop rdf:type my:post_update_loop),
-	(?Loop my:update ?upd),
-	(?Loop my:cond ?cnd),
-
-	(?e my:end_of ?upd),
-	(?b my:begin_of ?cnd),
-	 ->
-	 (?e my:always_consequent ?b),
-]
+#[connect_LoopUpdate-cond:
+#	(?Loop rdf:type my:post_update_loop),
+#	(?Loop my:update ?upd),
+#	(?Loop my:cond ?cnd),
+#
+#	(?e my:end_of ?upd),
+#	(?b my:begin_of ?cnd),
+#	 ->
+#	 (?e my:always_consequent ?b),
+#	 (?e my:LoopCondAfterUpdate ?b),
+#]
 
