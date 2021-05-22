@@ -1424,7 +1424,7 @@ def create_ontology_tbox() -> "onto":
     # global ONTOLOGY_maxID
 
     # создание онтологии
-    my_iri = ('http://vstu.ru/poas/ctrl_structs_2020-05_v%d' % 1)
+    my_iri = ('http://vstu.ru/poas/code')
     # ONTOLOGY_maxID += 1
     onto = get_ontology(my_iri)
     clear_ontology(onto, keep_tbox=False)  # True
@@ -1666,7 +1666,7 @@ def find_by_type(dict_or_list, types=(dict,), _not_entry=None):
                 yield from find_by_type(v, types, _not_entry)
 
 
-def save_schema(file_path='jena/schema-only.rdf'):
+def save_schema(file_path='jena/control-flow-statements-domain-schema.rdf'):
     create_ontology_tbox().save(file_path)
 
     print("Saved as:\t", file_path)

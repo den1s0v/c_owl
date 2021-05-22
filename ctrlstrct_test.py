@@ -651,7 +651,7 @@ def test_algorithm_to_tags():
 
 def test_algorithm_to_triples():
 
-	print("SPECIAL MODE: algorithm_to_triples")
+	print("SPECIAL MODE: algorithm_to_triples (saving questions JSON)")
 
 	import export2json
 	import json

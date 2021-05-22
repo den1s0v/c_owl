@@ -5,7 +5,7 @@
 @include <jena/rdfs4core.rules>.
 
 
-@prefix my: <http://vstu.ru/poas/ctrl_structs_2020-05_v1#> .
+@prefix my: <http://vstu.ru/poas/code#> .
 
 
 
