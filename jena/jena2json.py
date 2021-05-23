@@ -8,27 +8,32 @@ import re
 OUT_FILE = "control-flow-statements-domain-laws.json"
 
 
-TASK_MAP = {
-	"rdfs4core.rules": {
-		"name": "rdfs_subset",
+TASK_MAP = [
+	("rdfs4core.rules", {
+		"name": "rdfs_subset_positive",
 		"positive": True,
-	},
-	"alg_rules.ttl": {
+	}),
+	# Duplicate this as there no way to include these to both positive and negative
+	("rdfs4core.rules", {
+		"name": "rdfs_subset_negative",
+		"positive": False,
+	}),
+	("alg_rules.ttl", {
 		"name": None,
 		"positive": True,
-	},
-	"trace_rules.ttl": {
+	}),
+	("trace_rules.ttl", {
 		"name": None,
 		"positive": False,
-	},
-}
+	}),
+]
 
 # alg_rules.ttl
 # trace_rules.ttl
 
 def main():
 	all_laws = []
-	for fname, config in TASK_MAP.items():
+	for fname, config in TASK_MAP:
 		laws = read_laws_from_file(fname, config)
 		all_laws.extend(laws)
 		# print(laws)

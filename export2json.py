@@ -1,6 +1,8 @@
 # export2json.py
 # write algorithm examples to JSON for CompPrehension Question format
 
+from itertools import count
+
 from owlready2 import *
 import ctrlstrct_run
 import trace_gen.styling as styling
@@ -20,6 +22,8 @@ def export_algtr2dict(alg_tr, onto):
 	answerObjects = []
 	tags = []
 	concepts = set()
+
+	answer_ids = count()
 
 	# "owl:NamedIndividual"
 	# "xsd:int"
@@ -90,10 +94,32 @@ def export_algtr2dict(alg_tr, onto):
 			})
 
 
-	def make_answerObject(hyperText, phase, id_, concept):
+	def make_answerObject(hyperText, phase, id_, concept, answer_id=None):
+		if answer_id is None:
+			answer_id = next(answer_ids)
+		# make simple trace line without "nth time" in English only ...
+		# strip first word (begin/end/execute) and add phase (started/finished/performed)
+		view_phase = {
+			'started': 'began',
+			'finished': 'ended',
+			'performed': 'evaluated' if concept == 'expr' else 'executed',
+		}[phase]
+		trace_act = hyperText.split(maxsplit=1)[1] + " " + view_phase
+		trace_act_hypertext = trace_act
+		# trace_act_hypertext = styling.to_html(styling.prepare_tags_for_line(trace_act))
+
+		# patch ids in HTML
+		old_info = phase + ":" + str(id_)
+		new_info = old_info + ":" + trace_act_hypertext
+		nonlocal question_html
+		question_html = question_html.replace(old_info, str(answer_id))
+
+		print("domainInfo length:", len(new_info))
+
 		return {
+			"answerId": answer_id,
 			"hyperText": hyperText,
-			"domainInfo": phase + ":" + str(id_),
+			"domainInfo": new_info,
 			"isRightCol": False,
 			"concept": concept,
 			"responsesLeft": [],
@@ -105,7 +131,7 @@ def export_algtr2dict(alg_tr, onto):
 
 	### print(action_classes)
 
-	for ind in onto.action.instances():
+	for ind in sorted(onto.action.instances(), key=lambda a: a.name):
 		if isinstance(ind, onto.algorithm):  # or use `ind.is_a`
 			continue  # no buttons for whole algorithm
 		action_class = [cl for cl in ind.is_a if cl in action_classes]
@@ -139,11 +165,11 @@ def export_algtr2dict(alg_tr, onto):
 	question_html = question_html.replace("data-tooltip=", 'data-toggle="tooltip" title=')
 	question_html = question_html.replace("data-position=\"top left\"", 'data-placement="top"')
 
-	# replace answer IDs with their positions among answerObjects
-	for i, answerObject in enumerate(answerObjects):
-		pattern = "answer_" + answerObject["domainInfo"]
-		new_str = "answer_" + str(i)
-		question_html = question_html.replace(pattern, new_str)
+	# # replace answer IDs with their positions among answerObjects
+	# for i, answerObject in enumerate(answerObjects):
+	# 	pattern = "answer_" + answerObject["domainInfo"]
+	# 	new_str = "answer_" + str(i)
+	# 	question_html = question_html.replace(pattern, new_str)
 
 	question_html += STYLE_HEAD
 
