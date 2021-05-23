@@ -942,6 +942,8 @@ def init_persistent_structure(onto):
         class action(Concept): pass
         class algorithm(Concept): pass
 
+        class entry_point(algorithm >> action, FunctionalProperty): pass
+
         ##### Граф между действиями алгоритма
         class boundary(Thing): pass  # begin or end of an action
         class boundary_of(boundary >> action, FunctionalProperty): pass
@@ -1084,13 +1086,14 @@ def init_persistent_structure(onto):
         ]:
             types.new_class(class_name, (alt_branch,))
 
-        # make algorithm elements properties
-        for prop_name in ("body", "cond", "init", "update", ):
+        # make some properties
+        for prop_name in ("body", "cond", "init", "update", "student_next_act", "body_item", ):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
 
         # новое свойство executes
         prop_executes = types.new_class("executes", (Thing >> Thing, FunctionalProperty, ))
+        class executes_id(act >> int, FunctionalProperty): pass
 
         # новое свойство expr_value
         prop_expr_value = types.new_class("expr_value", (DataProperty, FunctionalProperty, ))
