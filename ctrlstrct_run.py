@@ -1087,7 +1087,7 @@ def init_persistent_structure(onto):
             types.new_class(class_name, (alt_branch,))
 
         # make some properties
-        for prop_name in ("body", "cond", "init", "update", "student_next_act", "body_item", ):
+        for prop_name in ("body", "cond", "init", "update", "body_item", "wrong_next_act", ):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
 
@@ -1104,10 +1104,10 @@ def init_persistent_structure(onto):
         # новое свойство next
         types.new_class("next", (Thing >> Thing, ))
         types.new_class("next_act", (correct_act >> correct_act, FunctionalProperty, InverseFunctionalProperty))
-        types.new_class("student_next", (Thing >> Thing, ))
 
         # новое свойство student_next
-        prop_student_next = types.new_class("student_next", (act >> act, ))
+        types.new_class("student_next", (Thing >> Thing, ))
+        types.new_class("student_next_latest", (act >> act, onto.student_next))
 
         # новое свойство next_sibling -- связывает акты, соседние по номеру раза выполнения (причём, начальные и конечные акты - раздельно)
         next_sibling = types.new_class("next_sibling", (Thing >> Thing, ))
@@ -1325,9 +1325,9 @@ def init_persistent_structure(onto):
                 # print(bases)
                 created_class = types.new_class(class_name, bases or (always_consequent,))
 
-        # for prop_name in ("reason", ):  # for correct acts !
-        #     if not onto[prop_name]:
-        #         types.new_class(prop_name, (correct_act >> Thing,))
+        for prop_name in ("reason", ):  # for correct acts !
+            if not onto[prop_name]:
+                types.new_class(prop_name, (correct_act >> Thing,))
 
 
 def load_swrl_rules(onto, rules_list, rules_filter=None):
