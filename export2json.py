@@ -105,8 +105,8 @@ def export_algtr2dict(alg_tr, onto):
 			'performed': 'evaluated' if concept == 'expr' else 'executed',
 		}[phase]
 		trace_act = hyperText.split(maxsplit=1)[1] + " " + view_phase
-		trace_act_hypertext = trace_act
-		# trace_act_hypertext = styling.to_html(styling.prepare_tags_for_line(trace_act))
+		# trace_act_hypertext = trace_act
+		trace_act_hypertext = styling.to_html(styling.prepare_tags_for_line(trace_act))
 
 		# patch ids in HTML
 		old_info = phase + ":" + str(id_)
