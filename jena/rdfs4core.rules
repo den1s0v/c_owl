@@ -4,6 +4,8 @@
 
 (?a ?p ?b), (?p rdfs:subPropertyOf ?q) -> (?a ?q ?b) .
 
+(?x owl:subClassOf ?y), (?y owl:subClassOf ?z) -> (?a owl:subClassOf ?z) .
+
 (?x rdfs:subClassOf ?y), (?a rdf:type ?x) -> (?a rdf:type ?y) .
 
 [transitiveRule: (?P rdf:type owl:TransitiveProperty), (?A ?P ?B), (?B ?P ?C) -> (?A ?P ?C) ]
