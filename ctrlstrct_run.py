@@ -540,7 +540,7 @@ class TraceTester():
 
                 # сохраняем назад в наш словарь (для привязки к актам трассы)
                 d["iri"] = iri
-                print('### saving iri back to dict:', iri)
+                ### print('### saving iri back to dict:', iri)
                 # создаём объект
                 obj = class_(iri)
                 # привязываем id
@@ -1106,7 +1106,7 @@ def init_persistent_structure(onto):
         types.new_class("next_act", (correct_act >> correct_act, FunctionalProperty, InverseFunctionalProperty))
 
         # новое свойство student_next
-        types.new_class("student_next", (Thing >> Thing, ))
+        types.new_class("student_next", (act >> Thing, ))
         types.new_class("student_next_latest", (act >> act, onto.student_next))
 
         # новое свойство next_sibling -- связывает акты, соседние по номеру раза выполнения (причём, начальные и конечные акты - раздельно)
@@ -1378,12 +1378,15 @@ def extact_mistakes(onto, as_objects=False, group_by=("text_line",), filter_by_l
             values.append(getattr(inst, prop_name) if hasattr(inst, prop_name) else None)
         return tuple(values)
 
-    categories = [
-        onto.UpcomingNeighbour,
-        onto.WrongCondNeighbour,
-        onto.NotNeighbour,
-        onto.Erroneous
-    ] if filter_by_level else [onto.Erroneous]
+    if filter_by_level:
+        categories = [
+            onto.UpcomingNeighbour,
+            onto.WrongCondNeighbour,
+            onto.NotNeighbour,
+            onto.Erroneous
+        ]
+    else:
+        categories = [onto.Erroneous]
 
     mistakes = {}
 

@@ -1,5 +1,5 @@
 # export2json.py
-# write algorithm examples to JSON for CompPrehension Question format
+# write algorithm examples to JSON as CompPrehension questions
 
 from itertools import count
 
@@ -85,6 +85,9 @@ def export_algtr2dict(alg_tr, onto):
 		expr_name = ind.stmt_name
 		values_list = alg_data["expr_values"].get(expr_name, None)
 		if values_list:
+			#
+			# print("values_list:", values_list)
+			#
 			statementFacts.append({
 				'subjectType': "owl:NamedIndividual",
 				'subject': expr_name,
@@ -114,7 +117,7 @@ def export_algtr2dict(alg_tr, onto):
 		nonlocal question_html
 		question_html = question_html.replace(old_info, str(answer_id))
 
-		print("domainInfo length:", len(new_info))
+		### print("domainInfo length:", len(new_info))
 
 		return {
 			"answerId": answer_id,
@@ -157,10 +160,13 @@ def export_algtr2dict(alg_tr, onto):
 				"finished", ind.id, action_class.name,
 			))
 
+	# show concepts
+	print("concepts:", concepts)
+
 
 	# patch generated html ...
 	question_html = question_html.replace("<i class=\"play small icon\"></i>", '<img src="https://icons.bootstrap-4.ru/assets/icons/play-fill.svg" alt="Play" width="22">')
-	question_html = question_html.replace("<i class=\"stop small icon\"></i>", '<img src="https://icons.bootstrap-4.ru/assets/icons/stop-fill.svg" alt="Stop" width="22">')
+	question_html = question_html.replace("<i class=\"stop small icon\"></i>", '<img src="https://icons.bootstrap-4.ru/assets/icons/stop-fill.svg" alt="Stop" width="20">')
 	# data-toggle="tooltip" data-placement="top" title="Tooltip on top"
 	question_html = question_html.replace("data-tooltip=", 'data-toggle="tooltip" title=')
 	question_html = question_html.replace("data-position=\"top left\"", 'data-placement="top"')

@@ -32,6 +32,7 @@ TASK_MAP = [
 # trace_rules.ttl
 
 def main():
+	print("Exporting Jena rules as laws ...")
 	all_laws = []
 	for fname, config in TASK_MAP:
 		laws = read_laws_from_file(fname, config)

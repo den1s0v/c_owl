@@ -1227,6 +1227,10 @@ def parse_text_file(txt_file_path, encoding="utf8"):
     print("  Number of valid traces:", len(valid_alg_trs))
     print()
 
+    ###
+    # from pprint import pprint
+    # pprint(valid_alg_trs[-1])
+
     return valid_alg_trs
 
 
