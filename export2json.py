@@ -178,7 +178,7 @@ def export_algtr2dict(alg_tr, onto):
 	# 	question_html = question_html.replace(pattern, new_str)
 
 	question_html += STYLE_HEAD
-
+	concepts = list(sorted(concepts))
 
 	return {
 		"questionType": "ORDERING",
@@ -195,10 +195,11 @@ def export_algtr2dict(alg_tr, onto):
 		"concepts": [  # ???
 		  "trace",
 		  "mistake",
-		  *sorted(concepts),
+		  *concepts,
 		],
 		"tags": [  # ????
 		  "C++",
+		  *concepts,
 		  # "basics",
 		  # "operators",
 		  # "order",
