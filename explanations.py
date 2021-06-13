@@ -203,6 +203,7 @@ def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 
 def format_by_spec(format_str: str, **params: dict):
 	"Simple replace"
+	# placeholder_affices = None
 	placeholder_affices = (("<", ">"), ("<list-", ">"))
 	for key, value in params.items():
 		for prefix, suffix in (placeholder_affices or (("",""),)):
