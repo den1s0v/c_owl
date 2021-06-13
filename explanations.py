@@ -1,5 +1,9 @@
 import re
 
+
+MESSAGES_FILE = "jena/control-flow-statements-domain-messages.txt"
+
+
 # from owlready2 import *
 
 from trace_gen.json2alg2tr import get_target_lang
@@ -199,10 +203,12 @@ def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 
 def format_by_spec(format_str: str, **params: dict):
 	"Simple replace"
+	placeholder_affices = (("<", ">"), ("<list-", ">"))
 	for key, value in params.items():
-		format_str = format_str.replace(key, value)
+		for prefix, suffix in (placeholder_affices or (("",""),)):
+			format_str = format_str.replace(prefix + key + suffix, value)
 
-	if not format_str.endswith('.'):
+	if not format_str.endswith('.') and not format_str.endswith('?'):
 		format_str += '.'
 	###
 	print('*', format_str)
@@ -265,7 +271,42 @@ def _sort_linked_list(array, next_prop: "transitive onto.prop"):
 	array.sort(key=cmp_to_key(next_prop.name))
 	return array
 
+
+def named_fields_param_provider(a: 'act_instance'):
+	"""extract ALL field_* facts, no matter what law they belong to."""
+	placeholders = {}
+	for prop in a.get_properties():
+		verb = prop.python_name
+		if verb.startswith("field_"):  # признак того, что это специальное свойство [act >> str]
+			fieldName = verb.replace("field_", "")
+			value = prop[a][0]
+			# convert to str
+			value = {
+				True: 'true',
+				False: 'false',
+			}.get(value, str(value))
+			value = "\"" + value + "\""  # enclose
+			if (fieldName in placeholders):
+				# append to previous data
+				value = placeholders.get(fieldName) + ", " + value
+
+			placeholders[fieldName] = value
+	return placeholders
+
+
 def register_explanation_handlers():
+
+	# read templates from file
+	with open(MESSAGES_FILE) as f:
+		for spec in f.readlines():
+			spec = spec.strip()
+			if not spec:
+				continue
+			class_name, format_str = class_formatstr(spec.split('\t'))
+			register_handler(class_name, format_str, named_fields_param_provider)
+
+	return
+	# no more hardcode needed >>
 
 
 	######### General act mistakes #########
