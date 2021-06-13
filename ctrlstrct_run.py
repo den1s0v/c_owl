@@ -1087,7 +1087,7 @@ def init_persistent_structure(onto):
             types.new_class(class_name, (alt_branch,))
 
         # make some properties
-        for prop_name in ("body", "cond", "init", "update", "body_item", "wrong_next_act", ):
+        for prop_name in ("body", "cond", "init", "update", "wrong_next_act", ):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
 
@@ -1144,6 +1144,40 @@ def init_persistent_structure(onto):
         # # новое свойство child_level
         # prop_child_level = types.new_class("child_level", (Thing >> Thing, SymmetricProperty))
 
+        # make string_placeholder properties
+        class string_placeholder(Thing >> str): pass
+        for suffix in (
+            "A", # "B", "C", "D", "EX",
+            "kind_of_loop", "TrueFalse",
+            "BEGIN",  # для CorrespondingEndMismatched
+            "EXTRA",  # для NotNeighbour
+            "MISSING",  # пропущены перед текущим
+            "COND",     # любое условие (общий случай)
+            "INNER",    # для CorrespondingEndMismatched: несоответствующее начало, которое явл. вложенным действием несоответствующего конца
+            "CONTEXT",    # (неверный) родитель (по трассе)
+            "PARENT",   # верный родитель
+            "PREVIOUS", # TooLateInSequence: тот, что должен быть после, но он перед текущим
+            "LOOP",
+            "LOOP_COND",
+            "ALT",
+            "ALT_COND", # любое из условий (перечисляет все условия)
+            "CURRENT_ALT_COND", # текущее условие
+            # "PREV_ALT_COND",
+            "LATEST_ALT_COND", # выполн. последним, но не текущее условие
+            "EXPECTED_ALT_COND", # ожидаемое, но отсутствующее
+            "REQUIRED_COND", # условие, которое не вычислено
+            "UNEXPECTED_ALT_COND", # не ожидаемое, но присутствующее
+            "BRANCH",  # уже выполнилась
+            "BRANCH2",
+            "EXPECTED_BRANCH", "UNEXPECTED_BRANCH",
+            # "ELSE_BRANCH", # "BRANCHES"
+        ):
+            prop_name = "field_" + suffix
+            if not onto[prop_name]:
+                types.new_class(prop_name, (string_placeholder, ))
+
+        class fetch_kind_of_loop(act >> action, ): pass
+
         # новое свойство corresponding_end
         class corresponding_end(act_begin >> act_end, ): pass
         class student_corresponding_end(act_begin >> act_end, ): pass
@@ -1156,13 +1190,14 @@ def init_persistent_structure(onto):
 
         class branches_item(parent_of): pass
         class body(parent_of): pass
+        class body_item(parent_of): pass
 
        # объекты, спровоцировавшие ошибку
         if not onto["Erroneous"]:
             Erroneous = types.new_class("Erroneous", (Thing,))
 
-            category2priority = None  # declare it later
-            class error_priority(Thing >> int): pass
+            # category2priority = None  # declare it later
+            # class error_priority(Thing >> int): pass
 
             # make Erroneous subclasses
             # (class, [bases])
@@ -1182,7 +1217,7 @@ def init_persistent_structure(onto):
                 # ("MisplacedBefore", ["WrongContext"]),
                 # ("MisplacedAfter", ["WrongContext"]),
                 ("MisplacedDeeper", ["WrongContext"], "wrong_context"),
-                ("EndedDeeper", ["WrongContext", "CorrespondingEndMismatched"], "wrong_context"),  # +
+                ("EndedDeeper", ["WrongContext", ], "wrong_context"),  # +
                 ("EndedShallower", ["WrongContext", "CorrespondingEndMismatched"], "wrong_context"), # не возникнет для первой ошибки в трассе.
                 ("OneLevelShallower", ["WrongContext"], "concrete_wrong_context"), # +
 
@@ -1213,7 +1248,7 @@ def init_persistent_structure(onto):
                 ("BranchWithoutCondition", (), "extra"), # +
                 ("BranchNotNextToCondition", ["BranchWithoutCondition"], "missing"), # +
                 ("ElseBranchNotNextToLastCondition", ["BranchWithoutCondition"], "extra"), # +
-                ("ElseBranchAfterTrueCondition", ["BranchWithoutCondition", "ConditionMisuse"], "by_different_cond"), # ~
+                ("ElseBranchAfterTrueCondition", ["BranchWithoutCondition", "ElseBranchNotNextToLastCondition", "ConditionMisuse"], "by_different_cond"), # ~
                 ("NoBranchWhenConditionIsTrue", ["ConditionMisuse"], "by_different_cond"), # +
                 ("LastConditionIsFalseButNoElse", (), "missing"), # +
                 ("NoNextCondition", (), "missing"), # ~
