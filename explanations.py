@@ -280,18 +280,20 @@ def named_fields_param_provider(a: 'act_instance'):
 		verb = prop.python_name
 		if verb.startswith("field_"):  # признак того, что это специальное свойство [act >> str]
 			fieldName = verb.replace("field_", "")
-			value = prop[a][0]
-			# convert to str
-			value = {
-				True: 'true',
-				False: 'false',
-			}.get(value, str(value))
-			value = "\"" + value + "\""  # enclose
-			if (fieldName in placeholders):
-				# append to previous data
-				value = placeholders.get(fieldName) + ", " + value
+			## value = prop[a][0]
+			for value in prop[a]:
+				# convert to str
+				value = {
+					True: 'true',
+					False: 'false',
+				}.get(value, str(value))
+				value = "\"" + value + "\""  # enclose
+				if (fieldName in placeholders):
+					# append to previous data
+					value = placeholders.get(fieldName) + ", " + value
 
-			placeholders[fieldName] = value
+				placeholders[fieldName] = value
+
 	return placeholders
 
 
