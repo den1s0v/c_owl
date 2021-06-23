@@ -1,5 +1,7 @@
 # common_helpers.py
 
+import re
+import os
 from timeit import default_timer as timer
 
 
@@ -72,8 +74,6 @@ class Uniqualizer():
 		pass
 
 
-import os
-
 def delete_file(file):
 	if os.path.exists(file):
 		try:
@@ -85,6 +85,12 @@ def delete_file(file):
 	else:
 		# print("File does not exist")
 		pass
+
+
+__CAMELCASE_RE = re.compile(r"([a-z])([A-Z])")
+
+def camelcase_to_snakecase(s: str, sep='_') -> str:
+	return __CAMELCASE_RE.sub(lambda m: f"{m.group(1)}{sep}{m.group(2)}", s).lower()
 
 
 if __name__ == '__main__':

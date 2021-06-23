@@ -1,5 +1,7 @@
 import re
 
+from common_helpers import camelcase_to_snakecase
+
 
 MESSAGES_FILE = "jena/control-flow-statements-domain-messages.txt"
 
@@ -10,7 +12,7 @@ from trace_gen.json2alg2tr import get_target_lang
 from upd_onto import get_relation_object, get_relation_subject
 
 
-onto = None
+onto = None  # TODO: remove global var
 
 
 def tr(word_en, case='nomn'):
@@ -59,10 +61,11 @@ ALGORITHM_ITEM_CLASS_NAMES = {
 # map error class name to format string & method of it's expansion
 FORMAT_STRINGS = {}
 PARAM_PROVIDERS = {}
-CLASS_NAMES = {}  # "lang" -> str
+CLASS_NAMES = {}  # "en-name" -> {"lang" -> "local-name"}
 
 
 def get_executes(act, *_):
+	onto = act.namespace
 	boundary = get_relation_object(act, onto.executes)
 	return get_relation_object(boundary, onto.boundary_of)
 
@@ -74,9 +77,19 @@ def get_leaf_classes(classes) -> set:
 		# print(classes, "-" ,base_classes)
 		return set(classes) - get_base_classes(classes)
 
+def class_name_to_readable(s):
+	sep = " "
+	res = s.replace("-", sep)
+	if res == s:
+		res = camelcase_to_snakecase(s, sep).capitalize()
+	return res
+
 
 def format_full_name(a: 'act or stmt', include_phase=False, include_type=True, include_line_index=False, case='nomn', quote="'"):
 	""" -> begin of loop waiting (at line 45) """
+
+	assert False, "Deprecated function: format_full_name()"
+
 	try:
 
 		is_act = bool({onto.act_begin, onto.act_end, onto.trace} & set(a.is_a))
@@ -179,16 +192,22 @@ def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 	for error_class in error_classes:
 		class_name = error_class.name
 		if class_name in PARAM_PROVIDERS:
-			format_str = FORMAT_STRINGS[class_name].get(get_target_lang(), None) or FORMAT_STRINGS[class_name].get("en", '__')
+			templates = FORMAT_STRINGS[class_name]
+			format_str = templates.get(get_target_lang(), None) or templates.get("en", '__')
+			params = PARAM_PROVIDERS[class_name](act_instance)
 			expl = format_by_spec(
 				format_str,
-				**PARAM_PROVIDERS[class_name](act_instance)
+				**params
 			)
 			## with prefixed error name
 			# localized_class_name = CLASS_NAMES[class_name].get(get_target_lang(), None) or class_name
 			# explanation = f"{localized_class_name}: {expl}"
 			## without error name
-			explanation = expl
+			explanation = {
+				"names": {lang: class_name_to_readable(name) for lang,name in CLASS_NAMES[class_name].items()},
+				"explanation": expl,
+				"explanation_by_locale": {lang: format_by_spec(format_str, **params) for lang, format_str in templates.items()},
+			}
 			result.append(explanation)
 		else:
 			print("<> Skipping explanation for: <>", class_name, "<>")
@@ -223,7 +242,7 @@ def register_handler(class_name, format_dict, method):
 		class_names_dict = class_name
 		class_name = class_names_dict["en"]
 	else:
-		class_names_dict = {}
+		class_names_dict = {}  # ? use {en -> class_name} by default ?
 
 	PARAM_PROVIDERS[class_name] = method
 	FORMAT_STRINGS[class_name] = format_dict
@@ -253,7 +272,7 @@ def _sort_linked_list(array, next_prop: "transitive onto.prop"):
 	def cmp_to_key(prop_name):
 		'Convert a cmp= function into a key= function'
 		class K:
-			def __init__(self, obj, *args):
+			def __init__(self, obj, *_):
 				self.obj = obj
 			def __lt__(self, other):
 				return getattr(self.obj, prop_name).__contains__(other.obj)

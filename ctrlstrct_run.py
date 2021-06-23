@@ -1453,8 +1453,10 @@ def extact_mistakes(onto, as_objects=False, group_by=("text_line",), filter_by_l
 
             classes = get_leaf_classes((set(inst.is_a) | set(d.get("classes", {}))) & error_classes)
             d["classes"] = [class_.name for class_ in classes]
-            explanations = format_explanation(onto, inst)
+            expanded_explanations = format_explanation(onto, inst)
+            explanations = [d["explanation"] for d in expanded_explanations]
             d["explanations"] = sorted(set(d.get("explanations", []) + explanations))
+            d["mistakes"] = expanded_explanations
         if mistakes:
             break
 

@@ -16,7 +16,7 @@ import trace_gen.styling as styling
 import trace_gen.syntax as syntax
 from trace_gen.json2alg2tr import set_target_lang
 
-from common_helpers import Checkpointer
+from common_helpers import Checkpointer, camelcase_to_snakecase
 
 from options import DEBUG, RUN_LOCALLY
 
@@ -233,6 +233,11 @@ def process_algorithm_and_trace_as_text_request(json):
 	assert "alg" in json
 	assert "trace" in json
 
+	# should create var on first execution
+	if '__LINE_IDNEX_RE' not in globals():
+		global __LINE_IDNEX_RE
+		__LINE_IDNEX_RE = re.compile(r"(line|строк\w+)\s*(\d+)")
+
 	alg_text = json["alg"].strip()
 	trace_text = json["trace"].strip()
 
@@ -331,13 +336,6 @@ def process_algorithm_and_trace_as_json_request(json):
 
 	# return str(feedback)
 	return formatted_feedback
-
-
-__CAMELCASE_RE = re.compile(r"([a-z])([A-Z])")
-__LINE_IDNEX_RE = re.compile(r"(line|строк\w+)\s*(\d+)")
-
-def camelcase_to_snakecase(s: str, sep='_') -> str:
-	return __CAMELCASE_RE.sub(lambda m: f"{m.group(1)}{sep}{m.group(2)}", s).lower()
 
 
 if __name__ == "__main__":

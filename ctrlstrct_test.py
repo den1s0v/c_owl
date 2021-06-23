@@ -399,6 +399,7 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 		if write_mistakes_to_acts and len(alg_trs_list) != 1:
 			print("** Warning!: write_mistakes_to_acts is inapplicable when traces count =", len(alg_trs_list), "(!=1)")
 		if write_mistakes_to_acts and len(alg_trs_list) == 1:
+			# ошибки нужны, и сейчас не режим тестирования
 			trace = alg_trs_list[0]['trace']
 			for mistake in mistakes:
 				act_id = mistake["id"][0]
@@ -407,6 +408,7 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 					act_obj["explanations"] = sorted(set(new_explanations))
 					if not act_obj["explanations"]:  # был пустой список - запишем хоть что-то
 						act_obj["explanations"] = ["Ошибка обнаружена, но вид ошибки не определён."]
+					act_obj["mistakes"] = mistake
 					act_obj["is_valid"] = False
 					if 'value' in act_obj:
 						print(" ***** Reset act value.")
