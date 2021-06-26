@@ -10,8 +10,13 @@ function redraw_activity_diagram(algorithm_json, trace_json, options) {
 	let entry_point = algorithm_json["entry_point"];
 	let alg = create_alg_for(entry_point);
 
+	// alg.rebase(new paper.Point(100, 82));
 
-	alg.rebase(new paper.Point(100, 82));
+	const alg_topCenter = alg.bbox().topCenter;
+	const blocklyArea = document.getElementById('blocklyArea');
+	const div_topCenter = new paper.Rectangle(element_rectangle(blocklyArea)).topCenter.add(new paper.Point(0, 20));
+
+	alg.rebase(alg_topCenter, div_topCenter);
 
 	// console.debug(" About to clear the canvas ...")
 	if (globals.project) {
@@ -26,7 +31,6 @@ function redraw_activity_diagram(algorithm_json, trace_json, options) {
 		let [second_last_act, last_act] = trace_json.slice(-2);
 		// console.log("second_last_act, last_act:", second_last_act, last_act)
 		highlight_or_connect(second_last_act, last_act);
-
 	}
 
 
@@ -38,6 +42,24 @@ function redraw_activity_diagram(algorithm_json, trace_json, options) {
 			link.draw();
 	}
 }
+
+function element_rectangle(elem) {
+	// Compute the absolute coordinates and dimensions of element.
+	let element = elem;
+	let x = 0;
+	let y = 0;
+	do {
+		x += element.offsetLeft;
+		y += element.offsetTop;
+		element = element.offsetParent;
+	} while (element);
+
+	return {
+			point: [x, y],
+			size: [elem.offsetWidth, elem.offsetHeight]
+	};
+}
+
 
 function _phase_to_role(phase, default_role) {
 	if (phase === "started")
