@@ -33,9 +33,10 @@
 <!-- <script type="text/javascript" src="/static/jquery.js"></script>
  -->
 <!-- Paper -->
-<script type="text/javascript" src="/static/paper/paper-full.min.js"></script>
+<script type="text/javascript" src="/static/paper/paper-core.min.js"></script>
 
-<script type="text/paperscript" canvas="myCanvas" src="/static/paper/paper-canvas.js"> </script>
+<!-- <script type="text/paperscript" canvas="myCanvas" src="/static/paper/paper-canvas.js"> </script> -->
+<script type="text/javascript" src="/static/paper/paper-canvas.js"> </script>
 <script type="text/javascript" src="/static/paper/diagram.js"> </script>
 <script type="text/javascript" src="/static/paper/activity-vis.js"> </script>
 <!-- /Paper -->
@@ -231,7 +232,7 @@
     // paper
     function paper_on_load() {
 		// console.log("paper_on_load() ...")
-        window.globals.paper_init();
+        window.globals.paper_init('myCanvas');
         diagram_init();
 		// console.log("paper_on_load() OK.")
     }

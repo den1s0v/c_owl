@@ -1,29 +1,29 @@
 // paper-canvas.js
 
-var canvas = null;
-var P = 4;
+let canvas = null;
+let P = 4;
 // OUTER = 'outer'
 // INNER = 'inner'
-// var COLOR = {};
+// let COLOR = {};
 // COLOR[OUTER] = '#ffeeee';
 // COLOR[INNER] = '#ffdddd';
-// var COLOR2 = {};
+// let COLOR2 = {};
 // COLOR2[OUTER] = '#eeeeff';
 // COLOR2[INNER] = '#ddddff';
-// var COLOR3 = {};
+// let COLOR3 = {};
 // COLOR3[OUTER] = '#eeffee';
 // COLOR3[INNER] = '#ddffdd';
 
 // Both PaperScript and JavaScript have access to the Window scope, therefore you can use window.globals<code> from the JavaScript and <code>globals<code> from PaperScript to pass information back and forth.
-globals = {};
+window.globals = {};
 
 function relative_coords(docX, docY) {
-	var bb = canvas.getBoundingClientRect()
+	let bb = canvas.getBoundingClientRect()
 	return [docX - bb.left, docY - bb.top]
 }
 
 function segment_frac(point1, point2, frac) {
-	var bb = canvas.getBoundingClientRect()
+	let bb = canvas.getBoundingClientRect()
 	return [
 		point1.x + (point2.x - point1.x) * frac,
 		point1.y + (point2.y - point1.y) * frac,
@@ -31,15 +31,15 @@ function segment_frac(point1, point2, frac) {
 }
 
 function span_bbox(span) {
-    bb = span.getBoundingClientRect()
-    var rectangle = new Rectangle(
-    	new Point(relative_coords(bb.left-P, bb.top-P)),
-    	new Point(relative_coords(bb.right+P, bb.bottom+P))
+    let bb = span.getBoundingClientRect()
+    let rectangle = new paper.Rectangle(
+    	new paper.Point(relative_coords(bb.left-P, bb.top-P)),
+    	new paper.Point(relative_coords(bb.right+P, bb.bottom+P))
 	);
     return rectangle;
 }
 function draw_around(rectangle, inner_color, outer_color) {
-    var path = new Path.Rectangle(rectangle, 5);
+    let path = new paper.Path.Rectangle(rectangle, 5);
     // Give the stroke a color
     path.fillColor = inner_color || COLOR2[INNER];
     path.strokeColor = outer_color || COLOR[OUTER];
@@ -51,7 +51,7 @@ function draw_around(rectangle, inner_color, outer_color) {
 }
 
 function PathDiamond(rect) {
-	path = new Path();
+	let path = new paper.Path();
 	path.add(rect.topCenter);
 	path.add(rect.rightCenter);
 	path.add(rect.bottomCenter);
@@ -60,18 +60,18 @@ function PathDiamond(rect) {
 	return path;
 }
 
-var COL_LINE = "#77f";
-var COL_BOX_BORDER = "#333";
-var BOX_BORDER_WIDTH = 3;
-var COL_BOX_FILL = "white";
-var COL_BLOCK_BORDER = '#0006';
+let COL_LINE = "#77f";
+let COL_BOX_BORDER = "#333";
+let BOX_BORDER_WIDTH = 3;
+let COL_BOX_FILL = "white";
+let COL_BLOCK_BORDER = '#0006';
 
-var COL_LINE_HIGHLIGHT = '#55ff77';
-var COL_BOX_HIGHLIGHT = '#ccccff';
+let COL_LINE_HIGHLIGHT = '#55ff77';
+let COL_BOX_HIGHLIGHT = '#ccccff';
 
 function draw_shape(type, config) {
 	// if (["arrow"].includes(type)) {
-	// 	path = new Path(config);
+	// 	path = new paper.Path(config);
 	// 	path.strokeColor = 'red';
 	// 	// path.dashArray = [10, 10];
 	// 	return
@@ -83,12 +83,13 @@ function draw_shape(type, config) {
 			config.fillColor = COL_LINE;
 		// config.strokeCap = 'butt';
 		config.strokeCap = config.strokeCap || 'square';
+
 		if (config.highlighted) {
 			config[config.highlight_field] = COL_LINE_HIGHLIGHT;
 			/// experiment:
 			config.strokeWidth *= 1.15;
 		}
-		path = new Path(config);
+		let path = new paper.Path(config);
 		// path.strokeColor = 'red';
 		// path.dashArray = [10, 10];
 		// path.smooth();
@@ -113,60 +114,60 @@ function draw_shape(type, config) {
 		return;
 	}
 	if ("text" === type) {
-		var text;
+		let text;
 		if (config.outline_offset) {
 			// draw several times with offset to mimic text outline
-			var config_clone = Object.assign({}, config);
+			let config_clone = Object.assign({}, config);
 			config_clone.fillColor = config.shadowColor || "white";
-			var d = config.outline_offset;
-			var shift = new Point(d, 0);
+			let d = config.outline_offset;
+			let shift = new paper.Point(d, 0);
 
-			for (var angle = 0; angle < 360; angle += 90) {
+			for (let angle = 0; angle < 360; angle += 90) {
 				config_clone.point = config.point + shift.rotate(angle);
-				text = new PointText(config_clone);
+				text = new paper.PointText(config_clone);
 			}
 		}
 		// draw the text
-		text = new PointText(config);
+		text = new paper.PointText(config);
 		return;
 	}
 	if ("circle" === type) {
-		var path = new Path.Circle(config);
+		let path = new paper.Path.Circle(config);
 		return;
 	}
 
-	var path = null;
+	let path = null;
 	if (["DoLoopArea", "WhileLoopArea", "AlternativeArea"].includes(type)) {
-		path = new Path.Rectangle(new Rectangle(config.rectangle));
+		path = new paper.Path.Rectangle(new paper.Rectangle(config.rectangle));
 		path.strokeColor = COL_BLOCK_BORDER;
 		path.dashArray = [10, 10];
 	}
 	else if (type === "SequenceArea") {
 		if (config.highlighted) {
-			path = new Path.Rectangle(new Rectangle(config.rectangle));
+			path = new paper.Path.Rectangle(new paper.Rectangle(config.rectangle));
 			path.strokeColor = COL_BLOCK_BORDER;
 			path.dashArray = [3, 3];
 		}
 	}
 	else if (type === "BoxArea") {
-		path = new Path.Rectangle(new Rectangle(config.rectangle));
+		path = new paper.Path.Rectangle(new paper.Rectangle(config.rectangle));
 		path.strokeColor = COL_BOX_BORDER;
 		path.strokeWidth = BOX_BORDER_WIDTH;
 		path.fillColor = config.highlighted ? COL_BOX_HIGHLIGHT : COL_BOX_FILL;
 	}
 	else if (type === "Slot") {
-		path = new Path.Circle(config, 2);
+		path = new paper.Path.Circle(config, 2);
 		path.strokeColor = 'black';
 		path.fillColor = 'yellow';
 	}
 	else if ("ConditionDiamond" === type) {
-		path = PathDiamond(new Rectangle(config.rectangle));
+		path = PathDiamond(new paper.Rectangle(config.rectangle));
 		path.strokeColor = COL_BOX_BORDER;
 		path.strokeWidth = BOX_BORDER_WIDTH;
 		path.fillColor = config.highlighted ? COL_BOX_HIGHLIGHT : COL_BOX_FILL;
 	}
 	else if ("TransitDiamond" === type) {
-		// path = new Path.Rectangle(config.rectangle);
+		// path = new paper.Path.Rectangle(config.rectangle);
 		if (config.hidden) {
 			path = PathDiamond(config.rectangle);
 			if (config.visible !== undefined) {
@@ -175,7 +176,7 @@ function draw_shape(type, config) {
 			path.fillColor = config.highlighted ? COL_LINE_HIGHLIGHT : config.color || COL_LINE;
 			// path.strokeColor = 'grey'; ///
 		} else {
-			path = new Path.Rectangle(config.rectangle);
+			path = new paper.Path.Rectangle(config.rectangle);
 			path.fillColor = config.highlighted ? COL_LINE_HIGHLIGHT : 'white';
 			path.strokeColor = COL_LINE;
 		}
@@ -187,72 +188,77 @@ function draw_shape(type, config) {
 		console.log("Do not draw: " + type);
 	}
 }
-globals.draw_shape = draw_shape
+window.globals.draw_shape = draw_shape
 
-function paper_init() {
+function paper_init(canvas_id) {
     // console.log("main() started")
 
     // Get a reference to the canvas object
-    canvas = document.getElementById('paper_canvas');
-	globals.project = project;
+    canvas = document.getElementById(canvas_id);
+
+	// Create an empty project and a view for the canvas:
+	paper.setup(canvas);
+
+	window.globals.project = paper.project;
+	console.debug("paper_init() finished.");
 }
-globals.paper_init = paper_init;
+window.globals.paper_init = paper_init;
 
 
 function main() {
     // Create an empty project and a view for the canvas:
     // setup(canvas);
     // algorithm_element_id="36"
-    var span1 = $("span[algorithm_element_id='33']").parent()[0];
-    var rect1 = span_bbox(span1);
-    var span2 = $("span[algorithm_element_id='29']").parent()[0];
-    var rect2 = span_bbox(span2);
+    let span1 = $("span[algorithm_element_id='33']").parent()[0];
+    let rect1 = span_bbox(span1);
+    let span2 = $("span[algorithm_element_id='29']").parent()[0];
+    let rect2 = span_bbox(span2);
  //    bb = span.getBoundingClientRect()
 
- 	var h = Math.max(10, (rect1.top - rect2.bottom) / 2);
+ 	let h = Math.max(10, (rect1.top - rect2.bottom) / 2);
  	// console.log(h)
- 	var up = new Point(0, -h);
- 	var down = new Point(0, h);
- 	// var right = new Point(h, 0);
+ 	let up = new paper.Point(0, -h);
+ 	let down = new paper.Point(0, h);
+ 	// let right = new paper.Point(h, 0);
 
-    var path = new Path();
+    let path = new paper.Path();
     // path.strokeColor = COLOR[OUTER];
     // path.fillColor = COLOR[OUTER];
 
     // Create the gradient, passing it an array of colors to be converted
     // to evenly distributed color stops:
-    var gradient = new Gradient([COLOR3[OUTER], COLOR[OUTER]]);
+    let gradient = new paper.Gradient([COLOR3[OUTER], COLOR[OUTER]]);
 
     // Have the gradient color run between the topLeft and
     // bottomRight points we defined earlier:
-    var gradientColor = new Color(gradient, rect2.bottomCenter, rect1.topCenter);
+    let gradientColor = new paper.Color(gradient, rect2.bottomCenter, rect1.topCenter);
 
     // Set the fill color of the path to the gradient color:
     path.fillColor = gradientColor;
     path.strokeColor = gradientColor;
 
     path.strokeWidth = 0*P;
-    var startskew = rect2.width * 0.3;
-    var endw = Math.min(5, rect1.width * 0.1);
+    let startskew = rect2.width * 0.3;
+    let endw = Math.min(5, rect1.width * 0.1);
     // path.dashArray = [20, 4];
-    path.add(new Segment(rect2.bottomRight + [-P,-0], null, down + [-startskew, 0]));
+    path.add(new paper.Segment(rect2.bottomRight + [-P,-0], null, down + [-startskew, 0]));
 
-    path.add(new Segment(rect1.center.add([endw, 0]),       up.add([0, 0])));
-    path.add(new Segment(rect1.center.add([-endw, 0]), null, up.add([-0, 0])));
+    path.add(new paper.Segment(rect1.center.add([endw, 0]),       up.add([0, 0])));
+    path.add(new paper.Segment(rect1.center.add([-endw, 0]), null, up.add([-0, 0])));
 
-    path.add(new Segment(rect2.bottomLeft.add([P,-0]),        down.add([startskew, 0])));
+    path.add(new paper.Segment(rect2.bottomLeft.add([P,-0]),        down.add([startskew, 0])));
     path.closePath();
 
     draw_around(rect1, COLOR[INNER], COLOR[OUTER]);
     draw_around(rect2, COLOR3[INNER], COLOR3[OUTER]);
 
- //    var rectangle = new Rectangle(
- //    	new Point(
+ //    let rectangle = new paper.Rectangle(
+ //    	new paper.Point(
  //    		...relative_coords(bb.left-P, bb.top-P)),
- //    	new Point(
+ //    	new paper.Point(
  //    		...relative_coords(bb.right+P, bb.bottom+P)),
 	// );
- //    var path = new Path.Rectangle(rectangle, 5);
+ //    let path = new paper.Path.Rectangle(rectangle, 5);
  //    // Give the stroke a color
  //    path.strokeColor = '#ff557799';
  //    path.strokeWidth = 4;
@@ -260,11 +266,11 @@ function main() {
 
     // http://paperjs.org/tutorials/geometry/point-size-and-rectangle/
 
-    // // var rect = new Rectangle(new Point(bb.left, bb.top), new Point(bb.right, bb.bottom));
-    // path.lineTo(new Point(...relative_coords(bb.left, bb.top)));
-    // path.lineTo(new Point(...relative_coords(bb.right, bb.top)));
-    // path.lineTo(new Point(...relative_coords(bb.right, bb.bottom)));
-    // path.lineTo(new Point(...relative_coords(bb.left, bb.bottom)));
+    // // let rect = new paper.Rectangle(new paper.Point(bb.left, bb.top), new paper.Point(bb.right, bb.bottom));
+    // path.lineTo(new paper.Point(...relative_coords(bb.left, bb.top)));
+    // path.lineTo(new paper.Point(...relative_coords(bb.right, bb.top)));
+    // path.lineTo(new paper.Point(...relative_coords(bb.right, bb.bottom)));
+    // path.lineTo(new paper.Point(...relative_coords(bb.left, bb.bottom)));
     // path.closePath();
 
     // Draw the view now:
@@ -322,9 +328,9 @@ d = new Diamond([12,15], [0,0, 100,100])
 console.log(d)
 */
 
-console.log("paper is ready ...")
+// console.log("paper is ready ...")
 // console.log("main() is starting ...")
 // main();
 // console.log("main() completed.")
 
-// globals.paper_on_load();
+// window.globals.paper_on_load();
