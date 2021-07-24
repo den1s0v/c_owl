@@ -612,7 +612,7 @@ STYLE_HEAD = '''<style type="text/css" media="screen">
 	#     border: 1px solid #000000;
 	# }
 
-	span.string, span.atom { color: #f08; font-style: italic; font-weight: bold; }
+	span.string, span.atom { color: #555; font-style: italic; }
 	span.comment { color: #262; font-style: italic; line-height: 1em; }
 	span.meta { color: #555; font-style: italic; line-height: 1em; }
 	span.variable { color: #700; text-decoration: underline; }
