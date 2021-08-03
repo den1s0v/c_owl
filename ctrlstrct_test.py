@@ -612,7 +612,8 @@ STYLE_HEAD = '''<style type="text/css" media="screen">
 	#     border: 1px solid #000000;
 	# }
 
-	span.string, span.atom { color: #555; font-style: italic; }
+    span.string { color: #555; font-style: italic }
+    span.atom { color: #f08; font-style: italic; font-weight: bold; }
 	span.comment { color: #262; font-style: italic; line-height: 1em; }
 	span.meta { color: #555; font-style: italic; line-height: 1em; }
 	span.variable { color: #700; text-decoration: underline; }
@@ -651,9 +652,9 @@ def test_algorithm_to_tags():
 		file.write(to_html(tags))
 
 
-def test_algorithm_to_triples():
+def test_algorithm_to_triples(inspect_questions_via_dot=False):
 
-	print("SPECIAL MODE: algorithm_to_triples (saving questions JSON)")
+	print("SPECIAL MODE: algorithm_to_triples (saving questions to JSON)")
 
 	import export2json
 	import json
@@ -669,9 +670,11 @@ def test_algorithm_to_triples():
 	for alg_tr in alg_trs:
 		# print(alg_tr)
 		if alg_tr["algorithm_name"] in alg_names:
+			# skip the same algorithms
 			continue
 
 		alg_names.add(alg_tr["algorithm_name"])
+		print(" >>> ", alg_tr["algorithm_name"])
 
 		# ctrlstrct_run.algorithm_only_to_onto(alg_tr, onto)
 		q_dict = export2json.export_algtr2dict(alg_tr, onto)
@@ -682,6 +685,14 @@ def test_algorithm_to_triples():
 	## apply rules only for algorithm
 	# onto = ctrlstrct_run.sync_jena(onto, rules_path="jena/alg_rules.ttl")
 
+
+	if inspect_questions_via_dot:
+		# analyze created questions
+		import qs2dot
+		qs2dot.lay_questions_on_graph({d["_alg_name"]:set(d["_mistakes"]) for d in questions})
+
+		print('SKIP saving to JSON ! 	Debugging the graph...')
+		return
 
 
 	with open("jena/control-flow-statements-domain-questions.json", "w") as f:
@@ -697,7 +708,7 @@ if __name__ == '__main__':
 	if 1:
 		# test_make_act_line()
 		# test_algorithm_to_tags()
-		test_algorithm_to_triples()
+		test_algorithm_to_triples(inspect_questions_via_dot=1)
 		###
 		print()
 		print('Exit as in custom debug mode.')

@@ -7,9 +7,9 @@ from owlready2 import *
 import ctrlstrct_run
 import trace_gen.styling as styling
 import trace_gen.syntax as syntax
+from trace_gen.txt2algntr import find_by_keyval_in
 
 from pprint import pprint
-
 
 syntax.set_allow_hidden_buttons(False)
 
@@ -161,7 +161,7 @@ def export_algtr2dict(alg_tr, onto):
 			))
 
 	# show concepts
-	print("concepts:", concepts)
+	print("\tconcepts:", concepts)
 
 
 	# patch generated html ...
@@ -178,7 +178,12 @@ def export_algtr2dict(alg_tr, onto):
 	# 	question_html = question_html.replace(pattern, new_str)
 
 	question_html += STYLE_HEAD
-	concepts = list(sorted(concepts))
+	concepts = sorted(concepts)
+
+	###
+	mistakes = find_mistakes_for_task(concepts, alg_data)
+	print("\tMistakes:", len(mistakes))
+	# print(mistakes)
 
 	return {
 		"questionType": "ORDERING",
@@ -196,6 +201,8 @@ def export_algtr2dict(alg_tr, onto):
 		  "trace",
 		  "mistake",
 		  *concepts,
+		  ### ???
+		  *mistakes,
 		],
 		"tags": [  # ????
 		  "C++",
@@ -204,7 +211,11 @@ def export_algtr2dict(alg_tr, onto):
 		  # "operators",
 		  # "order",
 		  # "evaluation"
-		]
+		],
+		###>
+		"_mistakes": mistakes,
+		"_alg_name": alg_tr["algorithm_name"],
+		###<
 	  }
 
 
@@ -217,13 +228,84 @@ def type_of(literal):
 	return "xsd:" + str(type(literal).__name__)
 
 
-STYLE_HEAD = '''<style type="text/css" media="screen">
-	div.code-line {
-	  font-family: courier;
-	  font-size: 10pt;
-	}
 
-	span.string, span.atom { color: #f08; font-style: italic; font-weight: bold; }
+_MISTAKES_MAP = None
+
+def find_mistakes_for_task(concepts, alg_data=None):
+	global _MISTAKES_MAP
+	if not _MISTAKES_MAP:
+		_MISTAKES_MAP = read_mistakes_map()
+	concepts = [*concepts, *_analyze_sequences_length(alg_data)]
+	mistakes = []
+	for name, mapping in _MISTAKES_MAP.items():
+		price = 0
+		for feature, cost in mapping.items():
+			if _match_against_features(feature, concepts):
+				price += cost
+		if price >= 1:
+			mistakes.append(name)
+	pass
+	return mistakes
+
+def _analyze_sequences_length(alg_data) -> tuple('of features'):
+	nontrivial_sequence_exists = False
+	for d in find_by_keyval_in("type", "sequence", alg_data):
+		if len(d["body"]) > 1:
+			nontrivial_sequence_exists = True
+			break
+	return () if nontrivial_sequence_exists else ('seq-of-1-max', )
+
+
+def _match_against_features(key: str, features: list) -> bool:
+	if key in features:
+		return True
+	if " & " in key:
+		keys = key.split(" & ")
+		return all(_match_against_features(k, features) for k in keys)
+	if key.startswith("*"):
+		key = key.lstrip("*")
+		for f in features:
+			if f.endswith(key):
+				return True
+	if key.startswith("!"):
+		key = key.lstrip("!")
+		return key not in features
+	### print("  *** Unknown feature key:", key)
+	return False
+
+
+def read_mistakes_map():
+	S = '\t'  # separator
+	mistakes_mapping = {}
+	with open('jena/mistakes-map.txt') as f:
+		for i, line in enumerate(f.readlines()):
+			if i == 0: continue
+			if i == 1:
+				# read useful header
+				assert line.startswith(S), line
+				features = line.strip().strip(S).split(S)
+				continue
+			# read mistake lines (table body)
+			line = line.strip().strip(S)
+			name, *cells = line.strip(S).split(S)
+			mapping = {f:float(c.strip()) for f, c in zip(features, cells) if c.strip() and c != "-"}
+			if mapping:  # is not empty
+				mistakes_mapping[name] = mapping
+
+	return mistakes_mapping
+
+
+
+STYLE_HEAD = '''<style type="text/css" media="screen">
+	body {
+	  font-family: courier; font-size: 10pt;
+	}
+	# div {
+	#     border: 1px solid #000000;
+	# }
+
+    span.string { color: #555; font-style: italic }
+    span.atom { color: #f08; font-style: italic; font-weight: bold; }
 	span.comment { color: #262; font-style: italic; line-height: 1em; }
 	span.meta { color: #555; font-style: italic; line-height: 1em; }
 	span.variable { color: #700; text-decoration: underline; }
@@ -244,3 +326,10 @@ STYLE_HEAD = '''<style type="text/css" media="screen">
 
 </style>
 '''
+
+def main():
+	# debug it!
+	print(find_mistakes_for_task(["if", "else"]))
+
+if __name__ == '__main__':
+	main()

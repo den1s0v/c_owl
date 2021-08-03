@@ -13,3 +13,6 @@ xmltodict
 
 ### ASP support ###
 # clyngor-with-clingo
+
+### Export questions data to DOT format (GraphViz itself required, too) ###
+# graphviz
