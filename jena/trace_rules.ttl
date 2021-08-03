@@ -1306,7 +1306,6 @@
 
 # Rule: NoAlternativeEndAfterBranch-alt_Error [alternative & mistake]
 [
-
 	(?a rdf:type my:act_end),
 	(?a my:executes ?bnd_a), (?bnd_a my:boundary_of ?br),
 	(?alt my:branches_item ?br),
@@ -1355,11 +1354,8 @@
 
 
 
-
-
-
 ###############################
-# loop mistake
+# loop helper
 ###############################
 
 # Rule: fetch_kind_of_loop-helper [loop & mistake]
@@ -1381,6 +1377,14 @@
 # TODO: ... add more helper rules for other kinds of loops:
 #	for_loop
 #	foreach_loop
+
+
+
+
+###############################
+# loop mistake
+###############################
+
 
 # Rule: LoopStartIsNotCondition-loop_Error [loop & mistake]
 [

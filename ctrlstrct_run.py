@@ -1171,12 +1171,18 @@ def init_persistent_structure(onto):
             "BRANCH2",
             "EXPECTED_BRANCH", "UNEXPECTED_BRANCH",
             # "ELSE_BRANCH", # "BRANCHES"
+            "SEQ",
+            "NEXT",
+            "NEXT_COND",
         ):
             prop_name = "field_" + suffix
             if not onto[prop_name]:
                 types.new_class(prop_name, (string_placeholder, ))
 
         class fetch_kind_of_loop(act >> action, ): pass
+        class reason_kind(boundary >> Thing, ): pass
+        class to_reason(Thing >> Thing, ): pass
+        class from_reason(Thing >> Thing, ): pass
 
         # новое свойство corresponding_end
         class corresponding_end(act_begin >> act_end, ): pass

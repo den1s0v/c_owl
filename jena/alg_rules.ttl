@@ -147,9 +147,16 @@
 	(?st rdf:type my:first_item),
 	(?b2 my:begin_of ?st),
 
+	makeSkolem(?R, ?b, ?b2),
+	(?block my:stmt_name ?seq_name),
+	(?st my:stmt_name ?inner_name),
 	 ->
 	 (?b my:always_consequent ?b2),
 	 (?b my:SequenceBegin ?b2),
+	  (?R my:reason_kind my:SequenceBegin),
+	  (?b my:to_reason ?R), (?R my:from_reason ?b2),
+	  (?R my:field_SEQ ?seq_name),
+	  (?R my:field_INNER ?inner_name),
 ]
 
 [connect_SequenceNext:
@@ -160,9 +167,18 @@
 	(?e my:end_of ?st),
 	(?b my:begin_of ?st2),
 
+	makeSkolem(?R, ?e, ?b),
+	(?block my:stmt_name ?seq_name),
+	(?st my:stmt_name ?previous_name),
+	(?st2 my:stmt_name ?next_name),
 	 ->
 	 (?e my:always_consequent ?b),
 	 (?e my:SequenceNext ?b),
+	  (?R my:reason_kind my:SequenceNext),
+	  (?e my:to_reason ?R), (?R my:from_reason ?b),
+	  (?R my:field_SEQ ?seq_name),
+	  (?R my:field_PREVIOUS ?previous_name),
+	  (?R my:field_NEXT ?next_name),
 ]
 
 [connect_SequenceEnd:
@@ -173,9 +189,14 @@
 	(?st rdf:type my:last_item),
 	(?e1 my:end_of ?st),
 
+	makeSkolem(?R, ?e1, ?e),
+	(?block my:stmt_name ?seq_name),
 	 ->
 	 (?e1 my:always_consequent ?e),
 	 (?e1 my:SequenceEnd ?e),
+	  (?R my:reason_kind my:SequenceEnd),
+	  (?e1 my:to_reason ?R), (?R my:from_reason ?e),
+	  (?R my:field_SEQ ?seq_name),
 ]
 
 
@@ -198,9 +219,16 @@
 	(?br my:cond ?cnd),
 	(?b2 my:begin_of ?cnd),
 
+	makeSkolem(?R, ?b, ?b2),
+	(?alt my:stmt_name ?alt_name),
+	(?cnd my:stmt_name ?cnd_name),
 	 ->
 	 (?b my:always_consequent ?b2),
 	 (?b my:AltBegin ?b2),
+	  (?R my:reason_kind my:AltBegin),
+	  (?b my:to_reason ?R), (?R my:from_reason ?b2),
+	  (?R my:field_ALT ?alt_name),
+	  (?R my:field_ALT_COND ?cnd_name),
 ]
 
 [connect_AltBranchBegin_CondTrue:
@@ -213,9 +241,18 @@
 	(?e my:end_of ?cnd),
 	(?b my:begin_of ?br),
 
+	makeSkolem(?R, ?e, ?b),
+#	(?alt my:stmt_name ?alt_name),
+	(?cnd my:stmt_name ?cnd_name),
+	(?br my:stmt_name ?branch_name),
 	 ->
 	 (?e my:on_true_consequent ?b),
 	 (?e my:AltBranchBegin ?b),
+	  (?R my:reason_kind my:AltBranchBegin),
+	  (?e my:to_reason ?R), (?R my:from_reason ?b),
+#	  (?R my:field_ALT ?alt_name),
+	  (?R my:field_ALT_COND ?cnd_name),
+	  (?R my:field_BRANCH ?branch_name),
 ]
 
 [connect_NextAltCondition:
@@ -231,9 +268,17 @@
 
 	(?e my:end_of ?cnd),
 	(?b my:begin_of ?cnd2),
+
+	makeSkolem(?R, ?e, ?b),
+	(?cnd my:stmt_name ?cnd_name),
+	(?cnd2 my:stmt_name ?cnd2_name),
 	 ->
 	 (?e my:on_false_consequent ?b),
 	 (?e my:NextAltCondition ?b),
+	  (?R my:reason_kind my:NextAltCondition),
+	  (?e my:to_reason ?R), (?R my:from_reason ?b),
+	  (?R my:field_ALT_COND ?cnd_name),
+	  (?R my:field_NEXT_COND ?cnd2_name),
 ]
 
 [connect_AltElseBranch:
@@ -243,15 +288,24 @@
 
 	(?br my:cond ?cnd),
 	(?br rdf:type my:alt_branch),
+	(?alt my:branches_item ?br),
 
 	(?br my:next ?br2),
 	(?br2 rdf:type my:else),
 
 	(?e my:end_of ?cnd),
 	(?b my:begin_of ?br2),
+
+	makeSkolem(?R, ?e, ?b),
+	(?alt my:stmt_name ?alt_name),
+	(?cnd my:stmt_name ?cnd_name),
 	 ->
 	 (?e my:on_false_consequent ?b),
 	 (?e my:AltElseBranchBegin ?b),
+	  (?R my:reason_kind my:AltElseBranchBegin),
+	  (?e my:to_reason ?R), (?R my:from_reason ?b),
+	  (?R my:field_ALT ?alt_name),
+	  (?R my:field_ALT_COND ?cnd_name),
 ]
 
 [connect_AltEndAllFalse:
@@ -261,15 +315,22 @@
 
 	(?br my:cond ?cnd),
 	(?br rdf:type my:alt_branch),
+	(?alt my:branches_item ?br),
 
 	(?br rdf:type my:last_item),
 	(?alt rdf:type my:alternative),
 	(?e my:end_of ?alt),
 
 	(?e1 my:end_of ?cnd),
+
+	makeSkolem(?R, ?e1, ?e),
+	(?alt my:stmt_name ?alt_name),
 	 ->
 	 (?e1 my:on_false_consequent ?e),
 	 (?e1 my:AltEndAllFalse ?e),
+	  (?R my:reason_kind my:AltEndAllFalse),
+	  (?e1 my:to_reason ?R), (?R my:from_reason ?e),
+	  (?R my:field_ALT ?alt_name),
 ]
 
 [connect_AltEndAfterBranch:
@@ -278,11 +339,43 @@
 	(?e my:end_of ?alt),
 
 	(?e1 my:end_of ?br),
+
+	makeSkolem(?R, ?e1, ?e),
+	(?alt my:stmt_name ?alt_name),
 	 ->
 	 (?e1 my:always_consequent ?e),
 	 (?e1 my:AltEndAfterBranch ?e),
+	  (?R my:reason_kind my:AltEndAfterBranch),
+	  (?e1 my:to_reason ?R), (?R my:from_reason ?e),
+	  (?R my:field_ALT ?alt_name),
 ]
 
+
+
+
+###############################
+# loop helper
+###############################
+
+# Rule: fetch_kind_of_loop-helper [loop & mistake]
+[
+	(?a my:fetch_kind_of_loop ?Loop),
+	(?Loop rdf:type my:while_loop),
+	 ->
+	 drop(0),
+	 (?a my:field_kind_of_loop "WHILE"),
+]
+# Rule: fetch_kind_of_loop-helper [loop & mistake]
+[
+	(?a my:fetch_kind_of_loop ?Loop),
+	(?Loop rdf:type my:do_while_loop),
+	 ->
+	 drop(0),
+	 (?a my:field_kind_of_loop "DO-WHILE"),
+]
+# TODO: ... add more helper rules for other kinds of loops:
+#	for_loop
+#	foreach_loop
 
 
 
@@ -297,9 +390,17 @@
 	(?b my:begin_of ?Loop),
 
 	(?b2 my:begin_of ?cnd),
+
+	makeSkolem(?R, ?b, ?b2),
+	(?Loop my:stmt_name ?loop_name),
+	(?cnd my:stmt_name ?cnd_name),
 	 ->
 	 (?b my:always_consequent ?b2),
 	 (?b my:PreCondLoopBegin ?b2),
+	  (?R my:reason_kind my:PreCondLoopBegin),
+	  (?b my:to_reason ?R), (?R my:from_reason ?b2),
+	  (?R my:field_LOOP ?loop_name),
+	  (?R my:field_LOOP_COND ?cnd_name),
 ]
 
 [connect_LoopBegin-body:
@@ -307,10 +408,15 @@
 	(?Loop my:body ?st),
 	(?b my:begin_of ?Loop),
 
+	makeSkolem(?R, ?b, ?b2),
+	(?Loop my:stmt_name ?loop_name),
 	(?b2 my:begin_of ?st),
 	 ->
 	 (?b my:always_consequent ?b2),
 	 (?b my:PostCondLoopBegin ?b2),
+	  (?R my:reason_kind my:PostCondLoopBegin),
+	  (?b my:to_reason ?R), (?R my:from_reason ?b2),
+	  (?R my:field_LOOP ?loop_name),
 ]
 
 [connect_LoopCond1-BodyBegin:
@@ -320,9 +426,18 @@
 
 	(?e my:end_of ?cnd),
 	(?b my:begin_of ?st),
+
+	makeSkolem(?R, ?e, ?b),
+	(?Loop my:stmt_name ?loop_name),
+	(?cnd my:stmt_name ?cnd_name),
 	 ->
 	 (?e my:on_true_consequent ?b),
 	 (?e my:IterationBeginOnTrueCond ?b),
+	  (?R my:reason_kind my:IterationBeginOnTrueCond),
+	  (?e my:to_reason ?R), (?R my:from_reason ?b),
+	  (?R my:fetch_kind_of_loop ?Loop),
+	  (?R my:field_LOOP ?loop_name),
+	  (?R my:field_LOOP_COND ?cnd_name),
 ]
 
 # Rule: connect_LoopCond0-body [correct & loop]
@@ -358,9 +473,18 @@
 	(?e my:end_of ?Loop),
 
 	(?e1 my:end_of ?cnd),
+
+	makeSkolem(?R, ?e1, ?e),
+	(?Loop my:stmt_name ?loop_name),
+	(?cnd my:stmt_name ?cnd_name),
 	 ->
 	 (?e1 my:on_false_consequent ?e),
 	 (?e1 my:LoopEndOnFalseCond ?e),
+	  (?R my:reason_kind my:LoopEndOnFalseCond),
+	  (?e1 my:to_reason ?R), (?R my:from_reason ?e),
+	  (?R my:fetch_kind_of_loop ?Loop),
+	  (?R my:field_LOOP ?loop_name),
+	  (?R my:field_LOOP_COND ?cnd_name),
 ]
 
 
@@ -374,9 +498,17 @@
 
 	(?e my:end_of ?st),
 	(?b my:begin_of ?cnd),
+
+	makeSkolem(?R, ?e, ?b),
+	(?Loop my:stmt_name ?loop_name),
+	(?cnd my:stmt_name ?cnd_name),
 	 ->
 	 (?e my:always_consequent ?b),
 	 (?e my:LoopCondBeginAfterIteration ?b),
+	  (?R my:reason_kind my:LoopCondBeginAfterIteration),
+	  (?e my:to_reason ?R), (?R my:from_reason ?b),
+	  (?R my:field_LOOP ?loop_name),
+	  (?R my:field_LOOP_COND ?cnd_name),
 ]
 
 #[connect_LoopBegin-init:
