@@ -1198,7 +1198,7 @@ def init_persistent_structure(onto):
         class body(parent_of): pass
         class body_item(parent_of): pass
 
-       # объекты, спровоцировавшие ошибку
+        # объекты, спровоцировавшие ошибку
         if not onto["Erroneous"]:
             Erroneous = types.new_class("Erroneous", (Thing,))
 
@@ -1630,7 +1630,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         onto.save(file=name_in, format='rdfxml')
 
         if 1:  # if 0, do not perform reasoning (rerun in debug)
-            eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=1)
+            eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=False)
         else:
             eval_stats = {"wall_time": 0}
 

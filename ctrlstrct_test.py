@@ -13,7 +13,7 @@ import re
 ###
 import ctrlstrct_run
 
-from ctrlstrct_run import process_algtraces
+from ctrlstrct_run import process_algtraces, TraceTester
 from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from trace_gen.json2alg2tr import act_line_for_alg_element
 from upd_onto import get_relation_object
@@ -275,7 +275,7 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 	### print(algorithm_element_id, act_type, *existing_trace_list, sep='\n')
 
 	try:
-		elem = algorithm_json["id2obj"].get(str(algorithm_element_id), None)
+		elem = algorithm_json["id2obj"].get(algorithm_element_id, algorithm_json["id2obj"].get(str(algorithm_element_id)))
 
 		assert elem, f"No element with id={algorithm_element_id} in given algorithm."
 
@@ -443,6 +443,137 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 		raise e
 		print(msg)
 		return [], msg
+
+
+def grid_question(alg):
+	""" Try all possible options "to click" for each step of building the trace.
+		Alert if multiple or no correct answers are found at a time.
+		Gather and return possible mistake types for each step.
+	 """
+
+    # use repair_data
+	TraceTester({
+			    "trace_name"    : 'trace_name',
+			    "algorithm_name": "alg_name",
+			    "trace"         : [],
+			    "algorithm"     : alg,
+			    "header_boolean_chain": None
+		    })
+
+	# print(alg)
+
+
+	# find all available "buttons" to "click"
+	actions = []  # list of tuples: (id, phase)
+	for d in find_by_key_in("id", alg['entry_point']['body']):
+		if 'type' in d:
+			if d['type'] in ('expr', 'stmt'):
+				act_types = ['performed']
+			else:
+				act_types = ['finished', 'started', ]
+			for phase in act_types:
+				item = ((d['id']), phase)
+				# actions.append(item)
+				actions.insert(0, item)
+				###
+				# print(repr(d['id']), d["act_name"]["ru"])
+				###
+
+	# actions = list(reversed(actions))
+
+	###
+	print("grid_question():", len(actions), "actions found in algorithm.")
+	###
+
+	partial_trace = []  # is always correct
+	trace_completed = False
+	steps = []
+
+	# step-by-step building the trace
+	while not trace_completed:
+		step = {
+			'mistakes': set(),
+			'correct_answer': None,
+		}
+		steps.append(step)
+
+		correct_acts = None
+
+		for i, (action_id, phase) in enumerate(actions):
+			###
+			print(">>>")
+			print(">>> Griging ... step", len(partial_trace), "take", i)
+			print(">>>")
+			###
+
+			# obtain a new partial trace with act-candidate
+			acts = make_act_json(algorithm_json=alg, algorithm_element_id=action_id,
+				act_type=phase,
+				existing_trace_json=partial_trace,
+				user_language='en',
+			)
+
+			###
+			print("Trying act:", acts[-1]["as_string"])
+			assert isinstance(acts[0], dict)
+
+			alg_trs = [{
+			    "trace_name"    : 'trace_name',
+			    "algorithm_name": "alg_name",
+			    "trace"         : acts,  # [*partial_trace, *acts]
+			    "algorithm"     : alg,
+			    "header_boolean_chain": None
+		    }]
+
+			# process_algorithms_and_traces(alg_trs, write_mistakes_to_acts=True)
+			try:
+				_onto, mistakes = process_algtraces(alg_trs, verbose=0, mistakes_as_objects=False, reasoning="jena", debug_rdf_fpath=None)
+
+			except Exception as e:
+				msg = "Exception occured running reasoner while griding a question: %s: %s"%(str(type(e)), str(e))
+				raise e
+				print(msg)
+				# return [], msg
+
+			if not mistakes:
+				if step["correct_answer"]:
+					# one more correct answer!
+					print("** grid_question(): Alert! Multiple correct answers at the same point!")
+				else:
+					correct_acts = acts
+					step["correct_answer"] = (action_id, phase)
+					print("\t+++")
+					print("\t++ Correct step(s) found:", *[d["as_string"] for d in acts], sep="\n\t\t")
+					print("\t+++")
+					###
+					# break
+					###
+
+				# a simple finish heuristic
+				if phase == 'finished' and action_id == actions[0][0]:
+					trace_completed = True
+					###
+					break
+					###
+
+			else:
+				curr_mistakes = {m for d in mistakes for m in d["classes"]}
+				step["mistakes"].update(curr_mistakes)
+
+
+		if not correct_acts:
+			# no correct answer!
+			print("** grid_question(): Alert! No correct answers at the point!")
+			break
+
+		# add correct act(s) to trace
+		for act in correct_acts:
+			act["is_valid"] = True
+		partial_trace = correct_acts
+
+		print("Mistakes possible at this step:", step["mistakes"])
+
+	return steps
 
 
 def run_tests(directory="test_data/", process_kwargs={}):
@@ -701,9 +832,25 @@ def test_algorithm_to_triples(inspect_questions_via_dot=False):
 	print('Questions written to JSON !')
 
 
+def test_grid():
+	import json
+	with open('trace_gen/alg_test.json') as file:
+		alg_data = json.load(file)
+
+
+	grid_question(alg_data)
+
 
 
 if __name__ == '__main__':
+
+	if 1:
+		test_grid()
+		###
+		print()
+		print('Exit as in custom debug mode.')
+		exit()
+		###
 
 	if 1:
 		# test_make_act_line()
