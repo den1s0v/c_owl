@@ -201,7 +201,8 @@ def export_algtr2dict(alg_tr, onto):
 		  "trace",
 		  "mistake",
 		  *concepts,
-		  ### ???
+		],
+		"negativeLaws": [
 		  *mistakes,
 		],
 		"tags": [  # ????

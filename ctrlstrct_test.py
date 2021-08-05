@@ -19,6 +19,8 @@ from trace_gen.json2alg2tr import act_line_for_alg_element
 from upd_onto import get_relation_object
 import trace_gen.styling as styling
 
+from common_helpers import Checkpointer
+
 
 TEST_DIR = "./test_data"
 OUTPUT_FNM = "output.json"
@@ -445,27 +447,29 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 		return [], msg
 
 
-def grid_question(alg):
+def grid_question(alg, skip_redundant_checks=False):
 	""" Try all possible options "to click" for each step of building the trace.
 		Alert if multiple or no correct answers are found at a time.
 		Gather and return possible mistake types for each step.
+
+		If True, `skip_redundant_checks` may result in incomplete mistakes set.
 	 """
 
-    # use repair_data
-	TraceTester({
-			    "trace_name"    : 'trace_name',
-			    "algorithm_name": "alg_name",
-			    "trace"         : [],
-			    "algorithm"     : alg,
-			    "header_boolean_chain": None
-		    })
+	# use repair_data
+	tt = TraceTester({
+					"trace_name"    : 'trace_name',
+					"algorithm_name": "alg_name",
+					"trace"         : [],
+					"algorithm"     : alg,
+					"header_boolean_chain": None
+				})
+	tt.prepare_id2obj()
 
 	# print(alg)
 
-
 	# find all available "buttons" to "click"
 	actions = []  # list of tuples: (id, phase)
-	for d in find_by_key_in("id", alg['entry_point']['body']):
+	for d in find_by_key_in("id", alg['entry_point']):
 		if 'type' in d:
 			if d['type'] in ('expr', 'stmt'):
 				act_types = ['performed']
@@ -483,11 +487,15 @@ def grid_question(alg):
 
 	###
 	print("grid_question():", len(actions), "actions found in algorithm.")
+	for i, action in enumerate(actions):
+		print("\t%d)" % (i + 1), action[0], action[1], ":", alg["id2obj"].get(action[0])["act_name"]["ru"])
 	###
 
 	partial_trace = []  # is always correct
 	trace_completed = False
 	steps = []
+
+	ch = Checkpointer()
 
 	# step-by-step building the trace
 	while not trace_completed:
@@ -502,7 +510,7 @@ def grid_question(alg):
 		for i, (action_id, phase) in enumerate(actions):
 			###
 			print(">>>")
-			print(">>> Griging ... step", len(partial_trace), "take", i)
+			print(">>> Griding ... step", len(partial_trace) + 1, "take", i + 1)
 			print(">>>")
 			###
 
@@ -514,16 +522,16 @@ def grid_question(alg):
 			)
 
 			###
+			assert isinstance(acts[0], dict), acts
 			print("Trying act:", acts[-1]["as_string"])
-			assert isinstance(acts[0], dict)
 
 			alg_trs = [{
-			    "trace_name"    : 'trace_name',
-			    "algorithm_name": "alg_name",
-			    "trace"         : acts,  # [*partial_trace, *acts]
-			    "algorithm"     : alg,
-			    "header_boolean_chain": None
-		    }]
+				"trace_name"    : 'trace_name',
+				"algorithm_name": "alg_name",
+				"trace"         : acts,  # [*partial_trace, *acts]
+				"algorithm"     : alg,
+				"header_boolean_chain": None
+			}]
 
 			# process_algorithms_and_traces(alg_trs, write_mistakes_to_acts=True)
 			try:
@@ -538,23 +546,24 @@ def grid_question(alg):
 			if not mistakes:
 				if step["correct_answer"]:
 					# one more correct answer!
+					print("** grid_question(): Alert!")
 					print("** grid_question(): Alert! Multiple correct answers at the same point!")
 				else:
 					correct_acts = acts
 					step["correct_answer"] = (action_id, phase)
 					print("\t+++")
-					print("\t++ Correct step(s) found:", *[d["as_string"] for d in acts], sep="\n\t\t")
+					print("\t++ Correct step(s) found:", *['%d: %s' % (d["executes"], d["as_string"]) for d in acts], sep="\n\t\t")
 					print("\t+++")
-					###
-					# break
-					###
 
 				# a simple finish heuristic
-				if phase == 'finished' and action_id == actions[0][0]:
+				if phase == 'finished' and partial_trace and action_id == partial_trace[0]["executes"]:
+					print(" >>>> Trace building completed successfully! <<<<")
 					trace_completed = True
-					###
+					# Last act is "program ended", so further griding makes no sense
 					break
-					###
+
+				if skip_redundant_checks:
+					break
 
 			else:
 				curr_mistakes = {m for d in mistakes for m in d["classes"]}
@@ -573,7 +582,24 @@ def grid_question(alg):
 
 		print("Mistakes possible at this step:", step["mistakes"])
 
+		# inner loop end
+		ch.hit("Griding step completed in")
+
+	# outer loop end
+	ch.since_start("Griding question completed in")
+
 	return steps
+
+
+def get_question_mistakes_via_grid(alg_data, skip_redundant_checks=False):
+	try:
+		steps = grid_question(alg_data, skip_redundant_checks)
+		mistakes_set = {m for step in steps for m in step['mistakes']}
+		return sorted(mistakes_set)
+	except Exception as e:
+		print("!* Exception in get_question_mistakes_via_grid():")
+		print(e)
+		return []
 
 
 def run_tests(directory="test_data/", process_kwargs={}):
@@ -743,8 +769,8 @@ STYLE_HEAD = '''<style type="text/css" media="screen">
 	#     border: 1px solid #000000;
 	# }
 
-    span.string { color: #555; font-style: italic }
-    span.atom { color: #f08; font-style: italic; font-weight: bold; }
+	span.string { color: #555; font-style: italic }
+	span.atom { color: #f08; font-style: italic; font-weight: bold; }
 	span.comment { color: #262; font-style: italic; line-height: 1em; }
 	span.meta { color: #555; font-style: italic; line-height: 1em; }
 	span.variable { color: #700; text-decoration: underline; }
@@ -783,7 +809,7 @@ def test_algorithm_to_tags():
 		file.write(to_html(tags))
 
 
-def test_algorithm_to_triples(inspect_questions_via_dot=False):
+def test_algorithm_to_triples(inspect_questions_via_dot=False, mistakes_via_grid=False):
 
 	print("SPECIAL MODE: algorithm_to_triples (saving questions to JSON)")
 
@@ -809,6 +835,10 @@ def test_algorithm_to_triples(inspect_questions_via_dot=False):
 
 		# ctrlstrct_run.algorithm_only_to_onto(alg_tr, onto)
 		q_dict = export2json.export_algtr2dict(alg_tr, onto)
+		if mistakes_via_grid:
+			# rewrite basic method with full tracing
+			print(" >>> Griding ", alg_tr["algorithm_name"])
+			q_dict["negativeLaws"] = get_question_mistakes_via_grid(alg_tr["algorithm"], skip_redundant_checks=True)  # =False is common case
 		### print(q_dict)
 		questions.append(q_dict)
 
@@ -833,18 +863,24 @@ def test_algorithm_to_triples(inspect_questions_via_dot=False):
 
 
 def test_grid():
-	import json
-	with open('trace_gen/alg_test.json') as file:
-		alg_data = json.load(file)
+	# import json
+	# with open('trace_gen/alg_test.json') as file:
+	# 	alg_data = json.load(file)
 
+	files = search_text_trace_files(directory="handcrafted_traces/")
+	alg_trs = parse_text_files(files)
 
-	grid_question(alg_data)
+	alg_data = alg_trs[0]['algorithm']
+
+	steps = grid_question(alg_data, True)
+	mistakes_set = {m for step in steps for m in step['mistakes']}
+	print("mistakes_set:", mistakes_set)
 
 
 
 if __name__ == '__main__':
 
-	if 1:
+	if 0:
 		test_grid()
 		###
 		print()
@@ -855,7 +891,7 @@ if __name__ == '__main__':
 	if 1:
 		# test_make_act_line()
 		# test_algorithm_to_tags()
-		test_algorithm_to_triples(inspect_questions_via_dot=1)
+		test_algorithm_to_triples(inspect_questions_via_dot=0, mistakes_via_grid=True)
 		###
 		print()
 		print('Exit as in custom debug mode.')
