@@ -16,7 +16,7 @@ import ctrlstrct_run
 from ctrlstrct_run import process_algtraces, TraceTester
 from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from trace_gen.json2alg2tr import act_line_for_alg_element
-from upd_onto import get_relation_object
+from onto_helpers import get_relation_object
 import trace_gen.styling as styling
 
 from common_helpers import Checkpointer

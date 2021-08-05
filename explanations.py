@@ -9,7 +9,7 @@ MESSAGES_FILE = "jena/control-flow-statements-domain-messages.txt"
 # from owlready2 import *
 
 from trace_gen.json2alg2tr import get_target_lang
-from upd_onto import get_relation_object, get_relation_subject
+from onto_helpers import get_relation_object, get_relation_subject
 
 
 onto = None  # TODO: remove global var

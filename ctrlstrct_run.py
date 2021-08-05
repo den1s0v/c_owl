@@ -15,7 +15,7 @@ import re
 
 # from owlready2 import *
 
-from upd_onto import *
+from onto_helpers import *
 from transliterate import slugify
 from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from explanations import format_explanation, get_leaf_classes

@@ -1,3 +1,5 @@
+assert False, 'deprecated; see onto_helpers.py'
+
 """
 
 Auto-augmenting ontology (wrapper for OwlReadу2 ontology).
