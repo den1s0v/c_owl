@@ -850,7 +850,7 @@ def test_algorithm_to_triples(inspect_questions_via_dot=False, mistakes_via_grid
 	if inspect_questions_via_dot:
 		# analyze created questions
 		import qs2dot
-		qs2dot.lay_questions_on_graph({d["_alg_name"]:set(d["_mistakes"]) for d in questions})
+		qs2dot.lay_questions_on_graph({d["_alg_name"]:set(d["negativeLaws"]) for d in questions})
 
 		print('SKIP saving to JSON ! 	Debugging the graph...')
 		return
@@ -859,7 +859,7 @@ def test_algorithm_to_triples(inspect_questions_via_dot=False, mistakes_via_grid
 	with open("jena/control-flow-statements-domain-questions.json", "w") as f:
 		json.dump(questions, f, indent=2)
 
-	print('Questions written to JSON !')
+	print('Done:', len(questions), 'questions written to JSON !')
 
 
 def test_grid():
@@ -891,7 +891,7 @@ if __name__ == '__main__':
 	if 1:
 		# test_make_act_line()
 		# test_algorithm_to_tags()
-		test_algorithm_to_triples(inspect_questions_via_dot=0, mistakes_via_grid=True)
+		test_algorithm_to_triples(inspect_questions_via_dot=0, mistakes_via_grid=0)
 		###
 		print()
 		print('Exit as in custom debug mode.')

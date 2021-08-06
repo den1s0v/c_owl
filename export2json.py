@@ -214,8 +214,7 @@ def export_algtr2dict(alg_tr, onto):
 		  # "evaluation"
 		],
 		###>
-		"_mistakes": mistakes,
-		"_alg_name": alg_tr["algorithm_name"],
+		# "_alg_name": alg_tr["algorithm_name"],
 		###<
 	  }
 
@@ -236,7 +235,7 @@ def find_mistakes_for_task(concepts, alg_data=None):
 	global _MISTAKES_MAP
 	if not _MISTAKES_MAP:
 		_MISTAKES_MAP = read_mistakes_map()
-	concepts = [*concepts, *_analyze_sequences_length(alg_data)]
+	concepts = [*concepts, *_analyze_sequences_length(alg_data), *_analyze_alternatives(alg_data)]
 	mistakes = []
 	for name, mapping in _MISTAKES_MAP.items():
 		price = 0
@@ -255,6 +254,15 @@ def _analyze_sequences_length(alg_data) -> tuple('of features'):
 			nontrivial_sequence_exists = True
 			break
 	return () if nontrivial_sequence_exists else ('seq-of-1-max', )
+
+
+def _analyze_alternatives(alg_data) -> tuple('of features'):
+	if_without_else_exists = False
+	for d in find_by_keyval_in("type", "alternative", alg_data):  # "type": "alternative"
+		if 'else' not in (b["type"] for b in d["branches"]):
+			if_without_else_exists = True
+			break
+	return ('!else', ) if if_without_else_exists else ()
 
 
 def _match_against_features(key: str, features: list) -> bool:

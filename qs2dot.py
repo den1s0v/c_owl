@@ -153,7 +153,7 @@ def fit_name_series_for_drawing(long_name):
 
 		long_name = res.strip()
 
-	return "%s (%d total)" % (long_name, long_name.count(" ") + 1)
+	return "%s (%d tasks)" % (long_name, long_name.count(" ") + 1)
 
 def graphviz_tutorial():
 	''' https://graphviz.readthedocs.io/en/stable/manual.html#basic-usage '''
