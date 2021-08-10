@@ -911,6 +911,8 @@ def init_persistent_structure(onto):
         class Concept(Thing):
             namespace = skos
 
+        # class related_to_concept(DatatypeProperty): pass
+
         # новое свойство id
         if not onto["id"]:
             id_prop = types.new_class("id", (Thing >> int, FunctionalProperty, ))
@@ -1208,91 +1210,93 @@ def init_persistent_structure(onto):
             # make Erroneous subclasses
             # (class, [bases])
             for class_spec in [
+                # (name, [bases], err_level, {related, concepts})
+
                 # Sequence mistakes ...
-                ("CorrespondingEndMismatched", (), "trace_structure"),
-                ("WrongNext", (), "general_wrong"),
+                ("CorrespondingEndMismatched", (), "trace_structure", {'action'}),
+                ("WrongNext", (), "general_wrong", {'action'}),
 
                 # "CorrespondingEndPerformedDifferentTime",
                 # "WrongExecTime",
                 # "ActStartsAfterItsEnd", "ActEndsWithoutStart",
                 # "AfterTraceEnd",
                 # "DuplicateActInSequence",
-                ("ConditionMisuse", ["WrongNext"], "general_wrong"),
+                ("ConditionMisuse", ["WrongNext"], "general_wrong", {'expr'}),
 
-                ("WrongContext", (), "wrong_context"),
+                ("WrongContext", (), "wrong_context", {'action'}),
                 # ("MisplacedBefore", ["WrongContext"]),
                 # ("MisplacedAfter", ["WrongContext"]),
-                ("MisplacedDeeper", ["WrongContext"], "wrong_context"),
-                ("EndedDeeper", ["WrongContext", ], "wrong_context"),  # +
-                ("EndedShallower", ["WrongContext", "CorrespondingEndMismatched"], "wrong_context"), # не возникнет для первой ошибки в трассе.
-                ("OneLevelShallower", ["WrongContext"], "concrete_wrong_context"), # +
+                ("MisplacedDeeper", ["WrongContext"], "wrong_context", {'action'}),
+                ("EndedDeeper", ["WrongContext", ], "wrong_context", {'action'}),  # +
+                ("EndedShallower", ["WrongContext", "CorrespondingEndMismatched"], "wrong_context", {'action'}), # не возникнет для первой ошибки в трассе.
+                ("OneLevelShallower", ["WrongContext"], "concrete_wrong_context", {'action'}), # +
 
-                ("NeighbourhoodError", ["WrongNext"], "general_wrong"),  # check that one of the following is determined
-                ("UpcomingNeighbour", ["NeighbourhoodError"], "missing"), #
-                ("NotNeighbour", ["NeighbourhoodError"], "extra"), # disjoint with UpcomingNeighbour
-                ("WrongCondNeighbour", ["NotNeighbour", "ConditionMisuse"], "by_different_cond"), #
+                ("NeighbourhoodError", ["WrongNext"], "general_wrong", {'action'}),  # check that one of the following is determined
+                ("UpcomingNeighbour", ["NeighbourhoodError"], "missing", {'action'}), #
+                ("NotNeighbour", ["NeighbourhoodError"], "extra", {'action'}), # disjoint with UpcomingNeighbour
+                ("WrongCondNeighbour", ["NotNeighbour", "ConditionMisuse"], "by_different_cond", {'action'}), #
 
                 # ("ExtraAct", ["WrongNext"]),
-                ("DuplicateOfAct", [], "extra"),
+                ("DuplicateOfAct", [], "extra", {'sequence'}),
                 # "MissingAct",
                 # "TooEarly", # right after missing acts
                 # ("DisplacedAct", ["TooEarly","ExtraAct","MissingAct"]), # act was moved somewhere
-                ("TooLateInSequence", ["WrongNext"], "extra"), # +
-                ("TooEarlyInSequence", ["WrongNext"], "missing"), # +
-                ("SequenceFinishedNotInOrder", (), "extra"),  # выполнены все действия, но в конце не последнее; не возникнет для первой ошибки в трассе.
-                ("SequenceFinishedTooEarly", ["SequenceFinishedNotInOrder"], "missing"), # +
+                ("TooLateInSequence", ["WrongNext"], "extra", {'sequence'}), # +
+                ("TooEarlyInSequence", ["WrongNext"], "missing", {'sequence'}), # +
+                ("SequenceFinishedNotInOrder", (), "extra", {'sequence'}),  # выполнены все действия, но в конце не последнее; не возникнет для первой ошибки в трассе.
+                ("SequenceFinishedTooEarly", ["SequenceFinishedNotInOrder"], "missing", {'sequence'}), # +
 
                 # Alternatives mistakes ...
-                ("NoFirstCondition", (), "missing"), # +
-                ("NoAlternativeEndAfterBranch", (), "missing"), # +
-                ("CondtionNotNextToPrevCondition", (), "extra"), # +
-                ("ConditionAfterBranch", ["NoAlternativeEndAfterBranch", "CondtionNotNextToPrevCondition"], "extra"), # ~
-                ("DuplicateOfCondition", ["CondtionNotNextToPrevCondition", "ConditionAfterBranch"], "extra"),  # +
+                ("NoFirstCondition", (), "missing", {'alternative', 'if', 'expr'}), # +
+                ("NoAlternativeEndAfterBranch", (), "missing", {'alternative', 'alt_branch'}), # +
+                ("CondtionNotNextToPrevCondition", (), "extra", {'alternative', 'else-if', 'expr'}), # +
+                ("ConditionAfterBranch", ["NoAlternativeEndAfterBranch", "CondtionNotNextToPrevCondition"], "extra", {'alternative', 'alt_branch', 'expr'}), # ~
+                ("DuplicateOfCondition", ["CondtionNotNextToPrevCondition", "ConditionAfterBranch"], "extra", {'alternative', 'if', 'else-if', 'expr'}),  # +
                 # ("WrongBranch", ["ExtraAct"]),
-                ("BranchOfFalseCondition", ["ConditionMisuse"], "by_different_cond"),
-                ("AnotherExtraBranch", ["NoAlternativeEndAfterBranch"], "extra"), # +
-                ("BranchWithoutCondition", (), "extra"), # +
-                ("BranchNotNextToCondition", ["BranchWithoutCondition"], "missing"), # +
-                ("ElseBranchNotNextToLastCondition", ["BranchWithoutCondition"], "extra"), # +
-                ("ElseBranchAfterTrueCondition", ["BranchWithoutCondition", "ElseBranchNotNextToLastCondition", "ConditionMisuse"], "by_different_cond"), # ~
-                ("NoBranchWhenConditionIsTrue", ["ConditionMisuse"], "by_different_cond"), # +
-                ("LastConditionIsFalseButNoElse", (), "missing"), # +
-                ("NoNextCondition", (), "missing"), # ~
-                ("ConditionTooLate", ["NoNextCondition", "CondtionNotNextToPrevCondition"], "extra"), # - skip for now
-                ("ConditionTooEarly", ["NoFirstCondition", "NoNextCondition", "CondtionNotNextToPrevCondition"], "extra"), # +
-                ("LastFalseNoEnd", (), "missing"), # +
-                ("AlternativeEndAfterTrueCondition", ["ConditionMisuse"], "by_different_cond"),  # +
+                ("BranchOfFalseCondition", ["ConditionMisuse"], "by_different_cond", {'alternative', 'alt_branch', 'expr'}),
+                ("AnotherExtraBranch", ["NoAlternativeEndAfterBranch"], "extra", {'alternative', 'alt_branch'}), # +
+                ("BranchWithoutCondition", (), "extra", {'alternative', 'alt_branch', 'expr'}), # +
+                ("BranchNotNextToCondition", ["BranchWithoutCondition"], "missing", {'alternative', 'alt_branch', 'expr'}), # +
+                ("ElseBranchNotNextToLastCondition", ["BranchWithoutCondition"], "extra", {'alternative', 'alt_branch', 'else', 'expr'}), # +
+                ("ElseBranchAfterTrueCondition", ["BranchWithoutCondition", "ElseBranchNotNextToLastCondition", "ConditionMisuse"], "by_different_cond", {'alternative', 'alt_branch', 'else', 'expr'}), # ~
+                ("NoBranchWhenConditionIsTrue", ["ConditionMisuse"], "by_different_cond", {'alternative', 'alt_branch', 'expr'}), # +
+                ("LastConditionIsFalseButNoElse", (), "missing", {'alternative', 'alt_branch', 'else', 'expr'}), # +
+                ("NoNextCondition", (), "missing", {'alternative', 'expr'}), # ~
+                ("ConditionTooLate", ["NoNextCondition", "CondtionNotNextToPrevCondition"], "extra", {'alternative', 'expr'}), # - skip for now
+                ("ConditionTooEarly", ["NoFirstCondition", "NoNextCondition", "CondtionNotNextToPrevCondition"], "extra", {'alternative', 'expr'}), # +
+                ("LastFalseNoEnd", (), "missing", {'alternative', 'expr'}), # +
+                ("AlternativeEndAfterTrueCondition", ["ConditionMisuse"], "by_different_cond", {'alternative', 'alt_branch', 'expr'}),  # +
 
                 # Loops mistakes ...
                 # a general Loop
-                ("NoLoopEndAfterFailedCondition", (), "missing"),  # +
-                ("LoopContinuedAfterFailedCondition", ["NoLoopEndAfterFailedCondition", "ConditionMisuse"], "by_different_cond"), # +
-                ("IterationAfterFailedCondition", ["LoopContinuedAfterFailedCondition"], "extra"), # +
-                ("LoopEndsWithoutCondition", (), "extra"),  # +
+                ("NoLoopEndAfterFailedCondition", (), "missing", {'loop', 'expr'}),  # +
+                ("LoopContinuedAfterFailedCondition", ["NoLoopEndAfterFailedCondition", "ConditionMisuse"], "by_different_cond", {'loop', 'expr'}), # +
+                ("IterationAfterFailedCondition", ["LoopContinuedAfterFailedCondition"], "extra", {'loop', 'expr'}), # +
+                ("LoopEndsWithoutCondition", (), "extra", {'loop', 'expr'}),  # +
                 # start_with_cond
-                ("LoopStartIsNotCondition", (), "missing"), # +
+                ("LoopStartIsNotCondition", (), "missing", {'while_loop', 'expr'}), # +
                 # start_with_body
-                ("LoopStartIsNotIteration", (), "missing"), # +
+                ("LoopStartIsNotIteration", (), "missing", {'do_while_loop'}), # +
                 # cond_then_body (-> true)
-                ("NoIterationAfterSuccessfulCondition", (), "missing"),  # +
-                ("LoopEndAfterSuccessfulCondition", ["NoIterationAfterSuccessfulCondition", "ConditionMisuse"], "by_different_cond"), # +
+                ("NoIterationAfterSuccessfulCondition", (), "missing", {'while_loop', 'do_while_loop', 'for_loop', 'expr'}),  # +
+                ("LoopEndAfterSuccessfulCondition", ["NoIterationAfterSuccessfulCondition", "ConditionMisuse"], "by_different_cond", {'while_loop', 'do_while_loop', 'for_loop', 'expr'}), # +
                 # body_then_cond
-                ("NoConditionAfterIteration", (), "missing"), # +
-                ("NoConditionBetweenIterations", ["NoConditionAfterIteration"], "missing"), # +
+                ("NoConditionAfterIteration", (), "missing", {'while_loop', 'do_while_loop', 'expr'}), # +
+                ("NoConditionBetweenIterations", ["NoConditionAfterIteration"], "missing", {'while_loop', 'do_while_loop', 'expr'}), # +
                 # ForLoop
-                ("LoopStartsNotWithInit", (), "missing"),
-                ("InitNotAtLoopStart", (), "extra"),
-                ("NoConditionAfterForInit", (), "missing"),
-                ("IterationAfterForInit", ["NoConditionAfterForInit"], "extra"),
-                ("NoUpdateAfterIteration", (), "missing"),
-                ("UpdateNotAfterIteration", (), "extra"),
-                ("ForConditionAfterIteration", ["UpdateNotAfterIteration"], "extra"),
-                ("NoConditionAfterForUpdate", (), "missing"),
+                ("LoopStartsNotWithInit", (), "missing", {'for_loop', }),
+                ("InitNotAtLoopStart", (), "extra", {'for_loop', }),
+                ("NoConditionAfterForInit", (), "missing", {'for_loop', 'expr'}),
+                ("IterationAfterForInit", ["NoConditionAfterForInit"], "extra", {'for_loop', }),
+                ("NoUpdateAfterIteration", (), "missing", {'for_loop', }),
+                ("UpdateNotAfterIteration", (), "extra", {'for_loop', }),
+                ("ForConditionAfterIteration", ["UpdateNotAfterIteration"], "extra", {'for_loop', 'expr'}),
+                ("NoConditionAfterForUpdate", (), "missing", {'for_loop', }),
                 # ForeachLoop
-                ("NoForeachUpdateAfterSuccessfulCondition", (), "missing"),
-                ("ForeachUpdateNotAfterSuccessfulCondition", (), "extra"),
-                ("NoIterationAfterForeachUpdate", (), "missing"),
-                ("IterationNotAfterForeachUpdate", (), "extra"),
+                ("NoForeachUpdateAfterSuccessfulCondition", (), "missing", {'foreach_loop', }),
+                ("ForeachUpdateNotAfterSuccessfulCondition", (), "extra", {'foreach_loop', }),
+                ("NoIterationAfterForeachUpdate", (), "missing", {'foreach_loop', }),
+                ("IterationNotAfterForeachUpdate", (), "extra", {'foreach_loop', }),
             ]:
                 if isinstance(class_spec, str):
                     types.new_class(class_spec, (Erroneous,))
@@ -1301,6 +1305,12 @@ def init_persistent_structure(onto):
                     bases = tuple((onto[base_name] if type(base_name) is str else base_name) for base_name in base_names)
                     # print(bases)
                     created_class = types.new_class(class_name, bases or (Erroneous,))
+                    related_concepts = class_spec[3]
+                    for related_concept in related_concepts:
+                        # make a new subclass of both mistake and concept
+                        types.new_class(class_name + '_related_to_' + related_concept, (created_class, onto[related_concept]))
+                        ### make_triple(created_class, related_to_concept, related_concept)
+
                     # if len(class_spec) >= 3:
                     #     category = class_spec[2]
                     #     if not category2priority:

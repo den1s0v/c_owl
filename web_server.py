@@ -362,3 +362,25 @@ if __name__ == "__main__":
 	else:
 		from waitress import serve
 		serve(app, host=host, port=port)
+
+
+"""
+
+долго работало:
+
+set target lang: 0.001 s
+make acts: 0.001 s
+create ontology tbox: 0.056 s
+attach expr value: defaulting to False...
+fill ontology data: 4.129 s
+
+после рестарта:
+
+set target lang: 0.001 s
+make acts: 0.001 s
+create ontology tbox: 0.027 s
+attach expr value: defaulting to False...
+attach expr value: defaulting to False...
+fill ontology data: 0.034 s
+
+"""

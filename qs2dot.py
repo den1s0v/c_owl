@@ -90,6 +90,8 @@ def lay_questions_on_graph(n2ms: dict):
 		if node1.mistakes > node2.mistakes:
 			in_use = False
 			for subn in node2.incoming:
+				if node1.is_connected_to(subn):
+					return
 				if node1.mistakes > subn.mistakes:  # 1 > s > 2
 					_connect_nodes(node1, subn)
 					in_use = True
