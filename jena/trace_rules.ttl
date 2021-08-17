@@ -188,6 +188,24 @@
 	 (?b my:field_MISSING ?name),
 ]
 
+# Rule: UpcomingNeighbour-find-1st-missing-on-1-Error [mistake]
+[
+	(?b rdf:type my:UpcomingNeighbour),
+	(?a my:student_next ?b),
+
+	(?a my:expr_value "true"^^xsd:boolean),
+
+	(?a my:executes ?cnd_e), (?cnd_e my:on_true_consequent ?bx),
+##	(?b my:executes ?by),
+##	(?bx   my:has_upcoming ?by),
+
+	(?bx my:boundary_of ?bx_action),
+	(?bx_action my:stmt_name ?bx_name),
+	 ->
+	 (?b my:should_be_after ?bx),
+	 (?b my:field_MISSING ?bx_name),
+]
+
 # Rule: UpcomingNeighbour-find-all-missing-on-0-Error [mistake]
 [
 	(?b rdf:type my:UpcomingNeighbour),
@@ -206,6 +224,22 @@
 # 	 # connecting boundary, not action !
 	 (?b my:should_be_after ?some),
 	 (?b my:field_MISSING ?name),
+]
+
+# Rule: UpcomingNeighbour-find-1st-missing-on-0-Error [mistake]
+[
+	(?b rdf:type my:UpcomingNeighbour),
+	(?a my:student_next ?b),
+
+	(?a my:expr_value "false"^^xsd:boolean),
+
+	(?a my:executes ?cnd_e), (?cnd_e my:on_false_consequent ?bx),
+
+	(?bx my:boundary_of ?bx_action),
+	(?bx_action my:stmt_name ?bx_name),
+	 ->
+	 (?b my:should_be_after ?bx),
+	 (?b my:field_MISSING ?bx_name),
 ]
 
 # Rule: NotNeighbour-not-cond-Error [mistake]
