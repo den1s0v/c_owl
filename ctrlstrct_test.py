@@ -352,8 +352,10 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 		return f"Server error in make_act_json() - {type(e).__name__}:\n\t{str(e)}"
 
 
-def add_styling_to_trace(algorithm_json, trace_json, user_language=None) -> list:
-	'''Adds text line, tags and html form for each act in given trace and returns the same reference to the trace list'''
+def add_styling_to_trace(algorithm_json, trace_json, user_language=None, comment_style=None, add_tags=False) -> list:
+	'''Adds text line, tags and html form for each act in given trace and returns the same reference to the trace list
+	
+	comment_style: {None | 'use' | 'highlight'}'''
 	try:
 		assert isinstance(trace_json, (list, tuple)), "The trace was not correctly constructed: " + str(trace_json)
 
@@ -374,15 +376,30 @@ def add_styling_to_trace(algorithm_json, trace_json, user_language=None) -> list
 				phase=act_dict['phase'],
 				lang=user_language,
 				expr_value=act_dict.get('value', None),
-				use_exec_time=act_dict['n'],
+				use_exec_time=int(act_dict['n']),
 				)
+			if act_dict['comment'] and comment_style is not None:
+				act_text += "    // " + act_dict['comment']
+				
 			html_tags = styling.prepare_tags_for_line(act_text)
+
+			if act_dict['comment'] and comment_style == 'highlight':
+				html_tags = {
+					"tag": "span",
+					"attributes": {"class": ["warning"]},
+					"content": html_tags
+				}
+				
 			add_json = {
-					'as_string': act_text,
-					# 'as_tags': html_tags,
-					'as_html': styling.to_html(html_tags),
+				'as_string': act_text,
+				'as_html': styling.to_html(html_tags),
 			}
 			act_dict.update(add_json)
+			if add_tags:
+				add_json = {
+					'as_tags': html_tags,
+				}
+				act_dict.update(add_json)
 
 		return trace_json
 	except Exception as e:
@@ -762,7 +779,7 @@ def test_make_act_line():
 
 
 STYLE_HEAD = '''<style type="text/css" media="screen">
-	body {
+	span.algorithm {
 	  font-family: courier; font-size: 10pt;
 	}
 	# div {
@@ -862,6 +879,87 @@ def test_algorithm_to_triples(inspect_questions_via_dot=False, mistakes_via_grid
 	print('Done:', len(questions), 'questions written to JSON !')
 
 
+def test_algtr_to_question_html(read_from="handcrafted_traces/one4html.txt", save_as="handcrafted_traces/one_q.html"):
+
+	print("SPECIAL MODE: test_algtr_to_question_html (making question HTML from text)")
+
+	from pprint import pprint
+	import trace_gen.syntax as syntax
+
+	files = [read_from]  # search_text_trace_files(directory="handcrafted_traces/")
+
+	alg_trs = parse_text_files(files)
+	alg_tr = alg_trs[0]
+
+	syntax.set_hide_all_buttons(True)
+	
+	alg_data = alg_tr['algorithm']
+	
+	# use repair_data
+	tt = TraceTester({
+					"trace_name"    : 'trace_name',
+					"algorithm_name": "alg_name",
+					"trace"         : [],
+					"algorithm"     : alg_data,
+					"header_boolean_chain": None
+				})
+	tt.prepare_id2obj()
+	del tt
+
+	user_language = 'ru'
+	user_syntax = 'C'
+	algorithm_tags = syntax.algorithm_to_tags(alg_data, user_language, user_syntax)
+	
+	# wrap with root tag
+	algorithm_tags = {
+		"tag": "span",
+		"attributes": {"class": ["algorithm"]},
+		"content": algorithm_tags
+	}
+	# question_html = styling.to_html(algorithm_tags)
+	
+	styling.inline_class_as_style(algorithm_tags, STYLE_HEAD)
+	alg_html = styling.to_html(algorithm_tags)
+	
+	tr_data = alg_tr['trace']
+	
+	question_type = None  # 'correct' or 'error'
+	
+	for tr_line in tr_data:
+		if tr_line["comment"]:
+			if not question_type:
+				comment_str = tr_line["comment"]
+				question_type = 'error' if comment_str.startswith(("error", "ошибк")) else 'correct'
+				if question_type == "error":
+					tr_line["comment"] = 'ошибка !'
+					
+			else:
+				# erase all further comments (show first error only)
+				tr_line["comment"] = ''
+				
+	print("guessed question_type:", question_type)
+	
+	tr_data = add_styling_to_trace(alg_data, tr_data, user_language, comment_style="highlight", add_tags=True)
+	
+	trace_html = "<br>\n".join(
+		styling.to_html(styling.inline_class_as_style(a['as_tags'] , STYLE_HEAD))
+		for a in tr_data
+	)
+
+	preamble = "Объясните, почему выделенное действие должно стоять в указанном месте (почему именно это действие и почему именно здесь)." if question_type == 'correct' else "Объясните, почему выделенное действие является ошибочным (почему именно это действие не должно быть в указанном месте)."
+	
+	trace_caption = "Трасса" if question_type == 'correct' else "Трасса с ошибками"
+
+	question_html = "%s<br>Алгоритм:\n<br>%s\n<p>%s:\n<br>%s" % (preamble, alg_html, trace_caption, trace_html)
+	# print(question_html)
+	
+	with open(save_as, "w") as f:
+		f.write(question_html.strip() + "")
+
+	print('Saved HTML to:', save_as)
+	print('Done with one alg-trace pair.')
+
+
 def test_grid():
 	# import json
 	# with open('trace_gen/alg_test.json') as file:
@@ -879,6 +977,12 @@ def test_grid():
 
 
 if __name__ == '__main__':
+
+	if 1:
+		test_algtr_to_question_html()
+		###
+		exit()
+		###
 
 	if 0:
 		test_grid()

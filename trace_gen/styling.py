@@ -168,12 +168,110 @@ def to_html(element: str or dict or list, sep='') -> str:
 
 	return 'UNKNOWN(%s)' % type(element).__name__
 
+# duplicate of txt2algntr.find_by_key_in(), for access convenience
+def find_by_key_in(key, dict_or_list, _not_entry=None):
+    _not_entry = _not_entry or set()
+    _not_entry.add(id(dict_or_list))
+    if isinstance(dict_or_list, dict):
+        for k, v in dict_or_list.items():
+            if k == key:
+                yield dict_or_list
+            elif id(v) not in _not_entry:
+                yield from find_by_key_in(key, v, _not_entry)
+    elif isinstance(dict_or_list, (list, tuple, set)):
+        for d in dict_or_list:
+            if id(d) not in _not_entry:
+                yield from find_by_key_in(key, d, _not_entry)
 
+
+def inline_class_as_style(html_tags, CSS_string=None):
+	'insert css as `style=` attribute instead of `class=` and styles defined elsewhere'
+	if not CSS_string:
+		return html_tags
+	
+	cls2style = {}
+	
+	for html_tag in find_by_key_in("attributes", html_tags):
+		attributes = html_tag["attributes"]
+		if "class" not in attributes:
+			continue
+			
+		css_classes = attributes["class"]
+		for cls in css_classes[:]:
+			if not cls:
+				# remove this empty class
+				css_classes.remove(cls)
+				continue
+			###
+			# print("cls:", cls)
+			###
+			css = None
+			if cls not in cls2style:
+				pattern = r'\b' + cls + r'\s*\{([^}]+?)\}'
+				RE_CSS_STYLE = re.compile(pattern)
+				m = RE_CSS_STYLE.search(CSS_string)
+				if m:
+					css = m[1].strip()
+				cls2style[cls] = css  # even if None
+			else:
+				css = cls2style[cls]
+			
+			if not css:
+				# print("::debug::  skip CSS class", cls)
+				continue
+				
+			existing_style = html_tag["attributes"].get("style", [])  # stored as array
+			existing_style.append(css)
+			# set or reassign
+			html_tag["attributes"]["style"] = existing_style
+			
+			# remove class replaced with CSS
+			css_classes.remove(cls)
+			
+		# remove class key if empty
+		if not css_classes:
+			del html_tag["attributes"]["class"]
+	return html_tags
+	
 
 if __name__ == '__main__':
 	# print(__doc__)
 
 	from pprint import pprint
 	html_tags = prepare_tags_for_line("условие не_зелёный выполнилось 1-й раз - истина")
+	pprint(html_tags)
+	
+	STYLE_HEAD = '''<style type="text/css" media="screen">
+		span.algorithm {
+		  font-family: courier; font-size: 10pt;
+		}
+		# div {
+		#     border: 1px solid #000000;
+		# }
+
+		span.string { color: #555; font-style: italic }
+		span.atom { color: #f08; font-style: italic; font-weight: bold; }
+		span.comment { color: #262; font-style: italic; line-height: 1em; }
+		span.meta { color: #555; font-style: italic; line-height: 1em; }
+		span.variable { color: #700; text-decoration: underline; }
+		span.variable-2 { color: #b11; }
+		span.struct { color: #07c; font-weight: bold; }
+		span.number { color: #f00; font-weight: bold; }
+		span.program { color: #f70; font-weight: bold; }
+		span.function { color: #707; font-weight: bold; }
+		span.action { color: #077; font-weight: bold; }
+		span.qualifier { color: #555; }
+		span.keyword { color: #00a; font-weight: bold; }
+		span.builtin { color: #30a; }
+		span.link { color: #762; }
+
+		span.warning { background-color: #ff9; }
+		span.error { background-color: #fdd; }
+		span.button { background-color: #add; }
+
+	</style>
+	'''
+	
+	inline_class_as_style(html_tags, STYLE_HEAD)
 	pprint(html_tags)
 	print(to_html(html_tags))

@@ -20,6 +20,11 @@ COMPLEX_NODE_FINISHED = ('finished', )
 EXISTING_TRACE = []
 
 ALLOW_HIDDEN_BUTTONS = True
+HIDE_ALL_BUTTONS = False
+
+
+ALLOW_HIDDEN_BUTTONS = True
+HIDE_ALL_BUTTONS = False
 
 
 BUTTON_TIP_FREFIX = {
@@ -42,6 +47,10 @@ def set_indent_step(step: int):
 def set_allow_hidden_buttons(allow: bool):
 	global ALLOW_HIDDEN_BUTTONS
 	ALLOW_HIDDEN_BUTTONS = allow
+
+def set_hide_all_buttons(hide: bool):
+	global HIDE_ALL_BUTTONS
+	HIDE_ALL_BUTTONS = hide
 
 
 # features of: Pseudocode / С / Python / JavaScript / etc.
@@ -106,7 +115,7 @@ def _get_act_button_tip(act_name, phase):
 	return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name.replace("'", '"'))
 
 def _make_alg_button(alg_node_id, act_name, state_name, allow_states=None) -> list or tuple:
-	if allow_states is None or (ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states)):
+	if HIDE_ALL_BUTTONS or allow_states is None or (ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states)):
 		return ()
 	if not ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states):
 		state_name = list(allow_states)[0]
