@@ -950,7 +950,7 @@ def test_algtr_to_question_html(read_from="handcrafted_traces/one4html.txt", sav
 	
 	trace_caption = "Трасса" if question_type == 'correct' else "Трасса с ошибками"
 
-	question_html = "%s<br>Алгоритм:\n<br>%s\n<p>%s:\n<br>%s" % (preamble, alg_html, trace_caption, trace_html)
+	question_html = "%s<br>Алгоритм:\n<br>%s\n<br><p>%s:\n<br>%s" % (preamble, alg_html, trace_caption, trace_html)
 	# print(question_html)
 	
 	with open(save_as, "w") as f:
