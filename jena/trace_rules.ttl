@@ -95,13 +95,13 @@
 
 
 [Reason-4-correct-transition-4-student_next_latest:
-# acts are really linked with consequent
+#   acts are really linked with consequent
 	(?a my:student_next_latest ?b),
 	(?a my:executes ?bnd_a),
 	(?b my:executes ?bnd_b),
 	(?bnd_a my:consequent ?bnd_b),
 
-# find leaf reason property (such that has no subproperties)
+#   find leaf reason property (such that has no subproperties)
 	(?bnd_a ?p ?bnd_b),
 	noValue(?such_p rdfs:subPropertyOf ?p)
 	 ->
