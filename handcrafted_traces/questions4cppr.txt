@@ -1,0 +1,1320 @@
+// questions
+
+
+// алгоритм seq1 (следование из 1 действиz)
+{
+    do_action()
+}
+
+// seq1 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм seq2 (следование из 2 действий)
+{
+    do_one()
+    do_two()
+}
+
+// seq2 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм seq3 (следование из 3 действий)
+{
+    do_one()
+    do_two()
+    do_three()
+}
+
+// seq3 - (2)
+// трасса  категории ошибок: SeqA_contains_B IS_containment
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм seq5 (следование из 5 действий)
+{
+    do_one()
+    do_two()
+    do_three()
+    do_four()
+    do_five()
+}
+
+// seq5 - (2)
+// трасса  категории ошибок: SeqA_contains_B IS_containment
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+
+// алгоритм alt_11 (развилка по_цвету с 2+1 ветками)
+{
+if (red) -> 1 // over_color
+    wait()
+else if (green) -> 1
+    run()
+else
+    get_ready()
+}
+
+// alt_11 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_1 (развилка по_цвету с 2+1 ветками)
+{
+if (red) -> 1 // over_color
+    wait()
+else if (green) -> 0
+    run()
+else
+    get_ready()
+}
+
+// alt_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_00 (развилка по_цвету с 2+1 ветками)
+{
+if (red) -> 0 // over_color
+    wait()
+else if (green) -> 0
+    run()
+else
+    get_ready()
+}
+
+// alt_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+// алгоритм alt_i1 (развилка по_цвету с 1 веткой)
+{
+if (red) -> 1 // over_color
+    wait()
+}
+
+// alt_i1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iaa1 (развилка по_цвету с 1 веткой)
+{
+if (red) -> 1 // over_color
+    do_one()
+    do_two()
+}
+
+// alt_iaa1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_i0 (развилка по_цвету с 1 веткой)
+{
+if (red) -> 0 // over_color
+    wait()
+}
+
+// alt_i0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iaa0 (развилка по_цвету с 1 веткой)
+{
+if (red) -> 0 // over_color
+    do_one()
+    do_two()
+}
+
+// alt_iaa0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм alt_ie1 (развилка по_цвету с 2 ветками)
+{
+if (red) -> 1 // over_color
+    wait()
+else
+    run()
+}
+
+// alt_ie1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ie0 (развилка по_цвету с 2 ветками)
+{
+if (red) -> 0 // over_color
+    wait()
+else
+    run()
+}
+
+// alt_ie0 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм alt_ii (развилка по_цвету с 2 уровнями вложенности)
+{
+if (red) -> 1 // checking_red
+	if (yellow) -> 1 // checking_yellow
+		get_ready()
+}
+
+// alt_ii 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iiaa (развилка по_цвету с 2 уровнями вложенности)
+{
+if (red) -> 1 // checking_red
+	if (yellow) -> 1 // checking_yellow
+		do_one()
+		do_two()
+}
+
+// alt_iiaa 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iii_111 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (not_green) -> 1 // checking_not_green
+	if (red) -> 1 // checking_red
+		if (yellow) -> 1 // checking_yellow
+			get_ready()
+}
+
+// alt_iii_111 111 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iii_110 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (not_green) -> 1 // checking_not_green
+	if (red) -> 1 // checking_red
+		if (yellow) -> 0 // checking_yellow
+			get_ready()
+}
+
+// alt_iii_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iiiaa_110 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (not_green) -> 1 // checking_not_green
+	if (red) -> 1 // checking_red
+		if (yellow) -> 0 // checking_yellow
+			do_one()
+			do_two()
+}
+
+// alt_iiiaa_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iii_10 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (not_green) -> 1 // checking_not_green
+	if (red) -> 0 // checking_red
+		if (yellow) -> 0 // checking_yellow
+			get_ready()
+}
+
+// alt_iii_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iii_0 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (not_green) -> 0 // checking_not_green
+	if (red) -> 0 // checking_red
+		if (yellow) -> 0 // checking_yellow
+			get_ready()
+}
+
+// alt_iii_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iiiaa_0 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (not_green) -> 0 // checking_not_green
+	if (red) -> 0 // checking_red
+		if (yellow) -> 0 // checking_yellow
+			do_one()
+			do_two()
+}
+
+// alt_iiiaa_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм alt_iei_c_1
+{
+if (red) -> 1 // check_color
+    red_chosen()
+else if yellow
+    yellow_chosen()
+}
+
+// alt_iei_c_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iei_c_01
+{
+if (red) -> 0 // check_color
+    red_chosen()
+else if yellow -> 1
+    yellow_chosen()
+}
+
+// alt_iei_c_01 01 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iei_c_00
+{
+if (red) -> 0 // check_color
+    red_chosen()
+else if yellow -> 0
+    yellow_chosen()
+}
+
+// alt_iei_c_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм alt_ieie_c_1
+{
+if (red) -> 1 // check_color
+    red_chosen()
+else if yellow -> 0
+    yellow_chosen()
+else
+    different_chosen()
+}
+
+// alt_ieie_c_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieie_c_01
+{
+if (red) -> 0 // check_color
+    red_chosen()
+else if yellow -> 1
+    yellow_chosen()
+else
+    different_chosen()
+}
+
+// alt_ieie_c_01 01 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieie_c_00
+{
+if (red) -> 0 // check_color
+    red_chosen()
+else if yellow -> 0
+    yellow_chosen()
+else
+    different_chosen()
+}
+
+// alt_ieie_c_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_00
+{
+if (red) -> 0 // check_color
+    red_chosen()
+else if orange -> 0
+    orange_chosen()
+else if yellow -> 0
+    yellow_chosen()
+else if green -> 0
+    green_chosen()
+else if blue -> 0
+    blue_chosen()
+else if indigo -> 0
+    indigo_chosen()
+else if violet -> 0
+    violet_chosen()
+else
+    different_chosen()
+}
+
+// alt_ieix7e_c_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_1
+{
+if (red) -> 1 // check_color
+    red_chosen()
+else if orange -> 0
+    orange_chosen()
+else if yellow -> 0
+    yellow_chosen()
+else if green -> 0
+    green_chosen()
+else if blue -> 0
+    blue_chosen()
+else if indigo -> 0
+    indigo_chosen()
+else if violet -> 0
+    violet_chosen()
+else
+    different_chosen()
+}
+
+// alt_ieix7e_c_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_001
+{
+if (red) -> 0 // check_color
+    red_chosen()
+else if orange -> 0
+    orange_chosen()
+else if yellow -> 1
+    yellow_chosen()
+else if green -> 0
+    green_chosen()
+else if blue -> 0
+    blue_chosen()
+else if indigo -> 0
+    indigo_chosen()
+else if violet -> 0
+    violet_chosen()
+else
+    different_chosen()
+}
+
+// alt_ieix7e_c_001 001 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_00001
+{
+if (red) -> 0 // check_color
+    red_chosen()
+else if orange -> 0
+    orange_chosen()
+else if yellow -> 0
+    yellow_chosen()
+else if green -> 0
+    green_chosen()
+else if blue -> 1
+    blue_chosen()
+else if indigo -> 0
+    indigo_chosen()
+else if violet -> 0
+    violet_chosen()
+else
+    different_chosen()
+}
+
+// alt_ieix7e_c_00001 00001 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_0000001
+{
+if (red) -> 0 // check_color
+    red_chosen()
+else if orange -> 0
+    orange_chosen()
+else if yellow -> 0
+    yellow_chosen()
+else if green -> 0
+    green_chosen()
+else if blue -> 0
+    blue_chosen()
+else if indigo -> 0
+    indigo_chosen()
+else if violet -> 1
+    violet_chosen()
+else
+    different_chosen()
+}
+
+// alt_ieix7e_c_0000001 0000001 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+
+// алгоритм while_0
+{
+while red -> 0 // waiting
+    wait()
+go()
+wait_seconds(3)
+}
+
+// while 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_10
+{
+while red -> 10 // waiting
+    wait()
+go()
+wait_seconds(3)
+}
+
+// while_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_110
+{
+while red -> 110 // waiting
+    wait()
+go()
+wait_seconds(3)
+}
+
+// while_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм while_2_0
+{
+while red -> 0 // waiting
+    wait()
+	go()
+wait_seconds(3)
+}
+
+// while_2_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_2_10
+{
+while red -> 10 // waiting
+    wait()
+	go()
+wait_seconds(3)
+}
+
+// while_2_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_2_110
+{
+while red -> 110 // waiting
+    wait()
+	go()
+wait_seconds(3)
+}
+
+// while_2_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм while_while_0
+{
+while red -> 0 // waiting_1
+    wait()
+	while green  // waiting_2
+		go()
+check_color()
+}
+
+
+// while_while_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_100
+{
+while red -> 10 // waiting_1
+    wait()
+	while green -> 0 // waiting_2
+		go()
+check_color()
+}
+
+// while_while_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_1100
+{
+while red -> 10 // waiting_1
+    wait()
+	while green -> 10 // waiting_2
+		go()
+check_color()
+}
+
+// while_while_1100 1100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_aa_1100
+{
+while red -> 10 // waiting_1
+    wait()
+	while green -> 10 // waiting_2
+		do_one()
+		do_two()
+check_color()
+}
+
+// while_while_aa_1100 1100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_11100
+{
+while red -> 10 // waiting_1
+    wait()
+	while green -> 110 // waiting_2
+		go()
+check_color()
+}
+
+// while_while_11100 11100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_110100
+{
+while red -> 110 // waiting_1
+    wait()
+	while green -> 100 // waiting_2
+		go()
+check_color()
+}
+
+// while_while_110100 110100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_aa_110100
+{
+while red -> 110 // waiting_1
+    wait()
+	while green -> 100 // waiting_2
+		do_one()
+		do_two()
+check_color()
+}
+
+// while_while_aa_110100 110100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм do_0
+{
+do   // enter_date
+    prompt_date()
+    read_date()
+while date_is_incorrect  -> 0
+}
+// do_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do_10
+{
+do   // enter_date
+    prompt_date()
+    read_date()
+while date_is_incorrect  -> 10
+}
+// do_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2_10
+{
+do   // waiting
+	если (red) -> 1  // over_color
+		wait()
+	иначе если (yellow) -> 0
+		get_ready()
+while not_green  -> 0
+}
+// do2_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2_11000
+{
+do   // waiting
+	если (red) -> 10  // over_color
+		wait()
+	иначе если (yellow) -> 0
+		get_ready()
+while not_green  -> 10
+}
+// do2_11000 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2_11010
+{
+do   // waiting
+	если (red) -> 10  // over_color
+		wait()
+	иначе если (yellow) -> 1
+		get_ready()
+while not_green  -> 10
+}
+// do2_11010 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм do2ie_10
+{
+do   // waiting
+	если (red) -> 1  // over_color
+		wait()
+	иначе
+		get_ready()
+while not_green  -> 0
+}
+// do2ie_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2ie_1100
+{
+do   // waiting
+	если (red) -> 10  // over_color
+		wait()
+	иначе
+		get_ready()
+while not_green  -> 10
+}
+// do2ie_1100 1100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2ie_1100
+{
+do   // waiting
+	если (red) -> 10  // over_color
+		wait()
+	иначе
+		get_ready()
+while not_green  -> 10
+}
+// do2ie_1100 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм wiei_1010
+{
+stop()
+пока not_green -> 1,0  // waiting
+	если (red) -> 0  // over_color
+		wait()
+	иначе если (yellow) -> 1
+		get_ready()
+go()
+}
+
+// wiei_1010 1010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wiei_1100
+{
+stop()
+пока not_green -> 1,0  // waiting
+	если (red) -> 1  // over_color
+		wait()
+	иначе если (yellow) -> 0
+		get_ready()
+go()
+}
+
+// wiei_1100 1100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wiei_1000
+{
+stop()
+пока not_green -> 1,0  // waiting
+	если (red) -> 0  // over_color
+		wait()
+	иначе если (yellow) -> 0
+		get_ready()
+go()
+}
+
+// wiei_1000 1000 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wiei_0
+{
+stop()
+пока not_green -> 0  // waiting
+	если (red) -> 0  // over_color
+		wait()
+	иначе если (yellow) -> 0
+		get_ready()
+go()
+}
+
+// wiei_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм wie_100
+{
+stop()
+пока not_green -> 1,0  // waiting
+	если (red) -> 0  // over_color
+		wait()
+	иначе
+		get_ready()
+go()
+}
+
+// wie_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wie_110
+{
+stop()
+пока not_green -> 1,0  // waiting
+	если (red) -> 1  // over_color
+		wait()
+	иначе
+		get_ready()
+go()
+}
+
+// wie_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wie_100
+{
+stop()
+пока not_green -> 1,0  // waiting
+	если (red) -> 0  // over_color
+		wait()
+	иначе
+		get_ready()
+go()
+}
+
+// wie_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wie_0
+{
+stop()
+пока not_green -> 0  // waiting
+	если (red) -> 0  // over_color
+		wait()
+	иначе
+		get_ready()
+go()
+}
+
+// wie_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм do_then_w_100
+{
+do   // enter_date
+    prompt_date()
+    read_date()
+while date_is_incorrect  -> 10
+пока date_is_winter -> 0  // move_date
+	add_months(1)
+print_date()
+}
+// do_then_w_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do_then_w_010
+{
+do   // enter_date
+    prompt_date()
+    read_date()
+while date_is_incorrect  -> 0
+пока date_is_winter -> 10  // move_date
+	add_months(1)
+print_date()
+}
+// do_then_w_010 010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do_then_w_0110
+{
+do   // enter_date
+    prompt_date()
+    read_date()
+while date_is_incorrect  -> 0
+пока date_is_winter -> 110  // move_date
+	add_months(1)
+print_date()
+}
+// do_then_w_0110 0110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_ewh_10
+{
+if first_case -> 1 // choice
+	do   // over_first
+		action11()
+		action12()
+	while first  -> 0
+	work1_completed()
+else
+	пока second -> 10  // over_second
+		action21()
+		action22()
+	work2_completed()
+}
+// ido_ewh_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_ewh_110
+{
+if first_case -> 1 // choice
+	do   // over_first
+		action11()
+		action12()
+	while first  -> 10
+	work1_completed()
+else
+	пока second -> 10  // over_second
+		action21()
+		action22()
+	work2_completed()
+}
+// ido_ewh_11 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_ewh_00
+{
+if first_case -> 0 // choice
+	do   // over_first
+		action11()
+		action12()
+	while first  -> 0
+	work1_completed()
+else
+	пока second -> 0  // over_second
+		action21()
+		action22()
+	work2_completed()
+}
+// ido_ewh_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_ewh_010
+{
+if first_case -> 0 // choice
+	do   // over_first
+		action11()
+		action12()
+	while first  -> 0
+	work1_completed()
+else
+	пока second -> 10  // over_second
+		action21()
+		action22()
+	work2_completed()
+}
+// ido_ewh_010 010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм ido_eiwh_e_0
+{
+if ready -> 0  // operate
+	if first_case -> 0 // choice
+		do   // over_first
+			action11()
+			action12()
+		while first  -> 0
+		work1_completed()
+	else if second_case -> 0
+		пока second -> 0  // over_second
+			action21()
+			action22()
+		work2_completed()
+	else
+		nothing_to_do()
+}
+// ido_eiwh_e_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_110
+{
+if ready -> 1  // operate
+	if first_case -> 1 // choice
+		do   // over_first
+			action11()
+			action12()
+		while first  -> 0
+		work1_completed()
+	else if second_case -> 0
+		пока second -> 10  // over_second
+			action21()
+			action22()
+		work2_completed()
+	else
+		nothing_to_do()
+}
+// ido_eiwh_e_110 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_1110
+{
+if ready -> 1  // operate
+	if first_case -> 1 // choice
+		do   // over_first
+			action11()
+			action12()
+		while first  -> 10
+		work1_completed()
+	else if second_case -> 0
+		пока second -> 10  // over_second
+			action21()
+			action22()
+		work2_completed()
+	else
+		nothing_to_do()
+}
+// ido_eiwh_e_1110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_1010
+{
+if ready -> 1  // operate
+	if first_case -> 0 // choice
+		do   // over_first
+			action11()
+			action12()
+		while first  -> 0
+		work1_completed()
+	else if second_case -> 1
+		пока second -> 0  // over_second
+			action21()
+			action22()
+		work2_completed()
+	else
+		nothing_to_do()
+}
+// ido_eiwh_e_1010 010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_10110
+{
+if ready -> 1  // operate
+	if first_case -> 0 // choice
+		do   // over_first
+			action11()
+			action12()
+		while first  -> 0
+		work1_completed()
+	else if second_case -> 1
+		пока second -> 10  // over_second
+			action21()
+			action22()
+		work2_completed()
+	else
+		nothing_to_do()
+}
+// ido_eiwh_e_10110 0110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_100
+{
+if ready -> 1  // operate
+	if first_case -> 0 // choice
+		do   // over_first
+			action11()
+			action12()
+		while first  -> 0
+		work1_completed()
+	else if second_case -> 0
+		пока second -> 0  // over_second
+			action21()
+			action22()
+		work2_completed()
+	else
+		nothing_to_do()
+}
+// ido_eiwh_e_100 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
