@@ -22,16 +22,17 @@ EXISTING_TRACE = []
 ALLOW_HIDDEN_BUTTONS = True
 HIDE_ALL_BUTTONS = False
 
+# ALLOW_HIDDEN_BUTTONS = True
+# HIDE_ALL_BUTTONS = False
 
-ALLOW_HIDDEN_BUTTONS = True
-HIDE_ALL_BUTTONS = False
+FORCE_BUTTON_TOOLTIPS_IN_ENGLISH = False
 
 
 BUTTON_TIP_FREFIX = {
 	"ru": {
-		'performed': 'Выполнится',
-		'started': 'Начнётся',
-		'finished': 'Закончится',
+		'performed': 'Выполнить',
+		'started': 'Начать',
+		'finished': 'Закончить',
 	},
 	"en": {
 		'performed': 'Perform',
@@ -51,6 +52,10 @@ def set_allow_hidden_buttons(allow: bool):
 def set_hide_all_buttons(hide: bool):
 	global HIDE_ALL_BUTTONS
 	HIDE_ALL_BUTTONS = hide
+
+def set_force_button_tooltips_in_english(force: bool):
+	global FORCE_BUTTON_TOOLTIPS_IN_ENGLISH
+	FORCE_BUTTON_TOOLTIPS_IN_ENGLISH = force
 
 
 # features of: Pseudocode / С / Python / JavaScript / etc.
@@ -110,7 +115,7 @@ set_syntax("C")  # the default
 #     # .replace('\\', '\\\\')
 
 def _get_act_button_tip(act_name, phase):
-	lang = get_target_lang()
+	lang = get_target_lang() if not FORCE_BUTTON_TOOLTIPS_IN_ENGLISH else 'en'
 	act_name = act_name.get(lang, None) or act_name.get("en", "[action]")
 	return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name.replace("'", '"'))
 

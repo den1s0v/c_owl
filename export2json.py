@@ -7,11 +7,21 @@ from owlready2 import *
 import ctrlstrct_run
 import trace_gen.styling as styling
 import trace_gen.syntax as syntax
-from trace_gen.txt2algntr import find_by_keyval_in
+from trace_gen.txt2algntr import find_by_key_in, find_by_keyval_in
 
 from pprint import pprint
 
+# USER_LANGUAGE = 'en'
+USER_LANGUAGE = 'ru'
+USER_SYNTAX = 'C'
+
+
+if USER_LANGUAGE == 'ru':
+	from jena.rusify import replace_in_text as translate_en2ru
+
 syntax.set_allow_hidden_buttons(False)
+# for buttons "data-tooltip" to translate correctly
+syntax.set_force_button_tooltips_in_english(True)
 
 
 def export_algtr2dict(alg_tr, onto):
@@ -40,9 +50,19 @@ def export_algtr2dict(alg_tr, onto):
 	alg_data = alg_tr['algorithm']
 	# pprint(alg_data)
 
-	user_language = 'en'
-	user_syntax = 'C'
-	algorithm_tags = syntax.algorithm_to_tags(alg_data, user_language, user_syntax)
+	algorithm_tags = syntax.algorithm_to_tags(alg_data, USER_LANGUAGE, USER_SYNTAX)
+
+	if USER_LANGUAGE == 'ru':
+		# patch tags containing English
+		key = "data-tooltip"
+		for d in find_by_key_in(key, algorithm_tags):
+			contents = d[key]
+			assert len(contents) == 1, contents
+			# print(contents[0], end=' -> ')
+			contents[0] = translate_en2ru(contents[0])
+			# print(contents[0])
+
+
 	# pprint(algorithm_tags)
 	question_html = styling.to_html(algorithm_tags)
 
@@ -100,7 +120,7 @@ def export_algtr2dict(alg_tr, onto):
 	def make_answerObject(hyperText, phase, id_, concept, answer_id=None):
 		if answer_id is None:
 			answer_id = next(answer_ids)
-		# make simple trace line without "nth time" in English only ...
+		# make simple trace line without "nth time" tail
 		# strip first word (begin/end/execute) and add phase (started/finished/performed)
 		view_phase = {
 			'started': 'began',
@@ -110,6 +130,13 @@ def export_algtr2dict(alg_tr, onto):
 		trace_act = hyperText.split(maxsplit=1)[1] + " " + view_phase
 		# trace_act_hypertext = trace_act
 		trace_act_hypertext = styling.to_html(styling.prepare_tags_for_line(trace_act))
+
+		if USER_LANGUAGE == 'ru':
+			# print(hyperText, end=' -> ')
+			hyperText = translate_en2ru(hyperText)
+			# print(hyperText)
+			trace_act_hypertext = translate_en2ru(trace_act_hypertext)
+
 
 		# patch ids in HTML
 		old_info = phase + ":" + str(id_)
@@ -144,7 +171,7 @@ def export_algtr2dict(alg_tr, onto):
 		for obj_dict in ctrlstrct_run.find_by_keyval_in("id", ind.id, alg_data):
 			break
 		### print(obj_dict)
-		action_title = obj_dict["act_name"]["en"]
+		action_title = obj_dict["act_name"]["en"]  # "en" should not be changed here
 		if onto.expr in ind.is_a or onto.stmt in ind.is_a:
 			answerObjects.append(make_answerObject(
 				("execute" if onto.stmt in ind.is_a else "evaluate") + " " + action_title,
@@ -306,13 +333,9 @@ def read_mistakes_map():
 
 
 STYLE_HEAD = '''<style type="text/css" media="screen">
-	body {
+	.comp-ph-question-text {
 	  font-family: courier; font-size: 10pt;
 	}
-	# div {
-	#     border: 1px solid #000000;
-	# }
-
     span.string { color: #555; font-style: italic }
     span.atom { color: #f08; font-style: italic; font-weight: bold; }
 	span.comment { color: #262; font-style: italic; line-height: 1em; }

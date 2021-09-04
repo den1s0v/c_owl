@@ -978,7 +978,7 @@ def test_grid():
 
 if __name__ == '__main__':
 
-	if 1:
+	if 0:
 		test_algtr_to_question_html()
 		###
 		exit()
