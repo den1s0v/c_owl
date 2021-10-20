@@ -33,6 +33,7 @@ class Checkpointer():  # dict
 
 
 class Uniqualizer():
+	"Make the strings unique by adding *_1, *_2, ... if the same is used multiple times"
 
 	label2max_free = {}
 

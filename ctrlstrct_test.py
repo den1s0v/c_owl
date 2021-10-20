@@ -378,12 +378,12 @@ def add_styling_to_trace(algorithm_json, trace_json, user_language=None, comment
 				expr_value=act_dict.get('value', None),
 				use_exec_time=int(act_dict['n']),
 				)
-			if act_dict['comment'] and comment_style is not None:
+			if 'comment' in act_dict and act_dict['comment'] and comment_style is not None:
 				act_text += "    // " + act_dict['comment']
 				
 			html_tags = styling.prepare_tags_for_line(act_text)
 
-			if act_dict['comment'] and comment_style == 'highlight':
+			if 'comment' in act_dict and act_dict['comment'] and comment_style == 'highlight':
 				html_tags = {
 					"tag": "span",
 					"attributes": {"class": ["warning"]},
