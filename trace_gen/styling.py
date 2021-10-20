@@ -38,7 +38,7 @@ def make_lexer():
 	'''
 	keyword_re = re.compile(r"(?:начался|началась|началось|began|закончился|закончилась|закончилось|ended|выполнился|выполнилась|выполнилось|executed|evaluated|calculated|если|иначе|делать|пока|для|от|до|шаг|с\s+шагом|if|else|do|while|for|from|to|with\s+step|step|каждого|в|из|по|к|foreach|each|in)(?=\s|\b|$)", re.I)
 
-	struct_re = re.compile(r"развилка|развилки|альтернативная|ветка|branch|alternative|условия|переход|update|итерация|iteration|иначe|условие|цикла|condition|of|loop|инициализация|init|initialization|цикл|следование|sequence", re.I)
+	struct_re = re.compile(r"(?:развилка|развилки|альтернативная|ветка|branch|alternative|условия|переход|update|итерация|iteration|иначe|условие|цикла|condition|of|loop|инициализация|init|initialization|цикл|следование|sequence)(?=\s|\b|$)", re.I)
 
 	simple_mode = {
 	  # The start state contains the rules that are intially used
@@ -238,6 +238,19 @@ if __name__ == '__main__':
 	# print(__doc__)
 
 	from pprint import pprint
+	tt = """
+branch ELSE of name began 
+	""".strip()
+	
+	for t in tt.splitlines():
+		html_tags = prepare_tags_for_line(t.strip())
+		print(to_html(html_tags))
+
+	
+	exit()
+	
+	###
+
 	html_tags = prepare_tags_for_line("условие не_зелёный выполнилось 1-й раз - истина")
 	pprint(html_tags)
 	
@@ -272,6 +285,6 @@ if __name__ == '__main__':
 	</style>
 	'''
 	
-	inline_class_as_style(html_tags, STYLE_HEAD)
+	# inline_class_as_style(html_tags, STYLE_HEAD)
 	pprint(html_tags)
 	print(to_html(html_tags))
