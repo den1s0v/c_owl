@@ -1,6 +1,6 @@
 # qs2dot.py
 
-import math
+# import math
 
 import graphviz
 from graphviz import nohtml

@@ -2154,3 +2154,23 @@
 }
 
 кон 06_do }
+
+
+
+
+
+
+while (not_enough)  // work
+{
+	if (ready)
+	{
+		some_stuff();
+		print("the stuff performed");
+	}
+	else
+	{
+		wait();
+	}
+}
+
+
