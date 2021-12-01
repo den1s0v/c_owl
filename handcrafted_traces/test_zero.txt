@@ -9,6 +9,11 @@ while (not_green)  // waiting
 	else if (yellow)
 	{  
 		get_ready
+		take_a_while
+	}  
+	else if (off)
+	{  
+		get_back
 	}  
 }  
 }

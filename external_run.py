@@ -9,7 +9,10 @@ from timeit import default_timer as timer
 # $ pip install psutil
 import psutil
 
-from options import JAVA_PATH # outcomment this import if loading from a foreign directory
+try:
+	from options import JAVA_PATH # outcomment this import if loading from a foreign directory
+except:
+	pass
 
 
 # MEASURE_TIME = True

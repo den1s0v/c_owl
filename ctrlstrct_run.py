@@ -972,7 +972,7 @@ def init_persistent_structure(onto):
         # class verbose_consequent(consequent): pass
         # class visible_consequent(consequent): pass
 
-        # окрестность - ближайшее будушее, до условия
+        # окрестность - ближайшее будущее, до условия
         class has_upcoming(boundary >> boundary, TransitiveProperty): pass
 
         # class interrupting_consequent(consequent): pass

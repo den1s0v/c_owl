@@ -3,8 +3,10 @@
 
 import re
 
-
-from trace_gen.json2alg2tr import get_target_lang
+try:
+    from trace_gen.json2alg2tr import get_target_lang
+except:
+    from json2alg2tr import get_target_lang
 
 _maxAlgID = 1
 _maxTrID = 1
@@ -1464,6 +1466,10 @@ def main():
     result = parse_text_files( search_text_trace_files() )
     from pprint import pprint
     pprint(result)
+
+    import json
+    with open(r"C:\D\Work\YDev\CompPr\c_owl\trace_gen\alg_example.json", 'w') as f:
+        f.write(json.dumps(result, ensure_ascii=False, indent=1))
 
 
 if __name__ == '__main__':
