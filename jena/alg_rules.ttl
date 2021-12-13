@@ -22,6 +22,29 @@
 
 
 
+###############################
+# action-boundaries-polyfill
+###############################
+
+[action-boundary-polyfill-begin_of:
+	(?a rdf:type my:action),
+	noValue(?x my:begin_of ?a) ,
+
+	makeSkolem(?b, ?a, "begin_of"),
+	 ->
+	 (?b rdf:type my:boundary) ,
+	 (?b my:begin_of ?a) ,
+]
+
+[action-boundary-polyfill-end_of:
+	(?a rdf:type my:action),
+	noValue(?x my:end_of ?a) ,
+
+	makeSkolem(?b, ?a, "end_of"),
+	 ->
+	 (?b rdf:type my:boundary) ,
+	 (?b my:end_of ?a) ,
+]
 
 
 
