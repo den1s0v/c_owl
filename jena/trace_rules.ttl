@@ -5,6 +5,9 @@
 @include <jena/rdfs4core.rules>.
 
 
+@include <jena/loop_names.ttl>.
+
+
 @prefix my: <http://vstu.ru/poas/code#> .
 
 
@@ -1388,32 +1391,6 @@
 
 
 
-###############################
-# loop helper
-###############################
-
-# Rule: fetch_kind_of_loop-helper [loop & mistake]
-[
-	(?a my:fetch_kind_of_loop ?Loop),
-	(?Loop rdf:type my:while_loop),
-	 ->
-	 drop(0),
-	 (?a my:field_kind_of_loop "WHILE"),
-]
-# Rule: fetch_kind_of_loop-helper [loop & mistake]
-[
-	(?a my:fetch_kind_of_loop ?Loop),
-	(?Loop rdf:type my:do_while_loop),
-	 ->
-	 drop(0),
-	 (?a my:field_kind_of_loop "DO-WHILE"),
-]
-# TODO: ... add more helper rules for other kinds of loops:
-#	for_loop
-#	foreach_loop
-
-
-
 
 ###############################
 # loop mistake
@@ -1620,4 +1597,316 @@
 	 (?b my:fetch_kind_of_loop ?Loop),
 ]
 
+
+# ForLoop
+
+# Rule: LoopStartsNotWithInit-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?Loop),
+	(?Loop rdf:type my:start_with_init),
+	(?Loop my:init ?init_stmt),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+#	not loop end
+	noValue(?bnd_b my:end_of ?Loop),
+#	not loop's init
+	noValue(?bnd_b my:begin_of ?init_stmt),
+
+	(?Loop my:stmt_name ?a_name),
+	(?init_stmt my:stmt_name ?i_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:LoopStartsNotWithInit),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_INIT ?i_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: InitNotAtLoopStart-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?init_stmt),
+	(?Loop my:init ?init_stmt),
+	(?Loop rdf:type my:start_with_init),
+
+	(?a my:student_next ?b),
+	(?a my:executes ?bnd_a),
+#	not this loop
+	noValue(?bnd_a my:boundary_of ?Loop),
+
+	(?Loop my:stmt_name ?a_name),
+#	(?a my:stmt_name ?a_name),
+	(?init_stmt my:stmt_name ?i_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:InitNotAtLoopStart),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_INIT ?i_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: NoConditionAfterForInit-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?Loop),
+	(?Loop rdf:type my:start_with_init),
+	(?Loop my:init ?init_stmt),
+	(?Loop my:cond ?cnd),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+#	not loop's cond
+	noValue(?bnd_b my:begin_of ?cnd),
+
+	(?Loop my:stmt_name ?a_name),
+	(?cnd  my:stmt_name ?c_name),
+	(?init_stmt my:stmt_name ?i_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:NoConditionAfterForInit),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_LOOP_COND ?c_name),
+	 (?b my:field_INIT ?i_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: IterationAfterForInit-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?init_stmt),
+	(?Loop my:init ?init_stmt),
+	(?Loop rdf:type my:start_with_init),
+	(?Loop my:cond ?cnd),
+	(?Loop my:body ?st),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+#	is loop's body
+	(?bnd_b my:begin_of ?st),
+
+	(?Loop my:stmt_name ?a_name),
+	(?cnd  my:stmt_name ?c_name),
+	(?init_stmt my:stmt_name ?i_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:IterationAfterForInit),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_LOOP_COND ?c_name),
+	 (?b my:field_INIT ?i_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: NoUpdateAfterIteration-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?st),
+	(?Loop rdf:type my:post_update_loop),
+	(?Loop my:body ?st),
+	(?Loop my:update ?upd),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+#	not loop's update
+	noValue(?bnd_b my:begin_of ?upd),
+
+	(?Loop my:stmt_name ?a_name),
+	(?upd  my:stmt_name ?u_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:NoUpdateAfterIteration),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_UPDATE ?u_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: UpdateNotAfterIteration-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?bnd), (?bnd my:boundary_of ?upd),
+	(?Loop rdf:type my:post_update_loop),
+	(?Loop my:update ?upd),
+	(?Loop my:body ?st),
+
+	(?a my:student_next ?b),
+	(?a my:executes ?bnd_a),
+#	not loop's body
+	noValue(?bnd_a my:boundary_of ?st),
+
+	(?Loop my:stmt_name ?a_name),
+	(?upd  my:stmt_name ?u_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:UpdateNotAfterIteration),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_UPDATE ?u_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: ForConditionAfterIteration-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?bnd), (?bnd my:boundary_of ?cnd),
+	(?Loop rdf:type my:post_update_loop),
+	(?Loop my:cond ?cnd),
+	(?Loop my:body ?st),
+
+	(?a my:student_next ?b),
+	(?a my:executes ?bnd_a),
+#	cond after loop's body
+	(?bnd_a my:boundary_of ?st),
+
+	(?Loop my:stmt_name ?a_name),
+	(?cnd  my:stmt_name ?c_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:UpdateNotAfterIteration),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_LOOP_COND ?c_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: NoConditionAfterForUpdate-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?upd),
+	(?Loop rdf:type my:post_update_loop),
+	(?Loop my:update ?upd),
+	(?Loop my:cond ?cnd),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+#	not loop's cond
+	noValue(?bnd_b my:boundary_of ?cnd),
+
+	(?Loop my:stmt_name ?a_name),
+	(?cnd  my:stmt_name ?c_name),
+	(?upd  my:stmt_name ?u_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:NoConditionAfterForUpdate),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_LOOP_COND ?c_name),
+	 (?b my:field_UPDATE ?u_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+
+
+# ForeachLoop
+
+# Rule: NoForeachUpdateAfterSuccessfulCondition-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?cnd),
+	(?Loop rdf:type my:pre_update_loop),
+	(?Loop my:cond ?cnd),
+	(?cnd my:expr_value "true"^^xsd:boolean),
+
+	(?Loop my:update ?upd),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+#	not loop's update
+	noValue(?bnd_b my:boundary_of ?upd),
+
+	(?Loop my:stmt_name ?a_name),
+	(?cnd  my:stmt_name ?c_name),
+	(?upd  my:stmt_name ?u_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:NoForeachUpdateAfterSuccessfulCondition),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_LOOP_COND ?c_name),
+	 (?b my:field_UPDATE ?u_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: ForeachUpdateNotAfterSuccessfulCondition-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?bnd), (?bnd my:boundary_of ?upd),
+	(?Loop rdf:type my:pre_update_loop),
+	(?Loop my:update ?upd),
+
+	(?Loop my:cond ?cnd),
+
+	(?a my:student_next ?b),
+#	previous is cond
+	(?a my:executes ?bnd_a), (?bnd_a my:end_of ?cnd),
+#	... but cond.expr_value is not true
+	(?a my:expr_value "false"^^xsd:boolean),
+
+	(?Loop my:stmt_name ?a_name),
+	(?cnd  my:stmt_name ?c_name),
+	(?upd  my:stmt_name ?u_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:ForeachUpdateNotAfterSuccessfulCondition),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_LOOP_COND ?c_name),
+	 (?b my:field_UPDATE ?u_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: NoIterationAfterForeachUpdate-loop_Error [loop & mistake]
+[
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?upd),
+	(?Loop my:update ?upd),
+	(?Loop rdf:type my:pre_update_loop),
+
+	(?Loop my:body ?st),
+
+	(?a my:student_next ?b),
+	(?b my:executes ?bnd_b),
+#	not loop's body
+	noValue(?bnd_b my:boundary_of ?st),
+
+	(?Loop my:stmt_name ?a_name),
+	(?upd  my:stmt_name ?u_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:NoIterationAfterForeachUpdate),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_UPDATE ?u_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
+
+
+# Rule: IterationNotAfterForeachUpdate-loop_Error [loop & mistake]
+[
+	(?b rdf:type my:act_begin),
+	(?b my:executes ?bnd), (?bnd my:boundary_of ?st),
+	(?Loop rdf:type my:pre_update_loop),
+	(?Loop my:body ?st),
+
+	(?Loop my:update ?upd),
+
+	(?a my:student_next ?b),
+	(?a my:executes ?bnd_a),
+#	not loop's update
+	noValue(?bnd_a my:boundary_of ?upd),
+
+	(?Loop my:stmt_name ?a_name),
+	(?cnd  my:stmt_name ?c_name),
+	(?upd  my:stmt_name ?u_name),
+	 ->
+#	 (?b my:cause ?a),
+	 (?b rdf:type my:ForeachUpdateNotAfterSuccessfulCondition),
+	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_UPDATE ?u_name),
+	 (?b my:fetch_kind_of_loop ?Loop),
+]
 

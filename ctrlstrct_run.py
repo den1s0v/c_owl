@@ -1161,6 +1161,8 @@ def init_persistent_structure(onto):
             "PREVIOUS", # TooLateInSequence: тот, что должен быть после, но он перед текущим
             "LOOP",
             "LOOP_COND",
+            "INIT",
+            "UPDATE",
             "ALT",
             "ALT_COND", # любое из условий (перечисляет все условия)
             "CURRENT_ALT_COND", # текущее условие
@@ -1357,15 +1359,15 @@ def init_persistent_structure(onto):
             "PostCondLoopBegin",
             ("IterationBeginOnTrueCond", on_true_consequent),
             # "IterationBeginOnFalseCond",
-            # ("LoopUpdateOnTrueCond", on_true_consequent),
-            # "LoopBodyAfterUpdate",
+            ("LoopUpdateOnTrueCond", on_true_consequent),
+            "IterationAfterUpdate",
             ("LoopEndOnFalseCond", on_false_consequent),
             # "LoopEndOnTrueCond",  # no rule yet?
             "LoopCondBeginAfterIteration",
-            # "LoopWithInitBegin",
-            # "LoopCondBeginAfterInit",
-            # "LoopUpdateAfterIteration",
-            # "LoopCondAfterUpdate",
+            "LoopWithInitBegin",
+            "LoopCondBeginAfterInit",
+            "LoopUpdateAfterIteration",
+            "LoopCondAfterUpdate",
         ]:
             # types.new_class(class_name, (correct_act,))
             if isinstance(class_spec, str):

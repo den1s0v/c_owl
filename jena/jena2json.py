@@ -18,6 +18,15 @@ TASK_MAP = [
 		"name": "rdfs_subset_negative",
 		"positive": False,
 	}),
+	("loop_names.ttl", {
+		"name": None,
+		"positive": True,
+	}),
+	# Duplicate this as there no way to include these to both positive and negative
+	("loop_names.ttl", {
+		"name": None,
+		"positive": False,
+	}),
 	("alg_rules.ttl", {
 		"name": None,
 		"positive": True,
@@ -38,7 +47,7 @@ def main():
 		laws = read_laws_from_file(fname, config)
 		all_laws.extend(laws)
 		# print(laws)
-		print()
+		print('.')
 
 	with open(OUT_FILE, 'w', encoding='utf-8') as f:
 		json.dump(all_laws, f, ensure_ascii=False, indent=2)

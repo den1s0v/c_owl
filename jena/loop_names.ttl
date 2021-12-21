@@ -1,0 +1,44 @@
+# loop_names.ttl
+
+###############################
+# loop helper
+###############################
+
+# Rule: fetch_kind_of_loop-helper-1 [loop & mistake]
+[
+	(?a my:fetch_kind_of_loop ?Loop),
+	(?Loop rdf:type my:while_loop),
+	 ->
+	 drop(0),
+	 (?a my:field_kind_of_loop "WHILE"),
+]
+# Rule: fetch_kind_of_loop-helper-2 [loop & mistake]
+[
+	(?a my:fetch_kind_of_loop ?Loop),
+	(?Loop rdf:type my:do_while_loop),
+	 ->
+	 drop(0),
+	 (?a my:field_kind_of_loop "DO-WHILE"),
+]
+# Rule: fetch_kind_of_loop-helper-3 [loop & mistake]
+[
+	(?a my:fetch_kind_of_loop ?Loop),
+	(?Loop rdf:type my:for_loop),
+	 ->
+	 drop(0),
+	 (?a my:field_kind_of_loop "FOR"),
+]
+# Rule: fetch_kind_of_loop-helper-4 [loop & mistake]
+[
+	(?a my:fetch_kind_of_loop ?Loop),
+	(?Loop rdf:type my:foreach_loop),
+	 ->
+	 drop(0),
+	 (?a my:field_kind_of_loop "FOREACH"),
+]
+# TODO: ... add more helper rules for other kinds of loops:
+#	+ for_loop
+#	+ foreach_loop
+
+
+

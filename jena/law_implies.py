@@ -3,11 +3,11 @@
 correct_by_mistake = [
 	# [(cm[0].split(","), cm[1]) for cm in list(L.strip().split("\t")) ]
 	L.strip()
-	 for L in """SequenceNext,SequenceEnd,SequenceBegin	TooEarlyInSequence
+	 for L in """SequenceNext,SequenceBegin	TooEarlyInSequence
 SequenceNext	TooLateInSequence
 SequenceNext,SequenceBegin	SequenceFinishedTooEarly
 SequenceEnd	SequenceFinishedNotInOrder
-SequenceNext	DuplicateOfAct
+SequenceNext, SequenceEnd	DuplicateOfAct
 AltBegin	NoFirstCondition
 AltBranchBegin,NextAltCondition	BranchNotNextToCondition
 AltBranchBegin,NextAltCondition	ElseBranchNotNextToLastCondition

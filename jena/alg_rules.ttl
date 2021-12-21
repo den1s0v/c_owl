@@ -5,6 +5,8 @@
 # An important RDF rules subset
 @include <jena/rdfs4core.rules>.
 
+@include <jena/loop_names.ttl>.
+
 # @include <RDFS>.
 
 @prefix my: <http://vstu.ru/poas/code#> .
@@ -46,6 +48,7 @@
 	 (?b my:end_of ?a) ,
 ]
 
+# this two ^ rules work good.
 
 
 
@@ -377,33 +380,6 @@
 
 
 ###############################
-# loop helper
-###############################
-
-# Rule: fetch_kind_of_loop-helper [loop & mistake]
-[
-	(?a my:fetch_kind_of_loop ?Loop),
-	(?Loop rdf:type my:while_loop),
-	 ->
-	 drop(0),
-	 (?a my:field_kind_of_loop "WHILE"),
-]
-# Rule: fetch_kind_of_loop-helper [loop & mistake]
-[
-	(?a my:fetch_kind_of_loop ?Loop),
-	(?Loop rdf:type my:do_while_loop),
-	 ->
-	 drop(0),
-	 (?a my:field_kind_of_loop "DO-WHILE"),
-]
-# TODO: ... add more helper rules for other kinds of loops:
-#	for_loop
-#	foreach_loop
-
-
-
-
-###############################
 # loop
 ###############################
 
@@ -466,29 +442,29 @@
 # Rule: connect_LoopCond0-body [correct & loop]
 # ...
 
-#[connect_LoopCond1-update:
-#	(?Loop rdf:type my:pre_update_loop),
-#	(?Loop my:cond ?cnd),
-#	(?Loop my:update ?upd),
-#
-#	(?e my:end_of ?cnd),
-#	(?b my:begin_of ?upd),
-#	 ->
-#	 (?e my:on_true_consequent ?b),
-#	 (?e my:LoopUpdateOnTrueCond ?b),
-#]
+[connect_LoopCond1-update:
+	(?Loop rdf:type my:pre_update_loop),
+	(?Loop my:cond ?cnd),
+	(?Loop my:update ?upd),
 
-#[connect_LoopUpdate-body:
-#	(?Loop rdf:type my:pre_update_loop),
-#	(?Loop my:update ?upd),
-#	(?Loop my:body ?st),
-#
-#	(?e my:end_of ?upd),
-#	(?b my:begin_of ?st),
-#	 ->
-#	 (?e my:always_consequent ?b),
-#	 (?e my:LoopBodyAfterUpdate ?b),
-#]
+	(?e my:end_of ?cnd),
+	(?b my:begin_of ?upd),
+	 ->
+	 (?e my:on_true_consequent ?b),
+	 (?e my:LoopUpdateOnTrueCond ?b),
+]
+
+[connect_LoopUpdate-body:
+	(?Loop rdf:type my:pre_update_loop),
+	(?Loop my:update ?upd),
+	(?Loop my:body ?st),
+
+	(?e my:end_of ?upd),
+	(?b my:begin_of ?st),
+	 ->
+	 (?e my:always_consequent ?b),
+	 (?e my:IterationAfterUpdate ?b),
+]
 
 [connect_LoopCond0-LoopEnd:
 	(?Loop rdf:type my:conditional_loop),
@@ -534,50 +510,50 @@
 	  (?R my:field_LOOP_COND ?cnd_name),
 ]
 
-#[connect_LoopBegin-init:
-#	(?Loop rdf:type my:start_with_init),
-#	(?Loop my:init ?st),
-#	(?b my:begin_of ?Loop),
-#
-#	(?b2 my:begin_of ?st),
-#	 ->
-#	 (?b my:always_consequent ?b2),
-#	 (?b my:LoopCondBeginAfterInit ?b2),
-#]
+[connect_LoopBegin-init:
+	(?Loop rdf:type my:start_with_init),
+	(?Loop my:init ?st),
+	(?b my:begin_of ?Loop),
 
-#[connect_LoopInit-cond:
-#	(?Loop rdf:type my:start_with_init),
-#	(?Loop my:init ?st),
-#	(?Loop my:cond ?cnd),
-#
-#	(?e my:end_of ?st),
-#	(?b my:begin_of ?cnd),
-#	 ->
-#	 (?e my:always_consequent ?b),
-#	 (?e my:LoopCondBeginAfterInit ?b),
-#]
+	(?b2 my:begin_of ?st),
+	 ->
+	 (?b my:always_consequent ?b2),
+	 (?b my:LoopWithInitBegin ?b2),
+]
 
-#[connect_LoopBody-update:
-#	(?Loop rdf:type my:post_update_loop),
-#	(?Loop my:body ?st),
-#	(?Loop my:update ?upd),
-#
-#	(?e my:end_of ?st),
-#	(?b my:begin_of ?upd),
-#	 ->
-#	 (?e my:always_consequent ?b),
-#	 (?e my:LoopUpdateAfterIteration ?b),
-#]
+[connect_LoopInit-cond:
+	(?Loop rdf:type my:start_with_init),
+	(?Loop my:init ?st),
+	(?Loop my:cond ?cnd),
 
-#[connect_LoopUpdate-cond:
-#	(?Loop rdf:type my:post_update_loop),
-#	(?Loop my:update ?upd),
-#	(?Loop my:cond ?cnd),
-#
-#	(?e my:end_of ?upd),
-#	(?b my:begin_of ?cnd),
-#	 ->
-#	 (?e my:always_consequent ?b),
-#	 (?e my:LoopCondAfterUpdate ?b),
-#]
+	(?e my:end_of ?st),
+	(?b my:begin_of ?cnd),
+	 ->
+	 (?e my:always_consequent ?b),
+	 (?e my:LoopCondBeginAfterInit ?b),
+]
+
+[connect_LoopBody-update:
+	(?Loop rdf:type my:post_update_loop),
+	(?Loop my:body ?st),
+	(?Loop my:update ?upd),
+
+	(?e my:end_of ?st),
+	(?b my:begin_of ?upd),
+	 ->
+	 (?e my:always_consequent ?b),
+	 (?e my:LoopUpdateAfterIteration ?b),
+]
+
+[connect_LoopUpdate-cond:
+	(?Loop rdf:type my:post_update_loop),
+	(?Loop my:update ?upd),
+	(?Loop my:cond ?cnd),
+
+	(?e my:end_of ?upd),
+	(?b my:begin_of ?cnd),
+	 ->
+	 (?e my:always_consequent ?b),
+	 (?e my:LoopCondAfterUpdate ?b),
+]
 
