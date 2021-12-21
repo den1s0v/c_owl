@@ -1,44 +1,24 @@
 # loop_names.ttl
 
+@prefix  rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix  rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix my: <http://vstu.ru/poas/code#> .
+
 ###############################
 # loop helper
 ###############################
 
-# Rule: fetch_kind_of_loop-helper-1 [loop & mistake]
+# Rule: fetch_kind_of_loop-helper [loop & mistake]
 [
 	(?a my:fetch_kind_of_loop ?Loop),
-	(?Loop rdf:type my:while_loop),
+	(?Loop rdf:type ?LoopClass),
+#	use annotation attached to class itself
+	(?LoopClass rdfs:label ?LoopLabel),
 	 ->
 	 drop(0),
-	 (?a my:field_kind_of_loop "WHILE"),
+##	 print(?LoopLabel),
+	 (?a my:field_kind_of_loop ?LoopLabel),
 ]
-# Rule: fetch_kind_of_loop-helper-2 [loop & mistake]
-[
-	(?a my:fetch_kind_of_loop ?Loop),
-	(?Loop rdf:type my:do_while_loop),
-	 ->
-	 drop(0),
-	 (?a my:field_kind_of_loop "DO-WHILE"),
-]
-# Rule: fetch_kind_of_loop-helper-3 [loop & mistake]
-[
-	(?a my:fetch_kind_of_loop ?Loop),
-	(?Loop rdf:type my:for_loop),
-	 ->
-	 drop(0),
-	 (?a my:field_kind_of_loop "FOR"),
-]
-# Rule: fetch_kind_of_loop-helper-4 [loop & mistake]
-[
-	(?a my:fetch_kind_of_loop ?Loop),
-	(?Loop rdf:type my:foreach_loop),
-	 ->
-	 drop(0),
-	 (?a my:field_kind_of_loop "FOREACH"),
-]
-# TODO: ... add more helper rules for other kinds of loops:
-#	+ for_loop
-#	+ foreach_loop
-
 
 

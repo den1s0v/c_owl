@@ -1051,18 +1051,23 @@ def init_persistent_structure(onto):
             # classes that define well-known loops as subclasses of the above defined loop-feature classes. These classes are to be used publicly
             class while_loop(start_with_cond): pass
             while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
+            while_loop.label = ["WHILE"]
 
             class do_while_loop(start_with_body): pass
             do_while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
+            do_while_loop.label = ["DO-WHILE"]
 
             # class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
             # do_until_loop.is_a += [body_then_cond]  # workaround
+            # do_until_loop.label = ["DO-UNTIL"]
 
             class for_loop(post_update_loop, start_with_init): pass
             for_loop.is_a += [cond_then_body]  # workaround
+            for_loop.label = ["FOR"]
 
             class foreach_loop(pre_update_loop, start_with_cond): pass
             foreach_loop.is_a += [body_then_cond]  # workaround
+            foreach_loop.label = ["FOREACH"]
 
 
 
@@ -1209,6 +1214,10 @@ def init_persistent_structure(onto):
             # category2priority = None  # declare it later
             # class error_priority(Thing >> int): pass
 
+            # class-level properties (called Annotations)
+            class involves_concept(AnnotationProperty): pass
+            class principal_violation(AnnotationProperty): pass
+
             # make Erroneous subclasses
             # (class, [bases])
             for class_spec in [
@@ -1308,29 +1317,26 @@ def init_persistent_structure(onto):
                     # print(bases)
                     created_class = types.new_class(class_name, bases or (Erroneous,))
                     related_concepts = class_spec[3]
-                    for related_concept in related_concepts:
-                        # make a new subclass of both mistake and concept
-                        types.new_class(class_name + '_related_to_' + related_concept, (created_class, onto[related_concept]))
-                        ### make_triple(created_class, related_to_concept, related_concept)
+                    created_class.involves_concept = list(map(onto.__getattr__, sorted(related_concepts)))
 
-                    # if len(class_spec) >= 3:
-                    #     category = class_spec[2]
-                    #     if not category2priority:
-                    #         category2priority = {n:i for i,n in enumerate([
-                    #             "trace_structure",
-                    #             "general_wrong",
-                    #             "wrong_context",
-                    #             "concrete_wrong_context",
-                    #             "extra",
-                    #             "by_different_cond",
-                    #             "missing",
-                    #             # "",
-                    #         ])}
-                    # assert category in category2priority, (category, class_name)
-                    # priority = category2priority[category]
-                    # # set error_priority
-                    # ## ??????
-                    # make_triple(created_class, error_priority, priority)
+                    ## if len(class_spec) >= 3:
+                    ##     category = class_spec[2]
+                    ##     if not category2priority:
+                    ##         category2priority = {n:i for i,n in enumerate([
+                    ##             "trace_structure",
+                    ##             "general_wrong",
+                    ##             "wrong_context",
+                    ##             "concrete_wrong_context",
+                    ##             "extra",
+                    ##             "by_different_cond",
+                    ##             "missing",
+                    ##             # "",
+                    ##         ])}
+                    ## assert category in category2priority, (category, class_name)
+                    ## priority = category2priority[category]
+                    ## # set error_priority
+                    ## ## ??????
+                    ## make_triple(created_class, error_priority, priority)
 
 
         for prop_name in ("precursor", "cause", "has_causing_condition", "should_be", "should_be_before", "should_be_after", "context_should_be"):
@@ -1339,44 +1345,51 @@ def init_persistent_structure(onto):
 
         # make consequent subproperties (always_consequent is default base)
         for class_spec in [
+            #: (name, [base], [principal_violations])
             # "DebugObj",
             # "FunctionBegin",
             # "FunctionEnd",
             # "FunctionBodyBegin",
             "StmtEnd",
             "ExprEnd",
-            "GlobalCodeBegin",
-            "SequenceBegin",
-            "SequenceNext",
-            "SequenceEnd",
-            "AltBegin",  # 1st condition
-            ("AltBranchBegin", on_true_consequent),
-            ("NextAltCondition", on_false_consequent),
-            ("AltElseBranchBegin", on_false_consequent),
-            ("AltEndAllFalse", on_false_consequent),
-            "AltEndAfterBranch",
-            "PreCondLoopBegin",
-            "PostCondLoopBegin",
-            ("IterationBeginOnTrueCond", on_true_consequent),
+
+            ("GlobalCodeBegin", 0, ['TooEarlyInSequence', 'SequenceFinishedTooEarly']),
+            ("SequenceBegin", 0, ['TooEarlyInSequence', 'SequenceFinishedTooEarly']),
+            ("SequenceNext", 0, ['DuplicateOfAct', 'TooEarlyInSequence', 'SequenceFinishedTooEarly']),
+            ("SequenceEnd", 0, ['DuplicateOfAct']),
+
+            ("AltBegin", 0, ['NoFirstCondition']),  # 1st condition
+            ("AltBranchBegin", on_true_consequent, ['NoBranchWhenConditionIsTrue']),
+            ("NextAltCondition", on_false_consequent, ['BranchOfFalseCondition']),
+            ("AltElseBranchBegin", on_false_consequent, ['LastConditionIsFalseButNoElse', 'BranchOfFalseCondition']),
+            ("AltEndAllFalse", on_false_consequent, ['LastFalseNoEnd']),
+            ("AltEndAfterBranch", 0, ['NoAlternativeEndAfterBranch']),
+
+            ("PreCondLoopBegin", 0, ['LoopStartIsNotCondition']),
+            ("PostCondLoopBegin", 0, ['LoopStartIsNotIteration']),
+            ("IterationBeginOnTrueCond", on_true_consequent, ['NoIterationAfterSuccessfulCondition']),
             # "IterationBeginOnFalseCond",
-            ("LoopUpdateOnTrueCond", on_true_consequent),
-            "IterationAfterUpdate",
-            ("LoopEndOnFalseCond", on_false_consequent),
+            ("LoopUpdateOnTrueCond", on_true_consequent, ['NoForeachUpdateAfterSuccessfulCondition']),
+            ("IterationAfterUpdate", 0, ['NoIterationAfterForeachUpdate']),
+            ("LoopEndOnFalseCond", on_false_consequent, ['NoLoopEndAfterFailedCondition']),
             # "LoopEndOnTrueCond",  # no rule yet?
-            "LoopCondBeginAfterIteration",
-            "LoopWithInitBegin",
-            "LoopCondBeginAfterInit",
-            "LoopUpdateAfterIteration",
-            "LoopCondAfterUpdate",
+            ("LoopCondBeginAfterIteration", 0, ['NoConditionAfterIteration']),
+            ("LoopWithInitBegin", 0, ['LoopStartsNotWithInit']),
+            ("LoopCondBeginAfterInit", 0, ['NoConditionAfterForInit']),
+            ("LoopUpdateAfterIteration", 0, ['NoUpdateAfterIteration']),
+            ("LoopCondAfterUpdate", 0, ['NoConditionAfterForUpdate']),
         ]:
             # types.new_class(class_name, (correct_act,))
             if isinstance(class_spec, str):
                 types.new_class(class_spec, (always_consequent,))
             elif isinstance(class_spec, tuple):
                 class_name, base_names = class_spec[:2]
-                bases = tuple((onto[base_name] if type(base_name) is str else base_name) for base_name in [base_names])
+                bases = tuple((onto[base_name] if type(base_name) is str else base_name) for base_name in [base_names] if base_name)
                 # print(bases)
                 created_class = types.new_class(class_name, bases or (always_consequent,))
+                if len(class_spec) >= 3:
+                    violations = class_spec[2]
+                    created_class.principal_violation = list(map(onto.__getattr__, violations))
 
         for prop_name in ("reason", ):  # for correct acts !
             if not onto[prop_name]:
