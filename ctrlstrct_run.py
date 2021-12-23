@@ -1218,6 +1218,9 @@ def init_persistent_structure(onto):
             class involves_concept(AnnotationProperty): pass
             class principal_violation(AnnotationProperty): pass
 
+            # reason node can be associated with violations poassible at the step of solution
+            class possible_violation(ObjectProperty): pass
+
             # make Erroneous subclasses
             # (class, [bases])
             for class_spec in [
@@ -1359,7 +1362,7 @@ def init_persistent_structure(onto):
             ("SequenceEnd", 0, ['DuplicateOfAct']),
 
             ("AltBegin", 0, ['NoFirstCondition']),  # 1st condition
-            ("AltBranchBegin", on_true_consequent, ['NoBranchWhenConditionIsTrue']),
+            ("AltBranchBegin", on_true_consequent, ['NoBranchWhenConditionIsTrue']),  # ElseBranchAfterTrueCondition (enabled by ELSE branch) - not included directly; see special rule from that whose process algorithms
             ("NextAltCondition", on_false_consequent, ['BranchOfFalseCondition']),
             ("AltElseBranchBegin", on_false_consequent, ['LastConditionIsFalseButNoElse', 'BranchOfFalseCondition']),
             ("AltEndAllFalse", on_false_consequent, ['LastFalseNoEnd']),

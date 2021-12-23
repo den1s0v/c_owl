@@ -144,6 +144,12 @@
 
 
 
+[attach-principal_violation-to-possible_violation-at-reason_node:
+
+	(?R my:reason_kind ?reason),
+	(?reason my:principal_violation ?viol)
+	 -> (?R my:possible_violation ?viol)
+]
 
 
 
@@ -280,6 +286,18 @@
 	  (?R my:field_ALT_COND ?cnd_name),
 	  (?R my:field_BRANCH ?branch_name),
 ]
+
+
+[attach-possible_violation-for-AltBranchBegin:
+	(?R my:reason_kind my:AltBranchBegin),
+	(?e my:to_reason ?R),
+	(?e my:to_reason ?R2),
+#	another way leads to ELSE branch => the branch exists in the Alternative.
+	(?R2 my:reason_kind my:AltElseBranchBegin),
+	 ->
+	 (?R my:possible_violation my:ElseBranchAfterTrueCondition)
+]
+
 
 [connect_NextAltCondition:
 	(?cnd rdf:type my:expr),
