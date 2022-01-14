@@ -1752,12 +1752,29 @@ def save_schema(file_path='jena/control-flow-statements-domain-schema.rdf'):
     print(r"c:\D\Work\YDev\CompPr\CompPrehension\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
 
 
+def _play_with_classes():
+    onto = create_ontology_tbox()
+    descendants = [*onto.action.descendants()]
+    # print(descendants)
+    showable = get_leaf_classes(descendants)
+    print(showable)
+    showable = [n.name for n in showable]
+    print("as strings:", showable)
+
+
+
 if __name__ == '__main__':
 
     if 1:
         print("Special run mode activated:")
         print("Saving schema only to file.")
         save_schema()
+        exit()
+
+    if 1:
+        print("Special run mode activated:")
+        print("_play_with_classes()")
+        _play_with_classes()
         exit()
 
     print("Please run *_test.py script instead!")

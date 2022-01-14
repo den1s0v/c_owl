@@ -85,89 +85,89 @@ def class_name_to_readable(s):
 	return res
 
 
-def format_full_name(a: 'act or stmt', include_phase=False, include_type=True, include_line_index=False, case='nomn', quote="'"):
-	""" -> begin of loop waiting (at line 45) """
+# def format_full_name(a: 'act or stmt', include_phase=False, include_type=True, include_line_index=False, case='nomn', quote="'"):
+	# """ -> begin of loop waiting (at line 45) """
 
-	assert False, "Deprecated function: format_full_name()"
+	# assert False, "Deprecated function: format_full_name()"
 
-	try:
+	# try:
 
-		is_act = bool({onto.act_begin, onto.act_end, onto.trace} & set(a.is_a))
-		is_boundary = onto.boundary in a.is_a
+	# 	is_act = bool({onto.act_begin, onto.act_end, onto.trace} & set(a.is_a))
+	# 	is_boundary = onto.boundary in a.is_a
 
-		### print(" * ! is_boundary:", is_boundary, "for a:", a)
+	# 	### print(" * ! is_boundary:", is_boundary, "for a:", a)
 
-		phase = ''
-		if is_act and include_phase:
-			if onto.act_begin in a.is_a:
-				phase = tr("begin of ")
-			elif onto.act_end in a.is_a:
-				phase = tr("end of ")
-			case = 'gent'
-		elif is_boundary and include_phase:
-			if a.begin_of:
-				phase = tr("begin of ")
-			elif a.end_of:
-				phase = tr("end of ")
-			case = 'gent'
+	# 	phase = ''
+	# 	if is_act and include_phase:
+	# 		if onto.act_begin in a.is_a:
+	# 			phase = tr("begin of ")
+	# 		elif onto.act_end in a.is_a:
+	# 			phase = tr("end of ")
+	# 		case = 'gent'
+	# 	elif is_boundary and include_phase:
+	# 		if a.begin_of:
+	# 			phase = tr("begin of ")
+	# 		elif a.end_of:
+	# 			phase = tr("end of ")
+	# 		case = 'gent'
 
-		line_index = ''
-		if is_act and include_line_index:
-			i = get_relation_object(a, onto.text_line)
-			if i:
-				line_index = tr(" (at line %d)") % i
-			else:
-				line_index = tr(" (the line is missing)")
+	# 	line_index = ''
+	# 	if is_act and include_line_index:
+	# 		i = get_relation_object(a, onto.text_line)
+	# 		if i:
+	# 			line_index = tr(" (at line %d)") % i
+	# 		else:
+	# 			line_index = tr(" (the line is missing)")
 
-		if is_act:
-			stmt = get_executes(a)
-		elif is_boundary:
-			stmt = get_relation_object(a, onto.boundary_of)
-		else:
-			stmt = a
-		assert stmt, f" ValueError: no stmt found for {str(a)}"
-		stmt_name = get_relation_object(stmt, onto.stmt_name)
-		assert stmt_name, f" ValueError: no stmt_name found for {str(stmt)}"
+	# 	if is_act:
+	# 		stmt = get_executes(a)
+	# 	elif is_boundary:
+	# 		stmt = get_relation_object(a, onto.boundary_of)
+	# 	else:
+	# 		stmt = a
+	# 	assert stmt, f" ValueError: no stmt found for {str(a)}"
+	# 	stmt_name = get_relation_object(stmt, onto.stmt_name)
+	# 	assert stmt_name, f" ValueError: no stmt_name found for {str(stmt)}"
 
-		if stmt_name.endswith("_loop_body"):
-			# тело цикла XYZ
-			# body of loop XYZ
-			stmt_name = tr("body of loop", case) + " " + quote + stmt_name.replace("_loop_body", '') + quote
-			include_type = False
-		else:
-			stmt_name = quote + stmt_name + quote
+	# 	if stmt_name.endswith("_loop_body"):
+	# 		# тело цикла XYZ
+	# 		# body of loop XYZ
+	# 		stmt_name = tr("body of loop", case) + " " + quote + stmt_name.replace("_loop_body", '') + quote
+	# 		include_type = False
+	# 	else:
+	# 		stmt_name = quote + stmt_name + quote
 
-		type_ = ''
-		if include_type:
-			onto_classes = get_leaf_classes(stmt.is_a)
-			onto_classes = {c.name for c in onto_classes}  # convert to strings
-			onto_classes &= ALGORITHM_ITEM_CLASS_NAMES
-			if onto_classes:
-				onto_class = next(iter(onto_classes))
-				# make the name more readable
-				if onto_class in {"if", "else-if", "else"}:
-					# onto_class += "-branch"
-					onto_class = tr("%s-branch") % onto_class
-				else:
-					onto_class = tr(onto_class, 'gent' if include_phase else 'nomn')
-				type_ = f"{onto_class} "
-			else:
-				type_ = tr("unknown structure")
-			type_ = type_.strip() + " "
+	# 	type_ = ''
+	# 	if include_type:
+	# 		onto_classes = get_leaf_classes(stmt.is_a)
+	# 		onto_classes = {c.name for c in onto_classes}  # convert to strings
+	# 		onto_classes &= ALGORITHM_ITEM_CLASS_NAMES
+	# 		if onto_classes:
+	# 			onto_class = next(iter(onto_classes))
+	# 			# make the name more readable
+	# 			if onto_class in {"if", "else-if", "else"}:
+	# 				# onto_class += "-branch"
+	# 				onto_class = tr("%s-branch") % onto_class
+	# 			else:
+	# 				onto_class = tr(onto_class, 'gent' if include_phase else 'nomn')
+	# 			type_ = f"{onto_class} "
+	# 		else:
+	# 			type_ = tr("unknown structure")
+	# 		type_ = type_.strip() + " "
 
-		### print(phase, type_, quote, stmt_name, quote, line_index)
-		full_msg = phase + type_ + stmt_name  # + line_index
-		if full_msg != stmt_name:
-			# wrap in additional quotes
-			full_msg = "«%s»" % full_msg
-		if line_index:
-			full_msg += line_index
-		return full_msg
-	except Exception as e:
-		print(e)
-		# raise e
-		# return tr("[unknown]")
-		return tr("__")
+	# 	### print(phase, type_, quote, stmt_name, quote, line_index)
+	# 	full_msg = phase + type_ + stmt_name  # + line_index
+	# 	if full_msg != stmt_name:
+	# 		# wrap in additional quotes
+	# 		full_msg = "«%s»" % full_msg
+	# 	if line_index:
+	# 		full_msg += line_index
+	# 	return full_msg
+	# except Exception as e:
+	# 	print(e)
+	# 	# raise e
+	# 	# return tr("[unknown]")
+	# 	return tr("__")
 
 
 def format_explanation(current_onto, act_instance, _auto_register=True) -> list:

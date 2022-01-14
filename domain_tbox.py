@@ -1,5 +1,7 @@
 # domain_tbox.py
 
+raise 'TODO: check status of domain_tbox.py ...'
+
 def init_persistent_structure(onto, complete_vocabulary_mode=True):
     # types.new_class(temp_name, (domain >> range_, ))  # , Property
 

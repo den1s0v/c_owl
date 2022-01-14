@@ -45,7 +45,7 @@ def make_lexer():
 	  'start': [
 		{'regex': keyword_re, 'token': "keyword"},
 		{'regex': re.compile(r"true|false|ложь|истина|not evaluated|не вычислено", re.I), 'token': "atom"},
-		{'regex': re.compile(r"([\"])(?:\.|[^\"'])*\1", re.I), 'token': "string"},
+		{'regex': re.compile(r"([\"'])(?:\.|[^\"'])*\1", re.I), 'token': "string"},
 		{'regex': re.compile(r"\d+(?:st|nd|rd|th)?", re.I),
 		  # /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
 		 'token': "number"},

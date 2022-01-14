@@ -272,7 +272,7 @@ class AlgorithmXMLParser(AlgorithmParser):
                     "id": self.newID(block_NAME),
                     "type": "alternative",
                     "name": block_NAME,
-                    "act_name": make_translation(ru=f"альтернатива '{block_NAME}'", en=f"alternative '{block_NAME}'"),
+                    "act_name": make_translation(ru=f"развилка '{block_NAME}'", en=f"selection '{block_NAME}'"),
                     "branches": []
                 })
                 # alt branches
