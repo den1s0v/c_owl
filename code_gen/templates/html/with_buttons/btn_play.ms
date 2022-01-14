@@ -1,0 +1,10 @@
+<span 	class="alg_button" 
+		algorithm_element_id="{{id}}" 
+		id="answer_{{act_type-play}}:{{id}}" 
+		act_type="{{act_type-play}}"
+		data-tooltip="{{phase-label-play}} {{act_name}}"
+		data-toggle="tooltip"
+		title="{{phase-label-play}} {{act_name}}"
+		data-position="top left"
+		data-placement="top"
+><i class="play small icon"></i></span>

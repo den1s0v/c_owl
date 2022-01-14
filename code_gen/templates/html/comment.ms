@@ -1,0 +1,1 @@
+&nbsp;{{#partial}}span | {class: comment, content: '// {{comment}}'}{{/partial}}
