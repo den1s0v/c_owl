@@ -6,7 +6,8 @@ import sys   # measure stack size
 from itertools import count
 
 
-import chevron
+from chevron import render as chevron_render
+from chevron.renderer import _html_escape  # use for monkey-patch to fix issue of double-escaping via double-rendering of variables
 import fs
 import yaml
 
@@ -16,10 +17,11 @@ LOCALES_BY_DEFAULT = ('ru', 'en', )  # what to use for quick-fix of "act_name" k
 _dir_path = os.path.dirname(os.path.realpath(__file__)) # dir of cuurent .py file
 TEMPLATES_PATH = os.path.join(_dir_path, 'templates')
 
-
 TEMPLATE_EXT = '.ms'.casefold()
 CONFIG_FILE_NAME = 'config.yml'.casefold()
 
+FIX_DOUBLE_ESCAPING_ISSUE = True  # see below; here is place to turn hacks OFF
+USE_HTML_ESCAPING = False
 
 BUTTON_TIP_FREFIX = {
     "ru": {
@@ -50,6 +52,33 @@ _DEBUG_RENDERING = False
 ####### Render code with Mustache templates #######
 #######                                     #######
 ###################################################
+
+if FIX_DOUBLE_ESCAPING_ISSUE:
+    # redefine function called by render() internally from chevron module ...
+    def _html_escape_noop(string):
+        """do nothing to preserve formatting
+            when multiple render of the same fragment occurs
+            within chevron.render() function
+        """
+        return string
+
+    chevron_render_original = chevron_render
+    # patch namespace of external function so it calls our function internally
+    chevron_render_original.__globals__['_html_escape'] = _html_escape_noop
+
+    if USE_HTML_ESCAPING:  # is performed by chevron by default
+        def chevron_render_wrapper(*args, **kwargs):
+            'call muted functionality once at the end'
+            rendered = chevron_render_original(*args, **kwargs)
+            rendered = _html_escape(rendered)  # call original function from chevron.renderer ONCE
+            return rendered
+
+        # patch namespace of external function so it calls our function internally
+        chevron_render_original.__globals__['render'] = chevron_render_wrapper
+
+        # replace function with wrapper to loook nice for client code
+        chevron_render = chevron_render_wrapper
+
 
 
 def render_code(alg_dict, locale='ru', **kwargs):
@@ -174,14 +203,14 @@ def run_rendering(keyed_alg_data, text_mode='html', lang='c', show_buttons=True,
             'pad': pad,
             'comment': comment,
             'kw': lambda text, render: render("{{#partial}}span | {class: keyword, content: '%s'}{{/partial}}" % text)
-            #### 'render': chevron.render,
+            #### 'render': chevron_render,
         },
         'partials_dict': partials_dict,
     }
 
     try:
         print("Start rendering ...")
-        rendered = chevron.render(**args, warn=True)
+        rendered = chevron_render(**args, warn=True)
         print("... rendering complete.")
         return rendered
         # if 0 or common_options['text_mode'] == 'text':
@@ -216,7 +245,7 @@ if 1:
     siblings_list = [
         "stmt sequence alternative while_loop do_while_loop for_loop foreach_loop".split(),   # add new action classes here
         if_branches,
-        # ["sequence"],
+        #### ["sequence"],  #  moved above to other regular statements
         ['expr'],
         ['algorithm', 'functions'],
     ]
@@ -471,7 +500,7 @@ if __name__ == '__main__':
     # alg_json_file = r'..\trace_gen\alg_out.json'
     # alg_json_file = r'..\trace_gen\alg_example.json'
     alg_json_file = r'hiw-alg.json'
-    # alg_json_file = r'ctrlflow_v4_1-alg.json'
+    # alg_json_file = r'ctrlflow_v4_28-alg.json'
 
     with open(alg_json_file, encoding='1251') as f:
         data = json.load(f)
