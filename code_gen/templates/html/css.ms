@@ -1,5 +1,5 @@
 <style type="text/css" media="screen">
-	.comp-ph-question-text {
+	.comp-ph-question-text, div.code-line {
 	  font-family: courier; font-size: 10pt;
 	}
     span.string { color: #555; font-style: italic }

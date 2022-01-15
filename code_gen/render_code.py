@@ -288,7 +288,9 @@ if 1:
                             d.update(replacings[rk](d))
 
                     # indent = 1 if ('body' in d and t != 'sequence') else 0
-                    indent = 1 if ('body' in d) else 0
+                    indent = 1 if ('body' in d and (
+                        type(d['body']) is list and d['body'][0].get('type') != 'sequence') # do not fall to deep in a loop body
+                    ) else 0
                     inner_d = {k: type2key(v, depth=depth+indent) for k, v in d.items() if k != 'type'}
                     if t in renamings:
                         # replace entries

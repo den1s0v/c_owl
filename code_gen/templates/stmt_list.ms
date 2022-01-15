@@ -1,1 +1,1 @@
-{{#use}}stmt{{/use}}{{#use}}alternative{{/use}}{{#use}}sequence{{/use}}{{#use}}while_loop as while{{/use}}{{#use}}do_while_loop as do_while{{/use}}
+{{#use}}stmt{{/use}}{{#use}}alternative{{/use}}{{#use}}sequence as named_sequence{{/use}}{{#use}}while_loop as while{{/use}}{{#use}}do_while_loop as do_while{{/use}}
