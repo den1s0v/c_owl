@@ -2155,6 +2155,8 @@ def patch_trace(trace: str) -> str:
 			"began program", "program began"
 		).replace(
 			"ended program", "program ended"
+		).replace(
+			"alternative", "selection"
 		)
 
 	# move <phase word> right before <ith>

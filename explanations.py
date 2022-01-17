@@ -33,7 +33,7 @@ def tr(word_en, case='nomn'):
 		"expr"				: ("выражение", "выражения", ),
 		"stmt"				: ("команда", "команды", ),
 		"sequence"			: ("следование", "следования", ),
-		"alternative"		: ("альтернатива", "альтернативы", ),
+		"alternative"		: ("развилка", "развилки", ),
 		"loop"				: ("цикл", "цикла", ),
 		"while_loop"		: ("цикл", "цикла", ),
 		"do_while_loop"		: ("цикл", "цикла", ),
@@ -280,10 +280,8 @@ def _sort_linked_list(array, next_prop: "transitive onto.prop"):
 				return getattr(other.obj, prop_name).__contains__(self.obj)
 			def __eq__(self, other):
 				return self.obj == other.obj
-			def __le__(self, other):
-				return getattr(self.obj, prop_name).__contains__(other.obj)
-			def __ge__(self, other):
-				return getattr(other.obj, prop_name).__contains__(self.obj)
+			__le__ = __lt__
+			__ge__ = __gt__
 			def __ne__(self, other):
 				return self.obj != other.obj
 		return K

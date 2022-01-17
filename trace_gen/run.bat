@@ -1,1 +1,1 @@
-python3 json2alg2tr.py
+python json2alg2tr.py
