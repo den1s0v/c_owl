@@ -5,6 +5,9 @@ transliterate
 Flask
 waitress
 
+# unified translations
+python-i18n[YAML]
+
 ### Java (11+, 14) is currently in use ###
 psutil
 
