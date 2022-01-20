@@ -12,6 +12,15 @@ import fs
 import yaml
 
 
+
+if __name__ == '__main__':  # to import from upper directory
+    import sys
+    sys.path.insert(1, '../')
+
+from trace_gen.get_i18n import action
+from trace_gen.txt2algntr import find_by_keyval_in, find_by_predicate
+
+
 LOCALES_BY_DEFAULT = ('ru', 'en', )  # what to use for quick-fix of "act_name" key absence
 
 _dir_path = os.path.dirname(os.path.realpath(__file__)) # dir of cuurent .py file
@@ -254,11 +263,57 @@ if 1:
 
 
     def transform_alg_dict_for_mustache(raw_data, locale='en'):
-        assert locale in ('ru', 'en', ), 'Unsupported locale: ' + repr(locale)
+        assert locale in LOCALES_BY_DEFAULT, 'Unsupported locale: %s, use one of: %s' % (repr(locale), repr(LOCALES_BY_DEFAULT))
         # # locale = 'ru'
         # locale = 'en'
 
-        replacings = {"stmt_name": lambda d: {"name": d["stmt_name"], 'act_name': {L: "'%s'" % d["stmt_name"] for L in LOCALES_BY_DEFAULT}},
+        def make_act_name(d, force_update=False):
+            ''' Using `raw_data` as root to search parent dicts '''
+            if 'act_name' in d and not force_update:
+                return d['act_name']  # quick no-op
+            # simple solution -- just names itself:
+            #### return {L: "'%s'" % d["stmt_name"] for L in LOCALES_BY_DEFAULT}
+            # full search solution:
+            node_type = d["type"]
+            name = d.get('stmt_name') or d.get('name')
+            kwargs = {}
+            if 'cond' in d:
+                cond = d.get('cond')
+                kwargs['cond_name'] = cond.get('stmt_name') or cond.get('name')
+                ### print(node_type)
+
+            if node_type in ('else', ):
+                alt = list(find_by_predicate(raw_data,
+                    lambda x: (type(x) is dict
+                        and ('type' in x)
+                        and x['type'] == 'alternative'
+                        and ('branches' in x)
+                        and (###print(x['branches'], end='\n\n') or
+                            d in x['branches']
+                            or d['id'] == x['branches'][-1].get('id'))
+                        ),
+                    find_one=True))
+                if alt:
+                    alt = alt[0]
+                    kwargs['alt_name'] = alt.get('stmt_name') or alt.get('name')
+                else:
+                    print('[WARN] Key `alt_name` not found for dict-node `else`')
+                    ### print(alt)
+
+            elif node_type.endswith('_loop'):
+                node_type = 'loop'
+            elif node_type in ('sequence', ):
+                loop = list(find_by_keyval_in('body', d, raw_data))
+                if loop:
+                    loop = loop[0]
+                    kwargs['loop_name'] = loop.get('stmt_name') or loop.get('name')
+                    node_type = 'loop-body'
+
+            return action(node_type, name=name, **kwargs)
+
+
+        replacings = {"stmt_name": lambda d: {"name": d["stmt_name"], 'act_name': make_act_name(d)},
+                      "name": lambda d: {'act_name': make_act_name(d)},
                       "act_name": lambda d: {"act_name": d["act_name"][locale]},
                       "type": lambda d: ({
                                 'act_type-play': 'performed',
@@ -279,7 +334,7 @@ if 1:
             return d
 
 
-        def type2key(d: dict, depth=-1):   # -1 is because top sequence adds 1 intent
+        def type2key(d: dict, depth=-1):   # -1 is because top sequence adds 1 indent
             if isinstance(d, dict):
                 if 'type' in d:
                     t = d['type']
@@ -491,6 +546,8 @@ if 1:
 
 
 if __name__ == '__main__':
+    # import sys
+    # sys.path.insert(1, '../')
 
     # templates = get_templates_for_language('html/c')
     # print([*templates], templates.get('comment'))
@@ -501,15 +558,15 @@ if __name__ == '__main__':
 
     # alg_json_file = r'..\trace_gen\alg_out.json'
     # alg_json_file = r'..\trace_gen\alg_example.json'
-    alg_json_file = r'hiw-alg.json'
-    # alg_json_file = r'ctrlflow_v4_28-alg.json'
+    # alg_json_file = r'hiw-alg_pretty.json'
+    alg_json_file = r'ctrlflow_v4_2-alg.json'
 
-    with open(alg_json_file, encoding='1251') as f:
+    with open(alg_json_file, encoding='utf8' or '1251') as f:
         data = json.load(f)
     if isinstance(data, list):
         data = data[0]
 
-    rendered = render_code(data, text_mode='html', raise_on_error=True)
+    rendered = render_code(data, text_mode='html', show_buttons=True, raise_on_error=True)
     with open(r'c:\D\Work\YDev\CompPr\c_owl\code_gen\test.html', 'w') as f:
         f.write(rendered)
 
