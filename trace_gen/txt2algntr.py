@@ -575,15 +575,15 @@ class AlgorithmParser:
                 continue  # with next stmt on current level
 
             # одно слово - имя действия: "бежать"
-            m = re.match(r"(\S+)$", current_line, re.I)
+            m = re.match(r"(\S+|\w.*(?:\(.*\)|=.|>>.|<<.|\+\+|--).*)$", current_line, re.I)
             if not m:
                 if not suggest_corrections and re.search('[a-z]+', current_line, re.I): suggest_corrections.append(
-                    'one-word-name-of-some-action')
+                    'some_action: function call(...), or variable = assignment, or VAR++/VAR--, or `cin >> ...` / `cout << ...`')
                 elif not suggest_corrections and re.search('[а-яё]+', current_line, re.I): suggest_corrections.append(
-                    'имя-действия-из-одного-слова')
+                    'действие: вызов(...) функции, или присваивание переменной = ..., или VAR++/VAR--, или `cin >> ...` / `cout << ...`')
             if m:
                 if self.verbose: print("action")
-                name = m.group(1)
+                name = m.group(1).replace('  ', ' ')
                 result.append( self.parse_stmt(name) )
                 ci = e + 1
                 continue  # with next stmt on current level

@@ -4,16 +4,17 @@ while (not_green)  // waiting
 {  
 	if (red)  // over_color
 	{  
-		wait
+		wait --
 	}  
 	else if (yellow)
 	{  
-		get_ready
-		take_a_while
+		cout << *get_ready 
+		take = a_while + 3 + 'seconds'
 	}  
 	else if (off)
 	{  
-		get_back
+		get_back ( i ) - 1
+		break
 	}  
 }  
 }
