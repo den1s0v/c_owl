@@ -1456,10 +1456,10 @@ def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=
 
 def main():
 
-	# parse_text_file("../handcrafted_traces/err_branching.txt")
-	# parse_text_file("../handcrafted_traces/err_loops.txt")
-	# parse_text_file("../handcrafted_traces/correct_branching.txt")
-	# parse_text_file("../handcrafted_traces/correct_loops.txt")
+    # parse_text_file("../handcrafted_traces/err_branching.txt")
+    # parse_text_file("../handcrafted_traces/err_loops.txt")
+    # parse_text_file("../handcrafted_traces/correct_branching.txt")
+    # parse_text_file("../handcrafted_traces/correct_loops.txt")
 
     # parse_text_files([
     #     # "../handcrafted_traces/err_branching.txt",
@@ -1471,16 +1471,31 @@ def main():
 
 
     result = parse_text_files( search_text_trace_files() )
-    from pprint import pprint
-    pprint(result)
+    print('Total algorithms / traces: ', len(result))
+    # from pprint import pprint
+    # to_print = result
+    # if len(to_print) > 3:
+    #     to_print = [result[:1], f'... {len(result) - 2} skipped ...', result[-1:]]
+    # pprint(to_print)
 
     import json
-    with open(r"C:\D\Work\YDev\CompPr\c_owl\trace_gen\alg_example.json", 'w') as f:
-        f.write(json.dumps(result, ensure_ascii=False, indent=1))
+    if not 'save all in one':
+        with open(r"C:/D/Work/YDev/CompPr/c_owl/trace_gen/alg_dbg.json", 'w') as f:
+            f.write(json.dumps(result, ensure_ascii=False, indent=1))
+    else:
+        out_dir = r'c:/Temp2/manual_json/'
+        for d in result:
+            filename = d['algorithm_name'] + '.json'
+            data = d['algorithm']
+            with open(out_dir + filename, 'w') as f:
+                f.write(json.dumps(data, ensure_ascii=False, indent=1))
+            print(end='.')
+        print()
 
 
 if __name__ == '__main__':
-	main()
+    main()
+    print('Done.')
 
     # v = get_ith_expr_value(
     #         ("(", 1, 2, 3, 4, ")", ), 16

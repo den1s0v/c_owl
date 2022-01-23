@@ -559,7 +559,49 @@ if 1:
 
 
 
+
+
+##############################
+#######                #######
+####### Debugging code #######
+#######                #######
+##############################
+
+def _render_json_2_html_batch(dir_src=r'c:\Temp2\cntrflowoutput_v4_json', dest_dir=r'c:\Temp2\cntrflowoutput_v4_html', ext_pattern='*.json'):
+    'convert all .json files in DIR_SRC to *.html into DEST_DIR'
+    from glob import glob
+    import json
+    import os.path
+
+    for fp in glob(os.path.join(dir_src, ext_pattern)):
+        print('>>>', fp, end='\t')
+
+        with open(fp) as f:
+            alg_json = json.load(f)
+
+        out = os.path.splitext(
+            os.path.join(
+                dest_dir,
+                os.path.split(fp)[1])
+            )[0] + '.html'
+
+        rendered = render_code(alg_json,
+            text_mode='html',
+            show_buttons=True,
+            raise_on_error=True)
+        with open(out, 'w') as f:
+            f.write(rendered)
+
+        print('OK')
+
+
+
 if __name__ == '__main__':
+    if 0:
+        # _render_json_2_html_batch()
+        _render_json_2_html_batch(dir_src=r'c:\Temp2\manual_json', dest_dir=r'c:\Temp2\manual_html')
+        exit(0)
+
     # import sys
     # sys.path.insert(1, '../')
 
@@ -573,7 +615,8 @@ if __name__ == '__main__':
     # alg_json_file = r'..\trace_gen\alg_out.json'
     # alg_json_file = r'..\trace_gen\alg_example.json'
     # alg_json_file = r'hiw-alg_pretty.json'
-    alg_json_file = r'ctrlflow_v4_2-alg.json'
+    # alg_json_file = r'ctrlflow_v4_379-s-alg.json'
+    alg_json_file = r'c:/Temp2/cntrflowoutput_v5_json/utf16_literal_to_utf8__18006635204267658488__1642965656.json'
 
     with open(alg_json_file, encoding='utf8' or '1251') as f:
         data = json.load(f)
