@@ -1,0 +1,1302 @@
+// questions
+
+
+// алгоритм seq1 (следование из 1 действия)
+{
+    free(array)
+}
+
+// seq1 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм seq2 (следование из 2 действий)
+{
+    free(array->elements)
+    free(array)
+}
+
+// seq2 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм seq3 (следование из 3 действий)
+{
+    free(hash->keys)
+    free(hash->values)
+    free(hash)
+}
+
+// seq3 - (2)
+// трасса  категории ошибок: SeqA_contains_B IS_containment
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм seq5 (следование из 5 действий)
+{
+    num = scanf("%d")
+    res = num + num + 1
+    res += 9
+    res = (int)(res / 2) - num
+    assert_five(res)
+}
+
+// seq5 - (2)
+// трасса  категории ошибок: SeqA_contains_B IS_containment
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+
+// алгоритм alt_11 (развилка по_цвету с 2+1 ветками)
+{
+if (col == 0) -> 1 // over_color
+    _set(BLACK)
+else if (col < 256) -> 1
+    _set(RED)
+else
+    _set(GREEN)
+}
+
+// alt_11 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_1 (развилка по_цвету с 2+1 ветками)
+{
+if (col == 0) -> 1 // over_color
+    _set(BLACK)
+else if (col < 256) -> 0
+    _set(RED)
+else
+    _set(GREEN)
+}
+
+// alt_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_00 (развилка по_цвету с 2+1 ветками)
+{
+if (col == 0) -> 0 // over_color
+    _set(BLACK)
+else if (col < 256) -> 0
+    _set(RED)
+else
+    _set(GREEN)
+}
+
+// alt_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+// алгоритм alt_i1 (развилка по_цвету с 1 веткой)
+{
+if (col == 0) -> 1 // over_color
+    _set(BLACK)
+}
+
+// alt_i1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iaa1 (развилка по_цвету с 1 веткой)
+{
+if (!_is_empty(array)) -> 1 // over_color
+    free(array->elements)
+    free(array)
+}
+
+// alt_iaa1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_i0 (развилка по_цвету с 1 веткой)
+{
+if (_is_empty(array)) -> 0 // over_color
+    free(array)
+}
+
+// alt_i0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iaa0 (развилка по_цвету с 1 веткой)
+{
+if (!_is_empty(array)) -> 0 // over_color
+    free(array->elements)
+    free(array)
+}
+
+// alt_iaa0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм alt_ie1 (развилка по_цвету с 2 ветками)
+{
+if (dif > 0) -> 1 // over_color
+    sign = 1
+else
+    sign = -1
+}
+
+// alt_ie1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ie0 (развилка по_цвету с 2 ветками)
+{
+if (dif > 0) -> 0 // over_color
+    sign = 1
+else
+    sign = -1
+}
+
+// alt_ie0 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм alt_ii (развилка по_цвету с 2 уровнями вложенности)
+{
+if (_Char >= 'A') -> 1 // checking_A
+	if (_Char <= 'Z') -> 1 // checking_Z
+		_add(_Char)
+}
+
+// alt_ii 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iiaa (развилка по_цвету с 2 уровнями вложенности)
+{
+if (_Char >= 'A') -> 1 // checking_A
+	if (_Char <= 'Z') -> 1 // checking_Z
+		_Char -= 32
+		result = _Char
+}
+
+// alt_iiaa 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iii_111 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (node != NULL) -> 1 // checking_node
+	if (node->right != NULL) -> 1 // checking_sub1
+		if (node->right->left != NULL) -> 1 // checking_sub2
+			printf(node->right->left->value)
+}
+
+// alt_iii_111 111 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iii_110 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (node != NULL) -> 1 // checking_node
+	if (node->right != NULL) -> 1 // checking_sub1
+		if (node->right->left != NULL) -> 0 // checking_sub2
+			printf(node->right->left->value)
+}
+
+// alt_iii_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iiiaa_110 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (node != NULL) -> 1 // checking_node
+	if (node->right != NULL) -> 1 // checking_sub1
+		if (node->left != NULL) -> 0 // checking_sub2
+			sum = node->right->value + node->left->value
+			node->value = sum
+}
+
+// alt_iiiaa_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iii_10 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (node != NULL) -> 1 // checking_node
+	if (node->right != NULL) -> 0 // checking_sub1
+		if (node->right->left != NULL) -> 0 // checking_sub2
+			printf(node->right->left->value)
+}
+
+// alt_iii_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iii_0 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (node != NULL) -> 0 // checking_node
+	if (node->right != NULL) -> 0 // checking_sub1
+		if (node->right->left != NULL) -> 0 // checking_sub2
+			printf(node->right->left->value)
+}
+
+// alt_iii_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iiiaa_0 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (node != NULL) -> 0 // checking_node
+	if (node->right != NULL) -> 0 // checking_sub1
+		if (node->left != NULL) -> 0 // checking_sub2
+			sum = node->right->value + node->left->value
+			node->value = sum
+}
+
+// alt_iiiaa_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм alt_iei_c_1
+{
+if (z % 2 == 1) -> 1 // check_z
+    result = z - 1
+else if (z % 3 == 2)
+    result = z - 2
+}
+
+// alt_iei_c_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iei_c_01
+{
+if (z % 2 == 1) -> 0 // check_z
+    result = z - 1
+else if (z % 3 == 2) -> 1
+    result = z - 2
+}
+
+// alt_iei_c_01 01 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iei_c_00
+{
+if (z % 2 == 1) -> 0 // check_z
+    result = z - 1
+else if (z % 3 == 2) -> 0
+    result = z - 2
+}
+
+// alt_iei_c_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм alt_ieie_c_1
+{
+if (z % 2 == 1) -> 1 // check_z
+    result = z - 1
+else if (z % 3 == 2) -> 0
+    result = z - 2
+else
+    result = z
+}
+
+// alt_ieie_c_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieie_c_01
+{
+if (z % 2 == 1) -> 0 // check_z
+    result = z - 1
+else if (z % 3 == 2) -> 1
+    result = z - 2
+else
+    result = z
+}
+
+// alt_ieie_c_01 01 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieie_c_00
+{
+if (z % 2 == 1) -> 0 // check_z
+    result = z - 1
+else if (z % 3 == 2) -> 0
+    result = z - 2
+else
+    result = z
+}
+
+// alt_ieie_c_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_00
+{
+if (c == RED) -> 0 // check_color
+    color_choice(RED)
+else if (c == ORANGE) -> 0
+    color_choice(ORANGE)
+else if (c == YELLOW) -> 0
+    color_choice(YELLOW)
+else if (c == GREEN) -> 0
+    color_choice(GREEN)
+else if (c == BLUE) -> 0
+    color_choice(BLUE)
+else if (c == INDIGO) -> 0
+    color_choice(INDIGO)
+else if (c == VIOLET) -> 0
+    color_choice(VIOLET)
+else
+    color_choice(UNKNOWN)
+}
+
+// alt_ieix7e_c_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_1
+{
+if (c == RED) -> 1 // check_color
+    color_choice(RED)
+else if (c == ORANGE) -> 0
+    color_choice(ORANGE)
+else if (c == YELLOW) -> 0
+    color_choice(YELLOW)
+else if (c == GREEN) -> 0
+    color_choice(GREEN)
+else if (c == BLUE) -> 0
+    color_choice(BLUE)
+else if (c == INDIGO) -> 0
+    color_choice(INDIGO)
+else if (c == VIOLET) -> 0
+    color_choice(VIOLET)
+else
+    color_choice(UNKNOWN)
+}
+
+// alt_ieix7e_c_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_001
+{
+if (c == RED) -> 0 // check_color
+    color_choice(RED)
+else if (c == ORANGE) -> 0
+    color_choice(ORANGE)
+else if (c == YELLOW) -> 1
+    color_choice(YELLOW)
+else if (c == GREEN) -> 0
+    color_choice(GREEN)
+else if (c == BLUE) -> 0
+    color_choice(BLUE)
+else if (c == INDIGO) -> 0
+    color_choice(INDIGO)
+else if (c == VIOLET) -> 0
+    color_choice(VIOLET)
+else
+    color_choice(UNKNOWN)
+}
+
+// alt_ieix7e_c_001 001 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_00001
+{
+if (c == RED) -> 0 // check_color
+    color_choice(RED)
+else if (c == ORANGE) -> 0
+    color_choice(ORANGE)
+else if (c == YELLOW) -> 0
+    color_choice(YELLOW)
+else if (c == GREEN) -> 0
+    color_choice(GREEN)
+else if (c == BLUE) -> 1
+    color_choice(BLUE)
+else if (c == INDIGO) -> 0
+    color_choice(INDIGO)
+else if (c == VIOLET) -> 0
+    color_choice(VIOLET)
+else
+    color_choice(UNKNOWN)
+}
+
+// alt_ieix7e_c_00001 00001 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_ieix7e_c_0000001
+{
+if (c == RED) -> 0 // check_color
+    color_choice(RED)
+else if (c == ORANGE) -> 0
+    color_choice(ORANGE)
+else if (c == YELLOW) -> 0
+    color_choice(YELLOW)
+else if (c == GREEN) -> 0
+    color_choice(GREEN)
+else if (c == BLUE) -> 0
+    color_choice(BLUE)
+else if (c == INDIGO) -> 0
+    color_choice(INDIGO)
+else if (c == VIOLET) -> 1
+    color_choice(VIOLET)
+else
+    color_choice(UNKNOWN)
+}
+
+// alt_ieix7e_c_0000001 0000001 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+
+// алгоритм while_0
+{
+while (node->right) -> 0 // walk
+    node = node->right
+leaf = node->value
+leaf->flag = 1
+}
+
+// while 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_10
+{
+while (node->right) -> 10 // walk
+    node = node->right
+leaf = node->value
+leaf->flag = 1
+}
+
+// while_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_110
+{
+while (node->right) -> 110 // walk
+    node = node->right
+leaf = node->value
+leaf->flag = 1
+}
+
+// while_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм while_2_0
+{
+while (data != EOF) -> 0 // reading
+	buffer->add(data)
+    data = _read(1)
+length = buffer->size()
+}
+
+// while_2_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_2_10
+{
+while (data != EOF) -> 10 // reading
+	buffer->add(data)
+    data = _read(1)
+length = buffer->size()
+}
+
+// while_2_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_2_110
+{
+while (data != EOF) -> 110 // reading
+	buffer->add(data)
+    data = _read(1)
+length = buffer->size()
+}
+
+// while_2_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм while_while_0
+{
+while (queue.size()) -> 0 // work
+    _set_active_task(queue.queue_pop())
+	while (!locked(_context))  // locking
+		lock(_context)
+unlock(_context)
+}
+
+
+// while_while_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_100
+{
+while (queue.size()) -> 10 // work
+    _set_active_task(queue.queue_pop())
+	while (!locked(_context)) -> 0  // locking
+		lock(_context)
+unlock(_context)
+}
+
+// while_while_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_1100
+{
+while (queue.size()) -> 10 // work
+    _set_active_task(queue.queue_pop())
+	while (!locked(_context)) -> 10  // locking
+		lock(_context)
+unlock(_context)
+}
+
+// while_while_1100 1100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_aa_1100
+{
+while (queue.size()) -> 10 // work
+    _set_active_task(queue.queue_pop())
+	while (!locked(_context)) -> 10  // locking
+		lock(_context)
+		signal_send(READY)
+unlock(_context)
+}
+
+// while_while_aa_1100 1100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_11100
+{
+while (queue.size()) -> 10 // work
+    _set_active_task(queue.queue_pop())
+	while (!locked(_context)) -> 110  // locking
+		lock(_context)
+unlock(_context)
+}
+
+// while_while_11100 11100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_110100
+{
+while (queue.size()) -> 110 // work
+    _set_active_task(queue.queue_pop())
+	while (!locked(_context)) -> 100  // locking
+		lock(_context)
+unlock(_context)
+}
+
+// while_while_110100 110100 трасса
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм while_while_aa_110100
+{
+while (queue.size()) -> 110 // work
+    _set_active_task(queue.queue_pop())
+	while (!locked(_context)) -> 100  // locking
+		lock(_context)
+		signal_send(READY)
+unlock(_context)
+}
+
+// while_while_aa_110100 110100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм do_0
+{
+do   // get_date
+    data = read_bytes(h_file, 10)
+    date = make_date(data)
+while date == NULL  -> 0
+}
+// do_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do_10
+{
+do   // get_date
+    data = read_bytes(h_file, 10)
+    date = make_date(data)
+while date == NULL  -> 10
+}
+// do_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2_10
+{
+do   // waiting
+	если (red) -> 1  // over_color
+		wait()
+	иначе если (yellow) -> 0
+		get_ready()
+while not_green  -> 0
+}
+// do2_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2_11000
+{
+do   // euclidean
+	если (a > b) -> 10  // reduce_step
+		a = a % b
+	иначе если (a < b) -> 0
+		b = b % a
+while (a > 0 && b > 0)  -> 10
+}
+// do2_11000 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2_11010
+{
+do   // euclidean
+	если (a > b) -> 10  // reduce_step
+		a = a % b
+	иначе если (a < b) -> 1
+		b = b % a
+while (a > 0 && b > 0)  -> 10
+}
+// do2_11010 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм do2ie_10
+{
+do   // euclidean
+	если (a > b) -> 1  // reduce_step
+		a = a % b
+	иначе
+		b = b % a
+while (a > 0 && b > 0)  -> 0
+}
+// do2ie_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2ie_1100
+{
+do   // euclidean
+	если (a > b) -> 10  // reduce_step
+		a = a % b
+	иначе
+		b = b % a
+while (a > 0 && b > 0)  -> 10
+}
+// do2ie_1100 1100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do2ie_0110
+{
+do   // euclidean
+	если (a > b) -> 01  // reduce_step
+		a = a % b
+	иначе
+		b = b % a
+while (a > 0 && b > 0)  -> 10
+}
+// do2ie_1100 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм wiei_1010
+{
+node = trie->root
+пока (node != NULL) -> 1,0  // search
+	если (node->use_count == 0) -> 0  // check_end
+		node = NULL
+	иначе если (next->prev != NULL) -> 1
+		next_node = &node->next[*p]
+node = next_node
+}
+
+// wiei_1010 1010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wiei_1100
+{
+node = trie->root
+пока (node != NULL) -> 1,0  // search
+	если (node->use_count == 0) -> 1  // check_end
+		node = NULL
+	иначе если (next->prev != NULL) -> 0
+		next_node = &node->next[*p]
+node = next_node
+}
+
+// wiei_1100 1100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wiei_1000
+{
+node = trie->root
+пока (node != NULL) -> 1,0  // search
+	если (node->use_count == 0) -> 0  // check_end
+		node = NULL
+	иначе если (next->prev != NULL) -> 0
+		next_node = &node->next[*p]
+node = next_node
+}
+
+// wiei_1000 1000 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wiei_0
+{
+node = trie->root
+пока (node != NULL) -> 0  // search
+	если (node->use_count == 0) -> 0  // check_end
+		node = NULL
+	иначе если (next->prev != NULL) -> 1
+		next_node = &node->next[*p]
+node = next_node
+}
+
+// wiei_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм wie_100
+{
+node = trie->root
+пока (node != NULL) -> 1,0  // search
+	если (node->use_count == 0) -> 0  // check_end
+		node = NULL
+	иначе
+		next_node = &node->next
+node = next_node
+}
+
+// wie_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wie_110
+{
+node = trie->root
+пока (node != NULL) -> 1,0  // search
+	если (node->use_count == 0) -> 1  // check_end
+		node = NULL
+	иначе
+		next_node = &node->next
+node = next_node
+}
+
+// wie_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм wie_0
+{
+node = trie->root
+пока (node != NULL) -> 0  // search
+	если (node->use_count == 0) -> 0  // check_end
+		node = NULL
+	иначе
+		next_node = &node->next
+node = next_node
+}
+
+// wie_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм do_then_w_100
+{
+do   // get_record
+    record = array.pop()
+    valid = record.is_valid()
+while (!valid)  -> 10
+пока (record.getDate().year < 2015) -> 0  // move_date
+	record.getDate().addYears(1)
+record.update()
+}
+// do_then_w_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do_then_w_010
+{
+do   // get_record
+    record = array.pop()
+    valid = record.is_valid()
+while (!valid)  -> 0
+пока (record.getDate().year < 2015) -> 10  // move_date
+	record.getDate().addYears(1)
+record.update()
+}
+// do_then_w_010 010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм do_then_w_0110
+{
+do   // get_record
+    record = array.pop()
+    valid = record.is_valid()
+while (!valid)  -> 0
+пока (record.getDate().year < 2015) -> 110  // move_date
+	record.getDate().addYears(1)
+record.update()
+}
+// do_then_w_0110 0110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_ewh_10
+{
+if (target == 1) -> 1 // enter_mode
+	do   // count_ones
+		summ += mode >> w & 0x01
+		w = w + 1
+	while (mode >> w > 0) -> 0
+	result = summ
+else
+	пока (mode >> w > 0) -> 10  // count_zeros
+		summ += !(mode >> w & 0x01)
+		w = w + 1
+	result = summ
+}
+// ido_ewh_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_ewh_110
+{
+if (target == 1) -> 1 // enter_mode
+	do   // count_ones
+		summ += mode >> w & 0x01
+		w = w + 1
+	while (mode >> w > 0) -> 10
+	result = summ
+else
+	пока (mode >> w > 0) -> 10  // count_zeros
+		summ += !(mode >> w & 0x01)
+		w = w + 1
+	result = summ
+}
+// ido_ewh_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_ewh_00
+{
+if (target == 1) -> 0 // enter_mode
+	do   // count_ones
+		summ += mode >> w & 0x01
+		w = w + 1
+	while (mode >> w > 0) -> 0
+	result = summ
+else
+	пока (mode >> w > 0) -> 0  // count_zeros
+		summ += !(mode >> w & 0x01)
+		w = w + 1
+	result = summ
+}
+// ido_ewh_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_ewh_010
+{
+if (target == 1) -> 0 // enter_mode
+	do   // count_ones
+		summ += mode >> w & 0x01
+		w = w + 1
+	while (mode >> w > 0) -> 0
+	result = summ
+else
+	пока (mode >> w > 0) -> 10  // count_zeros
+		summ += !(mode >> w & 0x01)
+		w = w + 1
+	result = summ
+}
+// ido_ewh_010 010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм ido_eiwh_e_0
+{
+if (mode > 0) -> 0  // operate
+	if (target == 1) -> 0 // enter_mode
+		do   // count_ones
+			summ += mode >> w & 0x01
+			w = w + 1
+		while (mode >> w > 0) -> 0
+		result = summ
+	else if (target == 0) -> 0
+		пока (mode >> w > 0) -> 0  // count_zeros
+			summ += !(mode >> w & 0x01)
+			w = w + 1
+		result = summ
+	else
+		result = 0
+}
+// ido_eiwh_e_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_110
+{
+if (mode > 0) -> 1  // operate
+	if (target == 1) -> 1 // enter_mode
+		do   // count_ones
+			summ += mode >> w & 0x01
+			w = w + 1
+		while (mode >> w > 0) -> 0
+		result = summ
+	else if (target == 0) -> 0
+		пока (mode >> w > 0) -> 0  // count_zeros
+			summ += !(mode >> w & 0x01)
+			w = w + 1
+		result = summ
+	else
+		result = 0
+}
+// ido_eiwh_e_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_1110
+{
+if (mode > 0) -> 1  // operate
+	if (target == 1) -> 1 // enter_mode
+		do   // count_ones
+			summ += mode >> w & 0x01
+			w = w + 1
+		while (mode >> w > 0) -> 10
+		result = summ
+	else if (target == 0) -> 0
+		пока (mode >> w > 0) -> 0  // count_zeros
+			summ += !(mode >> w & 0x01)
+			w = w + 1
+		result = summ
+	else
+		result = 0
+}
+// ido_eiwh_e_1110 1110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_1010
+{
+if (mode > 0) -> 1  // operate
+	if (target == 1) -> 0 // enter_mode
+		do   // count_ones
+			summ += mode >> w & 0x01
+			w = w + 1
+		while (mode >> w > 0) -> 0
+		result = summ
+	else if (target == 0) -> 1
+		пока (mode >> w > 0) -> 0  // count_zeros
+			summ += !(mode >> w & 0x01)
+			w = w + 1
+		result = summ
+	else
+		result = 0
+}
+// ido_eiwh_e_1010 1010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_10110
+{
+if (mode > 0) -> 1  // operate
+	if (target == 1) -> 0 // enter_mode
+		do   // count_ones
+			summ += mode >> w & 0x01
+			w = w + 1
+		while (mode >> w > 0) -> 0
+		result = summ
+	else if (target == 0) -> 1
+		пока (mode >> w > 0) -> 10  // count_zeros
+			summ += !(mode >> w & 0x01)
+			w = w + 1
+		result = summ
+	else
+		result = 0
+}
+// ido_eiwh_e_10110 10110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм ido_eiwh_e_100
+{
+if (mode > 0) -> 1  // operate
+	if (target == 1) -> 0 // enter_mode
+		do   // count_ones
+			summ += mode >> w & 0x01
+			w = w + 1
+		while (mode >> w > 0) -> 0
+		result = summ
+	else if (target == 0) -> 0
+		пока (mode >> w > 0) -> 0  // count_zeros
+			summ += !(mode >> w & 0x01)
+			w = w + 1
+		result = summ
+	else
+		result = 0
+}
+// ido_eiwh_e_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+

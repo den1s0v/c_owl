@@ -12,4 +12,5 @@ SKIP   test_loops.txt
 SKIP    test_one.txt
 SKIP    test_zero.txt
 
-questions4cppr.txt
+SKIP    questions4cppr.txt
+questions4cppr_anon.txt
