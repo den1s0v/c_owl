@@ -261,6 +261,20 @@ if 1:
     siblings = {s: siblings for siblings in siblings_list for s in siblings}
     renamings = {k: [('name', 'branch_name')] for k in if_branches}
 
+    def escape_name_yaml(s):
+        '''  # https://riptutorial.com/yaml/example/25838/escaping-characters
+        Unicode Escapes
+        a. space: "\u0020"
+        b. single quote: "\u0027"
+        c. double quote: "\u0022"
+        '''
+        s = s or ''  # recover from None
+        # s = s.replace("'", r"\u0027")
+        # s = s.replace('"', r"\u0022")
+        s = s.replace("'", r"&#39;")
+        s = s.replace('"', r"&#34;")
+        return s
+
 
     def transform_alg_dict_for_mustache(raw_data, locale='en'):
         assert locale in LOCALES_BY_DEFAULT, 'Unsupported locale: %s, use one of: %s' % (repr(locale), repr(LOCALES_BY_DEFAULT))
@@ -275,11 +289,11 @@ if 1:
             #### return {L: "'%s'" % d["stmt_name"] for L in LOCALES_BY_DEFAULT}
             # full search solution:
             node_type = d["type"]
-            name = d.get('stmt_name') or d.get('name')
+            name = escape_name_yaml(d.get('stmt_name') or d.get('name'))
             kwargs = {}
             if 'cond' in d:
                 cond = d.get('cond')
-                kwargs['cond_name'] = cond.get('stmt_name') or cond.get('name')
+                kwargs['cond_name'] = escape_name_yaml(cond.get('stmt_name') or cond.get('name'))
                 ### print(node_type)
 
             if node_type in ('else', ):
@@ -295,7 +309,7 @@ if 1:
                     find_one=True))
                 if alt:
                     alt = alt[0]
-                    kwargs['alt_name'] = alt.get('stmt_name') or alt.get('name')
+                    kwargs['alt_name'] = escape_name_yaml(alt.get('stmt_name') or alt.get('name'))
                 else:
                     print('[WARN] Key `alt_name` not found for dict-node `else`')
                     ### print(alt)
@@ -306,14 +320,14 @@ if 1:
                 loop = list(find_by_keyval_in('body', d, raw_data))
                 if loop:
                     loop = loop[0]
-                    kwargs['loop_name'] = loop.get('stmt_name') or loop.get('name')
+                    kwargs['loop_name'] = escape_name_yaml(loop.get('stmt_name') or loop.get('name'))
                     node_type = 'loop-body'
 
             return action(node_type, name=name, **kwargs)
 
 
-        replacings = {"stmt_name": lambda d: {"name": d["stmt_name"], 'act_name': make_act_name(d)},
-                      "name": lambda d: {'act_name': make_act_name(d)},
+        replacings = {"stmt_name": lambda d: {"name": escape_name_yaml(d["stmt_name"]), 'act_name': make_act_name(d)},
+                      "name": lambda d: {"name": escape_name_yaml(d["name"]), 'act_name': make_act_name(d)},
                       "act_name": lambda d: {"act_name": d["act_name"][locale]},
                       "type": lambda d: ({
                                 'act_type-play': 'performed',

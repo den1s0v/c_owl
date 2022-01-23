@@ -1,16 +1,16 @@
 ru:
   program:   программа
   algorithm: программа
-  sequence: следование '%{name}'
-  loop: цикл '%{name}'
-  loop-body: итерация цикла '%{loop_name}'
-  selection:   развилка '%{name}'
-  alternative: развилка '%{name}'
-  if: ветка ЕСЛИ с условием '%{cond_name}'
-  else-if: ветка ИНАЧЕ-ЕСЛИ с условием '%{cond_name}'
-  else: ветка ИНАЧЕ развилки '%{alt_name}'
-  function: функция '%{name}'
-  function-body: тело функции '%{name}'
-  stmt: действие '%{name}'
-  condition: условие '%{name}'
-  expr:      условие '%{name}'
+  sequence: следование `%{name}`
+  loop: цикл `%{name}`
+  loop-body: итерация цикла `%{loop_name}`
+  selection:   развилка `%{name}`
+  alternative: развилка `%{name}`
+  if: ветка ЕСЛИ с условием `%{cond_name}`
+  else-if: ветка ИНАЧЕ-ЕСЛИ с условием `%{cond_name}`
+  else: ветка ИНАЧЕ развилки `%{alt_name}`
+  function: функция `%{name}`
+  function-body: тело функции `%{name}`
+  stmt: действие `%{name}`
+  condition: условие `%{name}`
+  expr:      условие `%{name}`

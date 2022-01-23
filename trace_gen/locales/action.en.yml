@@ -1,16 +1,16 @@
 en:
   program:   program
   algorithm: program
-  sequence: sequence '%{name}'
-  loop: loop '%{name}'
-  loop-body: iteration of loop '%{loop_name}'
-  selection:   selection '%{name}'
-  alternative: selection '%{name}'
-  if: IF branch with condition '%{cond_name}'
-  else-if: ELSE-IF branch with condition '%{cond_name}'
-  else: ELSE branch of selection '%{alt_name}'
-  function: function '%{name}'
-  function-body: body of function '%{name}'
-  stmt: statement '%{name}'
-  condition: condition '%{name}'
-  expr:      condition '%{name}'
+  sequence: sequence `%{name}`
+  loop: loop `%{name}`
+  loop-body: iteration of loop `%{loop_name}`
+  selection:   selection `%{name}`
+  alternative: selection `%{name}`
+  if: IF branch with condition `%{cond_name}`
+  else-if: ELSE-IF branch with condition `%{cond_name}`
+  else: ELSE branch of selection `%{alt_name}`
+  function: function `%{name}`
+  function-body: body of function `%{name}`
+  stmt: statement `%{name}`
+  condition: condition `%{name}`
+  expr:      condition `%{name}`
