@@ -47,8 +47,9 @@ BUTTON_TIP_FREFIX = {
 
 # padding step
 PADDING = {
-    'text': (' '      * 4),
-    'html': ('&nbsp;' * 4),
+    'text': (' ' * 4),
+    # 'html': ('&nbsp;' * 4),  # just four spaces
+    'html': '<span class="left-border">%s</span>' % ('&nbsp;' * 4),  # four spaces with light line at left side (making vertical rulers)
 }
 
 _LOG_RENDERING = False
@@ -100,13 +101,13 @@ def render_code(alg_dict, locale='ru', **kwargs):
 
 
 
-def run_rendering(keyed_alg_data, text_mode='html', lang='c', show_buttons=True, locale='ru', raise_on_error=False):
+def run_rendering(keyed_alg_data, text_mode='html', lang='c', show_buttons=True, locale='ru', raise_on_error=False, quiet=False):
     common_options = dict(
         text_mode=text_mode,  # 'html', 'text',
         lang=lang,  # 'c',  # 'python'  'pascal'
         buttons_mode='with_buttons' if show_buttons else 'no_buttons',
         locale=locale,
-        stack_size_limit=70,
+        stack_size_limit=100,
     )
     # PAD = '`___'
     PAD = PADDING[common_options['text_mode']]
@@ -218,9 +219,9 @@ def run_rendering(keyed_alg_data, text_mode='html', lang='c', show_buttons=True,
     }
 
     try:
-        print("Start rendering ...")
+        if not quiet: print("Start rendering ...")
         rendered = chevron_render(**args, warn=True)
-        print("... rendering complete.")
+        if not quiet: print("... rendering complete.")
         return rendered
         # if 0 or common_options['text_mode'] == 'text':
         #     print(rendered)
@@ -573,8 +574,8 @@ def _render_json_2_html_batch(dir_src=r'c:\Temp2\cntrflowoutput_v4_json', dest_d
     import json
     import os.path
 
-    for fp in glob(os.path.join(dir_src, ext_pattern)):
-        print('>>>', fp, end='\t')
+    for i, fp in enumerate(glob(os.path.join(dir_src, ext_pattern))):
+        print(f'[{i+1}]\t', fp, end='\t')
 
         with open(fp) as f:
             alg_json = json.load(f)
@@ -588,7 +589,8 @@ def _render_json_2_html_batch(dir_src=r'c:\Temp2\cntrflowoutput_v4_json', dest_d
         rendered = render_code(alg_json,
             text_mode='html',
             show_buttons=True,
-            raise_on_error=True)
+            raise_on_error=True,
+            quiet=True)
         with open(out, 'w') as f:
             f.write(rendered)
 
@@ -597,8 +599,8 @@ def _render_json_2_html_batch(dir_src=r'c:\Temp2\cntrflowoutput_v4_json', dest_d
 
 
 if __name__ == '__main__':
-    if 0:
-        # _render_json_2_html_batch()
+    if 1:
+        # _render_json_2_html_batch(dir_src=r'c:/Temp2/cntrflowoutput_v6_json', dest_dir=r'c:/Temp2/cntrflowoutput_v6_html')
         _render_json_2_html_batch(dir_src=r'c:\Temp2\manual_json', dest_dir=r'c:\Temp2\manual_html')
         exit(0)
 
@@ -616,7 +618,7 @@ if __name__ == '__main__':
     # alg_json_file = r'..\trace_gen\alg_example.json'
     # alg_json_file = r'hiw-alg_pretty.json'
     # alg_json_file = r'ctrlflow_v4_379-s-alg.json'
-    alg_json_file = r'c:/Temp2/cntrflowoutput_v6_json/utf16_literal_to_utf8__18006635204267658488__1643030084.json'
+    alg_json_file = r'c:/Temp2/cntrflowoutput_v6_json/ijk_av_tree_insert__17603408635188800781__1643030101.json'
 
     with open(alg_json_file, encoding='utf8' or '1251') as f:
         data = json.load(f)

@@ -41,4 +41,17 @@
 	{
 		background: url(https://icons.bootstrap-4.ru/assets/icons/stop-fill.svg) top left no-repeat;
 	}
+	
+	span.left-border { /* https://stackoverflow.com/a/16363465/12824563 */
+		position: relative;
+	}
+	span.left-border:after {
+		content: '';
+		display: block;
+		position: absolute;
+			top: -2; left: 1;  /* shift position by pixels */
+		width: 1px;
+		height: 130%;  /* make longer in height */
+		background: #e0e0e0;
+	}
 </style>
