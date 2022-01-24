@@ -1,7 +1,9 @@
 # txt2algntr.py - Text to algorithm and trace mapped.
 
 
+from random import randint
 import re
+
 
 if __name__ == '__main__':  # to import from upper directory
     import sys
@@ -19,6 +21,8 @@ TRUTH_ALIASES = ("истина","да","true","1")
 FALSE_ALIASES = ("ложь","нет","false","0")
 TRUTH_ALIASES_re = re.compile("|".join(TRUTH_ALIASES))
 FALSE_ALIASES_re = re.compile("|".join(FALSE_ALIASES))
+
+_UNIFIED_COMPLEX_NAMES = False
 
 
 from trace_gen.get_i18n import action
@@ -279,6 +283,7 @@ class AlgorithmParser:
                     cond_name = cond_name[1:-1]      # удалить скобки
                 branch_name = "if-"+cond_name  # имя ветки должно отличаться от имени условия
                 # self.parse_expr()
+                name = complexname(name, 'alternative')
                 result.append({
                     "id": self.newID(name),
                     "type": "alternative",
@@ -385,6 +390,7 @@ class AlgorithmParser:
                 name = m.group(3)  # имя цикла (пишется в комментарии)
                 values = m.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 cond_name = m.group(1)  # условие цикла (может быть в скобках)
+                name = complexname(name, 'loop')
                 result.append({
                     "id": self.newID(name),
                     "type": "while_loop",
@@ -427,6 +433,7 @@ class AlgorithmParser:
                 name = m.group(1)  # имя цикла (пишется в комментарии)
                 cond_name = m2.group(1)  # условие цикла (может быть в скобках)
                 values = m2.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
+                name = complexname(name, 'loop')
                 result.append({
                     "id": self.newID(name),
                     "type": "do_while_loop",
@@ -469,6 +476,7 @@ class AlgorithmParser:
                 name = m.group(1)  # имя цикла (пишется в комментарии)
                 cond_name = m2.group(1)  # условие цикла (может быть в скобках)
                 values = m2.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
+                name = complexname(name, 'loop')
                 result.append({
                     "id": self.newID(name),
                     "type": "do_until_loop",
@@ -504,6 +512,7 @@ class AlgorithmParser:
                 s_step = m.group(4)  # шаг цикла
                 values = m.group(5)  # значения, принимаемые выражением - условием продолжения цикла - по мере выполнения программы (опционально)
                 name =   m.group(6)  # имя цикла (пишется в комментарии)
+                name = complexname(name, 'loop')
                 result.append({
                     "id": self.newID(name),
                     "type": "for_loop",
@@ -540,6 +549,7 @@ class AlgorithmParser:
                 s_container = m.group(2)  # контейнер
                 values = m.group(3)  # значения, принимаемые выражением - условием продолжения цикла - по мере выполнения программы (опционально)
                 name =   m.group(4)  # имя цикла (пишется в комментарии)
+                name = complexname(name, 'loop')
                 result.append({
                     "id": self.newID(name),
                     "type": "foreach_loop",
@@ -564,11 +574,12 @@ class AlgorithmParser:
             if m:
                 if self.verbose: print("named sequence:", m.group(1))
                 name =   m.group(1)  # имя следования (пишется в комментарии)
+                name = complexname(name, 'sequence')
                 result.append({
                     "id": self.newID(name),
                     "type": "sequence",
                     "name": name,
-                    "act_name": action('sequence', name=name),
+                    "act_name": action('', name=name),
                     "body": parse_algorithm(line_list[i+1:e], start_line=start_line + i+1),  # учитывая скобки { } вокруг тела
                 })
                 ci = e + 1
@@ -1454,6 +1465,32 @@ def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=
 
     return result_list
 
+
+def complexname(name, type_name, **kw):
+    if not _UNIFIED_COMPLEX_NAMES:
+        return name
+    return shortname_for_type(type_name, **kw)
+
+def shortname_for_type(type_name, **kw):
+    '''Нужно для независимых действий;  подчинённые действия не нуждаются в отбражаемом имени.
+    kw: `id`'''
+    prefix = None
+    if type_name.endswith('_loop'):
+        prefix = 'L'
+    elif type_name == 'sequence':
+        prefix = 'B' # "block"
+    else:  # if not prefix: # default
+        prefix = type_name[0].upper() # 1st letter
+
+    suffix = None
+    if 'id' in kw:
+        suffix = str(kw['id'])
+    else:
+        suffix = '%02d' % randint(1, 99)
+
+    return prefix + '_' + suffix
+
+
 def main():
 
     # parse_text_file("../handcrafted_traces/err_branching.txt")
@@ -1494,6 +1531,7 @@ def main():
 
 
 if __name__ == '__main__':
+    _UNIFIED_COMPLEX_NAMES = True  # set names to be `A_15`, `L_21`, ...
     main()
     print('Done.')
 
