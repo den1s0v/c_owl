@@ -616,7 +616,7 @@ if __name__ == '__main__':
     # alg_json_file = r'..\trace_gen\alg_example.json'
     # alg_json_file = r'hiw-alg_pretty.json'
     # alg_json_file = r'ctrlflow_v4_379-s-alg.json'
-    alg_json_file = r'c:/Temp2/cntrflowoutput_v5_json/utf16_literal_to_utf8__18006635204267658488__1642965656.json'
+    alg_json_file = r'c:/Temp2/cntrflowoutput_v6_json/utf16_literal_to_utf8__18006635204267658488__1643030084.json'
 
     with open(alg_json_file, encoding='utf8' or '1251') as f:
         data = json.load(f)
