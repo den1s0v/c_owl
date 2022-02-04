@@ -15,7 +15,7 @@
 
 // алгоритм seq2 (следование из 2 действий)
 {
-    free(array->elements)
+    free(a…y->e…s->d…a->p…r)
     free(array)
 }
 
@@ -45,10 +45,10 @@
 // алгоритм seq5 (следование из 5 действий)
 {
     num = scanf("%d")
-    res = num + num + 1
-    res += 9
-    res = (int)(res / 2) - num
-    assert_five(res)
+    result = num + num + 1
+    result += 9
+    result = (int)(result / 2) - num
+    assert_five(result)
 }
 
 // seq5 - (2)
@@ -596,8 +596,8 @@ leaf->flag = 1
 {
 while (node->right) -> 110 // walk
     node = node->right
-leaf = node->value
-leaf->flag = 1
+int tempUndefinedStmtReplacer6 = 0
+result = leaf->flag
 }
 
 // while_110 110 трасса
@@ -986,11 +986,11 @@ node = next_node
 {
 node = trie->root
 пока (node != NULL) -> 1,0  // search
-	если (node->use_count == 0) -> 1  // check_end
-		node = NULL
+	если (node->usage_count == 0) -> 1  // check_end
+		result = NULL
 	иначе
-		next_node = &node->next
-node = next_node
+		next_node = &node->next.n…e
+result = next_node
 }
 
 // wie_110 110 трасса

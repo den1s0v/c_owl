@@ -1765,7 +1765,7 @@ def _play_with_classes():
 
 if __name__ == '__main__':
 
-    if 1:
+    if 0:
         print("Special run mode activated:")
         print("Saving schema only to file.")
         save_schema()
