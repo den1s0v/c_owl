@@ -9,5 +9,5 @@
 {{#pad}}{{/pad}}}<!-- -->{{#use}}body/sequence as btn_stop{{/use}}
 </div>
 <div class="code-line">
-{{#pad}}{{/pad}}{{#kw}}while{{/kw}} ({{#use}}cond{{/use}});
+{{#pad}}{{/pad}}{{#kw}}while{{/kw}} ({{#use}}cond{{/use}}); {{> value_hint_comment }}
 </div>

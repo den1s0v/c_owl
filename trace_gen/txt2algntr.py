@@ -80,6 +80,35 @@ def parse_expr_values(s: str) -> list:
         s = s[nchars:]  # strip some chars from left
     return tuple(values)
 
+
+# from full_questions module
+def make_values_hint(values, is_loop=False, is_postcond=False):
+    if not values:
+        return ""
+
+    ### difference from original version
+    values = parse_expr_values(values)
+    print(values)
+    ###
+
+    map_bool = {True: 'истина', False: 'ложь'}.get
+    prefix = ''
+    if not is_loop:
+        prefix = '&#8594; '
+        r = (', '.join(map(map_bool, values)))
+    else:
+        successes = sum(values)
+        count = successes + is_postcond
+        if count == 1:
+            r = '1 итерация'
+        elif count in (2,3,4):
+            r = '%d итерации' % count
+        else:
+            r = '%d итераций' % count
+    return prefix + ('<span class="value">%s</span>' % r)
+
+
+
 def get_ith_expr_value(expr_values: tuple, i: int):
     """Decodes the result of 'parse_expr_values' function.
     Return None if 'i' is out of range
@@ -294,6 +323,7 @@ class AlgorithmParser:
                         "type": "if",
                         "name": branch_name,
                         "act_name": action('if', cond_name=cond_name),
+                        "cond_values_hint": make_values_hint(values, is_loop=False),
                         "cond":  self.parse_expr(cond_name, values=values),
                         "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                     } ]
@@ -337,6 +367,7 @@ class AlgorithmParser:
                         "name": branch_name,
                         "act_name": action('else-if', cond_name=cond_name),
                         "cond":  self.parse_expr(cond_name, values=values),
+                        "cond_values_hint": make_values_hint(values, is_loop=False),
                         "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
                     } ]
                 ci = e + 1
@@ -397,6 +428,7 @@ class AlgorithmParser:
                     "name": name,
                     "act_name": action('loop', name=name),
                     "cond": self.parse_expr(cond_name, values=values),
+                    "cond_values_hint": make_values_hint(values, is_loop=True),
                     "body":  make_loop_body(
                                 name,
                                 parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
@@ -440,6 +472,7 @@ class AlgorithmParser:
                     "name": name,
                     "act_name": action('loop', name=name),
                     "cond": self.parse_expr(cond_name, values=values),
+                    "cond_values_hint": make_values_hint(values, is_loop=True, is_postcond=True),
                     "body": make_loop_body(
                                 name,
                                 parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
@@ -483,6 +516,7 @@ class AlgorithmParser:
                     "name": name,
                     "act_name": action('loop', name=name),
                     "cond": self.parse_expr(cond_name, values=values),
+                    "cond_values_hint": make_values_hint(values, is_loop=True, is_postcond=True),
                     "body": make_loop_body(
                                 name,
                                 parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
@@ -522,6 +556,7 @@ class AlgorithmParser:
                     "init":   self.parse_stmt("{}={}".format(s_var, s_from)),
                     "cond":   self.parse_expr("{}<={}".format(s_var,s_to), values=values),
                     "update": self.parse_stmt("{v}={v}{:+d}".format(int(s_step), v=s_var)),
+                    "cond_values_hint": make_values_hint(values, is_loop=True),
                     "body":  make_loop_body(
                                 name,
                                 parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
@@ -560,6 +595,7 @@ class AlgorithmParser:
                     "init":   self.parse_stmt("{}={}.first()".format(s_var, s_container)),
                     "cond":   self.parse_expr("{}!={}.last()".format(s_var,s_container), values=values),
                     "update": self.parse_stmt("{v}=next({},{v})".format(s_container, v=s_var)),
+                    "cond_values_hint": make_values_hint(values, is_loop=True),
                     "body":  make_loop_body(
                                 name,
                                 parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать

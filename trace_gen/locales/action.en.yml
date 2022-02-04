@@ -1,4 +1,6 @@
 en:
+  __question-prompt: <big>Build a program trace by clicking on the beginning <br> and end of statements in the order of execution.</big> <br>
+  question-prompt: Press the actions of the algorithm in <br> the order they are evaluated. Activate actions <br> with play<i class="play small icon"></i> and stop<i class="stop small icon"></i> buttons. <br>
   program:   program
   algorithm: program
   sequence: sequence `%{name}`

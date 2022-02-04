@@ -12,10 +12,12 @@ import fs
 import yaml
 
 
+_dir_path = os.path.dirname(os.path.realpath(__file__)) # dir of cuurent .py file
 
-if __name__ == '__main__':  # to import from upper directory
+
+if __name__ == '__main__' or True:  # to import from upper directory
     import sys
-    sys.path.insert(1, '../')
+    sys.path.insert(1, os.path.join(_dir_path, '../'))
 
 from trace_gen.get_i18n import action
 from trace_gen.txt2algntr import find_by_keyval_in, find_by_predicate
@@ -23,7 +25,6 @@ from trace_gen.txt2algntr import find_by_keyval_in, find_by_predicate
 
 LOCALES_BY_DEFAULT = ('ru', 'en', )  # what to use for quick-fix of "act_name" key absence
 
-_dir_path = os.path.dirname(os.path.realpath(__file__)) # dir of cuurent .py file
 TEMPLATES_PATH = os.path.join(_dir_path, 'templates')
 
 TEMPLATE_EXT = '.ms'.casefold()
@@ -256,7 +257,7 @@ if 1:
         "stmt sequence alternative while_loop do_while_loop for_loop foreach_loop".split(),   # add new action classes here
         if_branches,
         #### ["sequence"],  #  moved above to other regular statements
-        ['expr'],
+        ['expr', 'cond_values_hint'],
         ['algorithm', 'functions'],
     ]
     siblings = {s: siblings for siblings in siblings_list for s in siblings}
@@ -290,6 +291,7 @@ if 1:
             #### return {L: "'%s'" % d["stmt_name"] for L in LOCALES_BY_DEFAULT}
             # full search solution:
             node_type = d["type"]
+            assert type(node_type) is str, node_type
             name = escape_name_yaml(d.get('stmt_name') or d.get('name'))
             kwargs = {}
             if 'cond' in d:
@@ -329,7 +331,7 @@ if 1:
 
         replacings = {"stmt_name": lambda d: {"name": escape_name_yaml(d["stmt_name"]), 'act_name': make_act_name(d)},
                       "name": lambda d: {"name": escape_name_yaml(d["name"]), 'act_name': make_act_name(d)},
-                      "act_name": lambda d: {"act_name": d["act_name"][locale]},
+                      "act_name": lambda d: {"act_name": d["act_name"][locale] if type(d["act_name"]) is dict else d["act_name"]},
                       "type": lambda d: ({
                                 'act_type-play': 'performed',
                                 'phase-label-play': BUTTON_TIP_FREFIX[locale]['performed'],
@@ -401,6 +403,13 @@ if 1:
         data = copy.deepcopy(raw_data)
         if 'entry_point' in data:
             del data['entry_point']
+
+
+        question_prompt = False
+        if 'inclide_question_prompt':
+            question_prompt = action("question-prompt")[locale]
+        data['question_prompt'] = question_prompt
+
 
         d = type2key(data)  # ['stmts']['body']
         keyed_data = d if type(d) is dict else d[0]
@@ -599,8 +608,8 @@ def _render_json_2_html_batch(dir_src=r'c:\Temp2\cntrflowoutput_v4_json', dest_d
 
 
 if __name__ == '__main__':
-    if 1:
-        # _render_json_2_html_batch(dir_src=r'c:/Temp2/cntrflowoutput_v6_json', dest_dir=r'c:/Temp2/cntrflowoutput_v6_html')
+    if 0:
+        # _render_json_2_html_batch(dir_src=r'c:/Temp2/cntrflowoutput_v6_fg_json', dest_dir=r'c:/Temp2/cntrflowoutput_v6_fg_html')
         _render_json_2_html_batch(dir_src=r'c:\Temp2\manual_json', dest_dir=r'c:\Temp2\manual_html')
         exit(0)
 
@@ -614,18 +623,17 @@ if __name__ == '__main__':
 
     import json
 
-    # alg_json_file = r'..\trace_gen\alg_out.json'
-    # alg_json_file = r'..\trace_gen\alg_example.json'
-    # alg_json_file = r'hiw-alg_pretty.json'
-    # alg_json_file = r'ctrlflow_v4_379-s-alg.json'
-    alg_json_file = r'c:/Temp2/cntrflowoutput_v6_json/ijk_av_tree_insert__17603408635188800781__1643030101.json'
+    # alg_json_file = r'c:/Temp2/cntrflowoutput_v6_json/ijk_av_tree_insert__17603408635188800781__1643030101.json'
+    # alg_json_file = r'c:/Temp2/manual_json/while_110.json'
+    # alg_json_file = r'nk_style_from_table.json'
+    alg_json_file = r'c:/Temp2/cntrflowoutput_v7_json/cJSON_GetArraySize.json'
 
     with open(alg_json_file, encoding='utf8' or '1251') as f:
         data = json.load(f)
     if isinstance(data, list):
         data = data[0]
 
-    rendered = render_code(data, text_mode='html', show_buttons=True, raise_on_error=True)
+    rendered = render_code(data, text_mode='html', locale='en', show_buttons=True, raise_on_error=True)
     with open(r'c:\D\Work\YDev\CompPr\c_owl\code_gen\test.html', 'w') as f:
         f.write(rendered)
 

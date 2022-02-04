@@ -3,7 +3,7 @@
 
 {{#branches}}
     {{#if}}
-({{#use}}cond{{/use}})  {{#comment}}{{name}}{{/comment}}
+({{#use}}cond{{/use}})  {{#comment}}{{name}}{{> value_hint }}{{/comment}}
 </div>
 <div class="code-line">
 {{#pad}}{{/pad}}{<!-- -->{{#partial}}btn_play{{/partial}}
@@ -17,7 +17,7 @@
     {{/if}}
     {{#else-if}}
 <div class="code-line">
-{{#pad}}{{/pad}}{{#kw}}else if{{/kw}} ({{#use}}cond{{/use}})
+{{#pad}}{{/pad}}{{#kw}}else if{{/kw}} ({{#use}}cond{{/use}}) {{> value_hint_comment }}
 </div>
 <div class="code-line">
 {{#pad}}{{/pad}}{<!-- -->{{#partial}}btn_play{{/partial}}

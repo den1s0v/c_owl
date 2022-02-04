@@ -1,10 +1,17 @@
-<!-- </div>
+<!-- <div>
 {{#comment}}algorithm{{/comment}}
 {{#algorithm}}
     {{^functions}}
 {{#comment}}No functions defined.{{/comment}}
     {{/functions}}
 </div> -->
+{{#question_prompt}}
+<div class="code-line">
+{{!#comment}}
+{{question_prompt}}
+{{!/comment}}
+</div> <br>
+{{/question_prompt}}
 
     {{#global_code}}
 {{!#use} }sequence/sequence{{/use}}

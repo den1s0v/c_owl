@@ -9,7 +9,7 @@
 	span.variable { color: #700; text-decoration: underline; }
 	span.variable-2 { color: #b11; }
 	span.struct { color: #07c; font-weight: bold; }
-	span.number { color: #f00; font-weight: bold; }
+	span.number { color: #f00; font-weight: bold; font-style: normal; }
 	span.program { color: #f70; font-weight: bold; }
 	span.function { color: #707; font-weight: bold; }
 	span.action { color: #077; font-weight: bold; }
@@ -17,6 +17,8 @@
 	span.keyword { color: #00a; font-weight: bold; }
 	span.builtin { color: #30a; }
 	span.link { color: #762; }
+	span.value { color: #0aa; font-weight: bold; font-style: normal; }
+	span.plain { color: #000; font-weight: normal; font-style: normal; }
 
 	span.warning { background-color: #ff9; }
 	span.error { background-color: #fdd; }
