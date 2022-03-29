@@ -9,8 +9,10 @@ import xmltodict  # pip install xmltodict
 
 try:
     from trace_gen.txt2algntr import AlgorithmParser
+    from trace_gen.get_i18n import action
 except ModuleNotFoundError:
     from txt2algntr import AlgorithmParser
+    from get_i18n import action
 
 
 SAMPLE_XML = """<xml xmlns="https://developers.google.com/blockly/xml">
