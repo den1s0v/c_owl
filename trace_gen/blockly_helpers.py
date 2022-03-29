@@ -8,7 +8,7 @@ from collections import OrderedDict
 import xmltodict  # pip install xmltodict
 
 try:
-    from trace_gen.txt2algntr import AlgorithmParser, make_translation
+    from trace_gen.txt2algntr import AlgorithmParser
 except ModuleNotFoundError:
     from txt2algntr import AlgorithmParser
 
