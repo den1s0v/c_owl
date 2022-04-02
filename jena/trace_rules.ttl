@@ -1516,13 +1516,14 @@
 # Rule: LoopEndsWithoutCondition-loop_Error [loop & mistake]
 [
 	(?b rdf:type my:act_end),
-	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?Loop),
+	(?b my:executes ?bnd_b), (?bnd_b my:end_of ?Loop),
 	(?Loop rdf:type my:conditional_loop),
 
 	(?a my:student_next ?b),
 #	(?b rdf:type my:Erroneous),
 	(?Loop my:cond ?cnd),
 	(?a my:executes ?bnd_a),
+	noValue(?bnd_a my:halt_of ?st_a),
 	noValue(?bnd_a my:boundary_of ?cnd),
 
 	(?Loop my:stmt_name ?a_name),
@@ -1557,7 +1558,8 @@
 	(?a rdf:type my:act_end),
 	(?Loop rdf:type my:body_then_cond),
 	(?Loop my:body ?st),
-	(?a my:executes ?bnd), (?bnd my:boundary_of ?st),
+#	`end_of`, not `halt_of`:
+	(?a my:executes ?bnd), (?bnd my:end_of ?st),
 	(?Loop my:cond ?cnd),
 
 	(?a my:student_next ?b),

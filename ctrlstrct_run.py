@@ -924,6 +924,8 @@ def init_persistent_structure(onto):
         class trace(act_begin): pass
         # -->
         class act_end(act): pass
+        # -->
+        class act_interrupted(act): pass
         # # -->
         # class student_act(act): pass
         # -->
@@ -951,6 +953,8 @@ def init_persistent_structure(onto):
         class boundary_of(boundary >> action, FunctionalProperty): pass
         class begin_of(boundary_of): pass
         class   end_of(boundary_of): pass
+        class  halt_of(boundary_of): pass  # interrupted_end_of
+        class interrupt_origin(boundary >> boundary): pass
         # class statement_begin(Thing): pass
         # class statement_end  (Thing): pass
 
@@ -1084,9 +1088,14 @@ def init_persistent_structure(onto):
         #     types.new_class(class_name, (action,))
 
         for class_name in [
-            "expr", "stmt",
+            "expr", "stmt", "interrupt_action",
         ]:
             types.new_class(class_name, (action, ))  ### hide_boundaries
+
+        for class_name in [
+            "return", "break", "continue",  # have `interrupt_target`
+        ]:
+            types.new_class(class_name, (onto['interrupt_action'], ))
 
         for class_name in [
             "if", "else-if", "else",
@@ -1094,7 +1103,7 @@ def init_persistent_structure(onto):
             types.new_class(class_name, (alt_branch,))
 
         # make some properties
-        for prop_name in ("body", "cond", "init", "update", "wrong_next_act", ):
+        for prop_name in ("body", "cond", "init", "update", "wrong_next_act", "interrupt_target", ):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
 
@@ -1356,6 +1365,7 @@ def init_persistent_structure(onto):
             "StmtEnd",
             "ExprEnd",
 
+            ("Interrupted", 0, []),  #  [??]
             ("GlobalCodeBegin", 0, ['TooEarlyInSequence', 'SequenceFinishedTooEarly']),
             ("SequenceBegin", 0, ['TooEarlyInSequence', 'SequenceFinishedTooEarly']),
             ("SequenceNext", 0, ['DuplicateOfAct', 'TooEarlyInSequence', 'SequenceFinishedTooEarly']),

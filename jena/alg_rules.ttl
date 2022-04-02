@@ -32,7 +32,7 @@
 	(?a rdf:type my:action),
 	noValue(?x my:begin_of ?a) ,
 
-	makeSkolem(?b, ?a, "begin_of"),
+	makeNamedSkolem(?b, my:boundary, ?a, "begin_of"),
 	 ->
 	 (?b rdf:type my:boundary) ,
 	 (?b my:begin_of ?a) ,
@@ -42,7 +42,7 @@
 	(?a rdf:type my:action),
 	noValue(?x my:end_of ?a) ,
 
-	makeSkolem(?b, ?a, "end_of"),
+	makeNamedSkolem(?b, my:boundary, ?a, "end_of"),
 	 ->
 	 (?b rdf:type my:boundary) ,
 	 (?b my:end_of ?a) ,
@@ -76,6 +76,17 @@
 	 (?b my:ExprEnd ?e),
 ]
 
+[connect_InterruptActionEnd:
+
+	(?st rdf:type my:interrupt_action),
+	(?b my:begin_of ?st),
+	makeNamedSkolem(?E, my:end, ?st),
+	 ->
+	 (?E my:halt_of ?st),
+	 (?b my:always_consequent ?E),
+	 (?b my:StmtEnd ?E),
+	 (?E my:interrupt_origin ?E),
+]
 
 
 ###############################
@@ -153,6 +164,139 @@
 
 
 
+##################################
+# break and continue and return
+##################################
+
+
+[connect_InterruptedToplevel:
+# redirect link to normal end if this is the bound of the top-level action
+#	 this link is to be replaced:
+	(?prev my:always_consequent ?halt_bnd),
+#	 this link is to be removed:
+	(?halt_bnd my:interrupt_origin ?o),
+	(?halt_bnd my:halt_of ?st),
+	(?alg my:entry_point ?st),
+	(?e my:end_of ?st),
+#	print("Top level: ", ?st)
+	 ->
+	 drop(0),
+	 drop(1),
+	 (?prev my:always_consequent ?e),
+	 (?prev my:Interrupted ?e),
+#	  R ??
+###	 print( "redirected to toplevel: ", ?st),
+]
+
+
+
+[connect_InterruptedByReturn:
+	(?halt_bnd my:interrupt_origin ?o),
+	(?o my:boundary_of ?origin_st),
+	(?origin_st rdf:type my:return),
+
+	(?halt_bnd my:halt_of ?inner_st),
+	(?st my:parent_of ?inner_st),
+# 	not a function
+	noValue(?st rdf:type my:func),
+# 	not a top-level sequence
+	noValue(?st my:entry_point ?_global),
+#	(?alg my:hasPartTransitive ?st),
+#	(?alg my:entry_point ?global),
+#	noValue(?alg my:parent_of ?st),
+###	noValue(?global my:parent_of ?st),
+
+	makeNamedSkolem(?E, my:h_ret, ?st),
+	 ->
+	 (?E my:halt_of ?st),
+	 (?E my:interrupt_origin ?o),
+	 (?halt_bnd my:always_consequent ?E),
+	 (?halt_bnd my:Interrupted ?E),
+#	  R ??
+###	 print( "returned: halt_of ", ?st ),
+]
+
+# TODO: add rule to connect (inalize) interrupted exact function body
+
+
+[connect_InterruptedByBreak:
+	(?halt_bnd my:interrupt_origin ?o),
+	(?o my:boundary_of ?origin_st),
+	(?origin_st rdf:type my:break),
+
+	(?halt_bnd my:boundary_of ?inner_st),
+	(?st my:parent_of ?inner_st),
+# 	not a loop
+	noValue(?st rdf:type my:loop),
+
+	makeNamedSkolem(?E, my:h_brk, ?st),
+	 ->
+	 (?E my:halt_of ?st),
+	 (?E my:interrupt_origin ?o),
+	 (?halt_bnd my:always_consequent ?E),
+	 (?halt_bnd my:Interrupted ?E),
+#	  R ??
+]
+
+[connect_InterruptedTillBreak:
+	(?halt_bnd my:interrupt_origin ?o),
+	(?o my:boundary_of ?origin_st),
+	(?origin_st rdf:type my:break),
+
+	(?halt_bnd my:boundary_of ?inner_st),
+	(?st my:parent_of ?inner_st),
+# 	a loop
+	(?st rdf:type my:loop),
+
+	(?e my:end_of ?st),
+	 ->
+	 (?halt_bnd my:always_consequent ?e),
+	 (?halt_bnd my:Interrupted ?e),
+#	  R ??
+]
+
+
+[connect_InterruptedByContinue:
+	(?halt_bnd my:interrupt_origin ?o),
+	(?o my:boundary_of ?origin_st),
+	(?origin_st rdf:type my:continue),
+
+	(?halt_bnd my:boundary_of ?inner_st),
+	(?st my:parent_of ?inner_st),
+	(?notL my:parent_of ?st),
+# 	not a loop
+	noValue(?notL rdf:type my:loop),
+
+	makeNamedSkolem(?E, my:h_con, ?st),
+	 ->
+	 (?E my:halt_of ?st),
+	 (?E my:interrupt_origin ?o),
+	 (?halt_bnd my:always_consequent ?E),
+	 (?halt_bnd my:Interrupted ?E),
+#	  R ??
+]
+
+[connect_InterruptedTillContinue:
+	(?halt_bnd my:interrupt_origin ?o),
+	(?o my:boundary_of ?origin_st),
+	(?origin_st rdf:type my:continue),
+
+	(?halt_bnd my:boundary_of ?inner_st),
+	(?st my:parent_of ?inner_st),
+	(?L my:parent_of ?st),
+# 	a loop
+	(?L rdf:type my:loop),
+
+	(?e my:end_of ?st),
+	 ->
+	 (?halt_bnd my:always_consequent ?e),
+	 (?halt_bnd my:Interrupted ?e),
+#	  R ??
+]
+
+
+
+
 ###############################
 # entry_point and sequence
 ###############################
@@ -179,7 +323,7 @@
 	(?st rdf:type my:first_item),
 	(?b2 my:begin_of ?st),
 
-	makeSkolem(?R, ?b, ?b2),
+	makeNamedSkolem(?R, my:Reason, ?b, ?b2),
 	(?block my:stmt_name ?seq_name),
 	(?st my:stmt_name ?inner_name),
 	 ->
@@ -199,7 +343,7 @@
 	(?e my:end_of ?st),
 	(?b my:begin_of ?st2),
 
-	makeSkolem(?R, ?e, ?b),
+	makeNamedSkolem(?R, my:Reason, ?e, ?b),
 	(?block my:stmt_name ?seq_name),
 	(?st my:stmt_name ?previous_name),
 	(?st2 my:stmt_name ?next_name),
@@ -221,7 +365,7 @@
 	(?st rdf:type my:last_item),
 	(?e1 my:end_of ?st),
 
-	makeSkolem(?R, ?e1, ?e),
+	makeNamedSkolem(?R, my:Reason, ?e1, ?e),
 	(?block my:stmt_name ?seq_name),
 	 ->
 	 (?e1 my:always_consequent ?e),
@@ -251,7 +395,7 @@
 	(?br my:cond ?cnd),
 	(?b2 my:begin_of ?cnd),
 
-	makeSkolem(?R, ?b, ?b2),
+	makeNamedSkolem(?R, my:Reason, ?b, ?b2),
 	(?alt my:stmt_name ?alt_name),
 	(?cnd my:stmt_name ?cnd_name),
 	 ->
@@ -273,7 +417,7 @@
 	(?e my:end_of ?cnd),
 	(?b my:begin_of ?br),
 
-	makeSkolem(?R, ?e, ?b),
+	makeNamedSkolem(?R, my:Reason, ?e, ?b),
 #	(?alt my:stmt_name ?alt_name),
 	(?cnd my:stmt_name ?cnd_name),
 	(?br my:stmt_name ?branch_name),
@@ -313,7 +457,7 @@
 	(?e my:end_of ?cnd),
 	(?b my:begin_of ?cnd2),
 
-	makeSkolem(?R, ?e, ?b),
+	makeNamedSkolem(?R, my:Reason, ?e, ?b),
 	(?cnd my:stmt_name ?cnd_name),
 	(?cnd2 my:stmt_name ?cnd2_name),
 	 ->
@@ -340,7 +484,7 @@
 	(?e my:end_of ?cnd),
 	(?b my:begin_of ?br2),
 
-	makeSkolem(?R, ?e, ?b),
+	makeNamedSkolem(?R, my:Reason, ?e, ?b),
 	(?alt my:stmt_name ?alt_name),
 	(?cnd my:stmt_name ?cnd_name),
 	 ->
@@ -367,7 +511,7 @@
 
 	(?e1 my:end_of ?cnd),
 
-	makeSkolem(?R, ?e1, ?e),
+	makeNamedSkolem(?R, my:Reason, ?e1, ?e),
 	(?alt my:stmt_name ?alt_name),
 	 ->
 	 (?e1 my:on_false_consequent ?e),
@@ -384,7 +528,7 @@
 
 	(?e1 my:end_of ?br),
 
-	makeSkolem(?R, ?e1, ?e),
+	makeNamedSkolem(?R, my:Reason, ?e1, ?e),
 	(?alt my:stmt_name ?alt_name),
 	 ->
 	 (?e1 my:always_consequent ?e),
@@ -408,7 +552,7 @@
 
 	(?b2 my:begin_of ?cnd),
 
-	makeSkolem(?R, ?b, ?b2),
+	makeNamedSkolem(?R, my:Reason, ?b, ?b2),
 	(?Loop my:stmt_name ?loop_name),
 	(?cnd my:stmt_name ?cnd_name),
 	 ->
@@ -425,7 +569,7 @@
 	(?Loop my:body ?st),
 	(?b my:begin_of ?Loop),
 
-	makeSkolem(?R, ?b, ?b2),
+	makeNamedSkolem(?R, my:Reason, ?b, ?b2),
 	(?Loop my:stmt_name ?loop_name),
 	(?b2 my:begin_of ?st),
 	 ->
@@ -444,7 +588,7 @@
 	(?e my:end_of ?cnd),
 	(?b my:begin_of ?st),
 
-	makeSkolem(?R, ?e, ?b),
+	makeNamedSkolem(?R, my:Reason, ?e, ?b),
 	(?Loop my:stmt_name ?loop_name),
 	(?cnd my:stmt_name ?cnd_name),
 	 ->
@@ -491,7 +635,7 @@
 
 	(?e1 my:end_of ?cnd),
 
-	makeSkolem(?R, ?e1, ?e),
+	makeNamedSkolem(?R, my:Reason, ?e1, ?e),
 	(?Loop my:stmt_name ?loop_name),
 	(?cnd my:stmt_name ?cnd_name),
 	 ->
@@ -516,7 +660,7 @@
 	(?e my:end_of ?st),
 	(?b my:begin_of ?cnd),
 
-	makeSkolem(?R, ?e, ?b),
+	makeNamedSkolem(?R, my:Reason, ?e, ?b),
 	(?Loop my:stmt_name ?loop_name),
 	(?cnd my:stmt_name ?cnd_name),
 	 ->

@@ -992,7 +992,7 @@ if __name__ == '__main__':
 		exit()
 		###
 
-	if 1:
+	if 0:
 		# test_make_act_line()
 		# test_algorithm_to_tags()
 		test_algorithm_to_triples(inspect_questions_via_dot=0, mistakes_via_grid=0)

@@ -199,13 +199,13 @@ class AlgorithmParser:
             "act_name": action('condition', name=name),
         }
 
-    def parse_stmt(self, name:str) -> dict:
+    def parse_stmt(self, name:str, stmt_type:'stmt/break/continue/return'='stmt') -> dict:
         ""
         return {
             "id": self.newID(name),
-            "type": "stmt",
+            "type": stmt_type,
             "name": name,
-            "act_name": action('stmt', name=name),
+            "act_name": action(stmt_type, name=name),
         }
 
     def parse_algorithm_ids(self, line_list: "list(str)", start_line=0, end_line=None) -> list:
@@ -620,6 +620,31 @@ class AlgorithmParser:
                 })
                 ci = e + 1
                 continue  # with next stmt on current level
+
+
+            # break / continue / return [<value>]
+            m = re.match(r"(break|continue|return)\s*(.*)$", current_line, re.I)
+            # if not m:
+            #     if not suggest_corrections and re.search('[a-z]+', current_line, re.I): suggest_corrections.append(
+            #         'some_action: function call(...), or variable = assignment, or VAR++/VAR--, or `cin >> ...` / `cout << ...`')
+            #     elif not suggest_corrections and re.search('[а-яё]+', current_line, re.I): suggest_corrections.append(
+            #         'действие: вызов(...) функции, или присваивание переменной = ..., или VAR++/VAR--, или `cin >> ...` / `cout << ...`')
+            if m:
+                kind  = m.group(1)
+                if self.verbose: print(kind)
+                value = m.group(2).replace('  ', ' ').strip()
+                node = self.parse_stmt(current_line.strip(), stmt_type=kind)
+                ### find interrupt_target ???
+                # set loop name / return expr if given
+                if value:
+                    if kind.lower() == 'return':
+                        node['return_expr'] = value
+                    else:
+                        node['interrupt_target_name'] = value
+                result.append( node )
+                ci = e + 1
+                continue  # with next stmt on current level
+
 
             # одно слово - имя действия: "бежать"
             m = re.match(r"(\S+|\w.*(?:\(.*\)|=.|>>.|<<.|\+\+|--).*)$", current_line, re.I)
