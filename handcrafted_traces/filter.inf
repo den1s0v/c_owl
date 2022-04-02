@@ -10,7 +10,7 @@ SKIP    test_sequences.txt
 SKIP   test_loops.txt
 
 SKIP    test_one.txt
-SKIP    test_zero.txt
+test_zero.txt
 
 SKIP    questions4cppr.txt
-questions4cppr_anon.txt
+SKIP    questions4cppr_anon.txt
