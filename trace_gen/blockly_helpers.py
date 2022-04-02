@@ -442,6 +442,15 @@ class AlgorithmXMLParser(AlgorithmParser):
                 name = 'print("%s")' % name
                 result.append( self.parse_stmt(name) )
 
+            # BREAK/CONTINUE
+            if '@type' in xml_tree and xml_tree['@type'] == 'controls_break_continue':
+                if self.verbose: print("BREAK/CONTINUE")
+                value_FLOW = get_named_member(xml_tree['field'], 'FLOW')
+                if value_FLOW:
+                    value_FLOW = value_FLOW['#text'].lower()
+                name = value_FLOW
+                result.append( self.parse_stmt(name, stmt_type=value_FLOW) )
+
             # # print("Warning: unknown control structure: ")
             # suggest = ""
             # if suggest_corrections:

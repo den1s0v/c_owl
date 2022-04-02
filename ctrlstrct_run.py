@@ -363,7 +363,7 @@ class TraceTester():
                       # "comment": None,
                 })
 
-            if node["type"] in {"stmt"}:
+            if node["type"] in {"stmt", "break", "continue", "return"}:
                 phase = "performed"
                 ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
                 result.append({
@@ -375,6 +375,8 @@ class TraceTester():
                       # "text_line": None,
                       # "comment": None,
                 })
+                if node["type"] in {"break", "continue", "return"}:
+                    return  # just stupidly stop current sequence
 
             if node["type"] in {"while_loop", "do_while_loop", "do_until_loop", "for_loop", "foreach_loop", "infinite_loop", }:
 

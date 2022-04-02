@@ -2037,8 +2037,8 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
 	parent = None
 	is_iteration = False
 	# в случае с простыми действиями (stmt, expr) phase не имеет значения - создаётся с фазой performed
-	if elem_type == "stmt":
-		node = StatementAtomJN(elem_type, name=alg_element["name"])
+	if elem_type in ("stmt", "break", "continue", "return"):
+		node = StatementAtomJN("stmt", name=alg_element["name"])
 	if elem_type == "expr":
 		node = GenericCondition(cond=None, name=alg_element["name"])
 	# в случае со сложными действиями создаётся акт целиком, со всеми вложенными действиями?..  phase указывает, еачало или конец нам нужно взять

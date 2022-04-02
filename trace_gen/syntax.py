@@ -265,7 +265,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 		if type_ in ("expr", ):
 			return _make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)
 
-		if type_ in ("stmt", ):
+		if type_ in ("stmt", "break", "continue", "return"):
 			return _make_line_tag(indent, SYNTAX["STATEMENT"](_make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)))
 
 		elif type_ == "sequence":  # and not name.endswith("_loop_body"):

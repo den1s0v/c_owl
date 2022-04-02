@@ -74,6 +74,19 @@ function get_toolbox_json() {
 				  <shadow type="text_name_of_loop"></shadow>
 				</value>
 			</block>`
+		  },
+		  {
+		    "kind": "label",
+		    "text": "Loop control" // Blockly.Msg["CUSTOM_LABEL_LOOP_POSTCOND"]
+		  },
+		  {"kind": "sep", "gap": "8"},
+		  {
+			"kind": "block",
+			"blockxml": `<block type="controls_break_continue">
+				<value name="FLOW">
+				  <shadow type="BREAK"></shadow>
+				</value>
+			</block>`
 		  }
 		]
 	  },
@@ -279,7 +292,7 @@ function init_blockly_environment(argument=null) {
 	]
   },
   {
-	// Block for if/elseif/else condition (modified to be named).
+	// Block for if/elseif/else condition (modified to make it named).
 	"type": "controls_named_if",
 	"message0": "// %{BKY_CUSTOM_NAME_OF_ALTERNATIVE}: %1",  // имя развилки
 	"args0": [
@@ -415,6 +428,27 @@ function init_blockly_environment(argument=null) {
 	"style": "text_blocks",
 	"helpUrl": "",
 	"tooltip": "%{BKY_CUSTOM_ACTION_TOOLTIP}"  // "Выполняет произвольное действие"
+  },
+
+  // Block for flow statements: continue, break.
+  {
+    "type": "controls_break_continue",
+    "message0": "%1",
+    "args0": [{
+      "type": "field_dropdown",
+      "name": "FLOW",
+      "options": [
+        ["%{BKY_CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK}", "BREAK"],
+        ["%{BKY_CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE}", "CONTINUE"]
+      ]
+    }],
+    "previousStatement": null,
+    "style": "loop_blocks",
+    "helpUrl": "%{BKY_CONTROLS_FLOW_STATEMENTS_HELPURL}",
+    "extensions": [
+      "controls_flow_tooltip",
+      // "controls_flow_in_loop_check"
+    ]
   },
 
   ]);
