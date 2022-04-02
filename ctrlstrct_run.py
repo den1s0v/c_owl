@@ -924,8 +924,6 @@ def init_persistent_structure(onto):
         class trace(act_begin): pass
         # -->
         class act_end(act): pass
-        # -->
-        class act_interrupted(act): pass
         # # -->
         # class student_act(act): pass
         # -->
@@ -1095,7 +1093,9 @@ def init_persistent_structure(onto):
         for class_name in [
             "return", "break", "continue",  # have `interrupt_target`
         ]:
-            types.new_class(class_name, (onto['interrupt_action'], ))
+            cls = types.new_class(class_name, (onto['interrupt_action'], ))
+            # add annotation name: rdfs:label
+            cls.label = [class_name]
 
         for class_name in [
             "if", "else-if", "else",
@@ -1164,7 +1164,9 @@ def init_persistent_structure(onto):
         class string_placeholder(Thing >> str): pass
         for suffix in (
             "A", # "B", "C", "D", "EX",
-            "kind_of_loop", "TrueFalse",
+            "kind_of_loop",
+            "kind_of_action",
+            "TrueFalse",
             "BEGIN",  # для CorrespondingEndMismatched
             "EXTRA",  # для NotNeighbour
             "MISSING",  # пропущены перед текущим
@@ -1258,6 +1260,10 @@ def init_persistent_structure(onto):
                 ("UpcomingNeighbour", ["NeighbourhoodError"], "missing", {'action'}), #
                 ("NotNeighbour", ["NeighbourhoodError"], "extra", {'action'}), # disjoint with UpcomingNeighbour
                 ("WrongCondNeighbour", ["NotNeighbour", "ConditionMisuse"], "by_different_cond", {'action'}), #
+
+                # interrupted flow
+                ("UnexpectedWhenInterrupting", ["NotNeighbour", ], "extra", {'action'}), #
+                ("TooEarlyWhenInterrupting", ["UpcomingNeighbour", ], "missing", {'action'}), #
 
                 # ("ExtraAct", ["WrongNext"]),
                 ("DuplicateOfAct", [], "extra", {'sequence'}),

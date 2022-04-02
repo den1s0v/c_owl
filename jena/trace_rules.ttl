@@ -87,6 +87,7 @@
 	 ->
 	 (?a my:executes ?bnd)
 ]
+#	? halt_of is unnesessary here ?
 
 
 [Erroneous-class-to-wrong_next_act:
@@ -251,7 +252,7 @@
 	(?a my:student_next ?b),
 	(?a my:executes ?bx),
 	(?b my:executes ?by),
-#	a is not condition
+#	a is not a condition
 	(?bx my:always_consequent ?some_bnd),
 #	noValue(?a my:type my:expr),
 #	check it
@@ -263,6 +264,44 @@
 	 (?b rdf:type my:NotNeighbour),
 	 (?b my:field_EXTRA ?name),
 ]
+
+
+# Rule: UnexpectedWhenInterrupting-Error [mistake]
+[
+	(?b rdf:type my:NotNeighbour),
+	(?a my:student_next ?b),
+	(?a my:executes ?bx),
+#	(?b my:executes ?by),
+	(?bx my:halt_of ?st_a),
+
+	(?bx my:interrupt_origin ?o),
+	(?o  my:boundary_of ?st),
+	(?st rdf:type ?interrupt_class),
+	(?interrupt_class rdfs:label ?kind),
+	 ->
+	 (?b rdf:type my:UnexpectedWhenInterrupting),
+#	 (?b my:field_MISSING ?name),
+	 (?b my:field_kind_of_action ?kind),
+]
+
+# Rule: TooEarlyWhenInterrupting-Error [mistake]
+[
+	(?b rdf:type my:UpcomingNeighbour),
+	(?a my:student_next ?b),
+	(?a my:executes ?bx),
+#	(?b my:executes ?by),
+	(?bx my:halt_of ?st_a),
+
+	(?bx my:interrupt_origin ?o),
+	(?o  my:boundary_of ?st),
+	(?st rdf:type ?interrupt_class),
+	(?interrupt_class rdfs:label ?kind),
+	 ->
+	 (?b rdf:type my:TooEarlyWhenInterrupting),
+#	 (?b my:field_MISSING ?name),
+	 (?b my:field_kind_of_action ?kind),
+]
+
 
 # Rule: GenericMisconceptionWhenTrue_Error [mistake]
 [
