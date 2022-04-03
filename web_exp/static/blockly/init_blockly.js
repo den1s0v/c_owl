@@ -83,9 +83,11 @@ function get_toolbox_json() {
 		  {
 			"kind": "block",
 			"blockxml": `<block type="controls_break_continue">
-				<value name="FLOW">
-				  <shadow type="BREAK"></shadow>
-				</value>
+			</block>`
+		  },
+		  {
+			"kind": "block",
+			"blockxml": `<block type="controls_return">
 			</block>`
 		  }
 		]
@@ -443,12 +445,28 @@ function init_blockly_environment(argument=null) {
       ]
     }],
     "previousStatement": null,
+	"nextStatement": null,  // outcomment this and block will lack its out port
     "style": "loop_blocks",
     "helpUrl": "%{BKY_CONTROLS_FLOW_STATEMENTS_HELPURL}",
     "extensions": [
       "controls_flow_tooltip",
       // "controls_flow_in_loop_check"
     ]
+  },
+  // Block for return statement
+  {
+	"type": "controls_return",
+	"message0": "return %1",
+	"args0": [{
+	  "type": "field_input",
+	  "name": "VALUE",
+	  "text": "%{BKY_CUSTOM_ENTER_EXPRESSION}"  // "введите выражение"
+	}],
+	"previousStatement": null,
+	"nextStatement": null,
+	"style": "logic_blocks",
+	"helpUrl": "",
+	"tooltip": "%{BKY_CUSTOM_RETURN_TOOLTIP}"  // "Прерывает выполнение текущей функции"
   },
 
   ]);
@@ -605,6 +623,16 @@ function patch_localization() {
 	ru?
 	  "принимает значения"
 	: "yields values"
+	);
+  Blockly.Msg["CUSTOM_ENTER_EXPRESSION"] = (
+	ru?
+	  "введите выражение"
+	: "enter an expression"
+	);
+  Blockly.Msg["CUSTOM_RETURN_TOOLTIP"] = (
+	ru?
+	  "Прерывает выполнение текущей функции."
+	: "Interrupts the execution of the current function."
 	);
 
 }

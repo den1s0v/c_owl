@@ -634,6 +634,36 @@ if TraceJsonVisitor:
 	TraceJsonVisitor.visit_StatementAtomJN = _
 
 
+class NameOnlyStatementJN(GenericAlgorithmJsonNode):
+	def __init__(self, jn_type="unkn", name='noname', **kw):
+		super().__init__(jn_type, name=name, **kw)
+		assert jn_type in ("break","continue","return",), jn_type
+		self.gen = 'it'
+	def to_dict(self):
+		return self.name
+	def accept(self, visitor):
+		return visitor.visit_NameOnlyStatementJN(self)
+	def display_name(self, case='nomn', include_type_only=False):
+		return self.name
+if AlgTextVisitor:
+	def _(self, node):
+		self.add_line(node.name)
+		return self
+	AlgTextVisitor.visit_NameOnlyStatementJN = _
+if TraceTextVisitor:
+	def _(self, node):
+		# Пример:    return -1 выполнилось 1-й раз
+		i = self.register_act(node.name)
+		self.add_line(node.make_act_line(name=node.name, phase="performed", n=i))
+		return self
+	TraceTextVisitor.visit_NameOnlyStatementJN = _
+if TraceJsonVisitor:
+	def _(self, node):
+		act = ActLine(node.name, executes=node.ID)
+		self.add_act(act)
+	TraceJsonVisitor.visit_NameOnlyStatementJN = _
+
+
 
 class FuncJN(GenericAlgorithmJsonNode):
 	def __init__(self, jn_type="unkn", func="noname", body=None, is_entry=None, param_list=None, **kw):
@@ -2037,9 +2067,11 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
 	parent = None
 	is_iteration = False
 	# в случае с простыми действиями (stmt, expr) phase не имеет значения - создаётся с фазой performed
-	if elem_type in ("stmt", "break", "continue", "return"):
+	if elem_type == "stmt":
 		node = StatementAtomJN("stmt", name=alg_element["name"])
-	if elem_type == "expr":
+	elif elem_type in ("break", "continue", "return"):
+		node = NameOnlyStatementJN(elem_type, name=alg_element["name"])
+	elif elem_type == "expr":
 		node = GenericCondition(cond=None, name=alg_element["name"])
 	# в случае со сложными действиями создаётся акт целиком, со всеми вложенными действиями?..  phase указывает, еачало или конец нам нужно взять
 	if not node:  # elem_type in ("if", "else if"):

@@ -265,8 +265,22 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 		if type_ in ("expr", ):
 			return _make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)
 
-		if type_ in ("stmt", "break", "continue", "return"):
+		if type_ == "stmt":
 			return _make_line_tag(indent, SYNTAX["STATEMENT"](_make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)))
+
+		if type_ == "return":
+			inner = [
+				_make_alg_tag(algorithm_json, "keyword", "return", states_before=SIMPLE_NODE_STATES),  # <- not `name` here.
+			]
+			if "return_expr" in algorithm_json:
+				inner += [
+					"&nbsp;",
+					_make_alg_tag(0, "variable", algorithm_json["return_expr"]),
+				]
+			return _make_line_tag(indent, SYNTAX["STATEMENT"](inner))
+
+		if type_ in ("break", "continue", ):
+			return _make_line_tag(indent, SYNTAX["STATEMENT"](_make_alg_tag(algorithm_json, "keyword", name, states_before=SIMPLE_NODE_STATES)))
 
 		elif type_ == "sequence":  # and not name.endswith("_loop_body"):
 			# # recurse with list

@@ -450,6 +450,24 @@ class AlgorithmXMLParser(AlgorithmParser):
                     value_FLOW = value_FLOW['#text'].lower()
                 name = value_FLOW
                 result.append( self.parse_stmt(name, stmt_type=value_FLOW) )
+                # set loop name if required in future
+                ## node['interrupt_target_name'] = value
+
+
+            # return
+            if '@type' in xml_tree and xml_tree['@type'] == 'controls_return':
+                if self.verbose: print("RETURN")
+                value_VALUE = get_named_member(xml_tree['field'], 'VALUE')
+                name = 'return'
+                expr = ''
+                if value_VALUE and '#text' in value_VALUE:
+                    expr = value_VALUE['#text'].strip().lower()
+                    name += ' ' + expr
+                node = self.parse_stmt(expr, stmt_type='return')
+                node['name'] = name
+                if expr:
+                    node['return_expr'] = expr
+                result.append( node )
 
             # # print("Warning: unknown control structure: ")
             # suggest = ""

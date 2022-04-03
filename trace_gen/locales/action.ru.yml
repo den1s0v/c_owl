@@ -15,6 +15,6 @@ ru:
   stmt: действие `%{name}`
   condition: условие `%{name}`
   expr:      условие `%{name}`
-  return: возврат `%{name}` из функции
+  return: возврат %{name} из функции
   break: break
   continue: continue
