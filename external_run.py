@@ -2,6 +2,7 @@
 
 import re
 import subprocess
+import sys
 import time
 import timeit
 from timeit import default_timer as timer
@@ -10,6 +11,7 @@ from timeit import default_timer as timer
 import psutil
 
 try:
+	from jena.jenaClient import JenaClient
 	from options import JAVA_PATH # outcomment this import if loading from a foreign directory
 except:
 	pass

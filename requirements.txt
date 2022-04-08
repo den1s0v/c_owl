@@ -5,6 +5,9 @@ transliterate
 Flask
 waitress
 
+# connecting to java daemon process
+thrift
+
 # unified translations
 python-i18n[YAML]
 
