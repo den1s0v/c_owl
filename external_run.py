@@ -10,8 +10,10 @@ from timeit import default_timer as timer
 # $ pip install psutil
 import psutil
 
+from jena.jenaClient import JenaClient, ThriftConnectionException
+from jena.client_manager import ClientManager
+
 try:
-	from jena.jenaClient import JenaClient
 	from options import JAVA_PATH # outcomment this import if loading from a foreign directory
 except:
 	pass
@@ -34,6 +36,14 @@ REASONING_STAT_DICT = {}  # triples_before triples_after iterations (for prolog,
 SHOW_PRINTOUT = True
 
 _WATCHING_THREAD = None
+
+
+# Jena service daemon process
+JENA_SERVICE_PORT = 20299
+JENA_RULE_PATHS = "jena/alg_rules.ttl;jena/relink_acts.ttl;jena/trace_rules.ttl"
+_service_Process = None
+_client_Manager = None
+
 
 def set_repeat_count(count: int):
 	'Set REPEAT_COUNT globally for the module'
@@ -359,7 +369,7 @@ def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena',
 	if not rules_path:
 		rules_path = {  # set defaults
 			# 'jena': "jena/all.rules",
-			'jena': "jena/alg_rules.ttl;jena/relink_acts.ttl;jena/trace_rules.ttl",
+			'jena': JENA_RULE_PATHS,
 			'sparql': "sparql_from_swrl.ru",
 		}[reasoning_mode]
 
@@ -373,4 +383,56 @@ def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena',
 	return get_run_stats()
 
 
+def invoke_jena_reasoning_service(rdfData:bytes, rules_path=JENA_RULE_PATHS):
+	# java -jar Jena.jar jena "test_data/test_make_trace_output.rdf" "jena/all.rules" "test_data/jena_output.rdf"
+
+	global _service_Process, _client_Manager
+	need_create_process = False
+	if not _service_Process or not _service_Process.is_running():
+		need_create_process = True
+	elif _service_Process.status() == psutil.STATUS_ZOMBIE:
+		_service_Process.wait()
+		need_create_process = True
+
+	exception = None
+	for _ in range(2):  # loop to retry
+		# debug: OFF at first
+		if False and need_create_process:
+			cmd = f'{JAVA_PATH} -jar jena/Jena.jar service --port {JENA_SERVICE_PORT}'
+			print("Starting java background service ...")
+			print("  command:  ", cmd)
+			_service_Process = psutil.Popen(cmd, stdout=sys.stderr)
+
+		try:
+			if not _client_Manager:
+				_client_Manager = ClientManager(
+					lambda: JenaClient(port=JENA_SERVICE_PORT)
+				)
+				_client_Manager.run(lambda jc: jc.ping())
+
+			# do the work!
+			return _client_Manager.run(lambda jc: jc.runReasoner(rdfData, rulePaths=rules_path))
+
+		except ThriftConnectionException as ex:
+			exception = ex
+			# try recover service process
+			stop_jena_reasoning_service()
+			continue
+
+	if exception:
+		# if we reached here, there is still an error.
+		raise exception
+
+
+def stop_jena_reasoning_service():
+	global _service_Process
+	if _service_Process and _service_Process.is_running():
+		if _client_Manager:
+			print("Stopping java background service ...")
+			_client_Manager.run(lambda jc: jc.stop())
+
+		print("Killing java background service ...")
+		_service_Process.kill()
+		_service_Process.wait()
+		_service_Process = None
 

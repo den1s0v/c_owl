@@ -3,6 +3,15 @@
 from owlready2 import *
 
 
+def get_isolated_ontology(ontology_iri):
+	new_world = World()
+	return new_world.get_ontology(ontology_iri)
+
+
+def delete_ontology(onto, close_world=True):
+	onto.destroy()
+	if close_world:
+		onto.world.close()
 
 
 def make_triple(subj, prop, obj):

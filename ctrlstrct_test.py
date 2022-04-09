@@ -16,7 +16,7 @@ import ctrlstrct_run
 from ctrlstrct_run import process_algtraces, TraceTester
 from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from trace_gen.json2alg2tr import act_line_for_alg_element
-from onto_helpers import get_relation_object
+from onto_helpers import get_relation_object, delete_ontology
 import trace_gen.styling as styling
 
 from common_helpers import Checkpointer
@@ -411,6 +411,8 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 
 	try:
 		_onto, mistakes = process_algtraces(alg_trs_list, verbose=0, mistakes_as_objects=False, **process_kwargs)
+
+		delete_ontology(_onto)
 
 		# from pprint import pprint
 		# pprint(mistakes)

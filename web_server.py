@@ -1,5 +1,6 @@
 # web_server.py
 
+import atexit
 import re
 import sys
 
@@ -15,6 +16,7 @@ from trace_gen.blockly_helpers import create_algorithm_from_blockly_xml
 import trace_gen.styling as styling
 import trace_gen.syntax as syntax
 from trace_gen.json2alg2tr import set_target_lang
+import external_run
 
 from common_helpers import Checkpointer, camelcase_to_snakecase
 
@@ -175,6 +177,7 @@ def create_app():
 				algorithm_html = styling.to_html(algorithm_tags)
 				ch.hit("HTML prepared")
 				ch.since_start("Finished processing the request in")
+				print()
 
 				return dict(
 					full_trace_json=full_trace,  ## res,
@@ -183,18 +186,19 @@ def create_app():
 					processing_errors=(),
 				)
 		except Exception as ex:
-			res = f"{type(ex)}: {ex}"
+			res = f"{type(ex).__name__}: {ex}".replace('<', '&lt;').replace('>', '&gt;')
 			print_exception(ex)
-			print("request.json :")
-			print(request.json)
+			# print("request.json :")
+			# print(request.json)
 			ch.since_start("Finished the request with exception in")
+			print()
 			return dict(
 				processing_errors=(res,),
 				full_trace_json=(),
 				algorithm_json=None,
 				algorithm_as_html=None,
 			)
-			print("The error above reported as response, continue.")
+			# print("The error above reported as response, continue.")
 
 		return dict(trace_line_json={"as_string": "Dummy act line!", "id": 49, "loop": "waiting", "executes": 7, "gen": "he", "phase": "started", "_n": 4})  # debug
 
@@ -339,6 +343,10 @@ def process_algorithm_and_trace_as_json_request(json):
 
 
 if __name__ == "__main__":
+
+	# try to close the external process if it will still be running
+	atexit.register(external_run.stop_jena_reasoning_service)
+
 	host = None
 	port = None
 
@@ -357,12 +365,16 @@ if __name__ == "__main__":
 	host = host or ('localhost' if RUN_LOCALLY else "109.206.169.214")
 	port = port or 2020
 
-	if DEBUG:
-		app.run(debug=DEBUG, host=host, port=port)
-	else:
-		from waitress import serve
-		serve(app, host=host, port=port)
-
+	try:
+		if DEBUG:
+			app.run(debug=DEBUG, host=host, port=port)
+		else:
+			from waitress import serve
+			serve(app, host=host, port=port)
+	except:
+		external_run.stop_jena_reasoning_service()
+		atexit.unregister(external_run.stop_jena_reasoning_service)
+		raise  # rerise to appear in the program's printout
 
 """
 

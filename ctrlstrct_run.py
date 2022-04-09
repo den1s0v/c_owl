@@ -8,24 +8,24 @@
 """
 
 
-import json
-import re
+import io
 
 # from pprint import pprint
 
 # from owlready2 import *
-
 from onto_helpers import *
+
 from transliterate import slugify
 from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from explanations import format_explanation, get_leaf_classes
-from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, measure_stats_for_pellet_running, measure_stats_for_clingo_running, measure_stats_for_dlv_running, get_process_run_stats
+from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, invoke_jena_reasoning_service, measure_stats_for_pellet_running, measure_stats_for_clingo_running, measure_stats_for_dlv_running, get_process_run_stats
 
 from common_helpers import Uniqualizer, delete_file
 
 onto_path.append(".")
 
 # ONTOLOGY_maxID = 1
+ONTOLOGY_IRI = 'http://vstu.ru/poas/code'
 
 def prepare_name(s):
     """Transliterate given word is needed"""
@@ -1519,9 +1519,7 @@ def create_ontology_tbox() -> "onto":
     # global ONTOLOGY_maxID
 
     # создание онтологии
-    my_iri = ('http://vstu.ru/poas/code')
-    # ONTOLOGY_maxID += 1
-    onto = get_ontology(my_iri)
+    onto = get_isolated_ontology(ONTOLOGY_IRI)
     clear_ontology(onto, keep_tbox=False)  # True
 
     with onto:
@@ -1585,9 +1583,6 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         onto.save(file=debug_rdf_fpath, format='rdfxml')
         print("Saved RDF file: {} !".format(debug_rdf_fpath))
 
-
-    if reasoning == "stardog":
-        seconds = sync_stardog(debug_rdf_fpath, ontology_prefix=onto.iri)
     # exit()
 
 
@@ -1663,12 +1658,31 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         if _eval_max_traces is not None:
             return eval_stats
 
+        # ! TODO: use delete_ontology & get_isolated_ontology
         clear_ontology(onto, keep_tbox=True)
         onto = get_ontology("file://" + name_out).load()
         seconds = eval_stats['wall_time']
 
+    # invoke through jenaService:
+    if reasoning == 'jena':
+        # save ontology to buffer in memory
+        # TODO: check if NTRIPLES will be processed faster!
+        stream = io.BytesIO()
+        onto.save(file=stream, format='rdfxml')
+        result_rdf_bytes = invoke_jena_reasoning_service(rdfData=stream.getvalue())
 
-    if reasoning in ('sparql', 'jena'):
+        # Clear curent ontology data
+        delete_ontology(onto)
+
+        # read from byte stream
+        # use isolated worlds (keep concurrent threads in mind)
+        onto = get_isolated_ontology(ONTOLOGY_IRI).load(
+            fileobj=io.BytesIO(result_rdf_bytes),
+            reload=True, only_local=True)
+
+
+    # old way: invoke jar directly, communicate via files.
+    if reasoning in ('sparql', '--OLD--jena'):
         # Jena is main option (the other options are not maintained)
         name, uniq_n = Uniqualizer.get(reasoning)
         name_in = f"{name}_in.rdf"
@@ -1689,6 +1703,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         onto.destroy()
 
         # read from file in force reload mode
+        # ! use get_isolated_ontology
         onto = get_ontology("file://" + name_out).load(reload=True, only_local=True)
 
         ### print("New base_iri:", onto.base_iri)
@@ -1706,7 +1721,10 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     # return onto, []  ### Debug exit
     # exit()
 
+    ch.hit("reasoning completed")
+
     mistakes = extact_mistakes(onto, as_objects=mistakes_as_objects, filter_by_level=filter_by_level)
+    ch.hit("mistakes extracted")
 
     return onto, list(mistakes.values())
 
@@ -1722,8 +1740,9 @@ def sync_jena(onto, rules_path=None, reasoning='jena', verbose=1) -> 'new onto':
 
     ## onto = get_ontology("file://" + name_out).load()
     # namespace cached so not overwritten workaround:
-    new_world = World()
-    onto = new_world.get_ontology("file://" + name_out).load()
+    # new_world = World()
+    # onto = new_world.get_ontology
+    onto = get_isolated_ontology("file://" + name_out).load()
     ### print("New base_iri:", onto.base_iri)
 
     return onto
