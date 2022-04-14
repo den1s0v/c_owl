@@ -1,0 +1,39 @@
+# relink_acts.ttl
+# stage 2  (after alg_rules and before trace_rules)
+
+@prefix  rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+# @prefix  rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+#
+# # An important RDF rules subset
+# @include <jena/rdfs4core.rules>.
+#
+#
+# @include <jena/loop_names.ttl>.
+
+@prefix my: <http://vstu.ru/poas/code#> .
+
+
+###############################
+# prepare-trace-step
+###############################
+
+
+# redirect end acts from normal ends to interrupted ends
+[Redirect-normal-end-to-interrupted-end:
+#   acts are linked with consequent
+	(?a my:student_next ?b),
+	(?a my:executes ?bnd_a),
+#	 this link is to be replaced:
+	(?b my:executes ?bnd_b),
+	(?bnd_b my:end_of ?st_b),
+	(?bnd_a my:consequent ?bnd_halt),
+#	 a different ending bound (end_of ==> halt_of)
+	(?bnd_halt my:halt_of ?st_b),
+#	guard for end of global code
+	noValue(?bnd_a my:consequent ?bnd_b),
+	 ->
+	 drop(2),
+	 (?b my:executes ?bnd_halt),
+]
+

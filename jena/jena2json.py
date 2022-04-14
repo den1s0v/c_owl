@@ -31,6 +31,11 @@ TASK_MAP = [
 		"name": None,
 		"positive": True,
 	}),
+	("relink_acts.ttl", {
+		"name": None,
+		"positive": False,
+		"salience": 10,
+	}),
 	("trace_rules.ttl", {
 		"name": None,
 		"positive": False,

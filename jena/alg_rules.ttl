@@ -216,7 +216,7 @@
 ###	 print( "returned: halt_of ", ?st ),
 ]
 
-# TODO: add rule to connect (inalize) interrupted exact function body
+# TODO: add rule to connect (finalize) interrupted exact function body
 
 
 [connect_InterruptedByBreak:
