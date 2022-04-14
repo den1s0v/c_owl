@@ -1,0 +1,92 @@
+////////////////
+///////// return, break, continue ///////
+////////////////
+
+
+// алгоритм return_if_red_11
+{
+while (not_green) -> 1 // waiting
+{  
+	if (red) -> 1  // over_color
+	{  
+		wait()
+		return
+	}  
+	else if (yellow)
+	{  
+		get_ready ()
+		continue
+	}  
+	else if (off)
+	{  
+		turn_around()
+		break
+	}  
+}  
+}
+
+// return_if_red_11 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм return_if_red_1010
+{
+while (not_green) -> 10 // waiting
+{  
+	if (red) -> 0  // over_color
+	{  
+		wait()
+		return
+	}  
+	else if (yellow) -> 1
+	{  
+		get_ready ()
+		continue
+	}  
+	else if (off)
+	{  
+		turn_around()
+		break
+	}  
+}  
+}
+
+// return_if_red_1010 1010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм return_if_red_1001
+{
+while (not_green) -> 1 // waiting
+{  
+	if (red) -> 0  // over_color
+	{  
+		wait()
+		return
+	}  
+	else if (yellow) -> 0
+	{  
+		get_ready ()
+		continue
+	}  
+	else if (off) -> 1
+	{  
+		turn_around()
+		break
+	}  
+}  
+}
+
+// return_if_red_1001 1001 трасса
+{
+началась программа
+закончилась программа
+}
+

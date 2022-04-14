@@ -1,0 +1,47 @@
+﻿См. https://docs.google.com/spreadsheets/d/1ex2ZoqpyhaHF8JWvUnW4IwE6azig8P9LFY8aWwHQr-s/edit#gid=1592040110	Всегда	Более 1 действия в программе или любом следовании	Развилка	2+ условий в развилке	с ELSE	без ELSE	Цикл	WHILE	DO-WHILE
+	*	!seq-of-1-max	alternative	else-if	else	if & !else	*loop	while_loop	do_while_loop	return	break	continue
+UpcomingNeighbour	-	-	-	-	-	-	-	-	-
+NotNeighbour	-	-	-	-	-	-	-	-	-
+WrongCondNeighbour	-	-	-	-	-	-	-	-	-
+SKIP___MisplacedBefore	-	-	-	-	-	-	-	-	-
+SKIP___MisplacedAfter	-	-	-	-	-	-	-	-	-
+CorrespondingEndMismatched			1				1
+EndedDeeper			1				1
+EndedShallower			1				1
+WrongContext			1				1
+OneLevelShallower			1				1
+TooEarlyInSequence		1
+TooLateInSequence		1
+SequenceFinishedTooEarly			1				1
+SequenceFinishedNotInOrder			1				1
+DuplicateOfAct	1
+NoFirstCondition			1
+BranchNotNextToCondition				1	1
+ElseBranchNotNextToLastCondition				0.5	0.5
+ElseBranchAfterTrueCondition					1
+CondtionNotNextToPrevCondition				1
+ConditionTooEarly				1
+ConditionTooLate				1
+ConditionAfterBranch			1
+DuplicateOfCondition				1
+NoNextCondition				1
+BranchOfFalseCondition			1
+AnotherExtraBranch			1
+BranchWithoutCondition			1
+NoBranchWhenConditionIsTrue			1
+LastFalseNoEnd						1
+AlternativeEndAfterTrueCondition			1
+NoAlternativeEndAfterBranch			1
+LastConditionIsFalseButNoElse					1
+NoIterationAfterSuccessfulCondition							1
+LoopEndAfterSuccessfulCondition							1
+NoLoopEndAfterFailedCondition							1
+LoopEndsWithoutCondition							1
+LoopStartIsNotCondition								1
+LoopStartIsNotIteration									1
+LoopContinuedAfterFailedCondition							1
+IterationAfterFailedCondition							1
+NoConditionAfterIteration							1
+NoConditionBetweenIterations							1
+TooEarlyWhenInterrupting										1	1	1
+UnexpectedWhenInterrupting										1	1	1
