@@ -16,6 +16,6 @@ en:
   stmt: statement `%{name}`
   condition: condition `%{name}`
   expr:      condition `%{name}`
-  return: return %{name}
+  return: return %{return_expr}
   break: break
   continue: continue

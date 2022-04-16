@@ -64,6 +64,7 @@ def export_algtr2dict(alg_tr, onto):
 
 
 	# pprint(algorithm_tags)
+	# will be patched in make_answerObject
 	question_html = styling.to_html(algorithm_tags)
 
 
@@ -164,15 +165,23 @@ def export_algtr2dict(alg_tr, onto):
 	for ind in sorted(onto.action.instances(), key=lambda a: a.name):
 		if isinstance(ind, onto.algorithm):  # or use `ind.is_a`
 			continue  # no buttons for whole algorithm
+
 		action_class = [cl for cl in ind.is_a if cl in action_classes]
 		assert action_class, (ind, ind.is_a, alg_tr)
 		action_class = action_class[0]  # must exist
 		concepts.add(action_class.name)
-		for obj_dict in ctrlstrct_run.find_by_keyval_in("id", ind.id, alg_data):
+		# find (first) dict with `id`
+		for obj_dict in find_by_keyval_in("id", ind.id, alg_data):
 			break
 		### print(obj_dict)
 		action_title = obj_dict["act_name"]["en"]  # "en" should not be changed here
-		if onto.expr in ind.is_a or onto.stmt in ind.is_a:
+		# note: all one-click actions should be listed here! (TODO: add if introduced in future)
+		if (onto.expr in ind.is_a or
+			onto.stmt in ind.is_a or
+			onto['return']   in ind.is_a or
+			onto['break']    in ind.is_a or
+			onto['continue'] in ind.is_a
+		   ):
 			answerObjects.append(make_answerObject(
 				("execute" if onto.stmt in ind.is_a else "evaluate") + " " + action_title,
 				"performed", ind.id, action_class.name,

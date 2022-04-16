@@ -36,7 +36,7 @@ def get_translations(_namespace, _key, _default=None, **kwargs) -> dict:
 	tr_d = {}
 	for loc in i18n.get('available_locales'):
 		try:
-			tr_d[loc] = i18n.t(f'{_namespace}.{_key}', locale=loc, **kwargs)
+			tr_d[loc] = i18n.t(f'{_namespace}.{_key}', locale=loc, **kwargs).strip()
 		except KeyError:
 			print(f'[WARN] no translation/no keys for "action.{_key}".format({dict(**kwargs)})')
 			tr_d[loc] = _default

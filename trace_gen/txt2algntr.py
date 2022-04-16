@@ -199,13 +199,13 @@ class AlgorithmParser:
             "act_name": action('condition', name=name),
         }
 
-    def parse_stmt(self, name:str, stmt_type:'stmt/break/continue/return'='stmt') -> dict:
+    def parse_stmt(self, name:str, stmt_type:'stmt/break/continue/return'='stmt', **kw) -> dict:
         ""
         return {
             "id": self.newID(name),
             "type": stmt_type,
             "name": name,
-            "act_name": action(stmt_type, name=name),
+            "act_name": action(stmt_type, name=name, **kw),
         }
 
     def parse_algorithm_ids(self, line_list: "list(str)", start_line=0, end_line=None) -> list:
@@ -633,14 +633,16 @@ class AlgorithmParser:
                 kind  = m.group(1)
                 if self.verbose: print(kind)
                 value = m.group(2).replace('  ', ' ').strip()
-                node = self.parse_stmt(current_line.strip(), stmt_type=kind)
-                ### find interrupt_target ???
+                special_params = {}
+                if kind.lower() == 'return':
+                    special_params['return_expr'] = value  # can be empty
+                elif value:
+                    special_params['interrupt_target_name'] = value
+                node = self.parse_stmt(current_line.strip(), stmt_type=kind, **special_params)
+                ### TODO: find interrupt_target (like in java's "named break") ???
                 # set loop name / return expr if given
                 if value:
-                    if kind.lower() == 'return':
-                        node['return_expr'] = value
-                    else:
-                        node['interrupt_target_name'] = value
+                    node.update(special_params)
                 result.append( node )
                 ci = e + 1
                 continue  # with next stmt on current level
