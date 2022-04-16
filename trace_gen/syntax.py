@@ -5,27 +5,57 @@
 
 
 
-import re
+import threading
 
+# special storage that allows storing data isolated for each thread by dispatching calls from different threads internally
+thread_globals = threading.local()
+
+from common_helpers import jsObj
 from trace_gen.json2alg2tr import tr, set_target_lang, get_target_lang
 from trace_gen.styling import to_html
 
 
+# EXISTING_TRACE = []
+def get_existing_trace():
+	'thread-safe wrapper for ex-global EXISTING_TRACE variable'
+	try:
+		return thread_globals.EXISTING_TRACE
+	except AttributeError:
+		trace = []
+		thread_globals.EXISTING_TRACE = trace
+		return trace
 
-INDENT_STEP = 2  # spaces
+
+# SYNTAX = {}
+
+# features of: Pseudocode / С / Python / JavaScript / etc.
+# token : function(str or tag) -> tag or tags
+def get_syntax(_init_default_syntax=True):
+	'thread-safe wrapper for ex-global SYNTAX variable'
+	try:
+		return thread_globals.SYNTAX
+	except AttributeError:
+		# create & fill with defaults
+		s = jsObj()
+		s.INDENT_STEP = 2  # spaces
+
+		s.ALLOW_HIDDEN_BUTTONS = True
+		s.HIDE_ALL_BUTTONS = False
+		# s.ALLOW_HIDDEN_BUTTONS = True
+		# s.HIDE_ALL_BUTTONS = False
+
+		s.FORCE_BUTTON_TOOLTIPS_IN_ENGLISH = False
+
+		thread_globals.SYNTAX = s
+		if _init_default_syntax:
+			set_syntax("C")  # the default
+		return s
+
+
 SIMPLE_NODE_STATES = ('performed', )
 COMPLEX_NODE_STATES = ('started', 'finished')
 COMPLEX_NODE_STARTED = ('started', )
 COMPLEX_NODE_FINISHED = ('finished', )
-EXISTING_TRACE = []
-
-ALLOW_HIDDEN_BUTTONS = True
-HIDE_ALL_BUTTONS = False
-
-# ALLOW_HIDDEN_BUTTONS = True
-# HIDE_ALL_BUTTONS = False
-
-FORCE_BUTTON_TOOLTIPS_IN_ENGLISH = False
 
 
 BUTTON_TIP_FREFIX = {
@@ -42,30 +72,23 @@ BUTTON_TIP_FREFIX = {
 }
 
 def set_indent_step(step: int):
-	global INDENT_STEP
-	INDENT_STEP = step
+	get_syntax().INDENT_STEP = step
 
 def set_allow_hidden_buttons(allow: bool):
-	global ALLOW_HIDDEN_BUTTONS
-	ALLOW_HIDDEN_BUTTONS = allow
+	get_syntax().ALLOW_HIDDEN_BUTTONS = allow
 
 def set_hide_all_buttons(hide: bool):
-	global HIDE_ALL_BUTTONS
-	HIDE_ALL_BUTTONS = hide
+	get_syntax().HIDE_ALL_BUTTONS = hide
 
 def set_force_button_tooltips_in_english(force: bool):
-	global FORCE_BUTTON_TOOLTIPS_IN_ENGLISH
-	FORCE_BUTTON_TOOLTIPS_IN_ENGLISH = force
+	get_syntax().FORCE_BUTTON_TOOLTIPS_IN_ENGLISH = force
 
-
-# features of: Pseudocode / С / Python / JavaScript / etc.
-# token : function(str or tag) -> tag or tags
-SYNTAX = {}
 
 def set_syntax(programming_language_name: str):
 	name = programming_language_name.capitalize()
-	passthrough = lambda tag: tag;
-	call_tr = lambda s: tr(s);
+	passthrough = lambda tag: tag
+	call_tr = lambda s: tr(s)
+	SYNTAX = get_syntax(_init_default_syntax=False)
 
 	if name in ("Pseudocode", ):
 		SYNTAX["BLOCK_OPEN"] = lambda: []
@@ -99,12 +122,13 @@ def set_syntax(programming_language_name: str):
 
 	else:
 		print(f"### Warning (ignoring): Unknown syntax in set_syntax('{name}').")
+		raise ValueError('Unknown syntax: `%s`' % name)
 		return
 
 	SYNTAX["name"] = name
 
 
-set_syntax("C")  # the default
+# set_syntax("C")  # the default
 # set_syntax("Pseudocode")
 # set_syntax("Python")
 
@@ -115,14 +139,15 @@ set_syntax("C")  # the default
 #     # .replace('\\', '\\\\')
 
 def _get_act_button_tip(act_name, phase):
-	lang = get_target_lang() if not FORCE_BUTTON_TOOLTIPS_IN_ENGLISH else 'en'
+	lang = get_target_lang() if not get_syntax().FORCE_BUTTON_TOOLTIPS_IN_ENGLISH else 'en'
 	act_name = act_name.get(lang, None) or act_name.get("en", "[action]")
 	return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name.replace("'", '"'))
 
 def _make_alg_button(alg_node_id, act_name, state_name, allow_states=None) -> list or tuple:
-	if HIDE_ALL_BUTTONS or allow_states is None or (ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states)):
+	SYNTAX = get_syntax()
+	if SYNTAX.HIDE_ALL_BUTTONS or allow_states is None or (SYNTAX.ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states)):
 		return ()
-	if not ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states):
+	if not SYNTAX.ALLOW_HIDDEN_BUTTONS and (state_name not in allow_states):
 		state_name = list(allow_states)[0]
 
 	state_tip = _get_act_button_tip(act_name, state_name)
@@ -184,7 +209,7 @@ def find_state_for_alg_id(algorithm_element_id, states):
 	assert states
 	if len(states) > 1:
 		# iterate the trace up from the bottom
-		for act in reversed(EXISTING_TRACE):
+		for act in reversed(get_existing_trace()):
 			if act["executes"] == algorithm_element_id and act["is_valid"] == True:
 				# "phase":    "string",  // "started"/"finished"/"performed"
 				last_phase = act["phase"]
@@ -207,6 +232,7 @@ def _make_block_tag(indent, inner='', indent_attr='margin-left'):
 
 
 def _make_block_with_braces(indent, block_json, inner=()):
+	SYNTAX = get_syntax()
 	return [
 	# кнопка для начала тела цикла
 	_make_line_tag(indent,
@@ -215,11 +241,11 @@ def _make_block_with_braces(indent, block_json, inner=()):
 				*(SYNTAX["BLOCK_OPEN"]() or [""]),
 			],
 			states_after=COMPLEX_NODE_STARTED,
-			trailing_content="&nbsp;" * (INDENT_STEP))
+			trailing_content="&nbsp;" * (SYNTAX.INDENT_STEP))
 		),
 	# # тело цикла
-	# algorithm_to_tags(block_json, indent=indent + INDENT_STEP),
-	_make_block_tag(INDENT_STEP, inner, indent_attr='padding-left'),
+	# algorithm_to_tags(block_json, indent=indent + SYNTAX.INDENT_STEP),
+	_make_block_tag(SYNTAX.INDENT_STEP, inner, indent_attr='padding-left'),
 	# закрыть тело цикла (если требуется по синтаксису)
 	# кнопка для конца тела цикла
 	_make_line_tag(indent,
@@ -228,7 +254,7 @@ def _make_block_with_braces(indent, block_json, inner=()):
 				*(SYNTAX["BLOCK_CLOSE"]() or [""]),
 			],
 			states_after=COMPLEX_NODE_FINISHED,
-			trailing_content="&nbsp;" * (INDENT_STEP) # немного пробелов, т.к. строка короткая
+			trailing_content="&nbsp;" * (SYNTAX.INDENT_STEP) # немного пробелов, т.к. строка короткая
 		)),
 	]
 
@@ -241,6 +267,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 		set_syntax(syntax)  # usually set once on the topmost recursive call
 	if existing_trace is not None:
 		# existing_trace tells which states to select for statements buttons
+		EXISTING_TRACE = get_existing_trace()
 		EXISTING_TRACE.clear()
 		EXISTING_TRACE.extend(existing_trace)
 
@@ -250,6 +277,8 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 	if isinstance(algorithm_json, str):
 		assert 0, algorithm_json
 		# return algorithm_json
+
+	SYNTAX = get_syntax()
 
 	if isinstance(algorithm_json, dict):
 		if algorithm_json["type"] == "algorithm":

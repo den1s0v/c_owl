@@ -1,27 +1,34 @@
 # json2alg2tr.py
 
 import copy
+from collections import namedtuple
 import json
 import re
-from collections import namedtuple
+import threading
+
+# special storage that allows storing data isolated for each thread by dispatching calls from different threads internally
+thread_globals = threading.local()
 
 
 SUPPORTED_LANGS = ("ru","en")
-# TARGET_LANG = "ru"
-TARGET_LANG = "en"
+DEFAULT_LANG = "ru"
 
 def set_target_lang(lang_code: str):
-	global TARGET_LANG
+	# global TARGET_LANG
 	assert lang_code in SUPPORTED_LANGS, lang_code
-	TARGET_LANG = lang_code
+	thread_globals.TARGET_LANG = lang_code
 	### print('===', "TARGET_LANG:", TARGET_LANG, '===')
 
 def get_target_lang():
-	return TARGET_LANG
+	try:
+		return thread_globals.TARGET_LANG
+	except AttributeError:
+		return DEFAULT_LANG
 
 
 def tr(word_en, case='nomn'):
 	""" Перевод на русский язык, если TARGET_LANG=="ru" """
+	TARGET_LANG = get_target_lang()
 	if TARGET_LANG == "en":
 		return (
 			str(word_en).lower()
@@ -38,8 +45,8 @@ def tr(word_en, case='nomn'):
 				.replace("cond", 'condition')   # 'condition of'
 				.lstrip()
 		)
-	if TARGET_LANG != "ru":
-		raise ValueError("TARGET_LANG variable must contain one of {%s}, but has `%s`" % (str(SUPPORTED_LANGS), TARGET_LANG))
+	# if TARGET_LANG != "ru":
+	# 	raise ValueError("TARGET_LANG variable must contain one of {%s}, but has `%s`" % (str(SUPPORTED_LANGS), TARGET_LANG))
 
 	grammemes = ('nomn','gent')
 	assert case in grammemes, "Unknown case: "+case
@@ -2272,7 +2279,7 @@ if __name__ == "__main__":
 					set_target_lang(lang)
 					print("Switched to language `%s`." % lang)
 				else:
-					print("Warning: invalid content of language-target file `%s` (one of %s is expected). Defaulting to `%s`." % (speak_lang_file,str(SUPPORTED_LANGS),TARGET_LANG))
+					print("Warning: invalid content of language-target file `%s` (one of %s is expected). Defaulting to `%s`." % (speak_lang_file,str(SUPPORTED_LANGS),DEFAULT_LANG))
 
 
 		if os.path.exists(input_alg_file):

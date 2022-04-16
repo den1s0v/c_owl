@@ -5,6 +5,17 @@ import os
 from timeit import default_timer as timer
 
 
+class jsObj(dict):
+    'JS-object-like dict (access to "foo": obj.foo as well as obj["foo"])'
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+
+# >>> d = jsObj()
+# >>> d.ax = '123'
+# >>> d
+    # {'ax': '123'}
+
+
 class Checkpointer():  # dict
     'Measures time between hits. Requires the `from timeit import default_timer as timer`'
     def __init__(self, start=True):
