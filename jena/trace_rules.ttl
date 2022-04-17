@@ -733,6 +733,11 @@
 	(?a my:student_corresponding_end ?b),
 	(?a my:student_parent_of ?child_act),
 	(?child_act rdf:type my:TooEarlyInSequence),
+#	guard: seq was finished not by interrupting
+	(?prev_act my:student_next ?b),
+	(?prev_act my:executes ?bnd_p),
+	noValue(?bnd_p, my:interrupt_origin),
+
 #	print("SequenceFinishedTooEarly-init1", ?b),
 	 ->
 #	 find which children acts were executed till the end of seq
@@ -747,6 +752,11 @@
 
 	(?a my:student_corresponding_end ?b),
 	(?b rdf:type my:Erroneous),
+#	guard: seq was finished not by interrupting
+	(?prev_act my:student_next ?b),
+	(?prev_act my:executes ?bnd_p),
+	noValue(?bnd_p, my:interrupt_origin),
+
 #	print("SequenceFinishedTooEarly-init2", ?b),
 	 ->
 #	 find which children acts were executed till the end of seq
@@ -785,21 +795,14 @@
 	(?b my:executes ?seq_e), (?seq_e my:boundary_of ?seq),
 	(?seq rdf:type my:sequence),
 
-	(?st_b my:consequent ?seq_e),
-	(?st_b my:boundary_of ?st),
-
 	(?a my:student_next ?b),
+	(?a my:executes ?bnd_b), (?bnd_b my:boundary_of ?sa),
 
-#	# fails because `executes_id -> executes` did not run yet
-#	# noValue(?a my:executes ?st_b),
-	(?a my:executes ?bnd), (?bnd my:boundary_of ?sa),
-		(?st my:id ?id1),
-		(?sa my:id ?id2),
-		notEqual(?id1, ?id2),
+#	what is before is not linked to end of seq
+	noValue(?bnd_b my:consequent ?seq_e),
 
 	(?seq my:stmt_name ?a_name),
 	 ->
-
 #	print("noValue? ", ?a, " - my:executes - ", ?st_b),
 	 (?b my:should_be_after ?st),
 	 (?b rdf:type my:SequenceFinishedNotInOrder),
