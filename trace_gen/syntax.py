@@ -349,7 +349,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 						"&nbsp;" * 2,
 						_make_alg_tag(None, 'comment',
 							inner=SYNTAX["COMMENT"](name))
-					];
+					]
 				else:
 					# Python case: emulate with `WHILE(TRUE): IF(): BREAK`.
 					header_line["content"] += ['==Python не поддерживает DO-WHILE==']
@@ -427,6 +427,6 @@ if __name__ == '__main__':
 	# print(__doc__)
 
 	from pprint import pprint
-	html_tags = prepare_tags_for_line("условие не_зелёный выполнилось 1-й раз - истина")
-	pprint(html_tags)
-	print(to_html(html_tags))
+	# html_tags = prepare_tags_for_line("условие не_зелёный выполнилось 1-й раз - истина")
+	# pprint(html_tags)
+	# print(to_html(html_tags))

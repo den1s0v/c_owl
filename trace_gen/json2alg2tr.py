@@ -273,7 +273,7 @@ class JsonVisitor(object):
 		if hasattr(obj_or_str, "accept"):
 			obj_or_str.accept(self)
 		else:
-			visit_fallback(obj_or_str)
+			self.visit_fallback(obj_or_str)
 		return self
 	def visit_fallback(self, obj_or_str):
 		"Called when an object cannot be visited normally"
