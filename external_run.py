@@ -398,7 +398,7 @@ def invoke_jena_reasoning_service(rdfData:bytes, rules_path=JENA_RULE_PATHS):
 	for _ in range(2):  # loop to retry
 		if need_create_process:
 			# invoke separate java process in non-blocking fasion, with shared stdout
-			cmd = f'{JAVA_PATH} -jar jena/Jena.jar service --port {JENA_SERVICE_PORT}'
+			cmd = f'{JAVA_PATH} -jar jena/Jena.jar service --port {JENA_SERVICE_PORT}'.split()
 			print("Starting java background service ...")
 			print("  command:  ", cmd)
 			_service_Process = psutil.Popen(cmd, stdout=sys.stderr)

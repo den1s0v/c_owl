@@ -1,5 +1,6 @@
 # jenaClient.py
 
+from time import sleep
 
 from jena.jenaService import JenaReasoner
 # from jenaService.ttypes import RDF_Graph
@@ -8,6 +9,9 @@ from thrift import Thrift
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
+
+
+RETRY_DELAY = 0.3  # seconds
 
 # make special exception type
 class ThriftConnectionException(RuntimeError):
@@ -73,6 +77,7 @@ class JenaClient:
                 print(f"Trift connection: cannot reconnect after {_retry_count} times!")
                 raise ThriftConnectionException(tx.message)
             try:
+                sleep(RETRY_DELAY)
                 print("Trift connection: trying to reconnect ...")
                 self.reconnect()
                 # run again
