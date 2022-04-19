@@ -58,3 +58,48 @@
 ]
 #	 halt_of is unnesessary here.
 
+
+
+###############################
+# propagate-skipped-act_ends
+###############################
+
+
+# add obvious end_act(s) next to last correct act (allowing skipping boring end acts)
+[Add-act-end-to-prev-to-last-act-if-valid:
+#	 this link is to be replaced:
+	(?a my:student_next ?b),
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd_a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
+#   acts aren't linked with consequent
+	noValue(?bnd_a my:consequent ?bnd_b),
+#   acts are in upcoming chain (i.e. `b` is a valid subsequence)
+	(?bnd_u my:boundary_of ?st_b),
+	(?bnd_a my:has_upcoming ?bnd_u),
+#   corrected bound isn't linked with consequent,
+#	so we still need inserting it.
+	noValue(?bnd_a my:consequent ?bnd_u),
+
+#   actual consequent of a is M (middle)
+	(?bnd_a my:consequent ?bnd_m),
+#   bnd_m is `end_of` or `halt_of`
+	noValue(?bnd_m, my:begin_of),
+
+#	create a middle act instance
+	makeNamedSkolem(?M, my:mid_act_end, ?a, ?bnd_m),
+
+#	make id for new act
+	(?a my:id ?a_id),
+	sum(?a_id, 1000, ?m_id)
+	 ->
+	 drop(0),
+#	 # reconnect acts via M
+	 (?a my:student_next ?M),
+	 (?M my:student_next ?b),
+	 (?M rdf:type my:act_end),
+	 (?M my:id ?m_id),
+	 (?M my:executes ?bnd_m),
+	 print("-> inject act", ?M, "after", ?a, "executes", ?bnd_m)
+]
+

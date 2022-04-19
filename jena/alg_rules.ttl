@@ -226,6 +226,9 @@
 
 	(?halt_bnd my:boundary_of ?inner_st),
 	(?st my:parent_of ?inner_st),
+# 	ensure that rdf:type has been assigned
+# 	just `action` is not enough here since `action` can be assigned via range of a connected property
+	(?st rdf:type ?stType), (?stType rdfs:subClassOf my:action),
 # 	not a loop
 	noValue(?st rdf:type my:loop),
 
@@ -236,6 +239,7 @@
 	 (?halt_bnd my:always_consequent ?E),
 	 (?halt_bnd my:Interrupted ?E),
 #	  R ??
+###	print(?halt_bnd, "-> h_brk ->", ?E)
 ]
 
 [connect_InterruptedTillBreak:
@@ -264,8 +268,13 @@
 	(?halt_bnd my:boundary_of ?inner_st),
 	(?st my:parent_of ?inner_st),
 	(?notL my:parent_of ?st),
+# 	ensure that rdf:type has been assigned
+# 	just `action` is not enough here since `action` can be assigned via range of a connected property
+	(?notL rdf:type ?notLtype), (?notLtype rdfs:subClassOf my:action),
+#	(?st   rdf:type my:action),
 # 	not a loop
 	noValue(?notL rdf:type my:loop),
+#	noValue(?st   rdf:type my:loop),
 
 	makeNamedSkolem(?E, my:h_con, ?st),
 	 ->
@@ -274,6 +283,7 @@
 	 (?halt_bnd my:always_consequent ?E),
 	 (?halt_bnd my:Interrupted ?E),
 #	  R ??
+###	print(?halt_bnd, "-> h_con ->", ?E, "action type:", ?notLtype)
 ]
 
 [connect_InterruptedTillContinue:

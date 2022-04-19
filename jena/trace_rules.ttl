@@ -273,13 +273,17 @@
 #	(?b my:executes ?by),
 	(?bx my:halt_of ?st_a),
 
+	(?bx my:consequent ?bn),
+	(?bn  my:boundary_of ?st_n),
+	(?st_n my:stmt_name ?name),
+
 	(?bx my:interrupt_origin ?o),
 	(?o  my:boundary_of ?st),
 	(?st rdf:type ?interrupt_class),
 	(?interrupt_class rdfs:label ?kind),
 	 ->
 	 (?b rdf:type my:TooEarlyWhenInterrupting),
-#	 (?b my:field_MISSING ?name),
+	 (?b my:field_MISSING ?name),
 	 (?b my:field_kind_of_action ?kind),
 ]
 
