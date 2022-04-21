@@ -98,8 +98,10 @@
 	 (?a my:student_next ?M),
 	 (?M my:student_next ?b),
 	 (?M rdf:type my:act_end),
+	 (?M rdf:type my:implicit_act),
 	 (?M my:id ?m_id),
 	 (?M my:executes ?bnd_m),
+#	 # TODO: remove debug print
 	 print("-> inject act", ?M, "after", ?a, "executes", ?bnd_m)
 ]
 

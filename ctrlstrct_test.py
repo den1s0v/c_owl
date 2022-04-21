@@ -14,8 +14,9 @@ import re
 import ctrlstrct_run
 
 from ctrlstrct_run import process_algtraces, TraceTester
-from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, get_ith_expr_value, find_by_key_in, find_by_keyval_in
+from explanations import _sort_linked_list
 from trace_gen.json2alg2tr import act_line_for_alg_element
+from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from onto_helpers import get_relation_object, delete_ontology
 import trace_gen.styling as styling
 
@@ -410,9 +411,38 @@ def add_styling_to_trace(algorithm_json, trace_json, user_language=None, comment
 def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=False, process_kwargs=dict(reasoning="jena", debug_rdf_fpath=None and 'test_data/ajax.rdf')) -> ('mistakes', 'error_message: str or None'):
 
 	try:
-		_onto, mistakes = process_algtraces(alg_trs_list, verbose=0, mistakes_as_objects=False, **process_kwargs)
+		onto, mistakes = process_algtraces(alg_trs_list, verbose=0, mistakes_as_objects=False, **process_kwargs)
 
-		delete_ontology(_onto)
+		if len(alg_trs_list) == 1:
+			### print("[] try to find automatically polyfilled acts ...")
+			# try to find automatically polyfilled acts & insert them into the trace
+			# apply simplest behaviour: skipped acts will be inserted to the previous-to-the-last position.
+			if implicit_acts := list(onto.implicit_act.instances()):
+				implicit_acts = _sort_linked_list(implicit_acts, next_prop=onto.student_next)
+				acts_count = len(implicit_acts)
+				print(acts_count, 'implicit_acts found!')
+
+				algorithm = alg_trs_list[0]["algorithm"]
+				# to be modified in-place (new acts will be inserted to prev. to the last)
+				mutable_trace = alg_trs_list[0]["trace"]
+
+				for imp_act in implicit_acts:
+					bound = imp_act.executes
+					st = bound.boundary_of
+					algorithm_element_id = st.id
+					if onto.act_end in imp_act.is_a:
+						act_type = "finished"
+					elif onto.act_begin in imp_act.is_a:
+						act_type = "started"
+					else:
+						raise ValueError("implict act has no begin/end type!: %s" % imp_act)
+					apended_trace = make_act_json(algorithm_json=algorithm, algorithm_element_id=algorithm_element_id, act_type=act_type, existing_trace_json=mutable_trace[:-1], user_language=None)
+					assert len(apended_trace) >= 2, apended_trace
+					mutable_trace.insert(-1, apended_trace[-1])
+					### print("+++ inserted act:", apended_trace[-1])
+				# end for
+
+		delete_ontology(onto)
 
 		# from pprint import pprint
 		# pprint(mistakes)

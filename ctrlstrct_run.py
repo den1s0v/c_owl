@@ -926,6 +926,10 @@ def init_persistent_structure(onto):
         class trace(act_begin): pass
         # -->
         class act_end(act): pass
+        # -->
+        class implicit_act(act):
+            'act that skipped by student but added instead by rules'
+            pass
         # # -->
         # class student_act(act): pass
         # -->

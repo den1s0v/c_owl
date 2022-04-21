@@ -165,7 +165,7 @@ def create_app():
 				    "algorithm"     : algorithm_json,
 				    "header_boolean_chain" : '',   # leave empty
 				}
-				# update acts data (inplace): write mistake explanations
+				# update acts data (inplace): write mistake explanations and (possibly) augment full_trace with explicit acts
 				_mistakes, err_msg = process_algorithms_and_traces([alg_tr], write_mistakes_to_acts=True)
 
 				assert not err_msg, err_msg
