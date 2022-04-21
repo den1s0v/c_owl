@@ -65,8 +65,8 @@
 ###############################
 
 
-# add obvious end_act(s) next to last correct act (allowing skipping boring end acts)
-[Add-act-end-to-prev-to-last-act-if-valid:
+# add obvious end_act(s) next to last correct act `a` (allowing skipping boring "end" acts)
+[Add-act-end-to-prev_to_last_act-if-valid:
 #	 this link is to be replaced:
 	(?a my:student_next ?b),
 	(?a rdf:type my:act_end),
@@ -86,17 +86,32 @@
 #   bnd_m is `end_of` or `halt_of`
 	noValue(?bnd_m, my:begin_of),
 
+	 ->
+	 drop(0),
+#	 # setup a task for instanse creation
+	 (?a my:__student_next ?b)
+	 (?a my:_insert_act_executing ?bnd_m)
+	 print("+++ prepare injection after", ?a, "that executes", ?bnd_m)
+]
+
+
+[Insert-act-in-between:
+#	 this link is to be replaced with two links:
+	(?a my:__student_next ?b),
+#	 this temporary link is to be removed:
+	(?a my:_insert_act_executing ?bnd_m),
+
 #	create a middle act instance
-	makeNamedSkolem(?M, my:mid_act_end, ?a, ?bnd_m),
+	makeNamedSkolem(?M, my:mid_act, ?a, ?bnd_m),
 
 #	make id for new act
 	(?a my:id ?a_id),
 	sum(?a_id, 1000, ?m_id)
 	 ->
 	 drop(0),
+	 drop(1),
 #	 # reconnect acts via M
-	 (?a my:student_next ?M),
-	 (?M my:student_next ?b),
+	 (?a my:student_next ?M), (?M my:student_next ?b),
 	 (?M rdf:type my:act_end),
 	 (?M rdf:type my:implicit_act),
 	 (?M my:id ?m_id),
