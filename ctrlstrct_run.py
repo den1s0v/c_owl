@@ -150,6 +150,7 @@ class TraceTester():
                 yield None
 
         self.last_cond_tuple = (-1, False)
+        self.consequent_mode = "normal"  # other values: "return", "break", "continue"
 
         self._maxID = max(self._maxID, max(map(int, self.id2obj.keys())) + 10)
 
@@ -239,6 +240,10 @@ class TraceTester():
                 for body_node in node["body"]["body"]:
                     make_correct_trace_for_alg_node(body_node)
 
+                if self.consequent_mode != "normal":
+                    # return encountered
+                    self.consequent_mode = "normal"
+
                 phase = "finished"
                 ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
                 result.append({
@@ -269,6 +274,8 @@ class TraceTester():
 
                 for body_node in node["body"]:
                     make_correct_trace_for_alg_node(body_node)
+                    if self.consequent_mode != "normal":
+                        break
 
                 # do not wrap 'global_code'
                 if node["name"] != 'global_code':
@@ -302,6 +309,8 @@ class TraceTester():
                     make_correct_trace_for_alg_node(branch)
                     if self.last_cond_tuple[1] == True:
                         break
+                    if self.consequent_mode != "normal":
+                        break
 
                 phase = "finished"
                 ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
@@ -333,6 +342,8 @@ class TraceTester():
 
                     for body_node in node["body"]:
                         make_correct_trace_for_alg_node(body_node)
+                        if self.consequent_mode != "normal":
+                            break
 
                     phase = "finished"
                     ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
@@ -376,8 +387,10 @@ class TraceTester():
                       # "comment": None,
                 })
                 if node["type"] in {"break", "continue", "return"}:
+                    self.consequent_mode = node["type"]
                     return  # just stupidly stop current sequence
 
+            # TODO: keep list of loop classes up-to-date
             if node["type"] in {"while_loop", "do_while_loop", "do_until_loop", "for_loop", "foreach_loop", "infinite_loop", }:
 
                 phase = "started"
@@ -415,6 +428,17 @@ class TraceTester():
                         # итерация цикла!
                         make_correct_trace_for_alg_node(node["body"])
                         # как обрабатывать break из цикла?
+                        if self.consequent_mode == "continue":
+                            # reset mode
+                            self.consequent_mode = "normal"
+                        elif self.consequent_mode == "break":
+                            # reset mode
+                            self.consequent_mode = "normal"
+                            return
+                        elif self.consequent_mode != "normal":
+                            # return encountered
+                            return
+
 
                         if node["type"] in {"for_loop"}:
                             make_correct_trace_for_alg_node(node["update"])
