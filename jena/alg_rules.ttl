@@ -163,6 +163,16 @@
 ]
 
 
+[always_consequent-in-outside-of-atomic-action-to-collapse_bound:
+
+	(?a my:always_consequent ?b),
+#	not the inner consequent of an atomic_action
+	       (?a my:boundary_of ?st),
+	noValue(?b my:boundary_of ?st),
+	 -> (?a my:collapse_bound ?b)
+]
+
+
 
 ##################################
 # break and continue and return

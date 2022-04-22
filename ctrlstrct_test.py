@@ -14,7 +14,6 @@ import re
 import ctrlstrct_run
 
 from ctrlstrct_run import process_algtraces, TraceTester
-from explanations import _sort_linked_list
 from trace_gen.json2alg2tr import act_line_for_alg_element
 from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from onto_helpers import get_relation_object, delete_ontology
@@ -418,7 +417,7 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 			# try to find automatically polyfilled acts & insert them into the trace
 			# apply simplest behaviour: skipped acts will be inserted to the previous-to-the-last position.
 			if implicit_acts := list(onto.implicit_act.instances()):
-				implicit_acts = _sort_linked_list(implicit_acts, next_prop=onto.student_next)
+				implicit_acts.sort(key=lambda a: a.id)
 				acts_count = len(implicit_acts)
 				print(acts_count, 'implicit_acts found, inserting them into trace.')
 

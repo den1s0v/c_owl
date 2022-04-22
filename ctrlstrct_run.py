@@ -1009,6 +1009,9 @@ def init_persistent_structure(onto):
         # окрестность - ближайшее будущее, до условия
         class has_upcoming(boundary >> boundary, TransitiveProperty): pass
 
+        # последовательные границы одного вида (начало или завершение => end_of или halt_of)
+        class collapse_bound(boundary >> boundary, TransitiveProperty): pass
+
         # class interrupting_consequent(consequent): pass
         # + subclasses
         class normal_consequent(consequent): pass

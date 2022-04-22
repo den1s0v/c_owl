@@ -28,7 +28,7 @@
 	noValue(?bnd_a my:consequent ?bnd_b),
 #   acts are in upcoming chain (i.e. `b` is a valid subsequence)
 	(?bnd_u my:boundary_of ?st_b),
-	(?bnd_a my:has_upcoming ?bnd_u),
+	(?bnd_a my:collapse_bound ?bnd_u),
 #   corrected bound (b -> u) isn't linked with consequent,
 #	so we still need inserting it.
 	noValue(?bnd_a my:consequent ?bnd_u),
@@ -49,7 +49,7 @@
 
 
 # add obvious act_begin(s) next to last correct act `a` (allowing skipping boring "begin" acts)
-[Add-act-end-to-prev_to_last_act-if-valid:
+[Add-act-begin-to-prev_to_last_act-if-valid:
 #	 this link is to be replaced:
 	(?a my:student_next ?b),
 	(?b rdf:type my:act_begin),
@@ -59,7 +59,7 @@
 	noValue(?bnd_a my:consequent ?bnd_b),
 #   acts are in upcoming chain (i.e. `b` is a valid subsequence)
 	(?bnd_u my:boundary_of ?st_b),
-	(?bnd_a my:has_upcoming ?bnd_u),
+	(?bnd_a my:collapse_bound ?bnd_u),
 #   corrected bound (b -> u) isn't linked with consequent,
 #	so we still need inserting it.
 	noValue(?bnd_a my:consequent ?bnd_u),
@@ -91,12 +91,12 @@
 #   actual consequent of a is M (middle)
 	(?bnd_a my:on_true_consequent ?bnd_m),
 #   acts are in upcoming chain (i.e. `b` is a valid subsequence)
-	(?bnd_u my:boundary_of ?st_b),
-	(?bnd_m my:has_upcoming ?bnd_u),
+	(?bnd_m my:collapse_bound ?bnd_b),
 #   corrected bound (b -> u) isn't linked with consequent,
 #	so we still need inserting it.
-	noValue(?bnd_a my:consequent ?bnd_u),
+	noValue(?bnd_a my:consequent ?bnd_b),
 
+#	only for loops with "direct" meaning of its true/false condition
 ###   bnd_m is `end_of` or `halt_of`
 ##	noValue(?bnd_m, my:begin_of),
 #   bnd_m is `begin_of` <-- after TRUE
@@ -125,11 +125,12 @@
 	(?bnd_a my:on_false_consequent ?bnd_m),
 #   acts are in upcoming chain (i.e. `b` is a valid subsequence)
 	(?bnd_u my:boundary_of ?st_b),
-	(?bnd_m my:has_upcoming ?bnd_u),
+	(?bnd_m my:collapse_bound ?bnd_u),
 #   corrected bound (b -> u) isn't linked with consequent,
 #	so we still need inserting it.
 	noValue(?bnd_a my:consequent ?bnd_u),
 
+#	only for loops with "direct" meaning of its true/false condition
 #   bnd_m is `end_of` or `halt_of`
 	noValue(?bnd_m, my:begin_of),
 ###   bnd_m is `begin_of` <-- after TRUE
