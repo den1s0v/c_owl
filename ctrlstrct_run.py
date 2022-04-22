@@ -1514,7 +1514,7 @@ def extact_mistakes(onto, as_objects=False, group_by=("text_line",), filter_by_l
 
     for error_class in categories:
         # The .instances() class method can be used to iterate through all Instances of a Class (including its subclasses). It returns a generator.
-        for inst in error_class.instances():
+        for inst in set(error_class.instances()):
 
             ###
             print("Erroneous instance:", inst.name)

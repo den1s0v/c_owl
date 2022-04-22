@@ -232,8 +232,7 @@ def format_by_spec(format_str: str, **params: dict):
 
 	if not format_str.endswith('.') and not format_str.endswith('?'):
 		format_str += '.'
-	###
-	print('*', format_str)
+	### print('*', format_str)
 
 	return format_str
 	# return 'cannot format it...'

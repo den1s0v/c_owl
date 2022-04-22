@@ -96,12 +96,6 @@
 #	so we still need inserting it.
 	noValue(?bnd_a my:consequent ?bnd_b),
 
-#	only for loops with "direct" meaning of its true/false condition
-###   bnd_m is `end_of` or `halt_of`
-##	noValue(?bnd_m, my:begin_of),
-#   bnd_m is `begin_of` <-- after TRUE
-	(?bnd_m my:begin_of ?some_st),
-
 	 ->
 	 drop(0),
 #	 # setup a task for instanse creation
@@ -129,12 +123,6 @@
 #   corrected bound (b -> u) isn't linked with consequent,
 #	so we still need inserting it.
 	noValue(?bnd_a my:consequent ?bnd_u),
-
-#	only for loops with "direct" meaning of its true/false condition
-#   bnd_m is `end_of` or `halt_of`
-	noValue(?bnd_m, my:begin_of),
-###   bnd_m is `begin_of` <-- after TRUE
-##	(?bnd_m my:begin_of ?some_st),
 
 	 ->
 	 drop(0),
