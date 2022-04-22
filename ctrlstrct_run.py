@@ -910,8 +910,10 @@ def init_persistent_structure(onto):
         # Статические определения
 
         # skos:Concept
-        class Concept(Thing):
-            namespace = skos
+        # class Concept(Thing):
+        #     namespace = skos
+        # use shortcut instead of adding unnecessary class
+        Concept = Thing
 
         # class related_to_concept(DatatypeProperty): pass
 
@@ -926,6 +928,10 @@ def init_persistent_structure(onto):
         class trace(act_begin): pass
         # -->
         class act_end(act): pass
+        # -->
+        class implicit_act(act):
+            'act that skipped by student but added instead by rules'
+            pass
         # # -->
         # class student_act(act): pass
         # -->
@@ -1126,6 +1132,8 @@ def init_persistent_structure(onto):
         # новое свойство student_next
         types.new_class("student_next", (act >> Thing, ))
         types.new_class("student_next_latest", (act >> act, onto.student_next))
+
+        types.new_class("_insert_act_executing", (act >> boundary, ))
 
         # новое свойство next_sibling -- связывает акты, соседние по номеру раза выполнения (причём, начальные и конечные акты - раздельно)
         next_sibling = types.new_class("next_sibling", (Thing >> Thing, ))

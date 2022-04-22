@@ -40,7 +40,7 @@ _WATCHING_THREAD = None
 
 # Jena service daemon process
 JENA_SERVICE_PORT = 20299
-JENA_RULE_PATHS = "jena/alg_rules.ttl;jena/relink_acts.ttl;jena/trace_rules.ttl"
+JENA_RULE_PATHS = "jena/alg_rules.ttl;jena/relink_acts.ttl;jena/unskip_acts.ttl;jena/trace_rules.ttl"
 _service_Process = None
 _client_Manager = None
 

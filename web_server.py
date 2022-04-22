@@ -165,7 +165,7 @@ def create_app():
 				    "algorithm"     : algorithm_json,
 				    "header_boolean_chain" : '',   # leave empty
 				}
-				# update acts data (inplace): write mistake explanations
+				# update acts data (inplace): write mistake explanations and (possibly) augment full_trace with explicit acts
 				_mistakes, err_msg = process_algorithms_and_traces([alg_tr], write_mistakes_to_acts=True)
 
 				assert not err_msg, err_msg
@@ -238,9 +238,9 @@ def process_algorithm_and_trace_as_text_request(json):
 	assert "trace" in json
 
 	# should create var on first execution
-	if '__LINE_IDNEX_RE' not in globals():
-		global __LINE_IDNEX_RE
-		__LINE_IDNEX_RE = re.compile(r"(line|строк\w+)\s*(\d+)")
+	if '__LINE_INDEX_RE' not in globals():
+		global __LINE_INDEX_RE
+		__LINE_INDEX_RE = re.compile(r"(line|строк\w+)\s*(\d+)")
 
 	alg_text = json["alg"].strip()
 	trace_text = json["trace"].strip()
@@ -283,7 +283,7 @@ user_alg {boolean_chain}user_trace
 
 	def convert_line_index_in_str(s):
 		if "line" in s or "строк" in s:
-			res = __LINE_IDNEX_RE.sub(lambda m: f"{m.group(1)} {convert_line_index(int(m.group(2)))}", s)
+			res = __LINE_INDEX_RE.sub(lambda m: f"{m.group(1)} {convert_line_index(int(m.group(2)))}", s)
 			print("Replaced line index: ", s, "->", res)
 			s = res
 		return s
