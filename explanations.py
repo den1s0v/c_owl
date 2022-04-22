@@ -270,26 +270,6 @@ def class_formatstr(*args):
 		"en": format_str_en,
 	}
 
-def _sort_linked_list(array, next_prop: "transitive onto.prop"):
-	def cmp_to_key(prop_name):
-		'Convert a cmp= function into a key= function'
-		class K:
-			def __init__(self, obj, *_):
-				self.obj = obj
-			def __lt__(self, other):
-				return getattr(self.obj, prop_name).__contains__(other.obj)
-			def __gt__(self, other):
-				return getattr(other.obj, prop_name).__contains__(self.obj)
-			def __eq__(self, other):
-				return self.obj == other.obj
-			__le__ = __lt__
-			__ge__ = __gt__
-			def __ne__(self, other):
-				return self.obj != other.obj
-		return K
-
-	array.sort(key=cmp_to_key(next_prop.name))
-	return array
 
 
 def named_fields_param_provider(a: 'act_instance'):
