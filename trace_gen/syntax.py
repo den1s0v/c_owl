@@ -57,6 +57,9 @@ COMPLEX_NODE_STATES = ('started', 'finished')
 COMPLEX_NODE_STARTED = ('started', )
 COMPLEX_NODE_FINISHED = ('finished', )
 
+# Make begin & end buttons of complex acts look a little transparent
+COMPLEX_ACTION_BUTTONS_DIMMING = True
+
 
 BUTTON_TIP_FREFIX = {
 	"ru": {
@@ -151,6 +154,8 @@ def _make_alg_button(alg_node_id, act_name, state_name, allow_states=None) -> li
 		state_name = list(allow_states)[0]
 
 	state_tip = _get_act_button_tip(act_name, state_name)
+	icon_name = "play" if state_name != "finished" else "stop"
+	icon_role = "disabled" if COMPLEX_ACTION_BUTTONS_DIMMING and state_name != "performed" else ""
 	return [
 		{
 			"tag": "span",
@@ -167,7 +172,7 @@ def _make_alg_button(alg_node_id, act_name, state_name, allow_states=None) -> li
 			"content": [{
 				"tag": "i",
 				"attributes": {
-					"class": ["play" if state_name != "finished" else "stop", "small icon"],
+					"class": [icon_name, icon_role, "small icon"],
 				},
 				"content": ''
 			},
