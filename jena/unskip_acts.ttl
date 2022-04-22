@@ -1,0 +1,177 @@
+# unskip_acts.ttl
+# Restore acts in trace that have been skipped by a student
+# stage 2.2  (after alg_rules and before trace_rules)
+
+@prefix  rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+# @prefix  rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+#
+# # An important RDF rules subset
+# @include <jena/rdfs4core.rules>.
+
+@prefix my: <http://vstu.ru/poas/code#> .
+
+
+###############################
+# propagate-skipped-act_ends
+###############################
+
+
+# add obvious end_act(s) next to last correct act `a` (allowing skipping boring "end" acts)
+[Add-act-end-to-prev_to_last_act-if-valid:
+#	 this link is to be replaced:
+	(?a my:student_next ?b),
+	(?a rdf:type my:act_end),
+	(?a my:executes ?bnd_a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
+#   acts aren't linked with consequent
+	noValue(?bnd_a my:consequent ?bnd_b),
+#   acts are in upcoming chain (i.e. `b` is a valid subsequence)
+	(?bnd_u my:boundary_of ?st_b),
+	(?bnd_a my:has_upcoming ?bnd_u),
+#   corrected bound (b -> u) isn't linked with consequent,
+#	so we still need inserting it.
+	noValue(?bnd_a my:consequent ?bnd_u),
+
+#   actual consequent of a is M (middle)
+	(?bnd_a my:consequent ?bnd_m),
+#   bnd_m is `end_of` or `halt_of`
+	noValue(?bnd_m, my:begin_of),
+
+	 ->
+	 drop(0),
+#	 # setup a task for instanse creation
+	 (?a my:__student_next ?b)
+	 (?a my:_insert_act_executing ?bnd_m)
+	 (?a my:_insert_act_type my:act_end)
+	 print("+++ prepare injection of [end] after", ?a, "that executes", ?bnd_m)
+]
+
+
+# add obvious act_begin(s) next to last correct act `a` (allowing skipping boring "begin" acts)
+[Add-act-end-to-prev_to_last_act-if-valid:
+#	 this link is to be replaced:
+	(?a my:student_next ?b),
+	(?b rdf:type my:act_begin),
+	(?a my:executes ?bnd_a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
+#   acts aren't linked with consequent
+	noValue(?bnd_a my:consequent ?bnd_b),
+#   acts are in upcoming chain (i.e. `b` is a valid subsequence)
+	(?bnd_u my:boundary_of ?st_b),
+	(?bnd_a my:has_upcoming ?bnd_u),
+#   corrected bound (b -> u) isn't linked with consequent,
+#	so we still need inserting it.
+	noValue(?bnd_a my:consequent ?bnd_u),
+
+#   actual consequent of a is M (middle)
+	(?bnd_a my:consequent ?bnd_m),
+#   bnd_m is `begin_of`
+	(?bnd_m my:begin_of ?some_st),
+
+	 ->
+	 drop(0),
+#	 # setup a task for instanse creation
+	 (?a my:__student_next ?b)
+	 (?a my:_insert_act_executing ?bnd_m)
+	 (?a my:_insert_act_type my:act_begin)
+	 print("+++ prepare injection of [begin] after", ?a, "that executes", ?bnd_m)
+]
+
+# add obvious consequent to end of condition (allowing skipping boring "begin of branch/body" acts)
+[Add-act-on-true-if-valid:
+#	 this link is to be replaced:
+	(?a my:student_next ?b),
+	(?a rdf:type my:act_end),
+	(?a my:expr_value "true"^^xsd:boolean),
+	(?a my:executes ?bnd_a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
+#   acts aren't linked with consequent
+	noValue(?bnd_a my:consequent ?bnd_b),
+#   actual consequent of a is M (middle)
+	(?bnd_a my:on_true_consequent ?bnd_m),
+#   acts are in upcoming chain (i.e. `b` is a valid subsequence)
+	(?bnd_u my:boundary_of ?st_b),
+	(?bnd_m my:has_upcoming ?bnd_u),
+#   corrected bound (b -> u) isn't linked with consequent,
+#	so we still need inserting it.
+	noValue(?bnd_a my:consequent ?bnd_u),
+
+###   bnd_m is `end_of` or `halt_of`
+##	noValue(?bnd_m, my:begin_of),
+#   bnd_m is `begin_of` <-- after TRUE
+	(?bnd_m my:begin_of ?some_st),
+
+	 ->
+	 drop(0),
+#	 # setup a task for instanse creation
+	 (?a my:__student_next ?b)
+	 (?a my:_insert_act_executing ?bnd_m)
+	 (?a my:_insert_act_type my:act_begin)
+	 print("+++ prepare injection [on true] after", ?a, "that executes", ?bnd_m)
+]
+
+# add obvious consequent to end of condition (allowing skipping boring "end of loop/selection" acts)
+[Add-act-on-false-if-valid:
+#	 this link is to be replaced:
+	(?a my:student_next ?b),
+	(?a rdf:type my:act_end),
+	(?a my:expr_value "false"^^xsd:boolean),
+	(?a my:executes ?bnd_a),
+	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
+#   acts aren't linked with consequent
+	noValue(?bnd_a my:consequent ?bnd_b),
+#   actual consequent of a is M (middle)
+	(?bnd_a my:on_false_consequent ?bnd_m),
+#   acts are in upcoming chain (i.e. `b` is a valid subsequence)
+	(?bnd_u my:boundary_of ?st_b),
+	(?bnd_m my:has_upcoming ?bnd_u),
+#   corrected bound (b -> u) isn't linked with consequent,
+#	so we still need inserting it.
+	noValue(?bnd_a my:consequent ?bnd_u),
+
+#   bnd_m is `end_of` or `halt_of`
+	noValue(?bnd_m, my:begin_of),
+###   bnd_m is `begin_of` <-- after TRUE
+##	(?bnd_m my:begin_of ?some_st),
+
+	 ->
+	 drop(0),
+#	 # setup a task for instanse creation
+	 (?a my:__student_next ?b)
+	 (?a my:_insert_act_executing ?bnd_m)
+	 (?a my:_insert_act_type my:act_end)
+	 print("+++ prepare injection [on false] after", ?a, "that executes", ?bnd_m)
+]
+
+
+
+
+[Insert-act-in-between:
+#	 this link is to be replaced with two links:
+	(?a my:__student_next ?b),
+#	 this temporary links are to be removed:
+	(?a my:_insert_act_executing ?bnd_m),
+	(?a my:_insert_act_type ?act_type)
+
+#	create a middle act instance
+	makeNamedSkolem(?M, ?act_type, ?a, ?bnd_m),
+##	makeNamedSkolem(?M, my:mid_act, ?a, ?bnd_m),
+
+#	make id for new act
+	(?a my:id ?a_id),
+	sum(?a_id, 1000, ?m_id)
+	 ->
+	 drop(0),
+	 drop(1), drop(2),
+#	 # reconnect acts via M
+	 (?a my:student_next ?M), (?M my:student_next ?b),
+	 (?M rdf:type ?act_type),
+	 (?M rdf:type my:implicit_act),
+	 (?M my:id ?m_id),
+	 (?M my:executes ?bnd_m),
+#	 # TODO: remove debug print
+	 print("-> inject act", ?M, "that executes", ?bnd_m)
+	 print("             ", "after", ?a, "and before", ?b)
+]
+

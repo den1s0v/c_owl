@@ -1131,6 +1131,8 @@ def init_persistent_structure(onto):
         types.new_class("student_next", (act >> Thing, ))
         types.new_class("student_next_latest", (act >> act, onto.student_next))
 
+        types.new_class("_insert_act_executing", (act >> boundary, ))
+
         # новое свойство next_sibling -- связывает акты, соседние по номеру раза выполнения (причём, начальные и конечные акты - раздельно)
         next_sibling = types.new_class("next_sibling", (Thing >> Thing, ))
 

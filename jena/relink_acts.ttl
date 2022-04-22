@@ -1,5 +1,5 @@
 # relink_acts.ttl
-# stage 2  (after alg_rules and before trace_rules)
+# stage 2.1  (after alg_rules and before trace_rules)
 
 @prefix  rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -59,64 +59,4 @@
 #	 halt_of is unnesessary here.
 
 
-
-###############################
-# propagate-skipped-act_ends
-###############################
-
-
-# add obvious end_act(s) next to last correct act `a` (allowing skipping boring "end" acts)
-[Add-act-end-to-prev_to_last_act-if-valid:
-#	 this link is to be replaced:
-	(?a my:student_next ?b),
-	(?a rdf:type my:act_end),
-	(?a my:executes ?bnd_a),
-	(?b my:executes ?bnd_b), (?bnd_b my:boundary_of ?st_b),
-#   acts aren't linked with consequent
-	noValue(?bnd_a my:consequent ?bnd_b),
-#   acts are in upcoming chain (i.e. `b` is a valid subsequence)
-	(?bnd_u my:boundary_of ?st_b),
-	(?bnd_a my:has_upcoming ?bnd_u),
-#   corrected bound isn't linked with consequent,
-#	so we still need inserting it.
-	noValue(?bnd_a my:consequent ?bnd_u),
-
-#   actual consequent of a is M (middle)
-	(?bnd_a my:consequent ?bnd_m),
-#   bnd_m is `end_of` or `halt_of`
-	noValue(?bnd_m, my:begin_of),
-
-	 ->
-	 drop(0),
-#	 # setup a task for instanse creation
-	 (?a my:__student_next ?b)
-	 (?a my:_insert_act_executing ?bnd_m)
-	 print("+++ prepare injection after", ?a, "that executes", ?bnd_m)
-]
-
-
-[Insert-act-in-between:
-#	 this link is to be replaced with two links:
-	(?a my:__student_next ?b),
-#	 this temporary link is to be removed:
-	(?a my:_insert_act_executing ?bnd_m),
-
-#	create a middle act instance
-	makeNamedSkolem(?M, my:mid_act, ?a, ?bnd_m),
-
-#	make id for new act
-	(?a my:id ?a_id),
-	sum(?a_id, 1000, ?m_id)
-	 ->
-	 drop(0),
-	 drop(1),
-#	 # reconnect acts via M
-	 (?a my:student_next ?M), (?M my:student_next ?b),
-	 (?M rdf:type my:act_end),
-	 (?M rdf:type my:implicit_act),
-	 (?M my:id ?m_id),
-	 (?M my:executes ?bnd_m),
-#	 # TODO: remove debug print
-	 print("-> inject act", ?M, "after", ?a, "executes", ?bnd_m)
-]
 
