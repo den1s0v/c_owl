@@ -910,8 +910,10 @@ def init_persistent_structure(onto):
         # Статические определения
 
         # skos:Concept
-        class Concept(Thing):
-            namespace = skos
+        # class Concept(Thing):
+        #     namespace = skos
+        # use shortcut instead of adding unnecessary class
+        Concept = Thing
 
         # class related_to_concept(DatatypeProperty): pass
 

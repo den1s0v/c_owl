@@ -420,7 +420,7 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 			if implicit_acts := list(onto.implicit_act.instances()):
 				implicit_acts = _sort_linked_list(implicit_acts, next_prop=onto.student_next)
 				acts_count = len(implicit_acts)
-				print(acts_count, 'implicit_acts found!')
+				print(acts_count, 'implicit_acts found, inserting them into trace.')
 
 				algorithm = alg_trs_list[0]["algorithm"]
 				# to be modified in-place (new acts will be inserted to prev. to the last)
@@ -428,7 +428,9 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 
 				for imp_act in implicit_acts:
 					bound = imp_act.executes
+					assert bound
 					st = bound.boundary_of
+					assert st
 					algorithm_element_id = st.id
 					if onto.act_end in imp_act.is_a:
 						act_type = "finished"
