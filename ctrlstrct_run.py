@@ -27,6 +27,10 @@ onto_path.append(".")
 # ONTOLOGY_maxID = 1
 ONTOLOGY_IRI = 'http://vstu.ru/poas/code'
 
+# options to not to save the parts of ontology while doing reasoning
+WRITE_INVOLVES_CONCEPT = False
+WRITE_PRINCIPAL_VIOLATION = False
+
 def prepare_name(s):
     """Transliterate given word is needed"""
     return slugify(s, "ru") or s
@@ -1379,8 +1383,9 @@ def init_persistent_structure(onto):
                     bases = tuple((onto[base_name] if type(base_name) is str else base_name) for base_name in base_names)
                     # print(bases)
                     created_class = types.new_class(class_name, bases or (Erroneous,))
-                    related_concepts = class_spec[3]
-                    created_class.involves_concept = list(map(onto.__getattr__, sorted(related_concepts)))
+                    if WRITE_INVOLVES_CONCEPT:
+                        related_concepts = class_spec[3]
+                        created_class.involves_concept = list(map(onto.__getattr__, sorted(related_concepts)))
 
                     ## if len(class_spec) >= 3:
                     ##     category = class_spec[2]
@@ -1451,7 +1456,7 @@ def init_persistent_structure(onto):
                 bases = tuple((onto[base_name] if type(base_name) is str else base_name) for base_name in [base_names] if base_name)
                 # print(bases)
                 created_class = types.new_class(class_name, bases or (always_consequent,))
-                if len(class_spec) >= 3:
+                if WRITE_PRINCIPAL_VIOLATION and len(class_spec) >= 3:
                     violations = class_spec[2]
                     created_class.principal_violation = list(map(onto.__getattr__, violations))
 
@@ -1824,6 +1829,10 @@ def find_by_type(dict_or_list, types=(dict,), _not_entry=None):
 
 
 def save_schema(file_path='jena/control-flow-statements-domain-schema.rdf'):
+    global WRITE_INVOLVES_CONCEPT
+    global WRITE_PRINCIPAL_VIOLATION
+    WRITE_INVOLVES_CONCEPT = True
+    WRITE_PRINCIPAL_VIOLATION = True
     create_ontology_tbox().save(file_path)
 
     print("Saved as:\t", file_path)
