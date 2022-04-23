@@ -988,6 +988,14 @@ def init_persistent_structure(onto):
         # class statement_begin(Thing): pass
         # class statement_end  (Thing): pass
 
+        # annotation `act_class`
+        class act_class(AnnotationProperty):
+            '''boundary_of property class -> act_begin or act_end'''
+            pass
+        begin_of.act_class = act_begin
+        end_of  .act_class = act_end
+        halt_of .act_class = act_end
+
         # hide so far
         # class hide_boundaries(action):
         #     """tells a complex action no to show (to skip) begin/end acts in not-collapsed mode."""

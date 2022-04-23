@@ -412,7 +412,7 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 	try:
 		onto, mistakes = process_algtraces(alg_trs_list, verbose=0, mistakes_as_objects=False, **process_kwargs)
 
-		if len(alg_trs_list) == 1:
+		if not mistakes and len(alg_trs_list) == 1:
 			### print("[] try to find automatically polyfilled acts ...")
 			# try to find automatically polyfilled acts & insert them into the trace
 			# apply simplest behaviour: skipped acts will be inserted to the previous-to-the-last position.
@@ -463,7 +463,7 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 					act_obj["mistakes"] = mistake
 					act_obj["is_valid"] = False
 					if 'value' in act_obj:
-						print(" ***** Reset act value.")
+						print(" ***** Reset expr evaluation value.")
 						act_obj["value"] = "not evaluated"
 						# del act_obj["value"]
 						alg_data = alg_trs_list[0]['algorithm']

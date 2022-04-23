@@ -9,6 +9,10 @@
 # # An important RDF rules subset
 # @include <jena/rdfs4core.rules>.
 
+# include rule `Redirect-normal-end-to-interrupted-end`
+# to handle ther need in changing the bound of target act (?b)
+@include <jena/relink_acts.ttl>.
+
 @prefix my: <http://vstu.ru/poas/code#> .
 
 
@@ -43,7 +47,6 @@
 #	 # setup a task for instanse creation
 	 (?a my:__student_next ?b)
 	 (?a my:_insert_act_executing ?bnd_m)
-	 (?a my:_insert_act_type my:act_end)
 ##	 print("+++ prepare injection of [end] after", ?a, "that executes", ?bnd_m)
 ]
 
@@ -74,7 +77,6 @@
 #	 # setup a task for instanse creation
 	 (?a my:__student_next ?b)
 	 (?a my:_insert_act_executing ?bnd_m)
-	 (?a my:_insert_act_type my:act_begin)
 ##	 print("+++ prepare injection of [begin] after", ?a, "that executes", ?bnd_m)
 ]
 
@@ -101,7 +103,6 @@
 #	 # setup a task for instanse creation
 	 (?a my:__student_next ?b)
 	 (?a my:_insert_act_executing ?bnd_m)
-	 (?a my:_insert_act_type my:act_begin)
 ##	 print("+++ prepare injection [on true] after", ?a, "that executes", ?bnd_m)
 ]
 
@@ -129,7 +130,6 @@
 #	 # setup a task for instanse creation
 	 (?a my:__student_next ?b)
 	 (?a my:_insert_act_executing ?bnd_m)
-	 (?a my:_insert_act_type my:act_end)
 ##	 print("+++ prepare injection [on false] after", ?a, "that executes", ?bnd_m)
 ]
 
@@ -137,30 +137,46 @@
 
 
 [Insert-act-in-between:
-#	 this link is to be replaced with two links:
+#	 this link is to be replaced with a couple of links:
 	(?a my:__student_next ?b),
 #	 this temporary links are to be removed:
 	(?a my:_insert_act_executing ?bnd_m),
-	(?a my:_insert_act_type ?act_type)
+
+#	 index of b is to be updated:
+###	(?b my:student_index ?ib_0),
+
+#	extract act_type from given boundary
+	(?bnd_m my:boundary_of ?st_m),
+	(?bnd_m ?prop ?st_m), (?prop my:act_class ?act_type),
 
 #	create a middle act instance
 	makeNamedSkolem(?M, ?act_type, ?a, ?bnd_m),
-##	makeNamedSkolem(?M, my:mid_act, ?a, ?bnd_m),
 
 #	make id for new act
 	(?a my:id ?a_id),
-	sum(?a_id, 1000, ?m_id)
+	sum(?a_id, 1000, ?m_id),
+
+#	calc new values for student_index
+	(?a my:student_index ?ia),
+	sum(?ia, 1, ?im),
+###	sum(?ia, 2, ?ib),
+
 	 ->
 	 drop(0),
-	 drop(1), drop(2),
+	 drop(1),
+###	 drop(2),
 #	 # reconnect acts via M
 	 (?a my:student_next ?M), (?M my:student_next ?b),
 	 (?M rdf:type ?act_type),
 	 (?M rdf:type my:implicit_act),
 	 (?M my:id ?m_id),
 	 (?M my:executes ?bnd_m),
+#	 # set student_index
+	 (?M my:student_index ?im),
+#	  jena fails to set this (ends up with infinite loop)!
+###	 (?b my:student_index ?ib),
 #	 # TODO: remove debug print
-##	 print("-> inject act", ?M, "that executes", ?bnd_m)
+##	 print("-> inject act", ?M, "that executes", ?bnd_m, "indices:", ?im, ?ib),
 ##	 print("             ", "after", ?a, "and before", ?b)
 ]
 
