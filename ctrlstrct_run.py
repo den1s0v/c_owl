@@ -959,7 +959,12 @@ def init_persistent_structure(onto):
         # -->
         class implicit_act(act):
             'act that skipped by student but added instead by rules'
-            pass
+
+        class fihish_trace_act(act):
+            '''class that marks an act;
+            if an act with this class present,
+            the trace can be automatically closed with "program ended".'''
+
         # # -->
         # class student_act(act): pass
         # -->
@@ -1138,7 +1143,7 @@ def init_persistent_structure(onto):
             types.new_class(class_name, (action, ))  ### hide_boundaries
 
         for class_name in [
-            "return", "break", "continue",  # have `interrupt_target`
+            "return", "break", "continue",  # have optional `interrupt_target`
         ]:
             cls = types.new_class(class_name, (onto['interrupt_action'], ))
             # add annotation name: rdfs:label

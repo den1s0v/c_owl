@@ -443,6 +443,33 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 					### print("+++ inserted act:", apended_trace[-1])
 				# end for
 
+			if fihish_trace_acts := list(onto.fihish_trace_act.instances()):
+				# fihish_trace_act exists => finish the trace.
+
+				print('fihish_trace_act found, closing the trace.')
+				act = fihish_trace_acts[0]
+
+				algorithm = alg_trs_list[0]["algorithm"]
+				# to be modified in-place (new acts will be inserted to prev. to the last)
+				mutable_trace = alg_trs_list[0]["trace"]
+
+				bound = act.executes
+				assert bound
+				end_of_trace_bound = bound.consequent[0]
+				assert end_of_trace_bound
+				st = end_of_trace_bound.boundary_of
+				assert st
+
+				algorithm_element_id = st.id
+				act_type = "finished"
+
+				apended_trace = make_act_json(algorithm_json=algorithm, algorithm_element_id=algorithm_element_id, act_type=act_type, existing_trace_json=mutable_trace[:], user_language=None)
+				assert len(apended_trace) >= 2, apended_trace
+				mutable_trace.append(apended_trace[-1])
+				###
+				print("+=+ inserted closing act:", apended_trace[-1]["as_string"])
+
+
 		delete_ontology(onto)
 
 		# from pprint import pprint
