@@ -551,7 +551,7 @@ class TraceTester():
                     written_ids.add(id_)
 
                 type_ = d.get("type")
-                name  = d.get("name", "")
+                name  = d.get("name", None) or d.get("stmt_name", "")
 
                 assert type_, "Error: No 'type' in agrorithm object: " + str(d)
 
