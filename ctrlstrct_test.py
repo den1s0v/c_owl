@@ -886,6 +886,15 @@ def test_algorithm_to_tags():
 		file.write(to_html(tags))
 
 
+def make_question_dict_for_alg_json(alg_json, algorithm_name='generated'):
+	import export2json
+	import json
+	onto = ctrlstrct_run.create_ontology_tbox()
+	alg_tr = dict(algorithm=alg_json, algorithm_name=algorithm_name)
+	q_dict = export2json.export_algtr2dict(alg_tr, onto)
+	return q_dict
+
+
 def test_algorithm_to_triples(inspect_questions_via_dot=False, mistakes_via_grid=False):
 
 	print("SPECIAL MODE: algorithm_to_triples (saving questions to JSON)")

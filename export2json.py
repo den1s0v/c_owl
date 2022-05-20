@@ -19,12 +19,15 @@ USER_SYNTAX = 'C'
 if USER_LANGUAGE == 'ru':
 	from jena.rusify import replace_in_text as translate_en2ru
 
+# some global setup, once imported from somewhere else
 syntax.set_allow_hidden_buttons(False)
-# for buttons "data-tooltip" to translate correctly
-syntax.set_force_button_tooltips_in_english(True)
+
+# # for buttons "data-tooltip" to translate correctly
+# syntax.set_force_button_tooltips_in_english(True)
 
 
 def export_algtr2dict(alg_tr, onto):
+	'onto: modifiable ontology containing schema (TBox)'
 	ctrlstrct_run.clear_ontology(onto, keep_tbox=True)
 	ctrlstrct_run.algorithm_only_to_onto(alg_tr, onto)
 
@@ -174,7 +177,10 @@ def export_algtr2dict(alg_tr, onto):
 		for obj_dict in find_by_keyval_in("id", ind.id, alg_data):
 			break
 		### print(obj_dict)
-		action_title = obj_dict["act_name"]["en"]  # "en" should not be changed here
+		act_name = obj_dict["act_name"]
+		if isinstance(act_name, dict):
+			act_name = act_name["en"]  # "en" should not be changed here
+		action_title = act_name
 		# note: all one-click actions should be listed here! (TODO: add if introduced in future)
 		if (onto.expr in ind.is_a or
 			onto.stmt in ind.is_a or
@@ -243,7 +249,7 @@ def export_algtr2dict(alg_tr, onto):
 		],
 		"tags": [  # ????
 		  "C++",
-		  *concepts,
+		  # *concepts,
 		  # "basics",
 		  # "operators",
 		  # "order",
@@ -322,7 +328,10 @@ def _match_against_features(key: str, features: list) -> bool:
 def read_mistakes_map():
 	S = '\t'  # separator
 	mistakes_mapping = {}
-	with open('jena/mistakes-map.txt') as f:
+	import os, os.path
+	_dir_path = os.path.dirname(os.path.realpath(__file__))  # dir of current .py file
+	filepath = os.path.join(_dir_path, 'jena/mistakes-map.txt')
+	with open(filepath) as f:
 		for i, line in enumerate(f.readlines()):
 			if i == 0: continue
 			if i == 1:

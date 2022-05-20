@@ -30,6 +30,7 @@ ONTOLOGY_IRI = 'http://vstu.ru/poas/code'
 # options to not to save the parts of ontology while doing reasoning
 WRITE_INVOLVES_CONCEPT = False
 WRITE_PRINCIPAL_VIOLATION = False
+WRITE_SKOS_CONCEPT = False
 
 def prepare_name(s):
     """Transliterate given word is needed"""
@@ -109,6 +110,10 @@ class TraceTester():
                 del self.id2obj[k]
 
         data = self.data["algorithm"]  # data to repair
+
+        if "functions" not in data:
+            data["functions"] = ()
+
         roots = data["global_code"], data["functions"]  # where actual data to be stored
 
         # referers = data["entry_point"], data["id2obj"]  # these should only refer to some nodes within roots.
@@ -553,7 +558,7 @@ class TraceTester():
                 type_ = d.get("type")
                 name  = d.get("name", None) or d.get("stmt_name", "")
 
-                assert type_, "Error: No 'type' in agrorithm object: " + str(d)
+                assert type_, "Error: No 'type' in algorithm object: " + str(d)
 
                 id_        = int(id_)
                 clean_name = prepare_name(name)
@@ -937,11 +942,13 @@ def init_persistent_structure(onto):
     with onto:
         # Статические определения
 
-        # skos:Concept
-        # class Concept(Thing):
-        #     namespace = skos
-        # use shortcut instead of adding unnecessary class
-        Concept = Thing
+        if WRITE_SKOS_CONCEPT:
+            # skos:Concept
+            class Concept(Thing):
+                namespace = skos
+        else:
+            # use shortcut instead of adding unnecessary class
+            Concept = Thing
 
         # class related_to_concept(DatatypeProperty): pass
 
@@ -1836,8 +1843,10 @@ def find_by_type(dict_or_list, types=(dict,), _not_entry=None):
 def save_schema(file_path='jena/control-flow-statements-domain-schema.rdf'):
     global WRITE_INVOLVES_CONCEPT
     global WRITE_PRINCIPAL_VIOLATION
+    global WRITE_SKOS_CONCEPT
     WRITE_INVOLVES_CONCEPT = True
     WRITE_PRINCIPAL_VIOLATION = True
+    WRITE_SKOS_CONCEPT = True
     create_ontology_tbox().save(file_path)
 
     print("Saved as:\t", file_path)

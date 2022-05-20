@@ -30,14 +30,14 @@ class Checkpointer():  # dict
         now = timer()
         delta = now - self.last
         if label:
-            print((label or 'Checkpoint') + ':', "%.3f" % delta, 's')
+            print((label or 'Checkpoint') + ':', "%.4f" % delta, 's')
         self.last = now
         return delta
     def since_start(self, label=None, hit=False) -> float:
         now = timer()
         delta = now - self.first
         if label:
-            print(label or 'Total:', "%.3f" % delta, 's')
+            print(label or 'Total:', "%.4f" % delta, 's')
         if hit:
             self.last = now
         return delta
