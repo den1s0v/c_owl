@@ -15,6 +15,9 @@ from pprint import pprint
 USER_LANGUAGE = 'ru'
 USER_SYNTAX = 'C'
 
+QUESTION_NAME_PREFIX = ''  # default: change nothing
+# QUESTION_NAME_PREFIX = '[human]'  # mark manual questions
+
 
 if USER_LANGUAGE == 'ru':
 	from jena.rusify import replace_in_text as translate_en2ru
@@ -232,6 +235,7 @@ def export_algtr2dict(alg_tr, onto):
 		"questionData": {
 		  "questionType": "ORDER",
 		  "questionDomainType": "OrderActs",
+		  "questionName": QUESTION_NAME_PREFIX + alg_tr["algorithm_name"],
 		  "questionText": question_html,
 		  "areAnswersRequireContext": False,
 		  "options": {
