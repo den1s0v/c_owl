@@ -967,7 +967,7 @@ def init_persistent_structure(onto):
         class implicit_act(act):
             'act that skipped by student but added instead by rules'
 
-        class fihish_trace_act(act):
+        class finish_trace_act(act):
             '''class that marks an act;
             if an act with this class present,
             the trace can be automatically closed with "program ended".'''

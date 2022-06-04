@@ -16,6 +16,7 @@ test_data/*.rdf
 *report*
 *dbg*
 *.ipynb
+*.iml
 
 trace_gen/*out*.*
 trace_gen/*test*.*
