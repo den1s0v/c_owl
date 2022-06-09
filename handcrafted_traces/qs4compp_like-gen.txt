@@ -1,0 +1,776 @@
+// questions
+
+
+// алгоритм seq1 (следование из 1 действия)
+{
+    free(array)
+}
+
+// seq1 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм seq2 (следование из 2 действий)
+{
+    free(a…y->e…s->d…a->p…r)
+    free(array)
+}
+
+// seq2 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм seq3 (следование из 3 действий)
+{
+    free(hash->keys)
+    free(hash->values)
+    free(hash)
+}
+
+// seq3 - (2)
+// трасса  категории ошибок: SeqA_contains_B IS_containment
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм seq5 (следование из 5 действий)
+{
+    num = scanf("%d")
+    result = num + num + 1
+    result += 9
+    result = (int)(result / 2) - num
+    assert_five(result)
+}
+
+// seq5 - (2)
+// трасса  категории ошибок: SeqA_contains_B IS_containment
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+
+// алгоритм alt_11 (развилка по_цвету с 2+1 ветками)
+{
+if (col == 0) -> 1 // A1
+    _set(BLACK)
+else if (col < 256) -> 1
+    _set(RED)
+else
+    _set(GREEN)
+}
+
+// alt_11 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+
+// алгоритм alt_i1 (развилка по_цвету с 1 веткой)
+{
+if (col == 0) -> 1 // A1
+    _set(BLACK)
+}
+
+// alt_i1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iaa1 (развилка по_цвету с 1 веткой)
+{
+if (!_is_empty(array)) -> 1 // A1
+    free(array->elements)
+    free(array)
+}
+
+// alt_iaa1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_i0 (развилка по_цвету с 1 веткой)
+{
+if (_is_empty(array)) -> 0 // A1
+    free(array)
+}
+
+// alt_i0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+// алгоритм alt_ie1 (развилка по_цвету с 2 ветками)
+{
+if (dif > 0) -> 1 // A1
+    sign = 1
+else
+    sign = -1
+}
+
+// alt_ie1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм alt_ii (развилка по_цвету с 2 уровнями вложенности)
+{
+if (_Char >= 'A') -> 1 // A1
+	if (_Char <= 'Z') -> 1 // A2
+		_add(_Char)
+}
+
+// alt_ii 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iiaa (развилка по_цвету с 2 уровнями вложенности)
+{
+if (_Char >= 'A') -> 1 // A1
+	if (_Char <= 'Z') -> 1 // A2
+		_Char -= 32
+		result = _Char
+}
+
+// alt_iiaa 11 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм alt_iii_111 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (node != NULL) -> 1 // A1
+	if (node->right != NULL) -> 1 // A3
+		if (node->right->left != NULL) -> 1 // A5
+			printf(node->right->left->value)
+}
+
+// alt_iii_111 111 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм alt_iiiaa_110 (развилка по_цвету с 2 уровнями вложенности)
+{
+if (node != NULL) -> 1 // A7
+	if (node->right != NULL) -> 1 // A5
+		if (node->left != NULL) -> 0 // A7
+			sum = node->right->value + node->left->value
+			node->value = sum
+}
+
+// alt_iiiaa_110 110 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм alt_iei_c_1
+{
+if (z % 2 == 1) -> 1 // A4
+    result = z - 1
+else if (z % 3 == 2)
+    result = z - 2
+}
+
+// alt_iei_c_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+// алгоритм alt_ieie_c_1
+{
+if (z % 2 == 1) -> 1 // A6
+    result = z - 1
+else if (z % 3 == 2) -> 0
+    result = z - 2
+else
+    result = z
+}
+
+// alt_ieie_c_1 1 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм alt_ieix7e_c_00
+{
+if (c == RED) -> 0 // A14
+    color_choice(RED)
+else if (c == ORANGE) -> 0
+    color_choice(ORANGE)
+else if (c == YELLOW) -> 0
+    color_choice(YELLOW)
+else if (c == GREEN) -> 0
+    color_choice(GREEN)
+else if (c == BLUE) -> 0
+    color_choice(BLUE)
+else if (c == INDIGO) -> 0
+    color_choice(INDIGO)
+else if (c == VIOLET) -> 0
+    color_choice(VIOLET)
+else
+    color_choice(UNKNOWN)
+}
+
+// alt_ieix7e_c_00 00 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+
+// алгоритм while_0
+{
+while (node->right) -> 0 // L5
+    node = node->right
+leaf = node->value
+leaf->flag = 1
+}
+
+// while 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм while_2_0
+{
+while (data != EOF) -> 0 // L6
+	buffer->add(data)
+    data = _read(1)
+int length = buffer->size()
+}
+
+// while_2_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм while_while_0
+{
+while (queue.size()) -> 0 // L8
+    _set_active_task(queue.queue_pop())
+	while (!locked(_context))  // L5
+		lock(_context)
+unlock(_context)
+}
+
+
+// while_while_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм while_while_aa_1100
+{
+while (queue.size()) -> 10 // L9
+    _set_active_task(queue.queue_pop())
+	while (!locked(_context)) -> 10  // L6
+		lock(_context)
+		signal_send(READY)
+unlock(_context)
+}
+
+// while_while_aa_1100 1100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм do_0
+{
+do   // L5
+    data = read_bytes(h_file, 10)
+    date = make_date(data)
+while date == NULL  -> 0
+}
+// do_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм do2_10
+{
+do   // L5
+	если (red) -> 1  // A3
+		wait()
+	иначе если (yellow) -> 0
+		get_ready()
+while not_green  -> 0
+}
+// do2_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+
+// алгоритм do2ie_10
+{
+do   // L7
+	если (a > b) -> 1  // A6
+		a = a % b
+	иначе
+		b = b % a
+while (a > 0 && b > 0)  -> 0
+}
+// do2ie_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+// алгоритм wiei_1010
+{
+node = trie->root
+пока (node != NULL) -> 1,0  // L8
+	если (node->use_count == 0) -> 0  // A6
+		node = NULL
+	иначе если (next->prev != NULL) -> 1
+		next_node = &node->next[*p]
+node = next_node
+}
+
+// wiei_1010 1010 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм wie_100
+{
+node = trie->root
+пока (node != NULL) -> 1,0  // L7
+	если (node->use_count == 0) -> 0  // A5
+		node = NULL
+	иначе
+		next_node = &node->next
+node = next_node
+}
+
+// wie_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм do_then_w_100
+{
+do   // L4
+    record = array.pop()
+    valid = record.is_valid()
+while (!valid)  -> 10
+пока (record.getDate().year < 2015) -> 0  // L9
+	record.getDate().addYears(1)
+record.update()
+}
+// do_then_w_100 100 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// алгоритм ido_ewh_10
+{
+if (target == 1) -> 1 // A1
+	do   // L6
+		summ += mode >> w & 0x01
+		w = w + 1
+	while (mode >> w > 0) -> 0
+	result = summ
+else
+	пока (mode >> w > 0) -> 10  // L12
+		summ += !(mode >> w & 0x01)
+		w = w + 1
+	result = summ
+}
+// ido_ewh_10 10 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+// алгоритм ido_eiwh_e_0
+{
+if (mode > 0) -> 0  // A1
+	if (target == 1) -> 0 // A3
+		do   // L8
+			summ += mode >> w & 0x01
+			w = w + 1
+		while (mode >> w > 0) -> 0
+		result = summ
+	else if (target == 0) -> 0
+		пока (mode >> w > 0) -> 0  // L15
+			summ += !(mode >> w & 0x01)
+			w = w + 1
+		result = summ
+	else
+		result = 0
+}
+// ido_eiwh_e_0 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// Вопросы из бнака вопросов edu.vstu > ОП(1)
+// Категория:  Какие строки программы выполнятся (7)
+// http://edu.vstu.ru/question/edit.php?courseid=64&category=2230%2C3298&qbshowtext=0&recurse=0&recurse=1&showhidden=0
+// Пример вопроса оттуда:
+// http://edu.vstu.ru/question/preview.php?id=25535&courseid=64
+
+// алгоритм which_line_1
+{
+	if ( x > 3 )  // A1
+	{
+		if ( x >= 6 )  // A4
+			x += 3;
+	}
+	else
+	  if ( x > 8 )  // A8
+		x /= 3;
+	x *= 2;
+}
+// which_line_1 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм which_line_11
+{
+	if (x > 3 && x < -3)  // A2
+	{
+		c ++;
+		if (x > 1 && x < 6)  // A5
+			x += 3;
+	}
+	else
+		x %= 2;
+	x += 7;
+}
+// which_line_11 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм which_line_12
+{
+	if (x < 100 || x > 20)  // A1
+		x += 2;
+	else
+		x ++;
+	if ((x /= 6) && (x %= 6))  // A5
+	{
+		if ( !x )
+			x *= 5;
+	}
+	y ++;
+}
+// which_line_12 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм which_line_13
+{
+	if ( !x == 0 )  // A2
+	{
+		a ++;
+		if ( ! (x > 3 || x < -6))  // A5
+			x --;
+	}
+	else
+	{
+		if ( x == 16 )  // A10
+			a = 0;
+	}
+}
+// which_line_13 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм which_line_7
+{
+	if (x > 3 && x = 7)  // A1
+		x +=7;
+	if (x % 3 == 2)  // A5
+		x ++;
+	else
+		x -= 1;
+	x --;
+}
+// which_line_7 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм which_line_8
+{
+	if (x > 3 && x == 6)  // A2
+		x += 7;
+	if (x % 3 == 2)  // A4
+		x ++;
+	else
+		x -= 1;
+	x --;
+}
+// which_line_8 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм which_line_9
+{
+	if (x > 3 && x < 11)  // A2
+		x ++;
+	if (x < 25)  // A4
+		b = x;
+	else
+		x *= 2;
+	if (x % 4)  // A8
+		x /= 3;
+}
+// which_line_9 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+// Контроль. Время жизни переменной (15)
+
+// алгоритм 2_vlozhennyh_usloviia
+{
+    int c = 7;
+    if (c > 0) // A3
+    {
+        printf("Message %d", с);
+        int a = 4;
+        if (c + 3 < 100) // A12
+        {
+             printf("Message %d", a); 
+        }
+    }
+}
+// 2_vlozhennyh_usloviia 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм v_konce_if_est_peremennaia
+{
+    int c = rand();
+    if (rand() > 1000) // A1
+    {
+        c += rand();
+        printf("%d", c);
+        int a = rand();
+        printf("%d %d", a, c);
+    }
+    printf("%d", c);
+}
+// v_konce_if_est_peremennaia 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм var_in_while_header_dies
+{
+    while(int a = 1)  // L1
+    {
+        printf("%d", a--);
+        break;
+    }
+}
+// var_in_while_header_dies 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм var_in_doWhile
+{
+    do  // L1
+        int a = 0;
+        printf("%d", a); 
+        ++a;
+    while(rand() > 1000);
+}
+// var_in_doWhile 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм var_in_while_dies
+{
+    while(rand() > 1000)  // L1
+    {
+         int а = 5; 
+         printf("%d", a);
+    }
+}
+// var_in_while_dies 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// алгоритм var_before_dowhile
+{
+    int count = 0;
+    do  // L1
+        printf("%d", rand());
+    while (count != 0);
+}
+// var_before_dowhile 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+// Категория: Тренировка. Область видимости переменной (6)
+
+// алгоритм var_in_if_with_else
+{
+    int c = 0;
+    if (int a = 1)   // A4
+         а += 10;
+    else
+        c += 10
+}
+// var_in_if_with_else 0 трасса
+{
+началась программа
+закончилась программа
+}
+
+
+
+
