@@ -402,8 +402,8 @@ class AlgorithmParser:
             # while my-cond-2   -> 101 // my-while-2
             m = re.match(r"""
                 (?:while|пока)
-                \s+
-                (\(.+\)|\S+)    # 1 cond_name
+                \s*
+                (\(.+\)|\s\S+)    # 1 cond_name
                 (?:
                     \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
@@ -448,8 +448,8 @@ class AlgorithmParser:
             m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", current_line, re.I)
             m2 = e+1 < len(line_list)  and  re.match(r"""
                 (?:while|пока)
-                \s+
-                (\(.+\)|\S+)  # 1 cond_name
+                \s*
+                (\(.+\)|\s\S+) ;?  # 1 cond_name
                 (?:
                     \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
@@ -492,8 +492,8 @@ class AlgorithmParser:
             m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", current_line, re.I)
             m2 = e+1 < len(line_list)  and  re.match(r"""
                 (?:until|до)
-                \s+
-                (\(.+\)|\S+)  # 1 cond_name
+                \s*
+                (\(.+\)|\s\S+) ;?  # 1 cond_name
                 (?:
                     \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
@@ -623,18 +623,18 @@ class AlgorithmParser:
 
 
             # break / continue / return [<value>]
-            m = re.match(r"(break|continue|return)\s*(.*)$", current_line, re.I)
+            m = re.match(r"(break|continue|return)\s*(.*);?\s*$", current_line, re.I)
             # if not m:
             #     if not suggest_corrections and re.search('[a-z]+', current_line, re.I): suggest_corrections.append(
             #         'some_action: function call(...), or variable = assignment, or VAR++/VAR--, or `cin >> ...` / `cout << ...`')
             #     elif not suggest_corrections and re.search('[а-яё]+', current_line, re.I): suggest_corrections.append(
             #         'действие: вызов(...) функции, или присваивание переменной = ..., или VAR++/VAR--, или `cin >> ...` / `cout << ...`')
             if m:
-                kind  = m.group(1)
+                kind  = m.group(1).lower()
                 if self.verbose: print(kind)
                 value = m.group(2).replace('  ', ' ').strip()
                 special_params = {}
-                if kind.lower() == 'return':
+                if kind == 'return':
                     special_params['return_expr'] = value  # can be empty
                 elif value:
                     special_params['interrupt_target_name'] = value
@@ -649,7 +649,7 @@ class AlgorithmParser:
 
 
             # одно слово - имя действия: "бежать"
-            m = re.match(r"(\S+|\w.*(?:\(.*\)|=.|>>.|<<.|\+\+|--).*)$", current_line, re.I)
+            m = re.match(r"(\S+|\w.*(?:\(.*\)|=.|>>.|<<.|\+\+|--).*);?\s*$", current_line, re.I)
             if not m:
                 if not suggest_corrections and re.search('[a-z]+', current_line, re.I): suggest_corrections.append(
                     'some_action: function call(...), or variable = assignment, or VAR++/VAR--, or `cin >> ...` / `cout << ...`')
@@ -657,7 +657,7 @@ class AlgorithmParser:
                     'действие: вызов(...) функции, или присваивание переменной = ..., или VAR++/VAR--, или `cin >> ...` / `cout << ...`')
             if m:
                 if self.verbose: print("action")
-                name = m.group(1).replace('  ', ' ')
+                name = m.group(1).replace('  ', ' ').rstrip(';')
                 result.append( self.parse_stmt(name) )
                 ci = e + 1
                 continue  # with next stmt on current level
