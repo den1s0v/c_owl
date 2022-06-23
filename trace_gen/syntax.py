@@ -63,9 +63,12 @@ COMPLEX_ACTION_BUTTONS_DIMMING = True
 
 BUTTON_TIP_FREFIX = {
 	"ru": {
-		'performed': 'Выполнить',
-		'started': 'Начать',
-		'finished': 'Закончить',
+		'performed': 'Выполнится',
+		'started': 'Начнётся',
+		'finished': 'Закончится',
+		# 'performed': 'Выполнить',
+		# 'started': 'Начать',
+		# 'finished': 'Закончить',
 	},
 	"en": {
 		'performed': 'Perform',
@@ -143,8 +146,8 @@ def set_syntax(programming_language_name: str):
 
 def _get_act_button_tip(act_name, phase):
 	lang = get_target_lang() if not get_syntax().FORCE_BUTTON_TOOLTIPS_IN_ENGLISH else 'en'
-	act_name = act_name.get(lang, None) or act_name.get("en", "[action]")
-	return BUTTON_TIP_FREFIX[lang][phase] + " " + (act_name.replace("'", '"'))
+	name = act_name.get(lang, None) or act_name.get("en", "[action]") if isinstance(act_name, dict) else str(act_name)
+	return BUTTON_TIP_FREFIX[lang][phase] + " " + (name.replace("'", '"'))
 
 def _make_alg_button(alg_node_id, act_name, state_name, allow_states=None) -> list or tuple:
 	SYNTAX = get_syntax()
@@ -155,7 +158,7 @@ def _make_alg_button(alg_node_id, act_name, state_name, allow_states=None) -> li
 
 	state_tip = _get_act_button_tip(act_name, state_name)
 	icon_name = "play" if state_name != "finished" else "stop"
-	icon_role = "disabled" if COMPLEX_ACTION_BUTTONS_DIMMING and state_name != "performed" else ""
+	# icon_role = "disabled" if COMPLEX_ACTION_BUTTONS_DIMMING and state_name != "performed" else ""
 	return [
 		{
 			"tag": "span",
@@ -172,7 +175,7 @@ def _make_alg_button(alg_node_id, act_name, state_name, allow_states=None) -> li
 			"content": [{
 				"tag": "i",
 				"attributes": {
-					"class": [icon_name, icon_role, "small icon"],
+					"class": [icon_name, "small icon"],  ### icon_role,
 				},
 				"content": ''
 			},
@@ -294,7 +297,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 			algorithm_json = algorithm_json["body"]
 
 		type_ = algorithm_json["type"]
-		name = algorithm_json["name"]
+		name = algorithm_json.get("name") or algorithm_json.get("stmt_name")
 
 		if type_ in ("expr", ):
 			return _make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)
