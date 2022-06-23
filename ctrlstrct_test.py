@@ -443,11 +443,11 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 					### print("+++ inserted act:", apended_trace[-1])
 				# end for
 
-			if fihish_trace_acts := list(onto.fihish_trace_act.instances()):
-				# fihish_trace_act exists => finish the trace.
+			if finish_trace_acts := list(onto.finish_trace_act.instances()):
+				# finish_trace_act exists => finish the trace.
 
-				print('fihish_trace_act found, closing the trace.')
-				act = fihish_trace_acts[0]
+				print('finish_trace_act found, closing the trace.')
+				act = finish_trace_acts[0]
 
 				algorithm = alg_trs_list[0]["algorithm"]
 				# to be modified in-place (new acts will be inserted to prev. to the last)

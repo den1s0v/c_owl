@@ -212,7 +212,7 @@ def create_app():
 			feedback = process_algorithm_and_trace_as_text_request(request.json)
 			return jsonify(feedback)
 		except Exception as ex:
-			raise ex
+			# raise ex
 			return dict(messages=[f"Error processing the request - {ex.__class__.__name__}: {str(ex)}"])
 
 	# @app.route('/process_as_json', methods=['POST'])
