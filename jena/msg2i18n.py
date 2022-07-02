@@ -1,5 +1,8 @@
 # msg2i18n.py
 
+"First-time conversion of localization file to different (Spring) format. Don't run again since the result files were modified."
+
+
 DIR = r'c:\D\Dev\YDev\CompPr\CompPrehension\src\main\resources\org\vstu\compprehension\models\businesslogic\domains' + "\\"
 
 MESSAGES_FILE = DIR + "control-flow-statements-domain-messages.txt"

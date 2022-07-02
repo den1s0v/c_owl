@@ -1776,6 +1776,10 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
 
         seconds = eval_stats['wall_time']
 
+    if debug_rdf_fpath:
+        onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
+        print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
+
     if on_done:
         on_done(seconds)
 
