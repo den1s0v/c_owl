@@ -277,6 +277,22 @@
 	 (?b my:field_kind_of_action ?kind),
 ]
 
+# Rule: IgnoreInterruptingFlow-Error [mistake]
+[
+	(?b rdf:type my:UnexpectedWhenInterrupting),
+	(?a my:student_next ?b),
+	(?a my:executes ?bx),
+	(?b my:executes ?by),
+# get "normal" end as b2
+	(?bx my:halt_of ?st_a),
+	(?b2 my:end_of ?st_a),
+	(?b2 my:has_upcoming ?by),
+	 ->
+	 (?b rdf:type my:IgnoreInterruptingFlow),
+##	 (?b my:field_MISSING ?name),
+#	 (?b my:field_kind_of_action ?kind),
+]
+
 # Rule: TooEarlyWhenInterrupting-Error [mistake]
 [
 	(?b rdf:type my:UpcomingNeighbour),

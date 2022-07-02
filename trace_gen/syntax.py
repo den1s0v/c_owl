@@ -57,8 +57,8 @@ COMPLEX_NODE_STATES = ('started', 'finished')
 COMPLEX_NODE_STARTED = ('started', )
 COMPLEX_NODE_FINISHED = ('finished', )
 
-# Make begin & end buttons of complex acts look a little transparent
-COMPLEX_ACTION_BUTTONS_DIMMING = True
+# # Make begin & end buttons of complex acts look a little transparent
+# COMPLEX_ACTION_BUTTONS_DIMMING = False
 
 
 BUTTON_TIP_FREFIX = {

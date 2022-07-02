@@ -1325,6 +1325,7 @@ def init_persistent_structure(onto):
                 # interrupted flow
                 ("UnexpectedWhenInterrupting", ["NotNeighbour", ], "extra", {'action'}), #
                 ("TooEarlyWhenInterrupting", ["UpcomingNeighbour", ], "missing", {'action'}), #
+                ("IgnoreInterruptingFlow", ["UnexpectedWhenInterrupting", ], "extra", {'action'}), #
 
                 # ("ExtraAct", ["WrongNext"]),
                 ("DuplicateOfAct", [], "extra", {'sequence'}),

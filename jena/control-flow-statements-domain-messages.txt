@@ -11,6 +11,8 @@ TooEarlyWhenInterrupting Пропуск-в-цепочке-прерывания	�
 
 UnexpectedWhenInterrupting Лишнее-в-цепочке-прерывания	Почему вы выполнили <EXTRA> ? Идёт прерывание действий по <kind_of_action>.	Why did you execute <EXTRA> ? Actions are currently being interrupted by <kind_of_action>.
 
+IgnoreInterruptingFlow Не-прервалолсь	Почему вы продолжили выполнение до <EXTRA> ? Идёт прерывание действий по <kind_of_action>.	Why did you go on to <EXTRA> ? Actions are currently being interrupted by <kind_of_action>.
+
 SKIP___MisplacedBefore Раньше-объемлющего-акта	<A> не может выполняться до начала <B>, потому что <A> входит в <B>.	<A> is a part of <B> so <A> can't be executed before <B> starts.
 		
 SKIP___MisplacedAfter Позже-объемлющего-акта	<B> не может выполняться после окончания <A>, потому что <B> входит в <A>.	<B> is a part of <A> so <B> can't be executed after <A> ends.
