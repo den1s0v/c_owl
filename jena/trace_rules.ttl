@@ -94,7 +94,7 @@
 ]
 
 
-[Mark-last-act-in-trace-as-fihish_trace_act:
+[Mark-last-act-in-trace-as-finish_trace_act:
 	(?Trace my:executes ?alg),
 	(?alg my:entry_point ?gc),
 	(?bnd_e my:boundary_of ?gc),
@@ -104,7 +104,7 @@
 	(?a my:executes ?bnd_a),
 	(?bnd_a my:always_consequent ?bnd_e),
 	 ->
-	 (?a rdf:type my:fihish_trace_act)
+	 (?a rdf:type my:finish_trace_act)
 ]
 
 
