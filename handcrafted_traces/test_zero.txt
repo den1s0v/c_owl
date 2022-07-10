@@ -42,7 +42,7 @@ while (not_green)  // waiting
 закончилась программа
 }
 
-// alg тест break
+// SKIP____alg тест break
 {
 началась программа
     начался цикл waiting 1-й раз
@@ -61,7 +61,7 @@ while (not_green)  // waiting
 закончилась программа
 }
 
-// alg тест return
+// SKIP____alg тест return
 {
 началась программа
     начался цикл waiting 1-й раз

@@ -895,7 +895,7 @@ def make_question_dict_for_alg_json(alg_json, algorithm_name='generated'):
 	return q_dict
 
 
-def test_algorithm_to_triples(inspect_questions_via_dot=False, mistakes_via_grid=False):
+def save_algorithms_to_questions_as_json(inspect_questions_via_dot=False, mistakes_via_grid=False):
 
 	print("SPECIAL MODE: algorithm_to_triples (saving questions to JSON)")
 
@@ -1061,10 +1061,10 @@ if __name__ == '__main__':
 		exit()
 		###
 
-	if 0:
+	if 1:
 		# test_make_act_line()
 		# test_algorithm_to_tags()
-		test_algorithm_to_triples(inspect_questions_via_dot=0, mistakes_via_grid=0)
+		save_algorithms_to_questions_as_json(inspect_questions_via_dot=0, mistakes_via_grid=0)
 		###
 		print()
 		print('Exit as in custom debug mode.')

@@ -377,6 +377,7 @@ STYLE_HEAD = '''<style type="text/css" media="screen">
 	span.warning { background-color: #ff9; }
 	span.error { background-color: #fdd; }
 	span.button { background-color: #add; }
+	span.alg_button { color: #111; }
 
 </style>
 '''

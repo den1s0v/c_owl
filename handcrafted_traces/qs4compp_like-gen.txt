@@ -1,7 +1,7 @@
 // questions
 
 
-// алгоритм seq1 (следование из 1 действия)
+// алгоритм SKIP__seq1 (следование из 1 действия)
 {
     free(array)
 }
@@ -363,11 +363,11 @@ while date == NULL  -> 0
 // алгоритм do2_10
 {
 do   // L5
-	если (red) -> 1  // A3
-		wait()
-	иначе если (yellow) -> 0
-		get_ready()
-while not_green  -> 0
+	если (*p != 0) -> 1  // A3
+		p++
+	иначе если (strlen(str) >= 256) -> 0
+		handle_long_string(str)
+while (isdigit(*p))  -> 0
 }
 // do2_10 10 трасса
 {
@@ -505,6 +505,33 @@ if (mode > 0) -> 0  // A1
 закончилась программа
 }
 
+
+// алгоритм return_if_red2_1001
+{
+while (signal != WM_CLOSE) -> 1 // L2
+{  
+	if (signal == WM_MOUSE_ENTER) -> 0  // A5
+	{  
+		notify(w->button_close)
+		return
+	}  
+	else if (w->has_focus()) -> 0
+	{  
+		prepareInputs()
+		continue
+	}  
+	else if (w->input4->isChanged()) -> 1
+	{  
+		updateFields()
+		break
+	}  
+}  
+}
+// return_if_red2_1001 1001 трасса
+{
+началась программа
+закончилась программа
+}
 
 
 // Вопросы из бнака вопросов edu.vstu > ОП(1)
@@ -772,5 +799,191 @@ if (mode > 0) -> 0  // A1
 }
 
 
+
+// Ф. Е.
+
+// алгоритм cm1
+{
+    begin = true;
+	while (x >= 3) ->0  // L1
+		if (begin)  // A1
+			x /=3;
+			begin = false;
+		else
+			x++;
+		x -= 2;
+}
+
+// cm1 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм cm2 
+{
+    n = 5;
+	s = a[n];
+	while (n != 0) -> 0 // L1
+		s = s * x + a[--n];
+	accept(s);
+}
+// cm2 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм cm3 
+{
+	elements = rows * cols;
+	if (elements / rows == cols && mtx->data = elements) // A1
+	{
+		mtx->rows = rows;
+		mtx->cols = cols;
+	}
+	else
+	{
+		mtx->data = ptr;
+		mtx->rows = 0;
+		mtx->cols = 0;
+	}
+}
+// cm3 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм cm4 
+{
+	isinsert = true;
+	elements = rows * cols;
+	if (elements / rows != cols) // A1
+		isinsert = false;
+	if (mtx < elements) // A2
+	{
+		bytes = elements * 4;	
+		data = mtx->data * bytes;
+		mtx->data = data;
+		mtx->rows = rows;
+		mtx->cols = cols;
+		isinsert = true;
+	}
+	else
+	{
+		mtx->rows = rows;
+		mtx->cols = cols;
+	}
+}
+
+// cm4 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+// алгоритм cm12
+{ 
+	if (a >= b && a >= c) // A1
+	{
+		if (a * a == b * b + c * c)  // A2
+			triangle = RightTriangle;
+	}
+	else if (b >= a && b >= c)
+	{
+		if (b * b == a * a + c * c)  // A3
+			triangle = RightTriangle;
+	}
+	else if (c * c == a * a + b * b)
+		triangle = RightTriangle;
+}
+// cm12 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+
+
+
+// алгоритм cm14
+{ 
+	if (x < 0)  // A1
+    {
+        xchek = x * -1;
+        fullx = int(xchek);
+        drobx = xchek - fullx;
+    }
+    else
+    {
+        xchek = x;
+        fullx = int(xchek);
+        drobx = xchek - fullx;
+    }
+}
+
+// cm14 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+// алгоритм cm15
+{ 
+	a = *(end - 2), b = *(end - 1);
+	do  // L1
+	{
+		c = *begin++;		
+		ba = b - a,
+		cb = c - b;
+		if (crossp(ba, cb) <= 0)  // A1
+			a = cross(c);
+		a = b;
+		b = c;
+	} 
+	while (begin != end) -> 0
+}
+
+// cm15 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
+
+
+// алгоритм cm19
+{ 
+	if (p1 != a0 && p1 !=b0 && p1 !=c)  // A1
+	{
+		b = d;
+		d = c;
+		f2 = f1;
+		c = a + s1(b-a);
+		f1 = f(c);
+	}
+	else
+	{
+		a = c;
+		c = d;
+		f1 = f2;
+		d = a + s2(b-a);
+		f2 = f(d);
+	}
+}
+
+// cm19 - (2) трасса 
+{
+началась программа
+закончилась программа
+}
 
 
