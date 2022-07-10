@@ -108,7 +108,7 @@ def run_rendering(keyed_alg_data, text_mode='html', lang='c', show_buttons=True,
         lang=lang,  # 'c',  # 'python'  'pascal'
         buttons_mode='with_buttons' if show_buttons else 'no_buttons',
         locale=locale,
-        stack_size_limit=100,
+        stack_size_limit=200,
     )
     # PAD = '`___'
     PAD = PADDING[common_options['text_mode']]
@@ -254,7 +254,7 @@ if 1:
     if_branches = ["if", "else-if", "else"]
 
     siblings_list = [
-        "stmt sequence alternative while_loop do_while_loop for_loop foreach_loop".split(),   # add new action classes here
+        "stmt return sequence alternative while_loop do_while_loop for_loop foreach_loop".split(),   # add new action classes here
         if_branches,
         #### ["sequence"],  #  moved above to other regular statements
         ['expr', 'cond_values_hint'],

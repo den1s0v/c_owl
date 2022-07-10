@@ -1041,6 +1041,10 @@ function create_alg_for(alg_node, parent) {
 	if (alg_node.type == "stmt") {
 		a = new BoxArea();
 	}
+	if (alg_node.type == "return" || alg_node.type == "break" || alg_node.type == "continue") {
+		/// !!!
+		a = new BoxArea();
+	}
 	if (alg_node.type == "expr") {
 		a = new ConditionDiamond();
 	}
