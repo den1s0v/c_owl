@@ -1726,6 +1726,9 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
 
     # invoke through jenaService:
     if reasoning == 'jena':
+
+        ### onto.save(file="jena_dbg_in.rdf", format='rdfxml')
+
         # save ontology to buffer in memory
         # TODO: check if NTRIPLES will be processed faster!
         stream = io.BytesIO()
@@ -1740,6 +1743,9 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
         onto = get_isolated_ontology(ONTOLOGY_IRI).load(
             fileobj=io.BytesIO(result_rdf_bytes),
             reload=True, only_local=True)
+
+        ### onto.save(file="jena_dbg_out.rdf", format='rdfxml')
+
 
 
     # old way: invoke jar directly, communicate via files.
@@ -1873,13 +1879,13 @@ def _play_with_classes():
 
 if __name__ == '__main__':
 
-    if 0:
+    if 1:
         print("Special run mode activated:")
         print("Saving schema only to file.")
         save_schema()
         exit()
 
-    if 1:
+    if 0:
         print("Special run mode activated:")
         print("_play_with_classes()")
         _play_with_classes()
