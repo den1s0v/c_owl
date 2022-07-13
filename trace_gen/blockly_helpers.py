@@ -416,7 +416,65 @@ class AlgorithmXMLParser(AlgorithmParser):
 
             # для день от 1 до 5 с шагом +1  // my-for-3
             # for day from 1 to 5 step +1  // my-for-4
-            # ...
+            if '@type' in xml_tree and xml_tree['@type'] == 'controls_named_forLoop':
+                if self.verbose: 
+                    print("for loop")
+                name = block_NAME  # имя цикла (пишется в комментарии)
+                
+                loop_type = "for_loop"  # the default
+                # field_MODE = get_named_member(xml_tree['field'], "MODE")  # the field removed from the Block
+                # if field_MODE and '#text' in field_MODE and field_MODE['#text'] == 'UNTIL':
+                #     loop_type = "do_until_loop"
+
+                block_BOOL = get_named_member(xml_tree['value'], 'BOOL') if 'value' in xml_tree else None
+                if not block_BOOL:
+                    raise ValueError('Algorithm error: Missing condition of "%s" loop!' % block_NAME)
+
+                block_DO = get_named_member(xml_tree['statement'], 'DO') if 'statement' in xml_tree else None
+                if not block_DO:
+                    raise ValueError('Algorithm error: Missing body of "%s" loop!' % block_NAME)
+                    
+                    
+                block_key = next(iter({'shadow', 'block'} & set(block_BOOL.keys())))
+                block_COND_VALUES = block_BOOL[block_key]
+                block_COND_NAME = get_named_member(block_COND_VALUES['field'], "COND_NAME")
+                block_VALUES = get_named_member(block_COND_VALUES['field'], "VALUES")
+                
+                cond_name = block_COND_NAME['#text']  # условие цикла
+                values = block_VALUES['#text']  # значения, принимаемые выражением по мере выполнения программы (опционально)
+                
+                block_INIT = get_named_member(xml_tree['value'], 'INIT') if 'value' in xml_tree else None
+                if not block_INIT:
+                    raise ValueError('Algorithm error: Missing init of "%s" loop!' % block_NAME)
+
+                block_key = next(iter({'shadow', 'block'} & set(block_INIT.keys())))
+                block_text = block_INIT[block_key]
+                init_name = get_named_member(block_text['field'], "TEXT")['#text']
+                # if self.verbose: print('init:', init_name)
+                
+                block_STEP = get_named_member(xml_tree['value'], 'STEP') if 'value' in xml_tree else None
+                if not block_STEP:
+                    raise ValueError('Algorithm error: Missing update step of "%s" loop!' % block_NAME)
+
+                block_key = next(iter({'shadow', 'block'} & set(block_STEP.keys())))
+                block_text = block_STEP[block_key]
+                step_name = get_named_member(block_text['field'], "TEXT")['#text']
+                # if self.verbose: print('step:', step_name)
+                
+                result.append({
+                    "id": self.newID(name),
+                    "type": loop_type,
+                    "name": name,
+                    "act_name": action("loop", name=name),
+                    # "variable": 'xxx',  ### s_var,
+                    "init": self.parse_stmt(init_name),
+                    "cond": self.parse_expr(cond_name, values=values),
+                    "update": self.parse_stmt(step_name),
+                    "body": make_loop_body(
+                                name,
+                                parse_algorithm(block_DO['block'] if 'block' in block_DO else [])
+                            )
+                })
 
             # для каждого x в list  // my-for-in-4
             # foreach x in list -> 1110110  // my-for-in-5

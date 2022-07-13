@@ -90,6 +90,11 @@ def set_force_button_tooltips_in_english(force: bool):
 	get_syntax().FORCE_BUTTON_TOOLTIPS_IN_ENGLISH = force
 
 
+def raise_(ex):
+	'general purpose raiser (see https://stackoverflow.com/questions/8294618/define-a-lambda-expression-that-raises-an-exception)'
+	raise ex
+
+
 def set_syntax(programming_language_name: str):
 	name = programming_language_name.capitalize()
 	passthrough = lambda tag: tag
@@ -115,6 +120,7 @@ def set_syntax(programming_language_name: str):
 		SYNTAX["ELSEIF_KEYWORD"] = lambda s: s.replace("else-if", "else if")
 		SYNTAX["STATEMENT"] = lambda tag: [tag, ";"]
 		SYNTAX["WHILE_KEYWORD"] = lambda s: "while"
+		SYNTAX["FOR_KEYWORD"] = lambda s: "for"
 
 	elif name in ("Python"):
 		SYNTAX["BLOCK_OPEN"] = lambda: []
@@ -125,6 +131,7 @@ def set_syntax(programming_language_name: str):
 		SYNTAX["ELSEIF_KEYWORD"] = lambda s: s.replace("else-if", "elif")
 		SYNTAX["STATEMENT"] = passthrough
 		SYNTAX["WHILE_KEYWORD"] = lambda s: "while"
+		SYNTAX["FOR_KEYWORD"] = lambda s: raise_(SyntaxError("'for' loop is not supported in Python!"))
 
 	else:
 		print(f"### Warning (ignoring): Unknown syntax in set_syntax('{name}').")
@@ -267,7 +274,7 @@ def _make_block_with_braces(indent, block_json, inner=()):
 	]
 
 
-def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, syntax:str=None, existing_trace=None, indent=0) -> list:
+def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, syntax:str=None, existing_trace=None, indent=0, as_type=None) -> list:
 	""" Create new tree of html-tags with additional info about nodes """
 	if user_language:
 		set_target_lang(user_language)  # usually set once on the topmost recursive call
@@ -296,7 +303,7 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 		if algorithm_json["type"] == "func":
 			algorithm_json = algorithm_json["body"]
 
-		type_ = algorithm_json["type"]
+		type_ = as_type or algorithm_json["type"]
 		name = algorithm_json.get("name") or algorithm_json.get("stmt_name")
 
 		if type_ in ("expr", ):
@@ -304,6 +311,9 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 
 		if type_ == "stmt":
 			return _make_line_tag(indent, SYNTAX["STATEMENT"](_make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)))
+
+		if type_ == "inline_stmt":
+			return _make_alg_tag(algorithm_json, "variable", name, states_before=SIMPLE_NODE_STATES)
 
 		if type_ == "return":
 			inner = [
@@ -386,7 +396,29 @@ def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, synt
 					footer_line
 				])
 
-			# for, ... and more
+			if loop_type == 'for':
+				return _make_line_tag(0, [
+					# заголовок цикла
+					_make_line_tag(indent, [
+						_make_alg_tag(algorithm_json, 'keyword',
+							inner=SYNTAX["FOR_KEYWORD"](loop_type),
+							states_before=COMPLEX_NODE_STARTED, states_after=COMPLEX_NODE_FINISHED),
+						"&nbsp;",
+						*SYNTAX["CONDITION"]([
+							algorithm_to_tags(algorithm_json["init"], as_type='inline_stmt'),
+							";&nbsp;",
+							algorithm_to_tags(algorithm_json["cond"]),
+							";&nbsp;",
+							algorithm_to_tags(algorithm_json["update"], as_type='inline_stmt'),
+						]),
+						"&nbsp;" * 2,
+						_make_alg_tag(None, 'comment',
+							inner=SYNTAX["COMMENT"](name))
+					]),
+					*_make_block_with_braces(indent, algorithm_json["body"], inner=algorithm_to_tags(algorithm_json["body"], indent=0))
+				])
+
+			# for-each, ... and more
 			else:
 				raise NotImplementedError('Not implemented for loop type: ' + loop_type)
 

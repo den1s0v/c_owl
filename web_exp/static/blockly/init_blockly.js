@@ -76,6 +76,30 @@ function get_toolbox_json() {
 			</block>`
 		  },
 		  {
+        "kind": "label",
+        "text": Blockly.Msg["CUSTOM_LABEL_LOOP_FOR"]
+      },
+      {"kind": "sep", "gap": "8"},
+      {
+      "kind": "block",
+      "blockxml": `<block type="controls_named_forLoop">
+        <value name="NAME">
+          <shadow type="text_name_of_loop"></shadow>
+        </value>
+        <value name="INIT">
+          <shadow type="text_for_loop_init"></shadow>
+        </value>
+        <value name="BOOL">
+          <shadow type="condition_with_values_block">
+            <field name="COND_NAME">i &lt; max_i</field>
+            <field name="VALUES">1,1,(0)</field> </shadow>
+        </value>
+        <value name="STEP">
+          <shadow type="text_for_loop_step"></shadow> 
+        </value>
+      </block>`
+      },
+		  {
 		    "kind": "label",
 		    "text": "Loop control" // Blockly.Msg["CUSTOM_LABEL_LOOP_POSTCOND"]
 		  },
@@ -294,6 +318,38 @@ function init_blockly_environment(argument=null) {
 	]
   },
   {
+	// Block for text value (modified)
+	"type": "text_for_loop_init",
+	"message0": "%1",
+	"args0": [{
+	  "type": "field_input",
+	  "name": "TEXT",
+	  "text": "%{BKY_CUSTOM_FOR_LOOP_INIT_PROMPT}"
+	}],
+	"output": "String",
+	"style": "text_blocks",
+	"helpUrl": "%{BKY_TEXT_TEXT_HELPURL}",
+	"tooltip": "%{BKY_CUSTOM_FOR_LOOP_INIT}",
+	"extensions": [
+	]
+  },
+  {
+	// Block for text value (modified)
+	"type": "text_for_loop_step",
+	"message0": "%1",
+	"args0": [{
+	  "type": "field_input",
+	  "name": "TEXT",
+	  "text": "%{BKY_CUSTOM_FOR_LOOP_STEP_PROMPT}"
+	}],
+	"output": "String",
+	"style": "text_blocks",
+	"helpUrl": "%{BKY_TEXT_TEXT_HELPURL}",
+	"tooltip": "%{BKY_CUSTOM_FOR_LOOP_STEP}",
+	"extensions": [
+	]
+  },
+  {
 	// Block for if/elseif/else condition (modified to make it named).
 	"type": "controls_named_if",
 	"message0": "// %{BKY_CUSTOM_NAME_OF_ALTERNATIVE}: %1",  // имя развилки
@@ -416,6 +472,79 @@ function init_blockly_environment(argument=null) {
 	"helpUrl": "%{BKY_CONTROLS_WHILEUNTIL_HELPURL}",
 	"tooltip": "%{BKY_CUSTOM_DOWHILEUNTIL_TOOLTIP_WHILE}"
   },
+  {
+	// Block for 'do for' loop.
+	"type": "controls_named_forLoop",
+	"message0": "// %{BKY_CUSTOM_NAME_OF_LOOP}: %1",
+	"args0": [
+	  {
+		"type": "input_value",
+		"name": "NAME",
+		"check": "String",
+		"align": "RIGHT"
+	  }
+	],
+	"message1": "%1 %2",
+	"args1": [
+	  {
+		"align": "RIGHT",
+		// Hide the Dropdown control
+		// "type": "field_dropdown",
+		// "name": "MODE",
+		// "options": [
+		//   ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_WHILE}", "WHILE"],
+		//   ["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_UNTIL}", "UNTIL"]
+		// ],
+		"type": "field_label",
+		"name": "MODE1",
+		"text": "for ( [init]:",
+	  },
+	  {
+		"type": "input_value",
+		"name": "INIT",
+		"check": "String"
+	  }
+	],
+	"message2": "%1 %2",
+	"args2": [
+	  {
+		"align": "RIGHT",
+		"type": "field_label",
+		"name": "MODE2",
+		"text": "; [cond]:",
+	  },
+	  {
+		"type": "input_value",
+		"name": "BOOL",
+		"check": "Boolean"
+	  }
+	],
+	"message3": "%1 %2",
+	"args3": [
+	  {
+		"align": "RIGHT",
+		"type": "field_label",
+		"name": "MODE3",
+		"text": "; [step]:",
+	  },
+	  {
+		"type": "input_value",
+		"name": "STEP",
+		"check": "String"
+	  }
+	],
+	"message4": "%{BKY_CONTROLS_REPEAT_INPUT_DO} %1",
+	"args4": [{
+	  "type": "input_statement",
+	  "name": "DO"
+	}],
+	"previousStatement": null,
+	"nextStatement": null,
+	"style": "loop_blocks",
+	"helpUrl": "%{BKY_CONTROLS_WHILEUNTIL_HELPURL}",
+	"tooltip": "%{BKY_CONTROLS_WHILEUNTIL_TOOLTIP_WHILE}"
+  },
+
   // Block for text value (modified)
   {
 	"type": "action",
@@ -557,6 +686,16 @@ function patch_localization() {
   	  "Цикл с постусловием:"
   	: "Post-conditional loop:"
   	);
+  Blockly.Msg["CUSTOM_LABEL_LOOP_FOR"] = (
+  	ru?
+  	  "Цикл со счётчиком:"
+  	: "Counter-controlled loop:"
+  	);
+  Blockly.Msg["CUSTOM_LABEL_LOOP_CONTROL"] = (
+  	ru?
+  	  "Управление циклом (break/continue):"
+  	: "Loop control (break/continue):"
+  	);
   Blockly.Msg["CUSTOM_LABEL_UNIQUE"] = (
   	ru?
   	  "Имена действий должны быть уникальными."
@@ -592,6 +731,26 @@ function patch_localization() {
 	ru?
 	  "введите имя цикла здесь"
 	: "enter the name of the loop here"
+	);
+  Blockly.Msg["CUSTOM_FOR_LOOP_INIT"] = (
+	ru?
+	  "инициализация цикла FOR"
+	: "initialization of the FOR loop"
+	);
+  Blockly.Msg["CUSTOM_FOR_LOOP_INIT_PROMPT"] = (
+	ru?
+	  "i = 0"  // введите оператор инициализации цикла здесь (напр. i = 0)
+	: "i = 0"
+	);
+  Blockly.Msg["CUSTOM_FOR_LOOP_STEP"] = (
+	ru?
+	  "переход цикла FOR"
+	: "advancement of the FOR loop"
+	);
+  Blockly.Msg["CUSTOM_FOR_LOOP_STEP_PROMPT"] = (
+	ru?
+	  "i += 1"  // введите оператор перехода цикла здесь (напр. i = 0)
+	: "i += 1"
 	);
   
   Blockly.Msg["CUSTOM_CONDITION_WITH_VALUES_BLOCK_TOOLTIP"] = (
