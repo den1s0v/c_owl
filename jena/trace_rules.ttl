@@ -1659,7 +1659,7 @@
 
 # Rule: LoopStartsNotWithInit-loop_Error [loop & mistake]
 [
-	(?a rdf:type my:act_end),
+	(?a rdf:type my:act_begin),
 	(?a my:executes ?bnd), (?bnd my:boundary_of ?Loop),
 	(?Loop rdf:type my:start_with_init),
 	(?Loop my:init ?init_stmt),
@@ -1694,13 +1694,15 @@
 #	not this loop
 	noValue(?bnd_a my:boundary_of ?Loop),
 
-	(?Loop my:stmt_name ?a_name),
-#	(?a my:stmt_name ?a_name),
+	(?bnd_a my:boundary_of ?a_stmt),
+	(?a_stmt my:stmt_name ?a_name),
+	(?Loop my:stmt_name ?L_name),
 	(?init_stmt my:stmt_name ?i_name),
 	 ->
 #	 (?b my:cause ?a),
 	 (?b rdf:type my:InitNotAtLoopStart),
-	 (?b my:field_LOOP ?a_name),
+	 (?b my:field_A ?a_name),
+	 (?b my:field_LOOP ?L_name),
 	 (?b my:field_INIT ?i_name),
 	 (?b my:fetch_kind_of_loop ?Loop),
 ]
@@ -1709,7 +1711,7 @@
 # Rule: NoConditionAfterForInit-loop_Error [loop & mistake]
 [
 	(?a rdf:type my:act_end),
-	(?a my:executes ?bnd), (?bnd my:boundary_of ?Loop),
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?init_stmt),
 	(?Loop rdf:type my:start_with_init),
 	(?Loop my:init ?init_stmt),
 	(?Loop my:cond ?cnd),
@@ -1822,11 +1824,14 @@
 
 	(?Loop my:stmt_name ?a_name),
 	(?cnd  my:stmt_name ?c_name),
+	(?Loop my:update ?upd),
+	(?upd  my:stmt_name ?u_name),
 	 ->
 #	 (?b my:cause ?a),
-	 (?b rdf:type my:UpdateNotAfterIteration),
+	 (?b rdf:type my:ForConditionAfterIteration),
 	 (?b my:field_LOOP ?a_name),
 	 (?b my:field_LOOP_COND ?c_name),
+	 (?b my:field_UPDATE ?u_name),
 	 (?b my:fetch_kind_of_loop ?Loop),
 ]
 
