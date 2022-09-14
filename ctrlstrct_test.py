@@ -284,6 +284,7 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 		max_id = max(a['id'] for a in existing_trace_list) if existing_trace_list else 100 - 1
 
 		result_acts = []
+		# создать строку "program began" первой
 		if len(existing_trace_list) == 0 and elem['id'] != algorithm_json["entry_point"]['id']:
 			# создать строку "program began"
 			act_text = act_line_for_alg_element(algorithm_json, phase='started', lang=user_language, )  # передаём сам корень алгоритма, так как его type=='algorithm',
@@ -464,10 +465,21 @@ def process_algorithms_and_traces(alg_trs_list: list, write_mistakes_to_acts=Fal
 				act_type = "finished"
 
 				apended_trace = make_act_json(algorithm_json=algorithm, algorithm_element_id=algorithm_element_id, act_type=act_type, existing_trace_json=mutable_trace[:], user_language=None)
+
 				assert len(apended_trace) >= 2, apended_trace
-				mutable_trace.append(apended_trace[-1])
+				new_last_line = apended_trace[-1]
+
+				# создать строку "program ended"
+				act_text = act_line_for_alg_element(algorithm, phase='finished', lang=None, )  # передаём сам корень алгоритма, так как его type=='algorithm',
+				# обновить в строке трассы, т.к. по умолчанию генерируется 'следование global_code закончилось 1-й раз'
+				new_last_line["as_string"] = act_text
+				html_tags = styling.prepare_tags_for_line(act_text)
+				new_last_line['as_html'] = styling.to_html(html_tags)
+
+
+				mutable_trace.append(new_last_line)
 				###
-				print("+=+ inserted closing act:", apended_trace[-1]["as_string"])
+				print("+=+ inserted closing act:", new_last_line["as_string"])
 
 
 		delete_ontology(onto)
