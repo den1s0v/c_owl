@@ -766,6 +766,8 @@ class TraceTester():
     def inject_trace_to_ontology(self, onto, trace, act_classnames=("act",), next_propertyname=None):
         "Writes specified trace to ontology assigning properties to pre-created acts."
 
+        ### print(' INJECTING the following TRACE:', *map(lambda d: '   -> ' + d['as_string'], trace), '', sep='\n')
+
         additional_classes = [onto[nm] for nm in act_classnames]
         assert all(additional_classes), f"additional_classes={additional_classes}, {act_classnames}, {onto}"
 
@@ -874,8 +876,7 @@ class TraceTester():
             # self.data[iri_list_key] = trace_acts_list
 
 
-    def test_with_ontology_results(self, onto):
-        pass
+    # end of TraceTester class
 
 
 def make_trace_for_algorithm(alg_dict):

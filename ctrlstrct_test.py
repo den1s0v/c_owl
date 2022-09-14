@@ -274,7 +274,8 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 	existing_trace_json = existing_trace_json or ()
 	existing_trace_list = [act for act in existing_trace_json if act["is_valid"] == True]
 
-	### print(algorithm_element_id, act_type, *existing_trace_list, sep='\n')
+	# debug: list existing acts
+	### print('element_id: %d, phase: %s' % (algorithm_element_id, act_type), *map(lambda d: '   -> ' + d['as_string'], existing_trace_list), sep='\n')
 
 	try:
 		elem = algorithm_json["id2obj"].get(algorithm_element_id, algorithm_json["id2obj"].get(str(algorithm_element_id)))
