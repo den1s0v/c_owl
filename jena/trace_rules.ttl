@@ -103,6 +103,9 @@
 	(?a rdf:type my:act_end),
 	(?a my:executes ?bnd_a),
 	(?bnd_a my:always_consequent ?bnd_e),
+
+#	ensure that a is connected to some other act (not hanging as unconnected)
+	(?b my:student_next ?a),
 	 ->
 	 (?a rdf:type my:finish_trace_act)
 ]
