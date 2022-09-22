@@ -991,6 +991,10 @@ def init_persistent_structure(onto):
 
         # ->
         class action(Concept): pass
+        # annotation `act_class`
+        class atom_action(AnnotationProperty):
+            '''action that is is atomic and always shown in 'performed' phase '''
+
         class algorithm(Concept): pass
 
         class entry_point(algorithm >> action, FunctionalProperty): pass
@@ -1148,7 +1152,8 @@ def init_persistent_structure(onto):
         for class_name in [
             "expr", "stmt", "interrupt_action",
         ]:
-            types.new_class(class_name, (action, ))  ### hide_boundaries
+            cls = types.new_class(class_name, (action, ))  ### hide_boundaries
+            cls.atom_action = True
 
         for class_name in [
             "return", "break", "continue",  # have optional `interrupt_target`
@@ -1156,6 +1161,7 @@ def init_persistent_structure(onto):
             cls = types.new_class(class_name, (onto['interrupt_action'], ))
             # add annotation name: rdfs:label
             cls.label = [class_name]
+            cls.atom_action = True
 
         for class_name in [
             "if", "else-if", "else",
@@ -1226,12 +1232,17 @@ def init_persistent_structure(onto):
         class string_placeholder(Thing >> str): pass
         for suffix in (
             "A", # "B", "C", "D", "EX",
+            "A_bound",
             "kind_of_loop",
             "kind_of_action",
             "TrueFalse",
             "BEGIN",  # для CorrespondingEndMismatched
             "EXTRA",  # для NotNeighbour
+            # "EXTRA_act",
+            "EXTRA_bound",  # <-- ObjectProperty!
             "MISSING",  # пропущены перед текущим
+            # "MISSING_act",
+            "MISSING_bound",  # <-- ObjectProperty!
             "COND",     # любое условие (общий случай)
             "INNER",    # для CorrespondingEndMismatched: несоответствующее начало, которое явл. вложенным действием несоответствующего конца
             "CONTEXT",    # (неверный) родитель (по трассе)
@@ -1259,7 +1270,10 @@ def init_persistent_structure(onto):
         ):
             prop_name = "field_" + suffix
             if not onto[prop_name]:
-                types.new_class(prop_name, (string_placeholder, ))
+                prop_class_ = string_placeholder
+                if suffix.endswith(('_act', '_bound')):
+                    prop_class_ = ObjectProperty
+                types.new_class(prop_name, (prop_class_, ))
 
         class fetch_kind_of_loop(act >> action, ): pass
         class reason_kind(boundary >> Thing, ): pass

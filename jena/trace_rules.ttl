@@ -166,6 +166,7 @@
 # connecting boundary, not action !
 	 (?b my:should_be_after ?some),
 	 (?b my:field_MISSING ?name),
+	 (?b my:field_MISSING_bound ?some),
 ]
 
 # Rule: UpcomingNeighbour-find-all-missing-on-1-Error [mistake]
@@ -186,6 +187,7 @@
 # 	 # connecting boundary, not action !
 	 (?b my:should_be_after ?some),
 	 (?b my:field_MISSING ?name),
+	 (?b my:field_MISSING_bound ?some),
 ]
 
 # Rule: UpcomingNeighbour-find-1st-missing-on-1-Error [mistake]
@@ -204,6 +206,7 @@
 	 ->
 	 (?b my:should_be_after ?bx),
 	 (?b my:field_MISSING ?bx_name),
+	 (?b my:field_MISSING_bound ?bx),
 ]
 
 # Rule: UpcomingNeighbour-find-all-missing-on-0-Error [mistake]
@@ -224,6 +227,7 @@
 # 	 # connecting boundary, not action !
 	 (?b my:should_be_after ?some),
 	 (?b my:field_MISSING ?name),
+	 (?b my:field_MISSING_bound ?some),
 ]
 
 # Rule: UpcomingNeighbour-find-1st-missing-on-0-Error [mistake]
@@ -240,6 +244,7 @@
 	 ->
 	 (?b my:should_be_after ?bx),
 	 (?b my:field_MISSING ?bx_name),
+	 (?b my:field_MISSING_bound ?bx),
 ]
 
 # Rule: NotNeighbour-not-cond-Error [mistake]
@@ -259,6 +264,7 @@
 	 ->
 	 (?b rdf:type my:NotNeighbour),
 	 (?b my:field_EXTRA ?name),
+	 (?b my:field_EXTRA_bound ?by),
 ]
 
 
@@ -315,6 +321,7 @@
 	 ->
 	 (?b rdf:type my:TooEarlyWhenInterrupting),
 	 (?b my:field_MISSING ?name),
+	 (?b my:field_MISSING_bound ?bn),
 	 (?b my:field_kind_of_action ?kind),
 ]
 
@@ -473,6 +480,7 @@
 	(?some_st my:stmt_name ?name),
 	 ->
 	 (?b my:field_A ?name),
+	 (?b my:field_A_bound ?by),
 	 (?b my:field_COND ?name_a),
 	 (?b my:field_TrueFalse ?expr_val),
 ]
@@ -498,6 +506,7 @@
 	 (?b rdf:type my:NotNeighbour),
 #	 (?b my:precursor ?a),
 	 (?b my:field_EXTRA ?name),
+	 (?b my:field_EXTRA_bound ?by),
 ]
 
 
@@ -519,6 +528,7 @@
 	 (?b my:cause ?a)
 	 (?b my:field_BEGIN ?a_name),
 	 (?b my:field_A ?b_name),
+	 (?b my:field_A_bound ?bnd2),
 ]
 
 # Rule: GenericWrongStmtParent_Error [mistake]
@@ -544,6 +554,7 @@
 	 (?a my:context_should_be ?pa),
 	 (?a rdf:type my:WrongContext),
 	 (?a my:field_A ?a_name),
+	 (?a my:field_A_bound ?ba),
 	 (?a my:field_CONTEXT ?p_name),
 ]
 
@@ -667,11 +678,13 @@
 
 	(?st_b my:stmt_name ?b_name),
 	(?correct_b my:stmt_name ?c_name),
+	(?begin_of_corr_b my:begin_of ?correct_b),
 	 ->
 	 (?b my:should_be_after ?correct_b),
 	 (?b rdf:type my:TooEarlyInSequence),
 	 (?b my:field_A ?b_name),
 	 (?b my:field_MISSING ?c_name),
+	 (?b my:field_MISSING_bound ?begin_of_corr_b),
 ]
 
 # Rule: TooLateInSequence-Seq_error [mistake & sequence]
@@ -821,6 +834,7 @@
 	 (?b rdf:type my:SequenceFinishedTooEarly),
 	 (?b my:field_A ?a_name),
 	 (?b my:field_MISSING ?b_name),
+	 (?b my:field_MISSING_bound ?some_st_bnd),
 ]
 
 
@@ -1669,7 +1683,7 @@
 
 	(?a my:student_next ?b),
 	(?b my:executes ?bnd_b),
-#	not loop end
+#	not loop end (?? - error about unevaluated will appear anyway)
 	noValue(?bnd_b my:end_of ?Loop),
 #	not loop's init
 	noValue(?bnd_b my:begin_of ?init_stmt),
@@ -1705,6 +1719,7 @@
 #	 (?b my:cause ?a),
 	 (?b rdf:type my:InitNotAtLoopStart),
 	 (?b my:field_A ?a_name),
+	 (?b my:field_A_bound ?bnd_a),
 	 (?b my:field_LOOP ?L_name),
 	 (?b my:field_INIT ?i_name),
 	 (?b my:fetch_kind_of_loop ?Loop),

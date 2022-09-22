@@ -1,5 +1,6 @@
 # explanations.py
 
+from collections import defaultdict
 import re
 
 from common_helpers import camelcase_to_snakecase
@@ -17,10 +18,12 @@ from onto_helpers import get_relation_object, get_relation_subject
 onto = None  # TODO: remove global var
 
 
-def tr(word_en, case='nomn'):
+def tr(word_en, case='nomn', lang=None):
 	""" Перевод на русский язык, если get_target_lang()=="ru" """
-	if get_target_lang() == "en":
+	if (lang or get_target_lang()) == "en":
 		return word_en
+	# else: "ru"
+
 	grammemes = ('nomn','gent')
 	assert case in grammemes, "Unknown case: "+case
 	res = {
@@ -208,7 +211,7 @@ def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 			explanation = {
 				"names": {lang: class_name_to_readable(name) for lang,name in CLASS_NAMES[class_name].items()},
 				"explanation": expl,
-				"explanation_by_locale": {lang: format_by_spec(format_str, **params) for lang, format_str in templates.items()},
+				# "explanation_by_locale": {lang: format_by_spec(format_str, PARAM_PROVIDERS[class_name](act_instance, lang=lang)) for lang, format_str in templates.items()},
 			}
 			result.append(explanation)
 		else:
@@ -221,9 +224,15 @@ def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 	return result
 	# return ['Cannot format explanation for XYZY']
 
+def capitalize_first_letter(s: str) -> str:
+	# replace first letter ever if 's' starts with quote ('"')
+	# return s[:1].upper() + s[1:]
+	return re.subn(r'\w', lambda m:m[0].upper(), s, count=1)[0]  # take [0] from (str, count_replaced)
+	# capitalize_first_letter('"my 1st day"')
+
 
 def format_by_spec(format_str: str, **params: dict):
-	"Simple replace"
+	"Simple replace & add closing dot if needed"
 	# placeholder_affices = None
 	placeholder_affices = (("<", ">"), ("<list-", ">"))
 	for key, value in params.items():
@@ -234,7 +243,7 @@ def format_by_spec(format_str: str, **params: dict):
 		format_str += '.'
 	### print('*', format_str)
 
-	return format_str
+	return capitalize_first_letter(format_str)
 	# return 'cannot format it...'
 
 def register_handler(class_name, format_dict, method):
@@ -259,7 +268,7 @@ def register_handler(class_name, format_dict, method):
 
 
 def class_formatstr(*args):
-	""" Сохраняем все переводы в словарь """
+	""" Упаковать в словари переводы названия и сообщения """
 	class_name, format_str_ru, format_str_en = args if len(args) == 3 else list(args[0])
 
 	class_names_dict = dict(zip(("en", "ru"), class_name.split()))
@@ -271,26 +280,70 @@ def class_formatstr(*args):
 
 
 
-def named_fields_param_provider(a: 'act_instance'):
+def named_fields_param_provider(a: 'act_instance', **options):
 	"""extract ALL field_* facts, no matter what law they belong to."""
-	placeholders = {}
+
+	# for lookup
+	begin_of = a.namespace.begin_of
+	end_of   = a.namespace.end_of
+	atom_action = a.namespace.atom_action
+
+	lang = options.get("lang", None)
+
+	placeholders = defaultdict(dict)  # {fieldname -> {value_to_quote -> prefix}}
+
+	def add2placeholders(fieldName, to_quote, prefix):
+		### , replace=True
+		old_prefix = placeholders[fieldName].get(to_quote, None)
+		# replace empty values only
+		if old_prefix is None or prefix > old_prefix:    ### replace and
+			placeholders[fieldName][to_quote] = prefix
+
 	for prop in a.get_properties():
 		verb = prop.python_name
-		if verb.startswith("field_"):  # признак того, что это специальное свойство [act >> str]
+		if verb.startswith("field_"):  # признак того, что это специальное свойство [act >> str] или [act >> bound]
+			to_quote = None
+			prefix = ''
 			fieldName = verb.replace("field_", "")
-			## value = prop[a][0]
-			for value in prop[a]:
-				# convert to str
-				value = {
-					True: 'true',
-					False: 'false',
-				}.get(value, str(value))
-				value = "\"" + value + "\""  # enclose
-				if (fieldName in placeholders):
-					# append to previous data
-					value = placeholders.get(fieldName) + ", " + value
+			if fieldName.endswith("_bound"):
+				# process bound instances ...
+				# if 'phase' not in options:
+				# 	continue
+				fieldName = fieldName[:-len("_bound")]
+				for bound in prop[a]:
+					# extract phase to prepend to action name
+					phase_str = ''
+					# action class has 'atom_action' annotation = true
+					if not any(atom_action[cls] for cls in bound.boundary_of.is_a):
+					# if not (atom_action[action_class] or all(atom_action[action_class])):
+						# complex action, determine phase_str
+						if begin_of[bound]:
+							phase_str = tr("begin of ", lang=lang)
+						elif end_of[bound]:
+							phase_str = tr("end of ", lang=lang)
 
-				placeholders[fieldName] = value
+					name = bound.boundary_of.stmt_name
+					# add2placeholders(fieldName, to_quote=name, prefix=phase_str, replace=False)
+					# add 'phased-' version of placeholder
+					add2placeholders('phased-' + fieldName, to_quote=name, prefix=phase_str)
+			else:
+				# process literals ...
+				for value in prop[a]:
+					# convert to str
+					value = {
+						True: 'true',
+						False: 'false',
+					}.get(value, str(value))
+					add2placeholders(fieldName, to_quote=value, prefix='')
+
+
+	print(placeholders)
+
+	# convert sub-dicts to normal strings
+	placeholders = {
+		fieldName: ", ".join("\"" + prefix + to_quote + "\"" for to_quote, prefix in subd.items())
+		for fieldName, subd in placeholders.items()
+	}
 
 	return placeholders
 
