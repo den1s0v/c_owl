@@ -286,6 +286,7 @@ def named_fields_param_provider(a: 'act_instance', **options):
 	# for lookup
 	begin_of = a.namespace.begin_of
 	end_of   = a.namespace.end_of
+	halt_of  = a.namespace.halt_of
 	atom_action = a.namespace.atom_action
 
 	lang = options.get("lang", None)
@@ -319,7 +320,7 @@ def named_fields_param_provider(a: 'act_instance', **options):
 						# complex action, determine phase_str
 						if begin_of[bound]:
 							phase_str = tr("begin of ", lang=lang)
-						elif end_of[bound]:
+						elif end_of[bound] or halt_of[bound]:
 							phase_str = tr("end of ", lang=lang)
 
 					name = bound.boundary_of.stmt_name
