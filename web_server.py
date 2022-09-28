@@ -181,7 +181,7 @@ def create_app():
 
 				return dict(
 					full_trace_json=full_trace,  ## res,
-					algorithm_json=algorithm_json,  # pass back
+					# algorithm_json=algorithm_json,  # pass back
 					algorithm_as_html=algorithm_html,
 					processing_errors=(),
 				)
@@ -195,13 +195,27 @@ def create_app():
 			return dict(
 				processing_errors=(res,),
 				full_trace_json=(),
-				algorithm_json=None,
+				# algorithm_json=None,
 				algorithm_as_html=None,
 			)
 			# print("The error above reported as response, continue.")
 
 		return dict(trace_line_json={"as_string": "Dummy act line!", "id": 49, "loop": "waiting", "executes": 7, "gen": "he", "phase": "started", "_n": 4})  # debug
 
+
+	@app.route('/hint_next_step', methods=['POST'])
+	def hint_next_step():
+		### print(request.json)
+		# ch = Checkpointer()
+		# ch.since_start("Finished processing the request in")
+		# print()
+		if 'error or dummy stub':
+			return dict(
+				processing_errors=("A possible server-side error",),
+				full_trace_json=({"as_string": "Dummy act line!", "as_html": "<strike>Dummy</strike> <b>act</b> line<sub>!</sub>", "id": 49, "loop": "waiting", "executes": 7, "gen": "he", "phase": "started", "_n": 4}, ),
+				# algorithm_json=None,
+				algorithm_as_html="<h4>algorithm_as_html</h4><p>Algorithm content... .",
+			)
 
 
 	@app.route('/process_as_text', methods=['POST'])

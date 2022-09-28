@@ -461,7 +461,7 @@ Cм. выше в описании к <code>/creating_task</code>, здесь п�
     <summary>Request format</summary>
     Алгоритм в виде JSON (сохранённый из результата <code>/creating_task</code>), имеющийся фрагмент трассы (список актов) и код языка: рус/англ.
     <pre><code class="js">
-request to 'localhost:2020/verify_trace_act' [method:POST] : json {
+request to 'localhost:2020/hint_next_step' [method:POST] : json {
     "user_language":          "string"  // 'ru' или 'en'
     <strike>"algorithm_json":         {json},</strike>
     <strike>"algorithm_element_id":   int,</strike>
@@ -481,6 +481,78 @@ response: json {
 
 </details>
 
+<details>
+    <summary>Пример и тест API через $.ajax</summary>
+
+    <p><button
+        id="send_hint_next_step"
+        url="/hint_next_step"
+        payload_id="payload_hint_next_step"
+        result_id="result_hint_next_step"
+    >Test /hint_next_step [POST]</button>
+    with following JSON payload:
+    <p><textarea id="payload_hint_next_step" cols="80" rows="7">{"user_language": "ru", "existing_trace_json": [], "syntax": "Java",
+"algorithm_json": {
+  "entry_point": {
+    "act_name": "программа",
+    "body": [
+      {
+        "act_name": "действие 'print(\"Wow\")'",
+        "id": 31,
+        "name": "print(\"Wow\")",
+        "type": "stmt"
+      }
+    ],
+    "id": 30,
+    "name": "global_code",
+    "type": "sequence"
+  },
+  "expr_values": {},
+  "functions": [],
+  "global_code": {
+    "act_name": "программа",
+    "body": [
+      {
+        "act_name": "действие 'print(\"Wow\")'",
+        "id": 31,
+        "name": "print(\"Wow\")",
+        "type": "stmt"
+      }
+    ],
+    "id": 30,
+    "name": "global_code",
+    "type": "sequence"
+  },
+  "id": 29,
+  "id2obj": {
+    "30": {
+      "act_name": "программа",
+      "body": [
+        {
+          "act_name": "действие 'print(\"Wow\")'",
+          "id": 31,
+          "name": "print(\"Wow\")",
+          "type": "stmt"
+        }
+      ],
+      "id": 30,
+      "name": "global_code",
+      "type": "sequence"
+    },
+    "31": {
+      "act_name": "действие 'print(\"Wow\")'",
+      "id": 31,
+      "name": "print(\"Wow\")",
+      "type": "stmt"
+    }
+  },
+  "name": "algorithm",
+  "type": "algorithm"
+}}</textarea></p>
+    Response:
+    <div id="result_hint_next_step" style="background-color: #eeffff;"></div>
+    End of response.
+</details>
 
 
 <br>
