@@ -1308,7 +1308,8 @@ def init_persistent_structure(onto):
             prop_name = "field_" + suffix
             if not onto[prop_name]:
                 prop_class_ = string_placeholder
-                if suffix.endswith(('_act', '_bound')):
+                ### ???
+                if not WRITE_INVOLVES_CONCEPT and suffix.endswith(('_act', '_bound')):
                     prop_class_ = ObjectProperty
                 types.new_class(prop_name, (prop_class_, ))
 

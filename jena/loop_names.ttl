@@ -13,6 +13,7 @@
 [
 	(?a my:fetch_kind_of_loop ?Loop),
 	(?Loop rdf:type ?LoopClass),
+	noValue(?c2 rdfs:subClassOf ?LoopClass),
 #	use annotation attached to class itself
 	(?LoopClass rdfs:label ?LoopLabel),
 	 ->
