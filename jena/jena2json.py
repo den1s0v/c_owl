@@ -45,6 +45,14 @@ TASK_MAP = [
 # alg_rules.ttl
 # trace_rules.ttl
 
+## !!! Filter rules not needed for CompPrehension. TODO: make this more explicit.
+def filter_rule_by_name(name):
+	if 'collapse_bound' not in name:
+		return True
+	print(' !! omit rule:', name)
+	return False
+
+
 def main():
 	print("Exporting Jena rules as laws ...")
 	all_laws = []
@@ -57,6 +65,7 @@ def main():
 	with open(OUT_FILE, 'w', encoding='utf-8') as f:
 		json.dump(all_laws, f, ensure_ascii=False, indent=2)
 
+	print()
 	print("Don't forget to copy the result to:")
 	print(r"c:\D\Work\YDev\CompPr\CompPrehension\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
 
@@ -89,6 +98,10 @@ def create_Rule(name, formulation=None):
 def create_Law(law_config, formulations=None):
 	if "concepts" not in law_config: law_config["concepts"] = None
 	if "tags" not in law_config: law_config["tags"] = None
+
+	## !!! Filter rules not needed for CompPrehension. TODO: make this more explicit.
+	if formulations:
+		formulations = [f for f in formulations if filter_rule_by_name(f['name'])]
 
 	law = {
 		**law_config,
@@ -177,7 +190,8 @@ class SectionedRulesReader:
 			if tag not in law_tags:
 				law_tags.append(tag)
 
-		law["formulations"].append(create_Rule(**self.rule_config))
+		if filter_rule_by_name(self.rule_config["name"]):
+			law["formulations"].append(create_Rule(**self.rule_config))
 
 
 
