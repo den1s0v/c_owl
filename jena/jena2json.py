@@ -52,7 +52,7 @@ def main():
 		laws = read_laws_from_file(fname, config)
 		all_laws.extend(laws)
 		# print(laws)
-		print('.')
+		print(end='.')
 
 	with open(OUT_FILE, 'w', encoding='utf-8') as f:
 		json.dump(all_laws, f, ensure_ascii=False, indent=2)

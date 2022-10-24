@@ -31,6 +31,7 @@ ONTOLOGY_IRI = 'http://vstu.ru/poas/code'
 WRITE_INVOLVES_CONCEPT = False
 WRITE_PRINCIPAL_VIOLATION = False
 WRITE_SKOS_CONCEPT = False
+WRITE_CONCEPT_FLAG_LABEL = False
 
 def prepare_name(s):
     """Transliterate given word is needed"""
@@ -991,9 +992,15 @@ def init_persistent_structure(onto):
 
         # ->
         class action(Concept): pass
-        # annotation `act_class`
+        # annotation `atom_action`
         class atom_action(AnnotationProperty):
             '''action that is is atomic and always shown in 'performed' phase '''
+
+        # annotation `has_bitflags`
+        class has_bitflags(AnnotationProperty):
+            '''a Concept can have label & flags '''
+        FLAGS_visible = 1;
+        FLAGS_target = 2;
 
         class algorithm(Concept): pass
 
@@ -1052,6 +1059,10 @@ def init_persistent_structure(onto):
 
         # ->
         class sequence(action): pass
+        if WRITE_CONCEPT_FLAG_LABEL:
+            sequence.has_bitflags = 0
+            sequence.label = 'последовательность'
+
 
         # признак first
         class first_item(Thing, ): pass
@@ -1062,6 +1073,9 @@ def init_persistent_structure(onto):
 
         # ->
         class loop(action): pass
+        if WRITE_CONCEPT_FLAG_LABEL:
+            loop.has_bitflags = FLAGS_visible | FLAGS_target;
+            loop.label = ['циклы']
 
         if loop:  # hide a block under code folding
             # classes that regulate the use of condition in a loop
@@ -1119,9 +1133,15 @@ def init_persistent_structure(onto):
             while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
             while_loop.label = ["WHILE"]
 
+            if WRITE_CONCEPT_FLAG_LABEL:
+                while_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+
             class do_while_loop(start_with_body): pass
             do_while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
             do_while_loop.label = ["DO-WHILE"]
+
+            if WRITE_CONCEPT_FLAG_LABEL:
+                do_while_loop.has_bitflags = FLAGS_visible | FLAGS_target;
 
             # class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
             # do_until_loop.is_a += [body_then_cond]  # workaround
@@ -1131,9 +1151,15 @@ def init_persistent_structure(onto):
             for_loop.is_a += [cond_then_body]  # workaround
             for_loop.label = ["FOR"]
 
+            if WRITE_CONCEPT_FLAG_LABEL:
+                for_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+
             class foreach_loop(pre_update_loop, start_with_cond): pass
             foreach_loop.is_a += [body_then_cond]  # workaround
             foreach_loop.label = ["FOREACH"]
+
+            if WRITE_CONCEPT_FLAG_LABEL:
+                foreach_loop.has_bitflags = FLAGS_visible | FLAGS_target;
 
 
 
@@ -1142,6 +1168,9 @@ def init_persistent_structure(onto):
         class func(action): pass
         # class func(sequence): pass
         class alternative(action): pass
+        if WRITE_CONCEPT_FLAG_LABEL:
+            alternative.has_bitflags = FLAGS_visible | FLAGS_target;
+            alternative.label = ['ветвления (if)']
 
         # # make algorithm elements classes
         # for class_name in [
@@ -1162,11 +1191,19 @@ def init_persistent_structure(onto):
             # add annotation name: rdfs:label
             cls.label = [class_name]
             cls.atom_action = True
+            if WRITE_CONCEPT_FLAG_LABEL:
+                cls.has_bitflags = FLAGS_visible | FLAGS_target;
 
         for class_name in [
             "if", "else-if", "else",
         ]:
             types.new_class(class_name, (alt_branch,))
+
+        if WRITE_CONCEPT_FLAG_LABEL:
+            onto['else-if'].has_bitflags = FLAGS_visible | FLAGS_target;
+            onto['else-if'].label = ['else-if']
+            onto['else'].has_bitflags = FLAGS_visible | FLAGS_target;
+            onto['else'].label = ['else']
 
         # make some properties
         for prop_name in ("body", "cond", "init", "update", "wrong_next_act", "interrupt_target", ):
@@ -1759,7 +1796,8 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
             fileobj=io.BytesIO(result_rdf_bytes),
             reload=True, only_local=True)
 
-        ### onto.save(file="jena_dbg_out.rdf", format='rdfxml')
+        ###
+        onto.save(file="jena_dbg_out.rdf", format='rdfxml')
 
 
 
@@ -1869,16 +1907,19 @@ def find_by_type(dict_or_list, types=(dict,), _not_entry=None):
 def save_schema(file_path='jena/control-flow-statements-domain-schema.rdf'):
     global WRITE_INVOLVES_CONCEPT
     global WRITE_PRINCIPAL_VIOLATION
-    global WRITE_SKOS_CONCEPT
+    # global WRITE_SKOS_CONCEPT
+    global WRITE_CONCEPT_FLAG_LABEL
     WRITE_INVOLVES_CONCEPT = True
     WRITE_PRINCIPAL_VIOLATION = True
-    WRITE_SKOS_CONCEPT = True
+    # WRITE_SKOS_CONCEPT = True  # ! SKOS.Concept is no longer in use in CompPrehension project!
+    WRITE_CONCEPT_FLAG_LABEL = True
     create_ontology_tbox().save(file_path)
 
     print("Saved as:\t", file_path)
     print()
     print("Don't forget to copy the result to:")
-    print(r"c:\D\Work\YDev\CompPr\CompPrehension\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
+    # print(r"c:\D\Work\YDev\CompPr\CompPrehension\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
+    print(r"c:\D\Work\YDev\CompPr\CompPrehension\modules\server\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
 
 
 def _play_with_classes():
