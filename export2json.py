@@ -7,6 +7,7 @@ from owlready2 import *
 import ctrlstrct_run
 import trace_gen.styling as styling
 import trace_gen.syntax as syntax
+from explanations import get_leaf_classes
 from trace_gen.txt2algntr import find_by_key_in, find_by_keyval_in
 
 from pprint import pprint
@@ -174,7 +175,9 @@ def export_algtr2dict(alg_tr, onto):
 
 		action_class = [cl for cl in ind.is_a if cl in action_classes]
 		assert action_class, (ind, ind.is_a, alg_tr)
-		action_class = action_class[0]  # must exist
+		action_class = next(iter(get_leaf_classes(action_class)))  # must exist
+		# print('action_classes for', ind, ':', [*ind.is_a])
+		# print('action_classes for', ind, ':', action_class)
 		concepts.add(action_class.name)
 		# find (first) dict with `id`
 		for obj_dict in find_by_keyval_in("id", ind.id, alg_data):
@@ -377,7 +380,7 @@ STYLE_HEAD = '''<style type="text/css" media="screen">
 	span.warning { background-color: #ff9; }
 	span.error { background-color: #fdd; }
 	span.button { background-color: #add; }
-	span.alg_button { color: #111; }
+	span.alg_button { color: #111; cursor: pointer; }
 
 </style>
 '''
