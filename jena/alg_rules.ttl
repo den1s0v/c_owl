@@ -184,7 +184,7 @@
 #	 this link is to be replaced:
 	(?prev my:always_consequent ?halt_bnd),
 #	 this link is to be removed:
-	(?halt_bnd my:interrupt_origin ?o),
+	(?halt_bnd my:interrupt_origin ?_),
 	(?halt_bnd my:halt_of ?st),
 	(?alg my:entry_point ?st),
 	(?e my:end_of ?st),

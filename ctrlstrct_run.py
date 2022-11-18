@@ -952,6 +952,12 @@ def init_persistent_structure(onto):
             # use shortcut instead of adding unnecessary class
             Concept = Thing
 
+        # annotation `has_bitflags`
+        class has_bitflags(AnnotationProperty):
+            '''a Concept can have label & flags '''
+        FLAGS_visible = 1;
+        FLAGS_target = 2;
+
         # class related_to_concept(DatatypeProperty): pass
 
         # новое свойство id
@@ -963,6 +969,10 @@ def init_persistent_structure(onto):
         class act_begin(act): pass
         # --->
         class trace(act_begin): pass
+        if WRITE_CONCEPT_FLAG_LABEL:
+            trace.has_bitflags = 0 | FLAGS_target;
+            trace.label = ['ветвления (if)']
+
         # -->
         class act_end(act): pass
         # -->
@@ -995,12 +1005,6 @@ def init_persistent_structure(onto):
         # annotation `atom_action`
         class atom_action(AnnotationProperty):
             '''action that is is atomic and always shown in 'performed' phase '''
-
-        # annotation `has_bitflags`
-        class has_bitflags(AnnotationProperty):
-            '''a Concept can have label & flags '''
-        FLAGS_visible = 1;
-        FLAGS_target = 2;
 
         class algorithm(Concept): pass
 
@@ -1075,7 +1079,7 @@ def init_persistent_structure(onto):
         class loop(action): pass
         if WRITE_CONCEPT_FLAG_LABEL:
             loop.has_bitflags = FLAGS_visible | FLAGS_target;
-            loop.label = ['циклы']
+            loop.label = ['Циклы']
 
         if loop:  # hide a block under code folding
             # classes that regulate the use of condition in a loop
@@ -1158,8 +1162,8 @@ def init_persistent_structure(onto):
             foreach_loop.is_a += [body_then_cond]  # workaround
             foreach_loop.label = ["FOREACH"]
 
-            if WRITE_CONCEPT_FLAG_LABEL:
-                foreach_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+            # if WRITE_CONCEPT_FLAG_LABEL:
+            #     foreach_loop.has_bitflags = FLAGS_visible | FLAGS_target;
 
 
 
@@ -1170,7 +1174,7 @@ def init_persistent_structure(onto):
         class alternative(action): pass
         if WRITE_CONCEPT_FLAG_LABEL:
             alternative.has_bitflags = FLAGS_visible | FLAGS_target;
-            alternative.label = ['ветвления (if)']
+            alternative.label = ['if']
 
         # # make algorithm elements classes
         # for class_name in [
@@ -1184,14 +1188,31 @@ def init_persistent_structure(onto):
             cls = types.new_class(class_name, (action, ))  ### hide_boundaries
             cls.atom_action = True
 
-        for class_name in [
-            "return", "break", "continue",  # have optional `interrupt_target`
-        ]:
-            cls = types.new_class(class_name, (onto['interrupt_action'], ))
-            # add annotation name: rdfs:label
-            cls.label = [class_name]
-            cls.atom_action = True
-            if WRITE_CONCEPT_FLAG_LABEL:
+        if not WRITE_CONCEPT_FLAG_LABEL:
+            for class_name in [
+                "return", "break", "continue",  # have optional `interrupt_target`
+            ]:
+                cls = types.new_class(class_name, (onto['interrupt_action'], ))
+                # add annotation name: rdfs:label
+                cls.label = [class_name]
+                cls.atom_action = True
+                # if WRITE_CONCEPT_FLAG_LABEL:
+                #     cls.has_bitflags = FLAGS_visible | FLAGS_target;
+        else:
+            # making schema for export
+            class break_continue(onto['interrupt_action']): pass
+            break_continue.has_bitflags = FLAGS_visible | FLAGS_target;
+            break_continue.label = ['break & continue']
+
+            for class_name, parent in [
+                ("return", onto['interrupt_action']),
+                ("break", break_continue),
+                ("continue", break_continue),
+            ]:
+                cls = types.new_class(class_name, (parent, ))
+                # add annotation name: rdfs:label
+                cls.label = [class_name]
+                cls.atom_action = True
                 cls.has_bitflags = FLAGS_visible | FLAGS_target;
 
         for class_name in [
@@ -1919,8 +1940,7 @@ def save_schema(file_path='jena/control-flow-statements-domain-schema.rdf'):
     print("Saved as:\t", file_path)
     print()
     print("Don't forget to copy the result to:")
-    # print(r"c:\D\Work\YDev\CompPr\CompPrehension\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
-    print(r"c:\D\Work\YDev\CompPr\CompPrehension\modules\server\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
+    print(r"c:\D\Work\YDev\CompPr\CompPrehension\modules\core\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
 
 
 def _play_with_classes():

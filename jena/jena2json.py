@@ -100,8 +100,8 @@ def create_Law(law_config, formulations=None):
 	if "tags" not in law_config: law_config["tags"] = None
 
 	## !!! Filter rules not needed for CompPrehension. TODO: make this more explicit.
-	if formulations:
-		formulations = [f for f in formulations if filter_rule_by_name(f['name'])]
+	# if formulations:
+	# 	formulations = [f for f in formulations if filter_rule_by_name(f['name'])]
 
 	law = {
 		**law_config,
@@ -145,6 +145,8 @@ class SectionedRulesReader:
 					self.begin_rule(line)
 				elif line.startswith("]"):
 					self.in_rule = False
+					if not filter_rule_by_name(self.rule_config["name"]):
+						del self.laws[-1]["formulations"][-1]
 				else:
 					self.handle_code(line)
 
@@ -190,8 +192,8 @@ class SectionedRulesReader:
 			if tag not in law_tags:
 				law_tags.append(tag)
 
-		if filter_rule_by_name(self.rule_config["name"]):
-			law["formulations"].append(create_Rule(**self.rule_config))
+		# if filter_rule_by_name(self.rule_config["name"]):
+		law["formulations"].append(create_Rule(**self.rule_config))
 
 
 
