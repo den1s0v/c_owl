@@ -1169,13 +1169,13 @@ def init_persistent_structure(onto):
 
         # -->
         class alt_branch(sequence): pass
+        if WRITE_CONCEPT_FLAG_LABEL:
+            alt_branch.has_bitflags = FLAGS_visible | FLAGS_target;
+            alt_branch.label = ['if / else']
+
         class func(action): pass
         # class func(sequence): pass
         class alternative(action): pass
-        if WRITE_CONCEPT_FLAG_LABEL:
-            alternative.has_bitflags = FLAGS_visible | FLAGS_target;
-            alternative.label = ['if']
-
         # # make algorithm elements classes
         # for class_name in [
         #     "alternative",
@@ -1219,12 +1219,6 @@ def init_persistent_structure(onto):
             "if", "else-if", "else",
         ]:
             types.new_class(class_name, (alt_branch,))
-
-        if WRITE_CONCEPT_FLAG_LABEL:
-            onto['else-if'].has_bitflags = FLAGS_visible | FLAGS_target;
-            onto['else-if'].label = ['else-if']
-            onto['else'].has_bitflags = FLAGS_visible | FLAGS_target;
-            onto['else'].label = ['else']
 
         # make some properties
         for prop_name in ("body", "cond", "init", "update", "wrong_next_act", "interrupt_target", ):
