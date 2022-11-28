@@ -12,7 +12,7 @@ import fs
 import yaml
 
 
-_dir_path = os.path.dirname(os.path.realpath(__file__)) # dir of cuurent .py file
+_dir_path = os.path.dirname(os.path.realpath(__file__)) # dir of current .py file
 
 
 if __name__ == '__main__' or True:  # to import from upper directory

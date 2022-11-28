@@ -67,6 +67,7 @@ class JenaClient:
         try:
             # Send data ...
             print('runReasoner(%d bytes of binary data) ...' % len(rdfData))
+            # print('       ... (rulePaths: "%s") ...' % rulePaths)
             resultBytes = self.client.runReasoner(rdfData, rulePaths)
             print('Received %d bytes' % len(resultBytes))
             return resultBytes

@@ -28,7 +28,7 @@ def get_existing_trace():
 
 # SYNTAX = {}
 
-# features of: Pseudocode / С / Python / JavaScript / etc.
+# features of: Pseudocode / С / Python / Java / etc.
 # token : function(str or tag) -> tag or tags
 def get_syntax(_init_default_syntax=True):
 	'thread-safe wrapper for ex-global SYNTAX variable'

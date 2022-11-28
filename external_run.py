@@ -1,6 +1,7 @@
 # external_run.py
 
 import re
+import os
 import subprocess
 import sys
 import time
@@ -17,6 +18,9 @@ try:
 	from options import JAVA_PATH # outcomment this import if loading from a foreign directory
 except:
 	pass
+
+
+_DIR_PATH = os.path.dirname(os.path.realpath(__file__))  # dir of current .py file
 
 
 # MEASURE_TIME = True
@@ -40,10 +44,17 @@ _WATCHING_THREAD = None
 
 # Jena service daemon process
 JENA_SERVICE_PORT = 20299
-JENA_RULE_PATHS = "jena/alg_rules.ttl;jena/relink_acts.ttl;jena/unskip_acts.ttl;jena/trace_rules.ttl"
+JENA_RULE_PATHS = "jena/alg_rules.ttl;jena/relink_acts.ttl;jena/unskip_acts.ttl;jena/trace_rules.ttl"  # jena/rdfs4core.rules;jena/loop_names.ttl; <- these shouldn't be used separately
+JENA_RULE_PATHS_SOLVE_ALG = "jena/alg_rules.ttl"
 _service_Process = None
 _client_Manager = None
 
+
+def fix_current_dir() -> str:
+	''' return absolute path to c_owl/ dir if Python invoked from different location, or empty string otherwise. '''
+	if not os.path.samefile(_DIR_PATH, os.getcwd()):
+		return _DIR_PATH
+	return ''
 
 def set_repeat_count(count: int):
 	'Set REPEAT_COUNT globally for the module'
@@ -396,12 +407,21 @@ def invoke_jena_reasoning_service(rdfData:bytes, rules_path=JENA_RULE_PATHS):
 
 	exception = None
 	for _ in range(2):  # loop to retry
+		cur_dir = ''
+		# cur_dir = fix_current_dir()
+		# if cur_dir:
+		# 	cur_dir = cur_dir.replace('\\','/').rstrip('/\\') + "/"  # ensure slash
+		# 	# fix rule paths
+		# 	rules_path = ';'.join(cur_dir + p for p in rules_path.split(';'))
+		# 	# print('rules_path:')
+		# 	# print(rules_path)
+
 		if need_create_process:
 			# invoke separate java process in non-blocking fasion, with shared stdout
-			cmd = f'{JAVA_PATH} -jar jena/Jena.jar service --port {JENA_SERVICE_PORT}'.split()
+			cmd = f'{JAVA_PATH} -jar {cur_dir}jena/Jena.jar service --port {JENA_SERVICE_PORT}'.split()
 			print("Starting java background service ...")
 			print("  command:  ", cmd)
-			_service_Process = psutil.Popen(cmd, stdout=sys.stderr)
+			_service_Process = psutil.Popen(cmd, stdout=sys.stderr, cwd=_DIR_PATH)
 
 		try:
 			if not _client_Manager:

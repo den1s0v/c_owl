@@ -18,7 +18,7 @@ from onto_helpers import *
 from transliterate import slugify
 from trace_gen.txt2algntr import get_ith_expr_value, find_by_key_in, find_by_keyval_in
 from explanations import format_explanation, get_leaf_classes
-from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, invoke_jena_reasoning_service, measure_stats_for_pellet_running, measure_stats_for_clingo_running, measure_stats_for_dlv_running, get_process_run_stats
+from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, invoke_jena_reasoning_service, JENA_RULE_PATHS, JENA_RULE_PATHS_SOLVE_ALG, measure_stats_for_pellet_running, measure_stats_for_clingo_running, measure_stats_for_dlv_running, get_process_run_stats
 
 from common_helpers import Uniqualizer, delete_file
 
@@ -971,7 +971,7 @@ def init_persistent_structure(onto):
         class trace(act_begin): pass
         if WRITE_CONCEPT_FLAG_LABEL:
             trace.has_bitflags = 0 | FLAGS_target;
-            trace.label = ['ветвления (if)']
+            trace.label = ['трасса выполнения']
 
         # -->
         class act_end(act): pass
@@ -1494,7 +1494,7 @@ def init_persistent_structure(onto):
 
         # make consequent subproperties (always_consequent is default base)
         for class_spec in [
-            #: (name, [base], [principal_violations])
+            #: (name, optional base, [principal_violations])
             # "DebugObj",
             # "FunctionBegin",
             # "FunctionEnd",
@@ -1812,8 +1812,7 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
             fileobj=io.BytesIO(result_rdf_bytes),
             reload=True, only_local=True)
 
-        ###
-        onto.save(file="jena_dbg_out.rdf", format='rdfxml')
+        ### onto.save(file="jena_dbg_out.rdf", format='rdfxml')
 
 
 
@@ -1867,6 +1866,24 @@ def process_algtraces(trace_data_list, debug_rdf_fpath=None, verbose=1,
     ch.hit("mistakes extracted")
 
     return onto, list(mistakes.values())
+
+
+def run_jenaService_with_rdfxml(rdfxml_in: bytes, alg_only=False) -> bytes:
+    ''' perform reasoning & return bytes in 'N3' format '''
+    # # save ontology to buffer in memory
+    # # TODO: check if NTRIPLES will be processed faster!
+    # stream = io.BytesIO()
+    # onto.save(file=stream, format='rdfxml')
+    rules_path = JENA_RULE_PATHS_SOLVE_ALG if alg_only else JENA_RULE_PATHS
+    result_n3_bytes = invoke_jena_reasoning_service(rdfData=rdfxml_in, rules_path=rules_path)
+
+    return result_n3_bytes
+
+    # # read from byte stream
+    # # use isolated worlds (keep concurrent threads in mind)
+    # onto = get_isolated_ontology(ONTOLOGY_IRI).load(
+    #     fileobj=io.BytesIO(result_rdf_bytes),
+    #     reload=True, only_local=True)
 
 
 def sync_jena(onto, rules_path=None, reasoning='jena', verbose=1) -> 'new onto':
