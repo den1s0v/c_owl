@@ -805,9 +805,9 @@ while (signal != WM_CLOSE) -> 1 // L2
 // алгоритм cm1
 {
     begin = true;
-	while (x >= 3) ->0  // L1
+	while (x >= 3) -> 0  // L1
 		if (begin)  // A1
-			x /=3;
+			x /= 3;
 			begin = false;
 		else
 			x++;
