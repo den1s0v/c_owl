@@ -952,6 +952,12 @@ def init_persistent_structure(onto):
             # use shortcut instead of adding unnecessary class
             Concept = Thing
 
+        if WRITE_CONCEPT_FLAG_LABEL:
+            # skos:broader  (has broader, is sub-concept-of)
+            class broader(AnnotationProperty):
+                namespace = skos
+
+
         # annotation `has_bitflags`
         class has_bitflags(AnnotationProperty):
             '''a Concept can have label & flags '''
@@ -1139,6 +1145,7 @@ def init_persistent_structure(onto):
 
             if WRITE_CONCEPT_FLAG_LABEL:
                 while_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+                while_loop.broader = [loop]
 
             class do_while_loop(start_with_body): pass
             do_while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
@@ -1146,6 +1153,7 @@ def init_persistent_structure(onto):
 
             if WRITE_CONCEPT_FLAG_LABEL:
                 do_while_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+                do_while_loop.broader = [loop]
 
             # class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
             # do_until_loop.is_a += [body_then_cond]  # workaround
@@ -1157,6 +1165,7 @@ def init_persistent_structure(onto):
 
             if WRITE_CONCEPT_FLAG_LABEL:
                 for_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+                for_loop.broader = [loop]
 
             class foreach_loop(pre_update_loop, start_with_cond): pass
             foreach_loop.is_a += [body_then_cond]  # workaround
@@ -1164,23 +1173,35 @@ def init_persistent_structure(onto):
 
             # if WRITE_CONCEPT_FLAG_LABEL:
             #     foreach_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+            #     foreach_loop.broader = [loop]
 
 
 
         # -->
         class alt_branch(sequence): pass
-        if WRITE_CONCEPT_FLAG_LABEL:
-            alt_branch.has_bitflags = FLAGS_visible | FLAGS_target;
-            alt_branch.label = ['if / else']
+        # if WRITE_CONCEPT_FLAG_LABEL:
+        #     alt_branch.has_bitflags = FLAGS_visible | FLAGS_target;
+        #     alt_branch.label = ['Ветки развилки']
 
         class func(action): pass
         # class func(sequence): pass
         class alternative(action): pass
-        # # make algorithm elements classes
-        # for class_name in [
-        #     "alternative",
-        # ]:
-        #     types.new_class(class_name, (action,))
+        if WRITE_CONCEPT_FLAG_LABEL:
+            alternative.has_bitflags = FLAGS_visible | FLAGS_target;
+            alternative.label = ['if']
+
+        for class_name in [
+            "if", "else-if", "else",
+        ]:
+            cls = types.new_class(class_name, (alt_branch,))
+            if WRITE_CONCEPT_FLAG_LABEL:
+                cls.has_bitflags = FLAGS_visible | FLAGS_target;
+                cls.label = [class_name]
+        if WRITE_CONCEPT_FLAG_LABEL:
+            onto["if"].has_bitflags = 0 | FLAGS_target;
+            onto["if"]     .broader = [alternative]
+            onto["else-if"].broader = [alternative]
+            onto["else"]   .broader = [alternative]
 
         for class_name in [
             "expr", "stmt", "interrupt_action",
@@ -1188,37 +1209,24 @@ def init_persistent_structure(onto):
             cls = types.new_class(class_name, (action, ))  ### hide_boundaries
             cls.atom_action = True
 
-        if not WRITE_CONCEPT_FLAG_LABEL:
-            for class_name in [
-                "return", "break", "continue",  # have optional `interrupt_target`
-            ]:
-                cls = types.new_class(class_name, (onto['interrupt_action'], ))
-                # add annotation name: rdfs:label
-                cls.label = [class_name]
-                cls.atom_action = True
-                # if WRITE_CONCEPT_FLAG_LABEL:
-                #     cls.has_bitflags = FLAGS_visible | FLAGS_target;
-        else:
-            # making schema for export
-            class break_continue(onto['interrupt_action']): pass
-            break_continue.has_bitflags = FLAGS_visible | FLAGS_target;
-            break_continue.label = ['break & continue']
-
-            for class_name, parent in [
-                ("return", onto['interrupt_action']),
-                ("break", break_continue),
-                ("continue", break_continue),
-            ]:
-                cls = types.new_class(class_name, (parent, ))
-                # add annotation name: rdfs:label
-                cls.label = [class_name]
-                cls.atom_action = True
-                cls.has_bitflags = FLAGS_visible | FLAGS_target;
-
         for class_name in [
-            "if", "else-if", "else",
+            "return", "break", "continue",  # have optional `interrupt_target`
         ]:
-            types.new_class(class_name, (alt_branch,))
+            cls = types.new_class(class_name, (onto['interrupt_action'], ))
+            # add annotation name: rdfs:label
+            cls.label = [class_name]
+            cls.atom_action = True
+            if WRITE_CONCEPT_FLAG_LABEL:
+                cls.has_bitflags = FLAGS_visible | FLAGS_target;
+        if WRITE_CONCEPT_FLAG_LABEL:
+            # making schema for export
+            class loop_break_continue(Thing): pass
+            loop_break_continue.has_bitflags = FLAGS_visible | FLAGS_target;
+            loop_break_continue.label = ['Прерывание цикла']
+            # loop_break_continue.label = ['break & continue']
+
+            onto["break"]   .broader = [loop_break_continue]
+            onto["continue"].broader = [loop_break_continue]
 
         # make some properties
         for prop_name in ("body", "cond", "init", "update", "wrong_next_act", "interrupt_target", ):
