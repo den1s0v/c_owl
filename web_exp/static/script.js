@@ -89,7 +89,7 @@ program ended`)
     }); 	
     
     
-    $("#send_text").click(function(){
+    $("#send_text").on("click", function() {
         if (cm_alg.isReadOnly())
         	// fields was not changed, so reset the values to the stored before previous send
         	load_fields()
@@ -99,7 +99,7 @@ program ended`)
 	    
 	    $("#new").html("Edit (enable fields)")
 	     
-	    data = {
+	    let data = {
 	        alg: e_alg.getValue(),
 	        trace: e_trace.getValue()
         }
@@ -125,7 +125,7 @@ program ended`)
     });
 
     $("#send_json").click(function(){
-	    data = JSON_example
+	    let data = JSON_example;
 
         $.ajax({
         	url: '/process_as_json', 
@@ -149,7 +149,7 @@ program ended`)
     
     define_syntax_mode();
     
-    cm_config = {
+    let cm_config = {
     	lineNumbers: true,
     	theme: "elegant"
     }
@@ -182,16 +182,16 @@ function processing_callback(response="wait")
 	
 	if(response.messages)
 	{	
-		mistakes_count = 0
+		let mistakes_count = 0;
 		if(response.mistakes)
 			mistakes_count = response.mistakes.length
 		
-		explanations = []
+		let explanations = [];
 		
 		if(response.mistakes)
 		{
 			// add mistakes annotation to the end of each trace lines
-			line2names = {}
+			let line2names = {};
 			for(let m of response.mistakes)
 			{
 				if(m["text_line"])
@@ -213,14 +213,15 @@ function processing_callback(response="wait")
 			explanations.sort(function compare(a, b) {return a[0] - b[0]})
 			explanations = explanations.map( function(a) {return a[1]} )
 			
-			lines = load_field("trace").split('\n')
-			for(let i in line2names)
+			let lines = load_field("trace").split('\n')
+			for(let key in line2names)
 			{
+        const i = parseInt(key);
 				if(1 <= i && i <= lines.length)
 				{
-					names = [...new Set(line2names[i])]
+					let names = [...new Set(line2names[i])]
 					names.sort()
-					addition = '  // error: ' + names.join(', ')
+					const addition = '  // error: ' + names.join(', ')
 					if(! lines[i-1].endsWith(addition))
 						lines[i-1] += addition
 				}
@@ -231,7 +232,7 @@ function processing_callback(response="wait")
 			e_trace.setValue(text)
 		}
 		
-		messages = (response.messages.concat(explanations)).join("\n<br>")
+		const messages = (response.messages.concat(explanations)).join("\n<br>")
 		
 		$('#status').html("Server's response:\n" + messages + '\n<br>' 
 			+ mistakes_count + ` mistakes (in internal representation).`
@@ -276,12 +277,11 @@ function load_fields()
 // pass "alg" or "trace"
 function load_field(field_name)
 {
-	str = localStorage.algtrace
-	if(!str)
-	{
-		return ''
-	}
-	
+	const str = localStorage.algtrace
+  if (!str) {
+    return ''
+  }
+
 	let data = JSON.parse( str );
 	return data[field_name]
 }
@@ -293,9 +293,9 @@ function load_field(field_name)
 
 function define_syntax_mode() {
 
-	keyword_re = /(?:начался|началась|началось|began|закончился|закончилась|закончилось|ended|выполнился|выполнилась|выполнилось|executed|evaluated|calculated|если|иначе|делать|пока|для|от|до|шаг|с\s+шагом|if|else|do|while|for|from|to|with\s+step|step|каждого|в|из|по|к|foreach|each|in)(?:\s|$)/i
+	const keyword_re = /(?:начался|началась|началось|began|закончился|закончилась|закончилось|ended|выполнился|выполнилась|выполнилось|executed|evaluated|calculated|если|иначе|делать|пока|для|от|до|шаг|с\s+шагом|if|else|do|while|for|from|to|with\s+step|step|каждого|в|из|по|к|foreach|each|in)(?:\s|$)/i
 	
-	struct_re = /развилка|развилки|альтернативная|ветка|branch|alternative|условия|переход|update|итерация|iteration|иначe|условие|цикла|condition|of|loop|инициализация|init|initialization|цикл|следование|sequence/i
+	const struct_re = /развилка|развилки|альтернативная|ветка|branch|alternative|условия|переход|update|итерация|iteration|иначe|условие|цикла|condition|of|loop|инициализация|init|initialization|цикл|следование|sequence/i
 	
 	// выполнилось
 	CodeMirror.defineSimpleMode("algtracemode", {
@@ -322,7 +322,7 @@ function define_syntax_mode() {
 }
 
 
-JSON_example = {"algorithm": {"expr_values": {"не_зелёный": [true, true, false],
+const JSON_example = {"algorithm": {"expr_values": {"не_зелёный": [true, true, false],
                                  "цвет_жёлтый": [false],
                                  "цвет_красный": [true, false]},
                  "functions": [],
