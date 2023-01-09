@@ -26,3 +26,5 @@ code_gen/test.html
 
 web_exp/static/quick-guide-syntax.files/*.xml
 web_exp/static/quick-guide-syntax.files/*.thmx
+
+node_modules

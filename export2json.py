@@ -40,7 +40,7 @@ def export_algtr2dict(alg_tr, onto):
 	tags = []
 	concepts = set()
 
-	answer_ids = count()
+	answer_ids = count()  # infinite generator
 
 	# "owl:NamedIndividual"
 	# "xsd:int"

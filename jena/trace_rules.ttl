@@ -1729,7 +1729,7 @@
 # Rule: NoConditionAfterForInit-loop_Error [loop & mistake]
 [
 	(?a rdf:type my:act_end),
-	(?a my:executes ?bnd), (?bnd my:boundary_of ?init_stmt),
+	(?a my:executes ?bnd), (?bnd my:end_of ?init_stmt),
 	(?Loop rdf:type my:start_with_init),
 	(?Loop my:init ?init_stmt),
 	(?Loop my:cond ?cnd),
@@ -1782,7 +1782,8 @@
 # Rule: NoUpdateAfterIteration-loop_Error [loop & mistake]
 [
 	(?a rdf:type my:act_end),
-	(?a my:executes ?bnd), (?bnd my:boundary_of ?st),
+#	`end_of`, not `halt_of`:
+	(?a my:executes ?bnd), (?bnd my:end_of ?st),
 	(?Loop rdf:type my:post_update_loop),
 	(?Loop my:body ?st),
 	(?Loop my:update ?upd),
