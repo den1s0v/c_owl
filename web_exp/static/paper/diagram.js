@@ -48,7 +48,7 @@ function test() {
 	algorithm_json = JSON.parse(algorithm_json)
 	// console.log(algorithm_json)
 
-	entry_point = algorithm_json["entry_point"];
+	var entry_point = algorithm_json["entry_point"];
 	algorithm_json = undefined;
 
 	// var node = entry_point.body[0].body.body[0].branches[0];
@@ -100,7 +100,7 @@ function test() {
 
 
 	// /// bring flex arrow to front
-	for (link of g_allLinks) {
+	for (let link of g_allLinks) {
 		if (link.config.flex)
 			link.draw();
 	}
@@ -109,7 +109,7 @@ function test() {
 
 function get_links_connecting(from_id, to_id) {
 	let res = [];
-	for (link of g_allLinks) {
+	for (let link of g_allLinks) {
 		if (
 			(!from_id || link.from.owner.alg_id == from_id) &&
 			(!to_id   || link.to.owner.alg_id   == to_id)
@@ -159,6 +159,12 @@ function rebasePoint(p, old_base, new_base) {
 
 
 class Link {
+	/**
+	 * 
+	 * @param {Slot} slot1 
+	 * @param {Slot} slot2 
+	 * @param {object} config 
+	 */
 	constructor(slot1, slot2, config) {
 		// super();  // do not use in root classes !
 		this.from = slot1;
@@ -270,12 +276,20 @@ class Link {
 		if (this.config.text) {
 			let p1 = path_data.segments[0];
 			let p2 = path_data.segments[1];
-			let point = new paper.Rectangle(p1.point || p1, p2.point || p2).center;
+			const rect = new paper.Rectangle(p1.point || p1, p2.point || p2);
+			let point = rect.center;
 			point.y += FONT_SIZE / 3;  // vertical centering workaround
+			let justification = 'center';
+			if (rect.width < 1) {
+				justification = 'left';
+				point.x += LINE_WIDTH / 2;  // at right of vertical line
+			} else {
+				point.y -= LINE_WIDTH;  // above horizontal line
+			}
 			draw_shape("text", {
 				point: point,
 				content: this.config.text,
-				justification: 'center',
+				justification: justification,
 				fillColor: '#f48',
 				// fontFamily: 'Courier New',
 				fontWeight: 'bold',
@@ -294,6 +308,10 @@ class Link {
 }
 
 class Location {
+	/**
+	 * @param {paper.Point | null} corner
+	 * @param {paper.Point | null} size
+	 */
 	constructor(corner, size) {
 		// super();
 		this.corner = new paper.Point(corner || [0,0]);
@@ -349,6 +367,7 @@ class AlgArea extends Location {
 		this.config = config || {};
 		this.alg_id = false;    // assigned in create_alg_for()
 		this.alg_name = false;  // assigned in create_alg_for()
+		this.name_visible = false;  // assigned in .fit()
 	}
 	slot(direction, role) {  // getter & default creator
 		if (!this.slots[direction])
@@ -482,12 +501,11 @@ class AlgArea extends Location {
 			this.draw_name()
 	}
 	draw_name() {
-		const slot_in = this.find_slot("in");
-		let point = slot_in.corner;
+		let point = this.corner;
 		draw_shape("text", {
 			// point: this.corner,
 			// point: [this.corner.x + this.size.width - 2, this.corner.y + FONT_SIZE],
-			point: [point.x + LINE_WIDTH, point.y + FONT_SIZE * 1.3],
+			point: [point.x + LINE_WIDTH * 0.6, point.y + FONT_SIZE * 1.0],
 			content: this.alg_name,
 			justification: 'left',
 			// fillColor: '#f48',
@@ -517,7 +535,8 @@ class AlgArea extends Location {
 	}
 }
 
-class TransitDiamond extends AlgArea {  // links connection
+/** links connection */
+class TransitDiamond extends AlgArea {  
 	constructor(corner, parent, config) {
 		super(corner, config, parent);
 		this.side = LINE_WIDTH / 2;
@@ -1019,12 +1038,134 @@ class DoLoopArea extends AlgArea {
 	}
 }
 
+class ForLoopArea extends AlgArea {
+	fit(alg_node) {
+		this.name_visible = true;
+		const seph = U * 1.4;
+		const seph_s = U //* 0.9;
+		const sepv = U * 0.6;
+		const offseth = new paper.Point(seph, 0);
+		const offseth_s = new paper.Point(seph_s, 0);
+		const offsetv = new paper.Point(0, sepv);
+		let current_slot = null;
+		let plug_point = this.corner;
+
+		const input_diamond = new TransitDiamond(plug_point, this);
+		this.inner.push(input_diamond);
+		// input of whole node
+		this.create_slot(90, input_diamond.slot(90));
+		// connect through
+		this.links.push(new Link(this.slot(90), input_diamond.slot(90)));
+
+		plug_point = plug_point.add(offsetv);
+
+		const init = create_alg_for(alg_node.init, this);     // i = 0
+		const cond = create_alg_for(alg_node.cond, this);     // i < 10
+		const update = create_alg_for(alg_node.update, this); // i ++
+		const body = create_alg_for(alg_node.body, this);
+
+		init.name_visible = true;
+		update.name_visible = true;
+
+		this.inner.push(init);
+		this.inner.push(cond);
+		this.inner.push(update);
+		this.inner.push(body);
+
+		// link init
+		init.rebase(init.slot(90).corner, plug_point);
+		this.links.push(new Link(input_diamond.slot(270), init.slot(90)));
+
+		plug_point = init.slot(270).corner.add(offsetv);
+
+		// link cond
+		cond.rebase(cond.slot(90).corner, plug_point);
+		this.links.push(new Link(input_diamond.slot(270), cond.slot(90)));
+
+		plug_point = cond.slot(270).corner.add(offsetv);
+
+		// link update/increment (at left of cond)
+		const upd_plug_point = cond.slot(180).corner.subtract(offseth_s);
+
+		update.rebase(update.slot(0).corner, upd_plug_point);
+		this.links.push(new Link(update.slot(0), cond.slot(180), {arrow: true}));
+
+		// link body
+		body.rebase(body.slot(90).corner, plug_point);
+		this.links.push(new Link(cond.slot(270), body.slot(90), {text: LBL[1]}));
+
+		const body_bbox = body.bbox();
+		const too_wide_body = body_bbox.topLeft.x < update.slot(270, 'in').corner.x;
+
+		// link up to cond by left side ...
+		const helper_vertex_left = new TransitDiamond(new paper.Point(
+			too_wide_body?
+				update.slot(180, 'in').corner.add(offsetv).subtract(offseth_s)
+			  : update.slot(270, 'in').corner.add(offsetv)), 
+			this, {hidden: true});
+		this.inner.push(helper_vertex_left);
+		const helper_vertex_bottom = new TransitDiamond(new paper.Point(body_bbox.bottomLeft.add(offsetv)), this, {hidden: true});
+		this.inner.push(helper_vertex_bottom);
+
+		let body_out = body.slot(270, "out");
+
+		// link from body to cond
+		this.links.push(new Link(body_out, helper_vertex_bottom.slot(0, "in")));
+		this.links.push(new Link(helper_vertex_bottom.slot(180, "out"), helper_vertex_left.slot(270, "in")));
+		this.links.push(new Link(helper_vertex_left.slot(90, "out"), update.slot(too_wide_body? 180 : 270), {arrow: true}));
+
+		plug_point = body_out.corner.add(offsetv);
+		plug_point = plug_point.add(offsetv);
+
+		const join_diamond = new TransitDiamond(plug_point, this);
+		this.inner.push(join_diamond);
+
+		// link down to join_diamond by right side ...
+		const helper_vertex_right = new TransitDiamond(new paper.Point(body_bbox.bottomRight.add(offseth)), this, {hidden: true});
+		this.inner.push(helper_vertex_right);
+
+		// link from cond to the join_diamond
+		this.links.push(new Link(cond.slot(0), helper_vertex_right.slot(90), {text: LBL[0]}));
+		this.links.push(new Link(helper_vertex_right.slot(270), join_diamond.slot(0, "in"), {arrow: true}));
+
+		plug_point = plug_point.add(offsetv);
+
+		const output_diamond = new TransitDiamond(plug_point, this);
+		this.inner.push(output_diamond);
+		// output of whole node
+		this.create_slot(270, output_diamond.slot(270));
+		// connect end through
+		this.links.push(new Link(output_diamond.slot(270), this.slot(270)));
+
+		// link join_diamond to the output
+		this.links.push(new Link(join_diamond.slot(270), output_diamond.slot(90)));
+
+		this.actualize_rect();
+	}
+}
+
 
 class BoxArea extends AlgArea {
 	fit(alg_node) {
 		// this.alg_node = alg_node;  // ???
 		this.size = new paper.Size(U * 2, U * 0.81);
+		// Set this visibility as option!
 		// this.name_visible = true;
+	}
+	draw_name() {
+		let point = this.corner;
+		draw_shape("text", {
+			// point: this.corner,
+			point: [this.corner.x + this.size.width/2, this.corner.y + this.size.height/2 + FONT_SIZE/3],
+			content: this.alg_name,
+			justification: 'center',
+			fillColor: '#666',
+			// fontFamily: 'Courier New',
+			// fontWeight: 'bold',
+			fontSize: FONT_SIZE,
+
+			bbox: this.bbox(),
+		});
 	}
 }
 
@@ -1038,24 +1179,27 @@ function create_alg_for(alg_node, parent) {
 			a.cond = create_alg_for(alg_node.cond, parent);
 		}
 	}
-	if (alg_node.type == "stmt") {
+	else if (alg_node.type == "stmt") {
 		a = new BoxArea();
 	}
-	if (alg_node.type == "return" || alg_node.type == "break" || alg_node.type == "continue") {
-		/// !!!
+	else if (alg_node.type == "return" || alg_node.type == "break" || alg_node.type == "continue") {
+		/// TODO !!!
 		a = new BoxArea();
 	}
-	if (alg_node.type == "expr") {
+	else if (alg_node.type == "expr") {
 		a = new ConditionDiamond();
 	}
-	if (alg_node.type == "alternative") {
+	else if (alg_node.type == "alternative") {
 		a = new AlternativeArea();
 	}
-	if (alg_node.type == "while_loop") {
+	else if (alg_node.type == "while_loop") {
 		a = new WhileLoopArea();
 	}
-	if (alg_node.type == "do_while_loop") {
+	else if (alg_node.type == "do_while_loop") {
 		a = new DoLoopArea();
+	}
+	else if (alg_node.type == "for_loop") {
+		a = new ForLoopArea();
 	}
 	// if (alg_node.type == "sequence") {
 	// 	a = new SequenceArea();
@@ -1072,12 +1216,13 @@ function create_alg_for(alg_node, parent) {
 		// store globally
 		if (a.alg_id !== undefined) {
 			g_allAlgAreas[a.alg_id] = a;
-			console.debug(a.alg_id, '  \t- ', a.alg_name)
+			// console.debug(a.alg_id, '  \t- ', a.alg_name)
 		}
 		// create a tree for alg_node
 		a.fit(alg_node);
 	} else {
 		console.warn("No handler for node type: " + alg_node.type);
+		console.warn(alg_node);
 	}
 	return a;  // can be null
 }

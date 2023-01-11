@@ -43,8 +43,10 @@ function redraw_activity_diagram(algorithm_json, trace_json, options) {
 	}
 }
 
+/** Compute the absolute coordinates and dimensions of element.
+ * @returns {object} {point: [x,y], size: [w,h]}
+*/
 function element_rectangle(elem) {
-	// Compute the absolute coordinates and dimensions of element.
 	let element = elem;
 	let x = 0;
 	let y = 0;

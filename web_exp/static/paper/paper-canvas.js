@@ -104,11 +104,12 @@ function draw_shape(type, config) {
 			    2000
 			).then(function() {
 			    // ...tween color back to blue.
-			    path.tweenTo({ dashOffset: 0 }, 2000)
-				.then(function() {
+			    path.tweenTo({ dashOffset: 0 }, 10_000)
+				/* .then(function() {
 				    // ...set solid line.
 				    path.dashArray = [10, 0]
-			})});
+				}) */
+			});
 		}
 		/// </>
 		return;
@@ -122,13 +123,26 @@ function draw_shape(type, config) {
 			let d = config.outline_offset;
 			let shift = new paper.Point(d, 0);
 
-			for (let angle = 0; angle < 360; angle += 90) {
-				config_clone.point = config.point + shift.rotate(angle);
+			for (let angle = 0; angle < 360; angle += 45) {
+				config_clone.point = config.point.add(shift.rotate(angle));
 				text = new paper.PointText(config_clone);
 			}
 		}
 		// draw the text
 		text = new paper.PointText(config);
+		if (config.bbox) {
+			if (!config.bbox.contains(text.bounds)) {
+				text.fontSize *= 0.8;
+				// text.remove()
+				if (!config.bbox.contains(text.bounds)) {
+					while (!config.bbox.contains(text.bounds) && text.content.length > 1) {
+						text.content = text.content.slice(0, -1).trim();
+					}
+					text.content = text.content.slice(0, -1).trim() + '…';
+					text.point.x += 2;
+				}
+			}
+		}
 		return;
 	}
 	if ("circle" === type) {
@@ -137,7 +151,7 @@ function draw_shape(type, config) {
 	}
 
 	let path = null;
-	if (["DoLoopArea", "WhileLoopArea", "AlternativeArea"].includes(type)) {
+	if (["DoLoopArea", "WhileLoopArea", "ForLoopArea", "AlternativeArea"].includes(type)) {
 		path = new paper.Path.Rectangle(new paper.Rectangle(config.rectangle));
 		path.strokeColor = COL_BLOCK_BORDER;
 		path.dashArray = [10, 10];
