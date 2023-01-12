@@ -21,11 +21,13 @@ TASK_MAP = [
 	("loop_names.ttl", {
 		"name": None,
 		"positive": True,
+		"salience": 10,
 	}),
 	# Duplicate this as there no way to include these to both positive and negative
 	("loop_names.ttl", {
 		"name": None,
 		"positive": False,
+		"salience": 10,
 	}),
 	("alg_rules.ttl", {
 		"name": None,
@@ -49,7 +51,7 @@ TASK_MAP = [
 def filter_rule_by_name(name):
 	if 'collapse_bound' not in name:
 		return True
-	print(' !! omit rule:', name)
+	print(' Note! omit rule:', name)
 	return False
 
 
@@ -67,7 +69,7 @@ def main():
 
 	print()
 	print("Don't forget to copy the result to:")
-	print(r"c:\D\Work\YDev\CompPr\CompPrehension\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
+	print(r"c:\D\Work\YDev\CompPr\CompPrehension\modules\core\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
 
 
 
