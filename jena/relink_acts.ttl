@@ -9,7 +9,7 @@
 # @include <jena/rdfs4core.rules>.
 #
 #
-# @include <jena/loop_names.ttl>.
+@include <jena/update_names.ttl>.
 
 @prefix my: <http://vstu.ru/poas/code#> .
 

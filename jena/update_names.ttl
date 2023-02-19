@@ -1,0 +1,91 @@
+# update_names.ttl
+
+@prefix  rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix  rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix my: <http://vstu.ru/poas/code#> .
+
+###############################
+# loop alternative helper
+###############################
+
+# Rule: name-branch-if-helper [alternative]
+[
+#	 this link is to be deleted:
+	(?b my:stmt_name ?old_name),
+#	guard: no infinite repetitions for this individual
+#	noValue(?b my:_stmt_name_updated 1),
+	(?b rdf:type my:if ),
+	(?a my:branches_item ?b),
+	(?a rdf:type my:alternative),
+	(?b my:cond ?cnd),
+	(?cnd my:stmt_name ?cnd_name),
+
+	strConcat( "!{locale:text.branch.if} \"", ?cnd_name, "\"", ?new_name)
+	notEqual(?old_name, ?new_name)
+	 ->
+	 drop(0),
+	 (?b my:stmt_name ?new_name),
+	 (?b my:_stmt_name_updated 1)
+]
+
+# Rule: name-branch-else-if-helper [alternative]
+[
+#	 this link is to be deleted:
+	(?b my:stmt_name ?old_name),
+#	noValue(?b my:_stmt_name_updated 1),
+	(?b rdf:type my:else-if ),
+	(?a my:branches_item ?b),
+	(?a rdf:type my:alternative),
+	(?b my:cond ?cnd),
+	(?cnd my:stmt_name ?cnd_name),
+
+	strConcat( "!{locale:text.branch.else-if} \"", ?cnd_name, "\"", ?new_name)
+	notEqual(?old_name, ?new_name)
+	 ->
+	 drop(0),
+	 (?b my:stmt_name ?new_name),
+	 (?b my:_stmt_name_updated 1)
+]
+
+# Rule: name-branch-else-helper [alternative]
+[
+#	 this link is to be deleted:
+	(?b my:stmt_name ?old_name),
+#	noValue(?b my:_stmt_name_updated 1),
+	(?b rdf:type my:else ),
+	(?a my:branches_item ?b),
+	(?a rdf:type my:alternative),
+	(?a my:stmt_name ?alt_name),
+
+	strConcat( "!{locale:text.branch.else} \"", ?alt_name, "\"", ?new_name)
+	notEqual(?old_name, ?new_name)
+	 ->
+	 drop(0),
+	 (?b my:stmt_name ?new_name),
+	 (?b my:_stmt_name_updated 1)
+]
+
+
+# Rule: name-loop-body-helper [loop]
+[
+#	 this link is to be deleted:
+	(?b my:stmt_name ?old_name),
+#	noValue(?b my:_stmt_name_updated 1),
+	(?b rdf:type my:sequence ),
+	(?a my:body ?b),
+	(?a rdf:type my:loop),
+	(?a my:stmt_name ?loop_name),
+
+	strConcat( "!{locale:text.loop-body} \"", ?loop_name, "\"", ?new_name),
+	notEqual(?old_name, ?new_name)
+	 ->
+	 drop(0),
+	 (?b my:stmt_name ?new_name),
+	 (?b my:_stmt_name_updated 1)
+]
+
+
+
+
+

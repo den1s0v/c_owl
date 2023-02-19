@@ -18,16 +18,24 @@ TASK_MAP = [
 		"name": "rdfs_subset_negative",
 		"positive": False,
 	}),
-	("loop_names.ttl", {
+	("update_names.ttl", {
 		"name": None,
 		"positive": True,
 		"salience": 10,
 	}),
-	# Duplicate this as there no way to include these to both positive and negative
 	("loop_names.ttl", {
+		"name": None,
+		"positive": True,
+	}),
+	# Duplicate this as there no way to include these to both positive and negative
+	("update_names.ttl", {
 		"name": None,
 		"positive": False,
 		"salience": 10,
+	}),
+	("loop_names.ttl", {
+		"name": None,
+		"positive": False,
 	}),
 	("alg_rules.ttl", {
 		"name": None,

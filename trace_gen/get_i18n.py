@@ -21,7 +21,7 @@ i18n.load_path.append(localedir)
 i18n.get('available_locales').insert(0, 'ru')  # ?? do I need to add it manually?
 
 i18n.set('locale', 'ru')
-# i18n.set('fallback', 'en')  # 'en' seems to be by default
+# i18n.set('fallback', 'en')  # 'en' seems to be the default
 i18n.set('error_on_missing_translation', True)  # False by default
 i18n.set('error_on_missing_placeholder', True)  # False by default
 
