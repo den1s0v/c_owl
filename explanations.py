@@ -1,12 +1,11 @@
 # explanations.py
 
 from collections import defaultdict
+from configparser import ConfigParser, Interpolation
+from pathlib import Path
 import re
 
 from common_helpers import camelcase_to_snakecase
-
-
-MESSAGES_FILE = "jena/control-flow-statements-domain-messages.txt"
 
 
 # from owlready2 import *
@@ -15,347 +14,240 @@ from trace_gen.json2alg2tr import get_target_lang
 from onto_helpers import get_relation_object, get_relation_subject
 
 
-onto = None  # TODO: remove global var
 
+MESSAGES_FILE = "jena/control-flow-statements-domain-messages.txt"
 
-def tr(word_en, case='nomn', lang=None):
-	""" Перевод на русский язык, если get_target_lang()=="ru" """
-	if (lang or get_target_lang()) == "en":
-		return word_en
-	# else: "ru"
-
-	grammemes = ('nomn','gent')
-	assert case in grammemes, "Unknown case: "+case
-	res = {
-		"__"				: ("__", ),
-		"[unknown]"			: ("[неизвестно]", ),
-		"begin of " 		: ("начало ", ),
-		"end of " 			: ("конец ", ),
-		" (at line %d)" 	: (" (в строке %d)", ),
-		" (the line is missing)" : (" (строка отсутствует)", ),
-		"%s-branch" 		: ("ветка %s", ),
-		"unknown structure" : ("неизвестная структура", ),
-		"expr"				: ("выражение", "выражения", ),
-		"stmt"				: ("команда", "команды", ),
-		"sequence"			: ("следование", "следования", ),
-		"alternative"		: ("развилка", "развилки", ),
-		"loop"				: ("цикл", "цикла", ),
-		"while_loop"		: ("цикл", "цикла", ),
-		"do_while_loop"		: ("цикл", "цикла", ),
-		"body of loop"		: ("тело цикла", "тела цикла", ),
-		"ex."				: ("например,", ),
-		"is true"			: ("истинно", ),
-		"is false"			: ("ложно", ),
-	}.get(word_en, ())
-	try:
-		return res[grammemes.index(case)]
-	except IndexError:
-		print("tr(%s, %s) error!"%(word_en, case))
-		return "==>%s.%s not found!<=="%(word_en, case)
-
-
-ALGORITHM_ITEM_CLASS_NAMES = {
-	'sequence',
-	"alternative",
-	'loop', "while_loop", 'do_while_loop', 'do_until_loop', 'for_loop', 'foreach_loop', 'infinite_loop',
-	"func",
-	"expr", "stmt",
-	"if", "else-if", "else",
+PROPERTIES_LOCALIZATION_FILES = {
+    'en': r'jena/control-flow-messages_en.properties',
+    'ru': r'jena/control-flow-messages_ru.properties',
 }
+PROPERTIES_COMMON_PREFIX = 'ctrlflow_'
+# LOCALE_KEY_MARK = "!{locale:"
+LOCALE_KEY_RE = re.compile("!{locale:(.+?)}")
 
-# map error class name to format string & method of it's expansion
-FORMAT_STRINGS = {}
-PARAM_PROVIDERS = {}
-CLASS_NAMES = {}  # "en-name" -> {"lang" -> "local-name"}
+class LocalizationProvider:
+    def __init__(self, prop_file_paths=()):
+        self.loc2path = dict(prop_file_paths)
+        self.loaded = {}
+
+    def get(self, key: str, lang: str, default=None):
+        if lang not in self.loaded:
+            self.load_lang(lang)
+        # return self.loaded[lang].get(key, default)
+        return self.loaded[lang][key.lower()]
+
+    def load_lang(self, lang):
+        if lang not in self.loc2path:
+            raise KeyError('Cannot load language with code "%s"' % lang)
+        path = self.loc2path[lang]
+        data = read_properties_file(path, cut_key_prefix=PROPERTIES_COMMON_PREFIX)
+        ### print([*data])
+
+        self.loaded[lang] = data
+
+
+onto = None  # TODO: remove global var
+locale = LocalizationProvider(PROPERTIES_LOCALIZATION_FILES)
+
+def tr(key: str, lang: str = None, default=None):
+    return locale.get(key, lang or get_target_lang(), default)
 
 
 def get_executes(act, *_):
-	onto = act.namespace
-	boundary = get_relation_object(act, onto.executes)
-	return get_relation_object(boundary, onto.boundary_of)
+    onto = act.namespace
+    boundary = get_relation_object(act, onto.executes)
+    return get_relation_object(boundary, onto.boundary_of)
 
 def get_base_classes(classes) -> set:
-		return {sup for cl in classes for sup in cl.is_a}
+        return {sup for cl in classes for sup in cl.is_a}
 
 
 def get_leaf_classes(classes) -> set:
-		# print(classes, "-" ,base_classes)
-		return set(classes) - get_base_classes(classes)
+        # print(classes, "-" ,base_classes)
+        return set(classes) - get_base_classes(classes)
 
 def class_name_to_readable(s):
-	sep = " "
-	res = s.replace("-", sep)
-	if res == s:
-		res = camelcase_to_snakecase(s, sep).capitalize()
-	return res
-
-
-# def format_full_name(a: 'act or stmt', include_phase=False, include_type=True, include_line_index=False, case='nomn', quote="'"):
-	# """ -> begin of loop waiting (at line 45) """
-
-	# assert False, "Deprecated function: format_full_name()"
-
-	# try:
-
-	# 	is_act = bool({onto.act_begin, onto.act_end, onto.trace} & set(a.is_a))
-	# 	is_boundary = onto.boundary in a.is_a
-
-	# 	### print(" * ! is_boundary:", is_boundary, "for a:", a)
-
-	# 	phase = ''
-	# 	if is_act and include_phase:
-	# 		if onto.act_begin in a.is_a:
-	# 			phase = tr("begin of ")
-	# 		elif onto.act_end in a.is_a:
-	# 			phase = tr("end of ")
-	# 		case = 'gent'
-	# 	elif is_boundary and include_phase:
-	# 		if a.begin_of:
-	# 			phase = tr("begin of ")
-	# 		elif a.end_of:
-	# 			phase = tr("end of ")
-	# 		case = 'gent'
-
-	# 	line_index = ''
-	# 	if is_act and include_line_index:
-	# 		i = get_relation_object(a, onto.text_line)
-	# 		if i:
-	# 			line_index = tr(" (at line %d)") % i
-	# 		else:
-	# 			line_index = tr(" (the line is missing)")
-
-	# 	if is_act:
-	# 		stmt = get_executes(a)
-	# 	elif is_boundary:
-	# 		stmt = get_relation_object(a, onto.boundary_of)
-	# 	else:
-	# 		stmt = a
-	# 	assert stmt, f" ValueError: no stmt found for {str(a)}"
-	# 	stmt_name = get_relation_object(stmt, onto.stmt_name)
-	# 	assert stmt_name, f" ValueError: no stmt_name found for {str(stmt)}"
-
-	# 	if stmt_name.endswith("_loop_body"):
-	# 		# тело цикла XYZ
-	# 		# body of loop XYZ
-	# 		stmt_name = tr("body of loop", case) + " " + quote + stmt_name.replace("_loop_body", '') + quote
-	# 		include_type = False
-	# 	else:
-	# 		stmt_name = quote + stmt_name + quote
-
-	# 	type_ = ''
-	# 	if include_type:
-	# 		onto_classes = get_leaf_classes(stmt.is_a)
-	# 		onto_classes = {c.name for c in onto_classes}  # convert to strings
-	# 		onto_classes &= ALGORITHM_ITEM_CLASS_NAMES
-	# 		if onto_classes:
-	# 			onto_class = next(iter(onto_classes))
-	# 			# make the name more readable
-	# 			if onto_class in {"if", "else-if", "else"}:
-	# 				# onto_class += "-branch"
-	# 				onto_class = tr("%s-branch") % onto_class
-	# 			else:
-	# 				onto_class = tr(onto_class, 'gent' if include_phase else 'nomn')
-	# 			type_ = f"{onto_class} "
-	# 		else:
-	# 			type_ = tr("unknown structure")
-	# 		type_ = type_.strip() + " "
-
-	# 	### print(phase, type_, quote, stmt_name, quote, line_index)
-	# 	full_msg = phase + type_ + stmt_name  # + line_index
-	# 	if full_msg != stmt_name:
-	# 		# wrap in additional quotes
-	# 		full_msg = "«%s»" % full_msg
-	# 	if line_index:
-	# 		full_msg += line_index
-	# 	return full_msg
-	# except Exception as e:
-	# 	print(e)
-	# 	# raise e
-	# 	# return tr("[unknown]")
-	# 	return tr("__")
+    sep = " "
+    res = s.replace("-", sep)
+    if res == s:
+        res = camelcase_to_snakecase(s, sep).capitalize()
+    return res
 
 
 def format_explanation(current_onto, act_instance, _auto_register=True) -> list:
 
-	global onto
-	onto = current_onto
+    global onto
+    onto = current_onto
 
-	if not FORMAT_STRINGS:
-		register_explanation_handlers()
-	# # Не оптимально, зато не кешируются устаревшие онтологии
-	# if FORMAT_STRINGS:
-	# 	FORMAT_STRINGS.clear()
-	# 	PARAM_PROVIDERS.clear()
-	# register_explanation_handlers()
+    # if not FORMAT_STRINGS:
+    #   register_explanation_handlers()
+    # # Не оптимально, зато не кешируются устаревшие онтологии
+    # if FORMAT_STRINGS:
+    #   FORMAT_STRINGS.clear()
+    #   PARAM_PROVIDERS.clear()
+    # register_explanation_handlers()
 
-	### print(*FORMAT_STRINGS.keys())
+    ### print(*FORMAT_STRINGS.keys())
 
-	error_classes = set(act_instance.is_a) & set(onto.Erroneous.descendants())
-	error_classes = get_leaf_classes(error_classes)
-	result = []
+    error_classes = set(act_instance.is_a) & set(onto.Erroneous.descendants())
+    error_classes = get_leaf_classes(error_classes)
+    result = []
 
-	for error_class in error_classes:
-		class_name = error_class.name
-		if class_name in PARAM_PROVIDERS:
-			templates = FORMAT_STRINGS[class_name]
-			format_str = templates.get(get_target_lang(), None) or templates.get("en", '__')
-			params = PARAM_PROVIDERS[class_name](act_instance)
-			expl = format_by_spec(
-				format_str,
-				**params
-			)
-			## with prefixed error name
-			# localized_class_name = CLASS_NAMES[class_name].get(get_target_lang(), None) or class_name
-			# explanation = f"{localized_class_name}: {expl}"
-			## without error name
-			explanation = {
-				"names": {lang: class_name_to_readable(name) for lang,name in CLASS_NAMES[class_name].items()},
-				"explanation": expl,
-				# "explanation_by_locale": {lang: format_by_spec(format_str, PARAM_PROVIDERS[class_name](act_instance, lang=lang)) for lang, format_str in templates.items()},
-			}
-			result.append(explanation)
-		else:
-			print("<> Skipping explanation for: <>", class_name, "<>")
+    for error_class in error_classes:
+        class_name = error_class.name
+        format_str = locale.get(class_name, get_target_lang(), None) or locale.get(class_name, "en", '__')
+        if format_str:
+            # params = PARAM_PROVIDERS[class_name](act_instance)
+            params = named_fields_param_provider(act_instance)
+            expl = format_by_spec(
+                format_str,
+                **params
+            )
+            ## with prefixed error name
+            # localized_class_name = CLASS_NAMES[class_name].get(get_target_lang(), None) or class_name
+            # explanation = f"{localized_class_name}: {expl}"
+            ## without error name
+            class_name_readable = class_name_to_readable(class_name)
+            explanation = {
+                "names": {lang: class_name_readable for lang in ('en','ru')},  # this duplicated values. TODO: Do we need localizations here?
+                "explanation": expl,
+                # "explanation_by_locale": {lang: format_by_spec(format_str, PARAM_PROVIDERS[class_name](act_instance, lang=lang)) for lang, format_str in templates.items()},
+            }
+            result.append(explanation)
+            ###
+            print("++ done: explanation for: ", class_name)
+        else:
+            print("<> !! Skipping explanation for: <>", class_name, "<>")
 
-	# if not result and _auto_register:
-	# 	register_explanation_handlers()
-	# 	return format_explanation(onto, act_instance, _auto_register=False)
+    # if not result and _auto_register:
+    #   register_explanation_handlers()
+    #   return format_explanation(onto, act_instance, _auto_register=False)
 
-	return result
-	# return ['Cannot format explanation for XYZY']
+    return result
+    # return ['Cannot format explanation for XYZY']
 
 def capitalize_first_letter(s: str) -> str:
-	# replace first letter ever if 's' starts with quote ('"')
-	# return s[:1].upper() + s[1:]
-	return re.subn(r'\w', lambda m:m[0].upper(), s, count=1)[0]  # take [0] from (str, count_replaced)
-	# capitalize_first_letter('"my 1st day"')
+    # replace first letter ever if 's' starts with quote ('"')
+    # return s[:1].upper() + s[1:]
+    return re.subn(r'\w', lambda m:m[0].upper(), s, count=1)[0]  # take [0] from (str, count_replaced)
+    # capitalize_first_letter('"my 1st day"')
 
 
 def format_by_spec(format_str: str, **params: dict):
-	"Simple replace & add closing dot if needed"
-	# placeholder_affices = None
-	placeholder_affices = (("<", ">"), ("<list-", ">"))
-	for key, value in params.items():
-		for prefix, suffix in (placeholder_affices or (("",""),)):
-			format_str = format_str.replace(prefix + key + suffix, value)
+    "Simple replace & add closing dot if needed"
+    ### print(format_str, params)
+    format_str = format_str.format(**params)
+    # # placeholder_affices = None
+    # placeholder_affices = (("<", ">"), ("<list-", ">"))
+    # for key, value in params.items():
+    #   for prefix, suffix in (placeholder_affices or (("",""),)):
+    #       format_str = format_str.replace(prefix + key + suffix, value)
 
-	if not format_str.endswith('.') and not format_str.endswith('?'):
-		format_str += '.'
-	### print('*', format_str)
+    if not format_str.endswith('.') and not format_str.endswith('?'):
+        format_str += '.'
+    ### print('*', format_str)
 
-	return capitalize_first_letter(format_str)
-	# return 'cannot format it...'
-
-def register_handler(class_name, format_dict, method):
-	"Map class name to function procesing act with that error "
-	if isinstance(class_name, dict):
-		class_names_dict = class_name
-		class_name = class_names_dict["en"]
-	else:
-		class_names_dict = {}  # ? use {en -> class_name} by default ?
-
-	PARAM_PROVIDERS[class_name] = method
-	FORMAT_STRINGS[class_name] = format_dict
-	if class_names_dict:
-		CLASS_NAMES[class_name] = class_names_dict
-	# onto_class = onto[class_name]
-	# # assert onto_class, onto_class
-	# if onto_class:
-	# 	onto_class._format_explanation = method
-	# 	onto_class._format_str = format_str
-	# else:
-	# 	print(f" Warning: cannot register_explanation_handler for '{class_name}': no such class in the ontology.")
-
-
-def class_formatstr(*args):
-	""" Упаковать в словари переводы названия и сообщения """
-	class_name, format_str_ru, format_str_en = args if len(args) == 3 else list(args[0])
-
-	class_names_dict = dict(zip(("en", "ru"), class_name.split()))
-
-	return class_names_dict, {
-		"ru": format_str_ru,
-		"en": format_str_en,
-	}
+    return capitalize_first_letter(format_str)
+    # return 'cannot format it...'
 
 
 
 def named_fields_param_provider(a: 'act_instance', **options):
-	"""extract ALL field_* facts, no matter what law they belong to."""
+    """extract ALL field_* facts, no matter what law they belong to."""
 
-	# for lookup
-	begin_of = a.namespace.begin_of
-	end_of   = a.namespace.end_of
-	halt_of  = a.namespace.halt_of
-	atom_action = a.namespace.atom_action
+    onto = a.namespace
+    # for lookup
+    begin_of = onto.begin_of
+    end_of   = onto.end_of
+    halt_of  = onto.halt_of
+    atom_action = onto.atom_action
+    # stmt_name   = onto.stmt_name
+    # executes    = onto.executes
+    # boundary_of = onto.boundary_of
+    # wrong_next_act = onto.wrong_next_act
 
-	lang = options.get("lang", None)
+    lang = options.get("lang", None)
 
-	placeholders = defaultdict(dict)  # {fieldname -> {value_to_quote -> prefix}}
+    placeholders = defaultdict(dict)  # {fieldname -> {value_to_quote -> prefix}} ; prefix is the phase: `begin of` / `end of`
 
-	def add2placeholders(fieldName, to_quote, prefix):
-		### , replace=True
-		old_prefix = placeholders[fieldName].get(to_quote, None)
-		# replace empty values only
-		if old_prefix is None or prefix > old_prefix:    ### replace and
-			placeholders[fieldName][to_quote] = prefix
+    def add2placeholders(fieldName, to_quote, prefix):
+        to_quote = replaceLocaleMarks(to_quote, lang)
+        old_prefix = placeholders[fieldName].get(to_quote, None)
+        # replace empty values only
+        if old_prefix is None or prefix > old_prefix:    ### replace and
+            placeholders[fieldName][to_quote] = prefix
 
-	for prop in a.get_properties():
-		verb = prop.python_name
-		if verb.startswith("field_"):  # признак того, что это специальное свойство [act >> str] или [act >> bound]
-			to_quote = None
-			prefix = ''
-			fieldName = verb.replace("field_", "")
-			if fieldName.endswith("_bound"):
-				# process bound instances ...
-				# if 'phase' not in options:
-				# 	continue
-				fieldName = fieldName[:-len("_bound")]
-				for bound in prop[a]:
-					# extract phase to prepend to action name
-					phase_str = ''
-					# action class has 'atom_action' annotation = true
-					if not any(atom_action[cls] for cls in bound.boundary_of.is_a):
-					# if not (atom_action[action_class] or all(atom_action[action_class])):
-						# complex action, determine phase_str
-						if begin_of[bound]:
-							phase_str = tr("begin of ", lang=lang)
-						elif end_of[bound] or halt_of[bound]:
-							phase_str = tr("end of ", lang=lang)
+    for prop in a.get_properties():
+        verb = prop.python_name
+        if verb.startswith("field_"):  # признак того, что это специальное свойство [act >> str] или [act >> bound]
+            to_quote = None
+            prefix = ''
+            fieldName = verb.replace("field_", "")
+            if fieldName.endswith("_bound"):
+                # process bound instances ...
+                # if 'phase' not in options:
+                #   continue
+                fieldName = fieldName[:-len("_bound")]
+                for bound in prop[a]:
+                    # extract phase to prepend to action name
+                    phase_str = ''
+                    # action class has 'atom_action' annotation = true
+                    if not any(atom_action[cls] for cls in bound.boundary_of.is_a):
+                    # if not (atom_action[action_class] or all(atom_action[action_class])):
+                        # complex action, determine phase_str
+                        if begin_of[bound]:
+                            phase_str = tr("phase.begin_of", lang=lang) + " "
+                        elif end_of[bound] or halt_of[bound]:
+                            phase_str = tr("phase.end_of", lang=lang) + " "
 
-					name = bound.boundary_of.stmt_name
-					# add2placeholders(fieldName, to_quote=name, prefix=phase_str, replace=False)
-					# add 'phased-' version of placeholder
-					add2placeholders('phased-' + fieldName, to_quote=name, prefix=phase_str)
-			else:
-				# process literals ...
-				for value in prop[a]:
-					# convert to str
-					value = {
-						True: 'true',
-						False: 'false',
-					}.get(value, str(value))
-					add2placeholders(fieldName, to_quote=value, prefix='')
-
-
-	print(placeholders)
-
-	# convert sub-dicts to normal strings
-	placeholders = {
-		fieldName: ", ".join("\"" + prefix + to_quote + "\"" for to_quote, prefix in subd.items())
-		for fieldName, subd in placeholders.items()
-	}
-
-	return placeholders
+                    name = bound.boundary_of.stmt_name
+                    # add2placeholders(fieldName, to_quote=name, prefix=phase_str, replace=False)
+                    # add 'phased-' version of placeholder
+                    add2placeholders('phased-' + fieldName, to_quote=name, prefix=phase_str)
+            else:
+                # process literals ...
+                for value in prop[a]:
+                    # convert to str
+                    value = {
+                        True: 'true',
+                        False: 'false',
+                    }.get(value, str(value))
+                    add2placeholders(fieldName, to_quote=value, prefix='')
 
 
-def register_explanation_handlers():
+    # print(placeholders)
 
-	# read templates from file
-	with open(MESSAGES_FILE) as f:
-		for spec in f.readlines():
-			spec = spec.strip()
-			if not spec:
-				continue
-			class_name, format_str = class_formatstr(spec.split('\t'))
-			register_handler(class_name, format_str, named_fields_param_provider)
+    # convert sub-dicts to normal strings
+    placeholders = {
+        fieldName: ", ".join("«" + prefix + to_quote + "»" for to_quote, prefix in subd.items())
+        for fieldName, subd in placeholders.items()
+    }
+
+    return placeholders
+
+def replaceLocaleMarks(s, lang):
+    replace_lambda = lambda m: tr(m[1], lang, m[1])
+    return LOCALE_KEY_RE.sub(replace_lambda, s)
+
+
+def read_properties_file(file_path, delimiters='=', cut_key_prefix=None, replacements={r'\:': ':', '${': '{'}):
+    ' use INI files reader to parse Java properties files. All keys will be forced lowercase (I guess it cannot be figured out with ConfigParser)'
+    p = Path(file_path)
+    section_name = p.name
+    with open(p) as f:
+        # insert absent [ini section] required for parser; use file name to make error message more informative
+        config_string = f'[{section_name}]\n' + f.read()
+
+    for needle, replacement in replacements.items():
+        config_string = config_string.replace(needle, replacement)
+
+    config = ConfigParser(delimiters=delimiters, interpolation=Interpolation())
+    config.read_string(config_string)
+    data = dict(config[section_name])
+    if cut_key_prefix and isinstance(cut_key_prefix, str):
+        L = len(cut_key_prefix)
+        data = {(k[L:] if k.startswith(cut_key_prefix) else k): v for k, v in data.items()}
+
+    return data
+
+
