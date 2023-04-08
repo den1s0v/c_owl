@@ -161,10 +161,6 @@ def named_fields_param_provider(a: 'act_instance', **options):
     end_of   = onto.end_of
     halt_of  = onto.halt_of
     atom_action = onto.atom_action
-    # stmt_name   = onto.stmt_name
-    # executes    = onto.executes
-    # boundary_of = onto.boundary_of
-    # wrong_next_act = onto.wrong_next_act
 
     lang = options.get("lang", None)
 
