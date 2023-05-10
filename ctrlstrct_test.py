@@ -12,15 +12,13 @@ import re
 
 ###
 import ctrlstrct_run
-
-from ctrlstrct_run import process_algtraces, TraceTester
-from trace_gen.json2alg2tr import act_line_for_alg_element
-from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, get_ith_expr_value, find_by_key_in, find_by_keyval_in
-from onto_helpers import get_relation_object, delete_ontology
 import trace_gen.styling as styling
-
 from common_helpers import Checkpointer
-
+from ctrlstrct_run import process_algtraces, TraceTester
+from onto_helpers import delete_ontology
+from trace_gen.json2alg2tr import act_line_for_alg_element
+from trace_gen.txt2algntr import parse_text_files, parse_algorithms_and_traces_from_text, search_text_trace_files, \
+	get_ith_expr_value, find_by_key_in, find_by_keyval_in
 
 TEST_DIR = "./test_data"
 OUTPUT_FNM = "output.json"
@@ -882,17 +880,16 @@ STYLE_HEAD = '''<style type="text/css" media="screen">
 </style>
 '''
 
+
 def test_algorithm_to_tags():
 	import json
 	with open('trace_gen/alg_test.json') as file:
 		alg_data = json.load(file)
 
-	from trace_gen.styling import algorithm_to_tags, to_html, get_button_tips
+	from trace_gen.syntax import algorithm_to_tags
+	from trace_gen.styling import to_html
 
 	tags = algorithm_to_tags(alg_data, 'ru')
-	tips = get_button_tips()
-	from pprint import pprint
-	pprint(tips)
 
 	with open('web_exp/alg_test.htm', 'w') as file:
 		file.write(STYLE_HEAD)
@@ -901,7 +898,6 @@ def test_algorithm_to_tags():
 
 def make_question_dict_for_alg_json(alg_json, algorithm_name='generated'):
 	import export2json
-	import json
 	onto = ctrlstrct_run.create_ontology_tbox()
 	alg_tr = dict(algorithm=alg_json, algorithm_name=algorithm_name)
 	q_dict = export2json.export_algtr2dict(alg_tr, onto)
@@ -965,7 +961,6 @@ def test_algtr_to_question_html(read_from="handcrafted_traces/one4html.txt", sav
 
 	print("SPECIAL MODE: test_algtr_to_question_html (making question HTML from text)")
 
-	from pprint import pprint
 	import trace_gen.syntax as syntax
 
 	files = [read_from]  # search_text_trace_files(directory="handcrafted_traces/")

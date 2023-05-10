@@ -1229,47 +1229,50 @@ def extract_alg_name(line) -> str:
 
 # extract_alg_name("line 15 // алгоритм 07_while (while в стиле foreach, с 2 действиями)")
 
-def find_by_predicate(dict_or_list, pred=lambda x:(type(x) is dict), find_one=False, _not_entry=None):
+def find_by_predicate(dict_or_list, pred=lambda x:(type(x) is dict), find_one=False, _not_enter=None):
     "generator of dicts or objects selected by `pred`"
-    _not_entry = _not_entry or set()
-    _not_entry.add(id(dict_or_list))
+    _not_enter = _not_enter or set()
+    _not_enter.add(id(dict_or_list))
     if pred(dict_or_list):
         yield dict_or_list
         if find_one:
             return
     if isinstance(dict_or_list, dict):
         for v in dict_or_list.values():
-            if id(v) not in _not_entry:
-                yield from find_by_predicate(v, pred, _not_entry)
+            if id(v) not in _not_enter:
+                yield from find_by_predicate(v, pred, _not_enter)
     elif isinstance(dict_or_list, (list, tuple, set)):
         for v in dict_or_list:
-            if id(v) not in _not_entry:
-                yield from find_by_predicate(v, pred, _not_entry)
+            if id(v) not in _not_enter:
+                yield from find_by_predicate(v, pred, _not_enter)
 
-def find_by_key_in(key, dict_or_list, _not_entry=None):
-    _not_entry = _not_entry or set()
-    _not_entry.add(id(dict_or_list))
+def find_by_key_in(key, dict_or_list, _not_enter=None):
+    _not_enter = _not_enter or set()
+    _not_enter.add(id(dict_or_list))
     if isinstance(dict_or_list, dict):
         for k, v in dict_or_list.items():
             if k == key:
                 yield dict_or_list
-            elif id(v) not in _not_entry:
-                yield from find_by_key_in(key, v, _not_entry)
+            elif id(v) not in _not_enter:
+                yield from find_by_key_in(key, v, _not_enter)
     elif isinstance(dict_or_list, (list, tuple, set)):
         for d in dict_or_list:
-            if id(d) not in _not_entry:
-                yield from find_by_key_in(key, d, _not_entry)
+            if id(d) not in _not_enter:
+                yield from find_by_key_in(key, d, _not_enter)
 
-def find_by_keyval_in(key, val, dict_or_list):
+def find_by_keyval_in(key, val, dict_or_list, _not_enter=None):
+    _not_enter = _not_enter or set()
+    _not_enter.add(id(dict_or_list))
     if isinstance(dict_or_list, dict):
         for k, v in dict_or_list.items():
             if k == key and v == val:
                 yield dict_or_list
-            else:
-                yield from find_by_keyval_in(key, val, v)
+            elif id(v) not in _not_enter:
+                yield from find_by_keyval_in(key, val, v, _not_enter)
     elif isinstance(dict_or_list, (list, tuple, set)):
         for d in dict_or_list:
-            yield from find_by_keyval_in(key, val, d)
+            if id(d) not in _not_enter:
+                yield from find_by_keyval_in(key, val, d, _not_enter)
 
 # list(find_by_keyval_in("type", "sequence", ap.algorithm))
 

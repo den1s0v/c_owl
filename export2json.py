@@ -31,7 +31,7 @@ syntax.set_allow_hidden_buttons(False)
 
 
 def export_algtr2dict(alg_tr, onto):
-	'onto: modifiable ontology containing schema (TBox)'
+	"""onto: modifiable ontology containing schema (TBox)"""
 	ctrlstrct_run.clear_ontology(onto, keep_tbox=True)
 	ctrlstrct_run.algorithm_only_to_onto(alg_tr, onto)
 
@@ -242,6 +242,7 @@ def export_algtr2dict(alg_tr, onto):
 		  "questionText": question_html,
 		  "areAnswersRequireContext": False,
 		  "options": {
+			  "metadata": {},
 		  },
 		  "answerObjects": answerObjects,
 		  "statementFacts": statementFacts,
@@ -262,6 +263,7 @@ def export_algtr2dict(alg_tr, onto):
 		  # "order",
 		  # "evaluation"
 		],
+		"metadata": {},
 		###>
 		# "_alg_name": alg_tr["algorithm_name"],
 		###<

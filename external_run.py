@@ -1,5 +1,6 @@
 # external_run.py
 
+import atexit
 import re
 import os
 import subprocess
@@ -423,6 +424,9 @@ def invoke_jena_reasoning_service(rdfData:bytes, rules_path=JENA_RULE_PATHS):
 			print("  command:  ", cmd)
 			_service_Process = psutil.Popen(cmd, stdout=sys.stderr, cwd=_DIR_PATH)
 
+			# try to close the external process if it will still be running
+			atexit_register_stop_jena_reasoning_service()
+
 		try:
 			if not _client_Manager:
 				_client_Manager = ClientManager(
@@ -455,4 +459,13 @@ def stop_jena_reasoning_service():
 		_service_Process.kill()
 		_service_Process.wait()
 		_service_Process = None
+
+		# we have stopped it, don't trigger again
+		atexit.unregister(stop_jena_reasoning_service)
+
+
+
+def atexit_register_stop_jena_reasoning_service():
+	# try to close the external process if it will still be running
+	atexit.register(stop_jena_reasoning_service)
 

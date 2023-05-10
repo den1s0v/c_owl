@@ -35,7 +35,11 @@ WRITE_CONCEPT_FLAG_LABEL = False
 
 def prepare_name(s):
     """Transliterate given word is needed"""
-    return slugify(s, "ru") or s
+    try:
+        return slugify(s, "ru") or s
+    except:
+        print(' slugify() throwed error for action name: ', name)
+        return s
 
 
 # наладим связи между элементами алгоритма

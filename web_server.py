@@ -1,6 +1,5 @@
 # web_server.py
 
-import atexit
 import re
 import sys
 
@@ -368,9 +367,6 @@ def process_algorithm_and_trace_as_json_request(json):
 
 if __name__ == "__main__":
 
-    # try to close the external process if it will still be running
-    atexit.register(external_run.stop_jena_reasoning_service)
-
     host = None
     port = None
 
@@ -397,7 +393,6 @@ if __name__ == "__main__":
             serve(app, host=host, port=port)
     except:
         external_run.stop_jena_reasoning_service()
-        atexit.unregister(external_run.stop_jena_reasoning_service)
         raise  # rerise to appear in the program's printout
 
 """
