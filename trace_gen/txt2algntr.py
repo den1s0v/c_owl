@@ -3,10 +3,11 @@
 
 from random import randint
 import re
-
+from typing import Optional
 
 if __name__ == '__main__':  # to import from upper directory
     import sys
+
     sys.path.insert(1, '../')
 
 try:
@@ -17,16 +18,14 @@ except ImportError:
 _maxAlgID = 1
 _maxTrID = 1
 
-TRUTH_ALIASES = ("истина","да","true","1")
-FALSE_ALIASES = ("ложь","нет","false","0")
+TRUTH_ALIASES = ("истина", "да", "true", "1")
+FALSE_ALIASES = ("ложь", "нет", "false", "0")
 TRUTH_ALIASES_re = re.compile("|".join(TRUTH_ALIASES))
 FALSE_ALIASES_re = re.compile("|".join(FALSE_ALIASES))
 
 _UNIFIED_COMPLEX_NAMES = False
 
-
 from trace_gen.get_i18n import action
-
 
 
 ## def make_translation(**lang_to_msg_dict, ):
@@ -101,12 +100,11 @@ def make_values_hint(values, is_loop=False, is_postcond=False):
         count = successes + is_postcond
         if count == 1:
             r = '1 итерация'
-        elif count in (2,3,4):
+        elif count in (2, 3, 4):
             r = '%d итерации' % count
         else:
             r = '%d итераций' % count
     return prefix + ('<span class="value">%s</span>' % r)
-
 
 
 def get_ith_expr_value(expr_values: tuple, i: int):
@@ -133,7 +131,6 @@ def get_ith_expr_value(expr_values: tuple, i: int):
     return expr_values[b_i + repeat_i % repeat_len]
 
 
-
 class AlgorithmParser:
     def __init__(self, line_list=None, start_id=1, verbose=0):
         assert type(start_id) is int
@@ -144,7 +141,6 @@ class AlgorithmParser:
         #     self.algorithm['text'] = '\n'.join(line_list)
         if line_list:
             self.parse(line_list)
-
 
     def clear(self):
         self.name2id = {}
@@ -165,17 +161,16 @@ class AlgorithmParser:
               "expr_values": {},
         }
 
-
     def newID(self, what=None):
         self._maxID += 1
-        global _maxAlgID; _maxAlgID = self._maxID
+        global _maxAlgID;
+        _maxAlgID = self._maxID
         if what:
             if what in self.name2id:
-                print("Warning: multiple objects named as '%s' !"%what,
-                      "Old id/new id:", self.name2id[what],"/", self._maxID, "; Overriding with latter one.")
+                print("Warning: multiple objects named as '%s' !" % what,
+                      "Old id/new id:", self.name2id[what], "/", self._maxID, "; Overriding with latter one.")
             self.name2id[what] = self._maxID
         return self._maxID
-
 
     def parse(self, line_list: "list[str]"):
         self.algorithm["global_code"]["body"] += self.parse_algorithm_ids(line_list)
@@ -219,11 +214,11 @@ class AlgorithmParser:
         def make_loop_body(loop_name, stmt_List):
             name = loop_name + "_loop_body"
             return {
-                    "id": self.newID(name),
-                    "type": "sequence",
-                    "name": name,
-                    "act_name": action('loop-body', loop_name=loop_name),
-                    "body": stmt_List,
+                "id": self.newID(name),
+                "type": "sequence",
+                "name": name,
+                "act_name": action('loop-body', loop_name=loop_name),
+                "body": stmt_List,
             }
 
         result = []
@@ -234,7 +229,7 @@ class AlgorithmParser:
         current_level = None  # отступ текущего уровня (найдём в цикле как отступ первой строки кода, но не { }. )
 
         for i, idt in enumerate(line_indents):
-            if line_indents[i] == current_level  or  current_level is None:  # элемент текущего уровня
+            if line_indents[i] == current_level or current_level is None:  # элемент текущего уровня
                 if line_list[i].strip() in ("", "{", "}"):  # пропускаем { } и пустые
                     continue
                 current_level = line_indents[i]
@@ -267,27 +262,28 @@ class AlgorithmParser:
                 params_str = m.group(2).strip()  # опциональные скобки с опциональными параметрами
                 param_list = []
                 if params_str.startswith('(') and ')' in params_str:
-                    params_str = params_str[params_str.index('(') + 1 : params_str.index(')')]
+                    params_str = params_str[params_str.index('(') + 1: params_str.index(')')]
                     # simple split
                     param_list = [
                         s.strip() for s in params_str.split(',')
                     ]
 
-                body_name = name+"-body"
+                body_name = name + "-body"
                 self.algorithm["functions"].append({
-                      "id": self.newID(name),
-                      "type": "func",
-                      "name": name,  # имя функции
-                      "act_name": action('function', name=name),
-                      "is_entry": name == "main",
-                      "param_list": param_list,
-                      "body" : {   #  stmts -> global_code  !!!
-                            "id": self.newID(body_name),
-                            "type": "sequence",
-                            "name": body_name,
-                            "act_name": action('function-body', name=name),
-                            "body": parse_algorithm(line_list[i+2:e], start_line=start_line + i+2)  # исключая скобки { } вокруг тела
-                        },
+                    "id": self.newID(name),
+                    "type": "func",
+                    "name": name,  # имя функции
+                    "act_name": action('function', name=name),
+                    "is_entry": name == "main",
+                    "param_list": param_list,
+                    "body": {  # stmts -> global_code  !!!
+                        "id": self.newID(body_name),
+                        "type": "sequence",
+                        "name": body_name,
+                        "act_name": action('function-body', name=name),
+                        "body": parse_algorithm(line_list[i + 2:e], start_line=start_line + i + 2)
+                        # исключая скобки { } вокруг тела
+                    },
                 })
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -306,20 +302,22 @@ class AlgorithmParser:
                     \s+ (\S+)   # 2 optional values
                 )?
                 \s* (?://|\#)\s*(\S+)  # 3 name
-                """, current_line, re.I|re.VERBOSE)
+                """, current_line, re.I | re.VERBOSE)
             if not m:
-                if 'if' in current_line: suggest_corrections.append(
-                    'if color==green -> true,false,true // my-alt-1')
-                elif 'если' in current_line: suggest_corrections.append(
-                    'если цвет==зелёный ->  да,нет,да // моя-развилка-1')
+                if 'if' in current_line:
+                    suggest_corrections.append(
+                        'if color==green -> true,false,true // my-alt-1')
+                elif 'если' in current_line:
+                    suggest_corrections.append(
+                        'если цвет==зелёный ->  да,нет,да // моя-развилка-1')
             if m:
                 if self.verbose: print("alt if")
                 name = m.group(3)  # имя альтернативы (пишется в комментарии)
                 values = m.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
                 cond_name = m.group(1)  # условие if (может быть в скобках)
-                if cond_name[0]+cond_name[-1] == "()":
-                    cond_name = cond_name[1:-1]      # удалить скобки
-                branch_name = "if-"+cond_name  # имя ветки должно отличаться от имени условия
+                if cond_name[0] + cond_name[-1] == "()":
+                    cond_name = cond_name[1:-1]  # удалить скобки
+                branch_name = "if-" + cond_name  # имя ветки должно отличаться от имени условия
                 # self.parse_expr()
                 name = complexname(name, 'alternative')
                 result.append({
@@ -327,15 +325,16 @@ class AlgorithmParser:
                     "type": "alternative",
                     "name": name,
                     "act_name": action('selection', name=name),
-                    "branches": [ {
+                    "branches": [{
                         "id": self.newID(branch_name),
                         "type": "if",
                         "name": branch_name,
                         "act_name": action('if', cond_name=cond_name),
                         "cond_values_hint": make_values_hint(values, is_loop=False),
-                        "cond":  self.parse_expr(cond_name, values=values),
-                        "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
-                    } ]
+                        "cond": self.parse_expr(cond_name, values=values),
+                        "body": parse_algorithm(line_list[i + 1:e + 1], start_line=start_line + i + 1)
+                        # скобки { } вокруг тела могут отсутствовать
+                    }]
                 })
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -355,30 +354,34 @@ class AlgorithmParser:
                     \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
                 )?
-                """, current_line, re.I|re.VERBOSE)
+                """, current_line, re.I | re.VERBOSE)
             if not m:
-                if 'else' in current_line and 'if' in current_line: suggest_corrections.append(
-                    'else if color==green -> true,false,true')
-                elif 'иначе' in current_line and 'если' in current_line: suggest_corrections.append(
-                    'иначе если цвет==зелёный ->  да,нет,да')
+                if 'else' in current_line and 'if' in current_line:
+                    suggest_corrections.append(
+                        'else if color==green -> true,false,true')
+                elif 'иначе' in current_line and 'если' in current_line:
+                    suggest_corrections.append(
+                        'иначе если цвет==зелёный ->  да,нет,да')
             if m:
                 if self.verbose: print("alt elseif")
                 cond_name = m.group(1)  # условие else if (условие может быть в скобках)
-                if cond_name[0]+cond_name[-1] == "()":
-                    cond_name = cond_name[1:-1]      # удалить скобки
+                if cond_name[0] + cond_name[-1] == "()":
+                    cond_name = cond_name[1:-1]  # удалить скобки
                 values = m.group(2)  # значения, принимаемые выражением по мере выполнения программы (опционально)
-                branch_name = "elseif-"+cond_name  # имя ветки должно отличаться от имени условия
-                assert len(result)>0 and result[-1]["type"] == "alternative", "Algorithm Error: 'иначе если' does not follow 'если' :\n\t"+current_line
+                branch_name = "elseif-" + cond_name  # имя ветки должно отличаться от имени условия
+                assert len(result) > 0 and result[-1][
+                    "type"] == "alternative", "Algorithm Error: 'иначе если' does not follow 'если' :\n\t" + current_line
                 alt_obj = result[-1]
-                alt_obj["branches"] += [ {
-                        "id": self.newID(branch_name),
-                        "type": "else-if",
-                        "name": branch_name,
-                        "act_name": action('else-if', cond_name=cond_name),
-                        "cond":  self.parse_expr(cond_name, values=values),
-                        "cond_values_hint": make_values_hint(values, is_loop=False),
-                        "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
-                    } ]
+                alt_obj["branches"] += [{
+                    "id": self.newID(branch_name),
+                    "type": "else-if",
+                    "name": branch_name,
+                    "act_name": action('else-if', cond_name=cond_name),
+                    "cond": self.parse_expr(cond_name, values=values),
+                    "cond_values_hint": make_values_hint(values, is_loop=False),
+                    "body": parse_algorithm(line_list[i + 1:e + 1], start_line=start_line + i + 1)
+                    # скобки { } вокруг тела могут отсутствовать
+                }]
                 ci = e + 1
                 continue  # with next stmt on current level
 
@@ -386,26 +389,29 @@ class AlgorithmParser:
             # else
             m = re.match(r"(?:else|иначе)", current_line, re.I)
             if not m:
-                if 'else' in current_line and not suggest_corrections: suggest_corrections.append(
-                    'else')
-                elif 'иначе' in current_line and not suggest_corrections: suggest_corrections.append(
-                    'иначе')
+                if 'else' in current_line and not suggest_corrections:
+                    suggest_corrections.append(
+                        'else')
+                elif 'иначе' in current_line and not suggest_corrections:
+                    suggest_corrections.append(
+                        'иначе')
             if m:
                 if self.verbose: print("alt else")
-                assert len(result)>0 and result[-1]["type"] == "alternative", "Algorithm Error: 'иначе' does not follow 'если' :\n\t"+current_line
+                assert len(result) > 0 and result[-1][
+                    "type"] == "alternative", "Algorithm Error: 'иначе' does not follow 'если' :\n\t" + current_line
                 alt_obj = result[-1]
                 alt_name = alt_obj["name"]
                 branch_name = alt_name + "-else"  # имя ветки должно отличаться от имени ветвления
-                alt_obj["branches"] += [ {
-                        "id": self.newID(branch_name),
-                        "type": "else",
-                        "name": branch_name,
-                        "act_name": action('else', alt_name=alt_name),
-                        "body": parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
-                    } ]
+                alt_obj["branches"] += [{
+                    "id": self.newID(branch_name),
+                    "type": "else",
+                    "name": branch_name,
+                    "act_name": action('else', alt_name=alt_name),
+                    "body": parse_algorithm(line_list[i + 1:e + 1], start_line=start_line + i + 1)
+                    # скобки { } вокруг тела могут отсутствовать
+                }]
                 ci = e + 1
                 continue  # with next stmt on current level
-
 
             # пока while-cond-1  // my-while-1
             # while my-cond-2   -> 101 // my-while-2
@@ -419,12 +425,14 @@ class AlgorithmParser:
                 )?
                 \s* (?://|\#)
                 \s* (\S+)       # 3 loop name
-                """, current_line, re.I|re.VERBOSE)
+                """, current_line, re.I | re.VERBOSE)
             if not m:
-                if 'while' in current_line: suggest_corrections.append(
-                    'while my-condition-2   -> 101 // my-while-2')
-                elif 'пока' in current_line: suggest_corrections.append(
-                    'пока условие-цикла-1  // мой-цикл-1')
+                if 'while' in current_line:
+                    suggest_corrections.append(
+                        'while my-condition-2   -> 101 // my-while-2')
+                elif 'пока' in current_line:
+                    suggest_corrections.append(
+                        'пока условие-цикла-1  // мой-цикл-1')
             if m:
                 if self.verbose: print("while")
                 name = m.group(3)  # имя цикла (пишется в комментарии)
@@ -438,10 +446,11 @@ class AlgorithmParser:
                     "act_name": action('loop', name=name),
                     "cond": self.parse_expr(cond_name, values=values),
                     "cond_values_hint": make_values_hint(values, is_loop=True),
-                    "body":  make_loop_body(
-                                name,
-                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
-                            )
+                    "body": make_loop_body(
+                        name,
+                        parse_algorithm(line_list[i + 1:e + 1], start_line=start_line + i + 1)
+                        # скобки { } вокруг тела могут отсутствовать
+                    )
                 })
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -455,7 +464,7 @@ class AlgorithmParser:
             #    ...
             # while dowhile-cond-3  -> 100011100
             m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", current_line, re.I)
-            m2 = e+1 < len(line_list)  and  re.match(r"""
+            m2 = e + 1 < len(line_list) and re.match(r"""
                 (?:while|пока)
                 \s*
                 (\(.+\)|\s\S+) ;?  # 1 cond_name
@@ -463,12 +472,14 @@ class AlgorithmParser:
                     \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
                 )?
-                """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
-            if not m  or  m and not m2:
-                if 'do' in current_line: suggest_corrections.append(
-                    'do  // my-dowhile-2\n\t...\nwhile (condition) -> 11100')
-                elif 'делать' in current_line: suggest_corrections.append(
-                    'делать условие-цикла-1  // мой-цикл-пока-с-постусловием-1\n\t...\nпока (условие) -> 11100')
+                """, line_list[e + 1].strip(), re.I | re.VERBOSE)
+            if not m or m and not m2:
+                if 'do' in current_line:
+                    suggest_corrections.append(
+                        'do  // my-dowhile-2\n\t...\nwhile (condition) -> 11100')
+                elif 'делать' in current_line:
+                    suggest_corrections.append(
+                        'делать условие-цикла-1  // мой-цикл-пока-с-постусловием-1\n\t...\nпока (условие) -> 11100')
             if m and m2:
                 if self.verbose: print("do while")
                 name = m.group(1)  # имя цикла (пишется в комментарии)
@@ -483,9 +494,10 @@ class AlgorithmParser:
                     "cond": self.parse_expr(cond_name, values=values),
                     "cond_values_hint": make_values_hint(values, is_loop=True, is_postcond=True),
                     "body": make_loop_body(
-                                name,
-                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
-                            )
+                        name,
+                        parse_algorithm(line_list[i + 1:e + 1], start_line=start_line + i + 1)
+                        # скобки { } вокруг тела могут отсутствовать
+                    )
                 })
                 ci = e + 2
                 continue  # with next stmt on current level
@@ -499,7 +511,7 @@ class AlgorithmParser:
             #    ...
             # until dountil-cond-3  -> 100011100
             m = re.match(r"(?:do|делать)\s*(?://|#)\s*(\S+)", current_line, re.I)
-            m2 = e+1 < len(line_list)  and  re.match(r"""
+            m2 = e + 1 < len(line_list) and re.match(r"""
                 (?:until|до)
                 \s*
                 (\(.+\)|\s\S+) ;?  # 1 cond_name
@@ -507,12 +519,14 @@ class AlgorithmParser:
                     \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
                 )?
-                """,   line_list[ e+1 ].strip(), re.I|re.VERBOSE)
-            if not m  or  m and not m2:
-                if 'do' in current_line: suggest_corrections.append(
-                    'do  // my-dountil-2\n\t...\nuntil (condition) -> 00111')
-                elif 'делать' in current_line: suggest_corrections.append(
-                    'делать условие-цикла-1  // мой-цикл-до-тех-пор-1\n\t...\nдо (условие) -> 00011')
+                """, line_list[e + 1].strip(), re.I | re.VERBOSE)
+            if not m or m and not m2:
+                if 'do' in current_line:
+                    suggest_corrections.append(
+                        'do  // my-dountil-2\n\t...\nuntil (condition) -> 00111')
+                elif 'делать' in current_line:
+                    suggest_corrections.append(
+                        'делать условие-цикла-1  // мой-цикл-до-тех-пор-1\n\t...\nдо (условие) -> 00011')
             if m and m2:
                 if self.verbose: print("do until")
                 name = m.group(1)  # имя цикла (пишется в комментарии)
@@ -527,9 +541,10 @@ class AlgorithmParser:
                     "cond": self.parse_expr(cond_name, values=values),
                     "cond_values_hint": make_values_hint(values, is_loop=True, is_postcond=True),
                     "body": make_loop_body(
-                                name,
-                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
-                            )
+                        name,
+                        parse_algorithm(line_list[i + 1:e + 1], start_line=start_line + i + 1)
+                        # скобки { } вокруг тела могут отсутствовать
+                    )
                 })
                 ci = e + 2
                 continue  # with next stmt on current level
@@ -546,15 +561,16 @@ class AlgorithmParser:
                                 \s+ (\S+)   # 5 optional values
                             )?
                             \s* (?://|\#)\s*(\S+)         # 6 name
-                        """, current_line, re.I|re.VERBOSE)
+                        """, current_line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("for")
-                s_var =  m.group(1)  # переменная цикла
+                s_var = m.group(1)  # переменная цикла
                 s_from = m.group(2)  # нижняя граница цикла
-                s_to =   m.group(3)  # верхняя граница цикла
+                s_to = m.group(3)  # верхняя граница цикла
                 s_step = m.group(4)  # шаг цикла
-                values = m.group(5)  # значения, принимаемые выражением - условием продолжения цикла - по мере выполнения программы (опционально)
-                name =   m.group(6)  # имя цикла (пишется в комментарии)
+                values = m.group(
+                    5)  # значения, принимаемые выражением - условием продолжения цикла - по мере выполнения программы (опционально)
+                name = m.group(6)  # имя цикла (пишется в комментарии)
                 name = complexname(name, 'loop')
                 result.append({
                     "id": self.newID(name),
@@ -562,14 +578,15 @@ class AlgorithmParser:
                     "name": name,
                     "act_name": action('loop', name=name),
                     "variable": s_var,
-                    "init":   self.parse_stmt("{}={}".format(s_var, s_from)),
-                    "cond":   self.parse_expr("{}<={}".format(s_var,s_to), values=values),
+                    "init": self.parse_stmt("{}={}".format(s_var, s_from)),
+                    "cond": self.parse_expr("{}<={}".format(s_var, s_to), values=values),
                     "update": self.parse_stmt("{v}={v}{:+d}".format(int(s_step), v=s_var)),
                     "cond_values_hint": make_values_hint(values, is_loop=True),
-                    "body":  make_loop_body(
-                                name,
-                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
-                            )
+                    "body": make_loop_body(
+                        name,
+                        parse_algorithm(line_list[i + 1:e + 1], start_line=start_line + i + 1)
+                        # скобки { } вокруг тела могут отсутствовать
+                    )
                 })
                 ci = e + 1
                 continue  # with next stmt on current level
@@ -586,13 +603,14 @@ class AlgorithmParser:
                     \s+ (\S+)   # 3 optional values
                 )?
                 \s* (?://|\#)\s*(\S+)  # 4 name
-                """, current_line, re.I|re.VERBOSE)
+                """, current_line, re.I | re.VERBOSE)
             if m:
                 if self.verbose: print("foreach")
                 s_var = m.group(1)  # переменная цикла
                 s_container = m.group(2)  # контейнер
-                values = m.group(3)  # значения, принимаемые выражением - условием продолжения цикла - по мере выполнения программы (опционально)
-                name =   m.group(4)  # имя цикла (пишется в комментарии)
+                values = m.group(
+                    3)  # значения, принимаемые выражением - условием продолжения цикла - по мере выполнения программы (опционально)
+                name = m.group(4)  # имя цикла (пишется в комментарии)
                 name = complexname(name, 'loop')
                 result.append({
                     "id": self.newID(name),
@@ -601,35 +619,35 @@ class AlgorithmParser:
                     "act_name": action('loop', name=name),
                     "variable": s_var,
                     "container": s_container,
-                    "init":   self.parse_stmt("{}={}.first()".format(s_var, s_container)),
-                    "cond":   self.parse_expr("{}!={}.last()".format(s_var,s_container), values=values),
+                    "init": self.parse_stmt("{}={}.first()".format(s_var, s_container)),
+                    "cond": self.parse_expr("{}!={}.last()".format(s_var, s_container), values=values),
                     "update": self.parse_stmt("{v}=next({},{v})".format(s_container, v=s_var)),
                     "cond_values_hint": make_values_hint(values, is_loop=True),
-                    "body":  make_loop_body(
-                                name,
-                                parse_algorithm(line_list[i+1:e+1], start_line=start_line + i+1)  # скобки { } вокруг тела могут отсутствовать
-                            )
+                    "body": make_loop_body(
+                        name,
+                        parse_algorithm(line_list[i + 1:e + 1], start_line=start_line + i + 1)
+                        # скобки { } вокруг тела могут отсутствовать
+                    )
                 })
                 ci = e + 1
                 continue  # with next stmt on current level
-
 
             # {  // myseq-5  -  начало именованного следования
             m = re.match(r"\{\s*(?://|#)\s*(\S+)", current_line, re.I)
             if m:
                 if self.verbose: print("named sequence:", m.group(1))
-                name =   m.group(1)  # имя следования (пишется в комментарии)
+                name = m.group(1)  # имя следования (пишется в комментарии)
                 name = complexname(name, 'sequence')
                 result.append({
                     "id": self.newID(name),
                     "type": "sequence",
                     "name": name,
                     "act_name": action('', name=name),
-                    "body": parse_algorithm(line_list[i+1:e], start_line=start_line + i+1),  # учитывая скобки { } вокруг тела
+                    "body": parse_algorithm(line_list[i + 1:e], start_line=start_line + i + 1),
+                    # учитывая скобки { } вокруг тела
                 })
                 ci = e + 1
                 continue  # with next stmt on current level
-
 
             # break / continue / return [<value>]
             m = re.match(r"(break|continue|return)\s*(.*);?\s*$", current_line, re.I)
@@ -639,7 +657,7 @@ class AlgorithmParser:
             #     elif not suggest_corrections and re.search('[а-яё]+', current_line, re.I): suggest_corrections.append(
             #         'действие: вызов(...) функции, или присваивание переменной = ..., или VAR++/VAR--, или `cin >> ...` / `cout << ...`')
             if m:
-                kind  = m.group(1).lower()
+                kind = m.group(1).lower()
                 if self.verbose: print(kind)
                 value = m.group(2).replace('  ', ' ').strip()
                 special_params = {}
@@ -652,22 +670,23 @@ class AlgorithmParser:
                 # set loop name / return expr if given
                 if value:
                     node.update(special_params)
-                result.append( node )
+                result.append(node)
                 ci = e + 1
                 continue  # with next stmt on current level
-
 
             # одно слово - имя действия: "бежать"
             m = re.match(r"(\S+|\w.*(?:\(.*\)|=.|>>.|<<.|\+\+|--).*);?\s*$", current_line, re.I)
             if not m:
-                if not suggest_corrections and re.search('[a-z]+', current_line, re.I): suggest_corrections.append(
-                    'some_action: function call(...), or variable = assignment, or VAR++/VAR--, or `cin >> ...` / `cout << ...`')
-                elif not suggest_corrections and re.search('[а-яё]+', current_line, re.I): suggest_corrections.append(
-                    'действие: вызов(...) функции, или присваивание переменной = ..., или VAR++/VAR--, или `cin >> ...` / `cout << ...`')
+                if not suggest_corrections and re.search('[a-z]+', current_line, re.I):
+                    suggest_corrections.append(
+                        'some_action: function call(...), or variable = assignment, or VAR++/VAR--, or `cin >> ...` / `cout << ...`')
+                elif not suggest_corrections and re.search('[а-яё]+', current_line, re.I):
+                    suggest_corrections.append(
+                        'действие: вызов(...) функции, или присваивание переменной = ..., или VAR++/VAR--, или `cin >> ...` / `cout << ...`')
             if m:
                 if self.verbose: print("action")
                 name = m.group(1).replace('  ', ' ').rstrip(';')
-                result.append( self.parse_stmt(name) )
+                result.append(self.parse_stmt(name))
                 ci = e + 1
                 continue  # with next stmt on current level
 
@@ -675,8 +694,8 @@ class AlgorithmParser:
             suggest = ""
             if suggest_corrections:
                 suggest = "\nThis syntax constructs may help:\n\t" + ('\n\t'.join(suggest_corrections))
-            raise ValueError("AlgorithmError: unknown control structure at line %d: '%s'%s"%(1 + ci + start_line, current_line, suggest))
-
+            raise ValueError("AlgorithmError: unknown control structure at line %d: '%s'%s" % (
+                1 + ci + start_line, current_line, suggest))
 
         return result
 
@@ -733,17 +752,19 @@ class TraceParser:
             if not r and name[0] + name[-1] == "()":
                 return self.get_alg_node_id(name[1:-1], node_type=node_type)
             if not r:
-                name = name.replace(' ','')
+                name = name.replace(' ', '')
                 if not self.name2id_no_whitespace:
                     # копия словаря с ключами, из которых вырезаны пробелы
-                    self.name2id_no_whitespace = { n.replace(' ',''):v for n,v in self.name2id.items() }
+                    self.name2id_no_whitespace = {n.replace(' ', ''): v for n, v in self.name2id.items()}
                 # поищем без пробелов
                 r = self.name2id_no_whitespace.get(name, None)
 
         if node_type:  # and node_type == "expr":
-            name = name.replace('(','').replace(')','')
+            name = name.replace('(', '').replace(')', '')
 
-            criterion = lambda d: (type(d) is dict and "id" in d and  d["type"] == node_type and  d["name"].replace(' ','').replace('(','').replace(')','') == name)
+            criterion = lambda d: (
+                    type(d) is dict and "id" in d and d["type"] == node_type and d["name"].replace(' ', '').replace(
+                '(', '').replace(')', '') == name)
             nodes = list(find_by_predicate(self.alg_dict, criterion, find_one=True))
             if nodes:
                 expr = nodes[0]
@@ -755,7 +776,6 @@ class TraceParser:
             expr = list(find_by_predicate(self.alg_dict, criterion, find_one=True))
             if expr:
                 expr = expr[0]
-
 
                 # find the (expr as "cond")`s parent statement and return it
                 criterion = lambda d: (type(d) is dict and "cond" in d and d["cond"] == expr)
@@ -769,7 +789,8 @@ class TraceParser:
 
     def newID(self, what=None, owerwrite=False):
         self._maxID += 1
-        global _maxTrID; _maxTrID = self._maxID
+        global _maxTrID;
+        _maxTrID = self._maxID
         # if what:
         #     if what in self.name2id:
         #         if owerwrite:
@@ -832,9 +853,9 @@ class TraceParser:
             Ith1 = r"(?:\s+(\d+)(?:st|nd|rd|th|[-_]й)?\s+(?:time|раз))"
             Ith1_femn = r"(?:\s+(\d+)(?:st|nd|rd|th|[-_]я)?)"  # 1-я [итерация]
             PHASE_dict = dict(BEGAN=BEGAN, ENDED=ENDED, EXECUTED=EXECUTED,
-                BEGAN_ru=BEGAN_ru, ENDED_ru=ENDED_ru, EXECUTED_ru=EXECUTED_ru,
-                BEGAN_en=BEGAN_en, ENDED_en=ENDED_en, EXECUTED_en=EXECUTED_en,
-                Ith1=Ith1, Ith1_femn=Ith1_femn, )
+                              BEGAN_ru=BEGAN_ru, ENDED_ru=ENDED_ru, EXECUTED_ru=EXECUTED_ru,
+                              BEGAN_en=BEGAN_en, ENDED_en=ENDED_en, EXECUTED_en=EXECUTED_en,
+                              Ith1=Ith1, Ith1_femn=Ith1_femn, )
             BEGAN_re = re.compile(BEGAN, re.I)
             ENDED_re = re.compile(ENDED, re.I)
             EXECUTED_re = re.compile(EXECUTED, re.I)
@@ -849,12 +870,12 @@ class TraceParser:
                 else:
                     return "U-N-K-N-O-W-N"
 
-
             # началась программа
             # закончилась программа
             # program began
             # program ended
-            m = re.match(r"({BEGAN_ru}|{ENDED_ru})\s+программа|program\s+({BEGAN_en}|{ENDED_en})".format(**PHASE_dict), line, re.I)
+            m = re.match(r"({BEGAN_ru}|{ENDED_ru})\s+программа|program\s+({BEGAN_en}|{ENDED_en})".format(**PHASE_dict),
+                         line, re.I)
             if m:
                 phase_str = m.group(1) or m.group(2)
                 if self.verbose: print("{} программа".format(phase_str))
@@ -866,14 +887,14 @@ class TraceParser:
                 alg_obj_id = self.alg_dict["entry_point"]["id"]
                 assert alg_obj_id, f"TraceError: no entry_point found for '{name}'."
                 result.append({
-                      "id": self.newID(name),
-                      # "action": name,
-                      "name": name,
-                      "executes": alg_obj_id,
-                      "phase": phase,
-                      "n": 1,
-                      "text_line": ci,
-                      "comment": comment,
+                    "id": self.newID(name),
+                    # "action": name,
+                    "name": name,
+                    "executes": alg_obj_id,
+                    "phase": phase,
+                    "n": 1,
+                    "text_line": ci,
+                    "comment": comment,
                 })
 
                 if phase == "finished":
@@ -902,28 +923,28 @@ class TraceParser:
                 if self.verbose: print("{} {}".format(phase_str, struct_str))
                 #   {"id": 32, "action": "программа", "executes": 25, "gen": "she", "phase": "started", "n": null},
                 struct = {
-                            "следование": "sequence",
-                            "развилка": "alternative",
-                            "цикл": "loop",
-                            "функция": "func",
-                            "function": "func",
-                         }.get(struct_str, struct_str)
+                    "следование": "sequence",
+                    "развилка": "alternative",
+                    "цикл": "loop",
+                    "функция": "func",
+                    "function": "func",
+                }.get(struct_str, struct_str)
                 name = m.group(3)
-                ith = m.group(5)  if len(m.groups())>=5 else  None
+                ith = m.group(5) if len(m.groups()) >= 5 else None
                 phase = get_phase_by_str(phase_str)
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
                 if struct == "func":
                     alg_obj_id = next(find_by_keyval_in("name", name, self.alg_dict["functions"]))["body"]["id"]
                 result.append({
-                      "id": self.newID(name),
-                      # struct: name,
-                      "name": name,
-                      "executes": alg_obj_id,
-                      "phase": phase,
-                      "n": ith,
-                      "text_line": ci,
-                      "comment": comment,
+                    "id": self.newID(name),
+                    # struct: name,
+                    "name": name,
+                    "executes": alg_obj_id,
+                    "phase": phase,
+                    "n": ith,
+                    "text_line": ci,
+                    "comment": comment,
                 })
                 continue  # with next act
 
@@ -943,11 +964,12 @@ class TraceParser:
                 \s+ (\S+)   # 4 value
                 """.format(**PHASE_dict), line, re.I | re.VERBOSE)
             if m:
-                if self.verbose: print("условие {} {} выполнилось - {}".format(m.group(1) or "\b", m.group(2), m.group(4)))
-                struct = {"развилки":"alternative", "цикла":"loop", }.get(m.group(1), "alternative or loop")
+                if self.verbose: print(
+                    "условие {} {} выполнилось - {}".format(m.group(1) or "\b", m.group(2), m.group(4)))
+                struct = {"развилки": "alternative", "цикла": "loop", }.get(m.group(1), "alternative or loop")
                 name = m.group(2)
                 value = m.group(4)
-                ith = m.group(3)  if len(m.groups())>=3 else  None
+                ith = m.group(3) if len(m.groups()) >= 3 else None
                 phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
                 # alg_obj_id = self.get_alg_node_id(name)
                 cond_obj_id = self.get_alg_node_id(name, node_type="expr")
@@ -957,18 +979,20 @@ class TraceParser:
                     criterion = lambda d: (type(d) is dict and "id" in d and (
                             d["type"] in struct or
                             "loop" in struct and "loop" in d["type"]
-                        ))
+                    ))
                     nodes = list(find_by_predicate(self.alg_dict, criterion, find_one=False))
                     stmt_ids = [node["id"] for node in nodes]
                     for act in reversed(result):
-                        if  act["executes"] in stmt_ids:
+                        if act["executes"] in stmt_ids:
                             node = nodes[stmt_ids.index(act["executes"])]
                             cond_obj_id = node["cond"]["id"]
                             print()
-                            print(f'warning: condition "{name}" at line {ci} resolved as {node["cond"]["name"]} (of {node["type"]}: {node["name"]})')
+                            print(
+                                f'warning: condition "{name}" at line {ci} resolved as {node["cond"]["name"]} (of {node["type"]}: {node["name"]})')
                             break
 
-                assert cond_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
+                assert cond_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name,
+                                                                                                                ci)
 
                 # convert value to true / false if matches so
                 value = parse_expr_value(value)
@@ -982,15 +1006,15 @@ class TraceParser:
                     self.boolean_chain.append(value)
 
                 result.append({
-                      "id": self.newID(name),
-                      # "expr": name,
-                      "name": name,
-                      "value": value,
-                      "executes": cond_obj_id,  # not alg_obj_id !
-                      "phase": phase,
-                      "n": ith,
-                      "text_line": ci,
-                      "comment": comment,
+                    "id": self.newID(name),
+                    # "expr": name,
+                    "name": name,
+                    "value": value,
+                    "executes": cond_obj_id,  # not alg_obj_id !
+                    "phase": phase,
+                    "n": ith,
+                    "text_line": ci,
+                    "comment": comment,
                 })
                 continue  # with next act
 
@@ -1013,7 +1037,8 @@ class TraceParser:
                 else_branch_name = None
                 for obj in reversed(result):
                     if "alternative" in obj:
-                        else_branch_name = obj["alternative"] + "-else"  # используем правило формирования имени ветки "иначе"
+                        else_branch_name = obj[
+                                               "alternative"] + "-else"  # используем правило формирования имени ветки "иначе"
                         break
                 if else_branch_name is None:  # !!!!
                     # в трассе нет (ошибочная трасса!) - найдём первую попавшуюся ветку ИНАЧЕ в алгоритме (как часть развилки)
@@ -1021,21 +1046,24 @@ class TraceParser:
                     if found:
                         else_branch_name = found[0]["name"]
                     else:
-                        raise ValueError("TraceError: no else_branch element found in algorithm to bound '{}' at line {}!".format("ветка иначе", ci))
+                        raise ValueError(
+                            "TraceError: no else_branch element found in algorithm to bound '{}' at line {}!".format(
+                                "ветка иначе", ci))
                 name = else_branch_name
-                ith = m.group(2)  if len(m.groups())>=2 else  None
+                ith = m.group(2) if len(m.groups()) >= 2 else None
                 phase = get_phase_by_str(m.group(1))  # "started"  if "начал" in m.group(1) else  "finished"
                 alg_obj_id = self.get_alg_node_id(name)
-                assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format("ветка иначе", ci)
+                assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(
+                    "ветка иначе", ci)
                 result.append({
-                      "id": self.newID(name),
-                      # "branch": name,
-                      "name": name,
-                      "executes": alg_obj_id,
-                      "phase": phase,
-                      "n": ith,
-                      "text_line": ci,
-                      "comment": comment,
+                    "id": self.newID(name),
+                    # "branch": name,
+                    "name": name,
+                    "executes": alg_obj_id,
+                    "phase": phase,
+                    "n": ith,
+                    "text_line": ci,
+                    "comment": comment,
                 })
                 continue  # with next act
 
@@ -1069,18 +1097,19 @@ class TraceParser:
                 name = m.group(1) or m.group(2)
                 phase = get_phase_by_str(m.group(3))  # "started"  if "начал" in m.group(2) else  "finished"
                 if self.verbose: print("ветка {} {}".format(name, phase))
-                ith = m.group(4)  if len(m.groups())>=4 else  None
-                alg_obj_id = self.get_alg_node_id([prfx+name for prfx in ("if-","elseif-")])  # префиксы для веток "if" и "else if" - ветка Иначе здесь не обрабатывается!
+                ith = m.group(4) if len(m.groups()) >= 4 else None
+                alg_obj_id = self.get_alg_node_id([prfx + name for prfx in (
+                    "if-", "elseif-")])  # префиксы для веток "if" и "else if" - ветка Иначе здесь не обрабатывается!
                 assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
-                      "id": self.newID(name),
-                      # "branch": name,
-                      "name": name,
-                      "executes": alg_obj_id,
-                      "phase": phase,
-                      "n": ith,
-                      "text_line": ci,
-                      "comment": comment,
+                    "id": self.newID(name),
+                    # "branch": name,
+                    "name": name,
+                    "executes": alg_obj_id,
+                    "phase": phase,
+                    "n": ith,
+                    "text_line": ci,
+                    "comment": comment,
                 })
                 continue  # with next act
 
@@ -1106,7 +1135,8 @@ class TraceParser:
                 loop_name = m.group(4)
                 name = loop_name + "_loop_body"  # тело цикла сделано отдельной сущностью
                 ith = m.group(2) or m.group(3)
-                phase = get_phase_by_str(m.group(1) or m.group(5))  # "started"  if "начал" in m.group(1) else  "finished"
+                phase = get_phase_by_str(
+                    m.group(1) or m.group(5))  # "started"  if "начал" in m.group(1) else  "finished"
                 alg_obj_id = self.get_alg_node_id(loop_name)  # access body via loop
                 loop_dict = next(find_by_keyval_in("id", alg_obj_id, self.alg_dict))
                 alg_obj_id = loop_dict["body"]["id"]
@@ -1115,20 +1145,20 @@ class TraceParser:
                 count_dict = self.iteration_count_dict.get(alg_obj_id, {})
                 ith = count_dict.get(phase, 0) + 1
                 count_dict.update({phase: ith})
-                  # Временное решение! Не работает с рекурсией (считает все вхождения, идентично exec_time). Нужно отталкиваться от акта начала цикла, и запоминать все связанные непосредственно с ним итерации.
+                # Временное решение! Не работает с рекурсией (считает все вхождения, идентично exec_time). Нужно отталкиваться от акта начала цикла, и запоминать все связанные непосредственно с ним итерации.
                 self.iteration_count_dict[alg_obj_id] = count_dict
 
                 result.append({
-                      "id": self.newID(name),
-                      # "loop_name": name,
-                      # Добавлять информацию об объемлющем акте цикла?..
-                      "name": name,
-                      "executes": alg_obj_id,
-                      "phase": phase,
-                      "n": ith,
-                      "iteration_n": ith,
-                      "text_line": ci,
-                      "comment": comment,
+                    "id": self.newID(name),
+                    # "loop_name": name,
+                    # Добавлять информацию об объемлющем акте цикла?..
+                    "name": name,
+                    "executes": alg_obj_id,
+                    "phase": phase,
+                    "n": ith,
+                    "iteration_n": ith,
+                    "text_line": ci,
+                    "comment": comment,
                 })
                 continue  # with next act
 
@@ -1145,9 +1175,10 @@ class TraceParser:
             if m:
                 if self.verbose: print("{} {} {}".format(m.group(1), m.group(2), m.group(4)))
                 struct_str = m.group(2)
-                struct = {"инициализация":"init", "initialization":"init", "переход":"update", }.get(struct_str, struct_str)
+                struct = {"инициализация": "init", "initialization": "init", "переход": "update", }.get(struct_str,
+                                                                                                        struct_str)
                 name = m.group(3)
-                ith = m.group(4)  if len(m.groups())>=4 else  None
+                ith = m.group(4) if len(m.groups()) >= 4 else None
                 phase = "performed"
                 alg_obj_id = self.get_alg_node_id(name)
                 if alg_obj_id is None:
@@ -1157,25 +1188,25 @@ class TraceParser:
                     nodes = list(find_by_predicate(self.alg_dict, criterion, find_one=False))
                     stmt_ids = [node["id"] for node in nodes]
                     for act in reversed(result):
-                        if  act["executes"] in stmt_ids:
+                        if act["executes"] in stmt_ids:
                             node = nodes[stmt_ids.index(act["executes"])]
                             alg_obj_id = node[struct]["id"]
                             print()
-                            print(f'warning: {struct} "{name}" at line {ci} resolved as {node[struct]["name"]} (of {node["type"]}: {node["name"]})')
+                            print(
+                                f'warning: {struct} "{name}" at line {ci} resolved as {node[struct]["name"]} (of {node["type"]}: {node["name"]})')
                             break
                 assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
-                      "id": self.newID(name),
-                      # "action": name,
-                      "name": name,
-                      "executes": alg_obj_id,
-                      "phase": phase,
-                      "n": ith,
-                      "text_line": ci,
-                      "comment": comment,
+                    "id": self.newID(name),
+                    # "action": name,
+                    "name": name,
+                    "executes": alg_obj_id,
+                    "phase": phase,
+                    "n": ith,
+                    "text_line": ci,
+                    "comment": comment,
                 })
                 continue  # with next act
-
 
             # что-то выполнилось 1-й раз
             # greet executed 1st time
@@ -1188,26 +1219,25 @@ class TraceParser:
             if m:
                 if self.verbose: print("{} {}".format(m.group(1), m.group(2)))
                 name = m.group(1)
-                ith = m.group(3)  if len(m.groups())>=3 else  None
+                ith = m.group(3) if len(m.groups()) >= 3 else None
                 # phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
                 phase = get_phase_by_str(m.group(2))
                 alg_obj_id = self.get_alg_node_id(name)
                 assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
-                      "id": self.newID(name),
-                      # "action": name,
-                      "name": name,
-                      "executes": alg_obj_id,
-                      "phase": phase,
-                      "n": ith,
-                      "text_line": ci,
-                      "comment": comment,
+                    "id": self.newID(name),
+                    # "action": name,
+                    "name": name,
+                    "executes": alg_obj_id,
+                    "phase": phase,
+                    "n": ith,
+                    "text_line": ci,
+                    "comment": comment,
                 })
                 continue  # with next act
 
-
             # print("Warning: unknown trace line structure at line %d: "%ci, line)
-            raise ValueError("TraceError: unknown trace line structure at line %d: %s"%(ci, line))
+            raise ValueError("TraceError: unknown trace line structure at line %d: %s" % (ci, line))
 
         return result
 
@@ -1216,29 +1246,31 @@ class TraceParser:
 
 
 def word_in(words, text):
-    if not isinstance(words, (list,tuple)): words = [words]
-    rgx = "|".join([r"\b%s\b"%re.escape(w) for w in words])
+    if not isinstance(words, (list, tuple)): words = [words]
+    rgx = "|".join([r"\b%s\b" % re.escape(w) for w in words])
     return re.search(rgx, text) is not None
 
-def extract_alg_name(line) -> str:
+
+def extract_alg_name(line) -> Optional[str]:
     """Берём слово, стоящее за словом "алгоритм" """
     words = line.split()
-    choises = ("алгоритм", "algorithm")
-    choice = [w for w in words if w in choises]
+    choices = ("алгоритм", "algorithm")
+    choice = [w for w in words if w in choices]
     if choice:
         choice = choice[0]
         i = words.index(choice)
     else:
-        print("Warning: No", f"\"{'/'.join(choises)}\"", "in line:", line)
+        print("Warning: No", f"\"{'/'.join(choices)}\"", "in line:", line)
         return None
     if i == len(words) - 1:
-        print("Warning: No algoritm name following", f'"{choise}"', "in line:", line)
+        print("Warning: No algorithm name following", f'"{choice}"', "in line:", line)
         return None
-    return words[i+1]
+    return words[i + 1]
+
 
 # extract_alg_name("line 15 // алгоритм 07_while (while в стиле foreach, с 2 действиями)")
 
-def find_by_predicate(dict_or_list, pred=lambda x:(type(x) is dict), find_one=False, _not_enter=None):
+def find_by_predicate(dict_or_list, pred=lambda x: (type(x) is dict), find_one=False, _not_enter=None):
     "generator of dicts or objects selected by `pred`"
     _not_enter = _not_enter or set()
     _not_enter.add(id(dict_or_list))
@@ -1255,6 +1287,7 @@ def find_by_predicate(dict_or_list, pred=lambda x:(type(x) is dict), find_one=Fa
             if id(v) not in _not_enter:
                 yield from find_by_predicate(v, pred, _not_enter)
 
+
 def find_by_key_in(key, dict_or_list, _not_enter=None):
     _not_enter = _not_enter or set()
     _not_enter.add(id(dict_or_list))
@@ -1269,6 +1302,7 @@ def find_by_key_in(key, dict_or_list, _not_enter=None):
             if id(d) not in _not_enter:
                 yield from find_by_key_in(key, d, _not_enter)
 
+
 def find_by_keyval_in(key, val, dict_or_list, _not_enter=None):
     _not_enter = _not_enter or set()
     _not_enter.add(id(dict_or_list))
@@ -1282,6 +1316,7 @@ def find_by_keyval_in(key, val, dict_or_list, _not_enter=None):
         for d in dict_or_list:
             if id(d) not in _not_enter:
                 yield from find_by_keyval_in(key, val, d, _not_enter)
+
 
 # list(find_by_keyval_in("type", "sequence", ap.algorithm))
 
@@ -1305,20 +1340,20 @@ def parse_text_file(txt_file_path, encoding="utf8"):
         print(f"Error reading file {txt_file_path} :\n  " + str(e))
         return []
 
-    print("="*40)
+    print("=" * 40)
     print("Parsing algorithms and traces from".center(40))
     print(txt_file_path.center(40))
-    print("="*40)
+    print("=" * 40)
 
     valid_alg_trs = parse_algorithms_and_traces_from_text(text)
 
     print()
     print("Total in file (%s):" % txt_file_path)
-    print("  Number of effective algorithms:", len( {
+    print("  Number of effective algorithms:", len({
         trdct["algorithm_name"]
         for trdct in valid_alg_trs
         # if "erroneous" not in trdct["algorithm"]
-        } ))
+    }))
     print("  Number of valid traces:", len(valid_alg_trs))
     print()
 
@@ -1341,31 +1376,30 @@ def parse_algorithms_and_traces_from_text(text: str):
     collected from specified text data.
     """
 
-    text = text.replace("\t", " "*4)  # expand tabs to spaces (if any)
+    text = text.replace("\t", " " * 4)  # expand tabs to spaces (if any)
     lines = text.split("\n")
     text = None
 
-
     # Алгоритмы ...
 
-    last_line = len(lines)-2
+    last_line = len(lines) - 2
     alg_data = {}
 
     for i in range(0, last_line):
         if word_in(("алгоритм", "algorithm"), lines[i]) and '"algorithm"' not in lines[i]:
             # проверить начало алгоритма
-            if not re.search(r"\{|функция|function", lines[i+1]):
+            if not re.search(r"\{|функция|function", lines[i + 1]):
                 print("Ignored (no alg. begin): line", i, lines[i])
                 continue
             # найти конец алгоритма: не ранее 3-х строк ниже названия и далее
             for j in range(i + 3, last_line):
-                next_line = lines[j+1].strip()
+                next_line = lines[j + 1].strip()
                 if not next_line or re.match(r"/\*|//|#", next_line):  # следующая - пустая или комментарий
                     if "}" in lines[j]:
                         # найдено
                         name = extract_alg_name(lines[i])
                         alg_data[name] = {
-                            "lines": (i+1, j),  # строки текста алгоритма (вкл-но)
+                            "lines": (i + 1, j),  # строки текста алгоритма (вкл-но)
                         }
                         ## ### !!! save the text
                         ## if True:
@@ -1376,12 +1410,9 @@ def parse_algorithms_and_traces_from_text(text: str):
                         print(f"Ignored line {i}: {lines[i]}\n\tas no '{'}'}' found at line {j}: {lines[j]}")
                     break
 
-
-
     # Трассы ....
 
-    last_line = len(lines)-1
-
+    last_line = len(lines) - 1
 
     print("Algorithm names:", *list(alg_data.keys()))
 
@@ -1397,7 +1428,7 @@ def parse_algorithms_and_traces_from_text(text: str):
             name = None
             boolean_chain = None
             # ищем ссылку на алгоритм...
-            for j in range(i-1, i-5, -1):  # проверяем 4 строки вверх
+            for j in range(i - 1, i - 5, -1):  # проверяем 4 строки вверх
                 m = alg_names_rgx.search(lines[j])
                 if m:
                     alg_name = m.group(0)
@@ -1405,14 +1436,15 @@ def parse_algorithms_and_traces_from_text(text: str):
                     name = re.sub(r"^\s*(?:/\*|//|#)\s*", "", lines[j])
 
                     # найти цепочку из 0 и 1, стоящую за именем алгоритма (если есть)
-                    boolean_chain = None # слово за именем алгоритма
+                    boolean_chain = None  # слово за именем алгоритма
                     words = name.split()
                     alg_name_i = words.index(alg_name)
                     if alg_name_i < len(words) - 1:
                         boolean_chain_str = words[alg_name_i + 1]
                         if re.match(r"[01]", boolean_chain_str):
                             boolean_chain_str = re.sub(r"[^01]", "", boolean_chain_str)
-                            boolean_chain = list(map({"0":False, "1":True}.get, boolean_chain_str))  # convert to boolean list
+                            boolean_chain = list(
+                                map({"0": False, "1": True}.get, boolean_chain_str))  # convert to boolean list
                     break
 
             if not name:
@@ -1420,14 +1452,15 @@ def parse_algorithms_and_traces_from_text(text: str):
                 continue
             # найти конец трассы
             for j in range(i + 1, last_line):
-                if "}" in lines[j+1]:  # закрывающая скобка
-                    if word_in(("закончилась программа","program ended"), lines[j]):
+                if "}" in lines[j + 1]:  # закрывающая скобка
+                    if word_in(("закончилась программа", "program ended"), lines[j]):
                         # найдено
                         tr_data[name] = {
                             "alg_name": alg_name,
-                            "boolean_chain": boolean_chain,  # последовательность из 0 и 1 - значения условий в порядке появления в трассе
+                            "boolean_chain": boolean_chain,
+                            # последовательность из 0 и 1 - значения условий в порядке появления в трассе
                             # !
-                            "lines":(i, j)  # строки текста трассы (вкл-но)
+                            "lines": (i, j)  # строки текста трассы (вкл-но)
                         }
 
                         # print("line", i, name)
@@ -1445,8 +1478,8 @@ def parse_algorithms_and_traces_from_text(text: str):
         if "alg_parser" not in alg_data[alg_name] and "erroneous" not in alg_data[alg_name]:
             print("Parsing algorithm:", alg_name, "...", end='\t')
             try:
-                b,e = alg_data[alg_name]["lines"]
-                alg_data[alg_name]["alg_parser"] = AlgorithmParser(lines[b:e+1])
+                b, e = alg_data[alg_name]["lines"]
+                alg_data[alg_name]["alg_parser"] = AlgorithmParser(lines[b:e + 1])
                 print("Success")
             except Exception as e:
                 print("Error !")
@@ -1461,7 +1494,7 @@ def parse_algorithms_and_traces_from_text(text: str):
 
         print("Parsing trace:", tr_name, "...", end='\t')
         try:
-            b,e = tr_dict["lines"]
+            b, e = tr_dict["lines"]
             tr_dict["trace_parser"] = TraceParser(lines, alg_data[alg_name]["alg_parser"], start_line=b)
 
             # store boolean chain
@@ -1474,13 +1507,12 @@ def parse_algorithms_and_traces_from_text(text: str):
             print(" ", repr(e))
             raise e
 
-
     valid_alg_trs = [{
-        "trace_name"    : nm,
+        "trace_name": nm,
         "algorithm_name": trdct["alg_name"],
-        "trace"         : trdct["trace_parser"].trace,
-        "algorithm"     : alg_data[trdct["alg_name"]]["alg_parser"].algorithm,
-        "header_boolean_chain" : trdct["boolean_chain"],
+        "trace": trdct["trace_parser"].trace,
+        "algorithm": alg_data[trdct["alg_name"]]["alg_parser"].algorithm,
+        "header_boolean_chain": trdct["boolean_chain"],
 
     } for nm, trdct in tr_data.items() if "trace_parser" in trdct]
 
@@ -1508,7 +1540,8 @@ def parse_text_files(file_paths, encoding="utf8"):
     return alg_trs
 
 
-def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=(".txt", ".tr"), skip_starting_with_hypen=True, filter_file="filter.inf"):
+def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=(".txt", ".tr"),
+                            skip_starting_with_hypen=True, filter_file="filter.inf"):
     import os
     result_list = []
     search_in_dir = True
@@ -1547,6 +1580,7 @@ def complexname(name, type_name, **kw):
         return name
     return shortname_for_type(type_name, **kw)
 
+
 def shortname_for_type(type_name, **kw):
     '''Нужно для независимых действий;  подчинённые действия не нуждаются в отбражаемом имени.
     kw: `id`'''
@@ -1554,9 +1588,9 @@ def shortname_for_type(type_name, **kw):
     if type_name.endswith('_loop'):
         prefix = 'L'
     elif type_name == 'sequence':
-        prefix = 'B' # "block"
+        prefix = 'B'  # "block"
     else:  # if not prefix: # default
-        prefix = type_name[0].upper() # 1st letter
+        prefix = type_name[0].upper()  # 1st letter
 
     suffix = None
     if 'id' in kw:
@@ -1568,7 +1602,6 @@ def shortname_for_type(type_name, **kw):
 
 
 def main():
-
     # parse_text_file("../handcrafted_traces/err_branching.txt")
     # parse_text_file("../handcrafted_traces/err_loops.txt")
     # parse_text_file("../handcrafted_traces/correct_branching.txt")
@@ -1582,8 +1615,7 @@ def main():
     #     "../handcrafted_traces/no_such_file.txt",
     # ])
 
-
-    result = parse_text_files( search_text_trace_files() )
+    result = parse_text_files(search_text_trace_files())
     print('Total algorithms / traces: ', len(result))
     # from pprint import pprint
     # to_print = result
@@ -1592,7 +1624,8 @@ def main():
     # pprint(to_print)
 
     import json
-    if not 'save all in one':
+    # ### not
+    if 'save all in one':
         with open(r"C:/D/Work/YDev/CompPr/c_owl/trace_gen/alg_dbg.json", 'w') as f:
             f.write(json.dumps(result, ensure_ascii=False, indent=1))
     else:
