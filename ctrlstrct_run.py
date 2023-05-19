@@ -38,7 +38,7 @@ def prepare_name(s):
     try:
         return slugify(s, "ru") or s
     except:
-        print(' slugify() throwed error for action name: ', name)
+        print(' slugify() threw error for action name: ', name)
         return s
 
 

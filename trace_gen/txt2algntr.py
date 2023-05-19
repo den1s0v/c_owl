@@ -11,7 +11,7 @@ if __name__ == '__main__':  # to import from upper directory
 
 try:
     from trace_gen.json2alg2tr import get_target_lang
-except:
+except ImportError:
     from json2alg2tr import get_target_lang
 
 _maxAlgID = 1
@@ -177,7 +177,7 @@ class AlgorithmParser:
         return self._maxID
 
 
-    def parse(self, line_list: "list(str)"):
+    def parse(self, line_list: "list[str]"):
         self.algorithm["global_code"]["body"] += self.parse_algorithm_ids(line_list)
         # найдём точку входа
         for func in self.algorithm["functions"]:
@@ -853,7 +853,7 @@ class TraceParser:
                 name = "program"
                 phase = get_phase_by_str(phase_str)  # "started"  if BEGAN_re.match(phase_str) else  "finished"
                 # alg_obj_id = self.get_alg_node_id(("algorithm","алгоритм"))
-                # assert alg_obj_id, "TraceError: no corresporning '{}' found for '{}'".format("algorithm' or 'алгоритм", name)
+                # assert alg_obj_id, "TraceError: no corresponding '{}' found for '{}'".format("algorithm' or 'алгоритм", name)
                 alg_obj_id = self.alg_dict["entry_point"]["id"]
                 assert alg_obj_id, f"TraceError: no entry_point found for '{name}'."
                 result.append({
@@ -903,7 +903,7 @@ class TraceParser:
                 ith = m.group(5)  if len(m.groups())>=5 else  None
                 phase = get_phase_by_str(phase_str)
                 alg_obj_id = self.get_alg_node_id(name)
-                assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
                 if struct == "func":
                     alg_obj_id = next(find_by_keyval_in("name", name, self.alg_dict["functions"]))["body"]["id"]
                 result.append({
@@ -959,7 +959,7 @@ class TraceParser:
                             print(f'warning: condition "{name}" at line {ci} resolved as {node["cond"]["name"]} (of {node["type"]}: {node["name"]})')
                             break
 
-                assert cond_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                assert cond_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
 
                 # convert value to true / false if matches so
                 value = parse_expr_value(value)
@@ -1017,7 +1017,7 @@ class TraceParser:
                 ith = m.group(2)  if len(m.groups())>=2 else  None
                 phase = get_phase_by_str(m.group(1))  # "started"  if "начал" in m.group(1) else  "finished"
                 alg_obj_id = self.get_alg_node_id(name)
-                assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format("ветка иначе", ci)
+                assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format("ветка иначе", ci)
                 result.append({
                       "id": self.newID(name),
                       # "branch": name,
@@ -1062,7 +1062,7 @@ class TraceParser:
                 if self.verbose: print("ветка {} {}".format(name, phase))
                 ith = m.group(4)  if len(m.groups())>=4 else  None
                 alg_obj_id = self.get_alg_node_id([prfx+name for prfx in ("if-","elseif-")])  # префиксы для веток "if" и "else if" - ветка Иначе здесь не обрабатывается!
-                assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
                       # "branch": name,
@@ -1101,7 +1101,7 @@ class TraceParser:
                 alg_obj_id = self.get_alg_node_id(loop_name)  # access body via loop
                 loop_dict = next(find_by_keyval_in("id", alg_obj_id, self.alg_dict))
                 alg_obj_id = loop_dict["body"]["id"]
-                assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
 
                 count_dict = self.iteration_count_dict.get(alg_obj_id, {})
                 ith = count_dict.get(phase, 0) + 1
@@ -1154,7 +1154,7 @@ class TraceParser:
                             print()
                             print(f'warning: {struct} "{name}" at line {ci} resolved as {node[struct]["name"]} (of {node["type"]}: {node["name"]})')
                             break
-                assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
                       # "action": name,
@@ -1183,7 +1183,7 @@ class TraceParser:
                 # phase = "performed"  # "started"  if "начал" in m.group(1) else  "finished"
                 phase = get_phase_by_str(m.group(2))
                 alg_obj_id = self.get_alg_node_id(name)
-                assert alg_obj_id, "TraceError: no corresporning alg.element found for '{}' at line {}".format(name, ci)
+                assert alg_obj_id, "TraceError: no corresponding alg.element found for '{}' at line {}".format(name, ci)
                 result.append({
                       "id": self.newID(name),
                       # "action": name,
@@ -1485,7 +1485,7 @@ def parse_algorithms_and_traces_from_text(text: str):
 
 
 def parse_text_files(file_paths, encoding="utf8"):
-    """Returns concatenation of lists of traces collected from specified file paths.
+    """Returns concatenation of lists of traces collected from specified files.
     """
 
     alg_trs = []
@@ -1497,6 +1497,7 @@ def parse_text_files(file_paths, encoding="utf8"):
     print()
 
     return alg_trs
+
 
 def search_text_trace_files(directory="../handcrafted_traces/", file_extensions=(".txt", ".tr"), skip_starting_with_hypen=True, filter_file="filter.inf"):
     import os
