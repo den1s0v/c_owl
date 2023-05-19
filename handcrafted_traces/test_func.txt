@@ -19,6 +19,8 @@
 
 // алгоритм alg_fact1 (факториал)
 {
+	printf("Hello, %s!", "World");
+
 	функция fact(int n)
 	{
 		если условие (n <= 2)  // проверка_базы
@@ -27,16 +29,16 @@
 			value = fact(n-1)
 			return n * value
 	}
+	assert(fact(5) == 120)
 	
 	функция fact2(int x)
 	{
 		если условие (x <= 2)  // проверка_базы (в fact2)
-			return 1
+			return (1)
 		иначе
 			return fact2(x-1) * x
 	}
 	
-	assert(fact(5) == 120)
 	assert(fact2(5) == 120)
 }
 // alg_fact1 - (0)

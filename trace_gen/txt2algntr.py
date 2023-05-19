@@ -182,6 +182,8 @@ class AlgorithmParser:
         _maxAlgID = self._maxID
         if what:
             if what in self.name2id:
+                # TODO: Добавить подсистему для различимости имён (в конце дописывать номер в скобках,
+                #  а для предыдущего варианта - заменить все имена в уже готовом алгоритме)
                 print("Warning: multiple objects named as '%s' !" % what,
                       "Old id/new id:", self.name2id[what], "/", self._maxID, "; Overriding with latter one.")
             self.name2id[what] = self._maxID
@@ -252,7 +254,7 @@ class AlgorithmParser:
 
         result = []
         suggest_corrections = []
-        line_indents = [len(s) - len(s.lstrip()) for s in line_list]
+        line_indents = [len(s) - len(s.lstrip()) if s else 999 for s in line_list]
 
         current_level_stmt_line_idx = []
         current_level = None  # Отступ текущего уровня (найдём в цикле как отступ первой строки кода, но не { }. )
@@ -1437,11 +1439,13 @@ def parse_algorithms_and_traces_from_text(text: str):
                         alg_data[name] = {
                             "lines": (i + 1, j),  # строки текста алгоритма (вкл-но)
                         }
-                        # print("line", i, name)  # , lines[i])
+                        print(f"Found algorithm `{name}` at lines {(i + 1, j + 1)}")  # , lines[i])
                         break
                 # иначе - не найдено
-                else:
-                    print(f"Ignored line {i}: {lines[i]}\n\tas no '{'}'}' found at line {j}: {lines[j]}")
+
+            if depth > 0:
+                # Файл закончился, но скобка так и не была закрыта.
+                print(f"Ignored line {i + 1}: {lines[i]}\n\tas no '{'}'}' found at line {j + 1}: `{lines[j]}`")
 
     # Трассы ....
 
@@ -1481,7 +1485,7 @@ def parse_algorithms_and_traces_from_text(text: str):
                     break
 
             if not name:
-                print("Ignored (no reference to an algorithm found): line", i, lines[i])
+                print("Ignored (no reference to an algorithm found): line", i + 1, '—', lines[i])
                 continue
             # найти конец трассы
             for j in range(i + 1, last_line):
@@ -1499,7 +1503,7 @@ def parse_algorithms_and_traces_from_text(text: str):
                         # print("line", i, name)
                     # иначе - не найдено
                     else:
-                        print("Ignored: line", i, lines[i])
+                        print("Ignored: line", i + 1, lines[i])
                     break
 
     # Парсинг трасс совместно с алгоритмами, указывая строки в файле ...
