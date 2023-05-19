@@ -11,8 +11,10 @@ SKIP   test_loops.txt
 
 SKIP    test_one.txt
 SKIP    test_zero.txt
+test_func.txt
 
 SKIP    questions4cppr.txt
 SKIP    questions4cppr_anon.txt
-qs4compp_like-gen.txt
 SKIP    breaking_flow.txt
+
+SKIP    qs4compp_like-gen.txt
