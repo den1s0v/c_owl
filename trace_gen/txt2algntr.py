@@ -42,7 +42,7 @@ def parse_expr_value(s: str):
     return value
 
 
-CALLED_NAME_re = re.compile(r'\b([a-z_][\w\d_]*)\s*\(.*?\)', re.I | re.UNICODE)
+CALLED_NAME_re = re.compile(r'\b([a-z_][\w\d_]*)\s*\((?=.*?\))', re.I | re.UNICODE)
 
 
 def find_func_calls_in_expr(s) -> list[str]:
