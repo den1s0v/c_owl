@@ -41,6 +41,17 @@ def parse_expr_value(s: str):
         value = False
     return value
 
+
+CALLED_NAME_re = re.compile(r'\b([a-z_][\w\d_]*)\s*\(.*?\)', re.I | re.UNICODE)
+
+
+def find_func_calls_in_expr(s) -> list[str]:
+    """Найти имена вызываемых функций, то есть то, что слева от круглой открывающей скобки."""
+    return [
+        m[1] for m in CALLED_NAME_re.finditer(s) if m
+    ]
+
+
 def parse_expr_values(s: str) -> list:
     """
     '101'             -> (True, False, True)
@@ -146,19 +157,23 @@ class AlgorithmParser:
         self.name2id = {}
 
         self.algorithm = {
-              "id": self.newID("algorithm"),
-              "type": "algorithm",
-              "name": "algorithm",
-              "functions": [],
-              "global_code" : {   #  stmts -> global_code  !!!
-                    "id": self.newID("global_code"),
-                    "type": "sequence",
-                    "name": "global_code",
-                    "act_name": action('program'),
-                    "body": []
-                },
-              "entry_point": None,
-              "expr_values": {},
+            "id": self.newID("algorithm"),
+            "type": "algorithm",
+            "name": "algorithm",
+            "functions": [],
+            "global_code": {  # stmts -> global_code  !!!
+                "id": self.newID("global_code"),
+                "type": "sequence",
+                "name": "global_code",
+                "act_name": action('program'),
+                "body": []
+            },
+            "entry_point": None,
+            "expr_values": {},  # expr name -> list of boolean
+            "functions_called": [],  # set of names (without parameters so far)
+            # ^ все функции, которые когда-либо вызывались в алгоритме
+            # (пользовательские функции из этого множества нужно будет
+            # отображать на экране вместе с главным кодом)
         }
 
     def newID(self, what=None):
@@ -182,26 +197,40 @@ class AlgorithmParser:
         else:  # нет функции
             self.algorithm["entry_point"] = self.algorithm["global_code"]  # надеемся с id
 
-
     def parse_expr(self, name: str, values=None) -> dict:
-        "Нововведение: самостоятельный объект для выражений (пока - только условия)"
+        """Нововведение: самостоятельный объект для выражений (пока - только условия)"""
         if values:
             self.algorithm["expr_values"][name] = parse_expr_values(values)
+        data = {}
+        if called := self.detect_function_calls(name):
+            data['functions_called'] = called  # Задать простому узлу локально - какие функции он вызвал
         return {
             "id": self.newID(name),
             "type": "expr",
             "name": name,
             "act_name": action('condition', name=name),
+            **data,
         }
 
-    def parse_stmt(self, name:str, stmt_type:'stmt/break/continue/return'='stmt', **kw) -> dict:
-        ""
+    def parse_stmt(self, name: str, stmt_type: 'str: stmt/break/continue/return' = 'stmt', **kw) -> dict:
+        """Создать узел для простого действия"""
+        data = {}
+        if called := self.detect_function_calls(name):
+            data['functions_called'] = called  # Задать простому узлу локально - какие функции он вызвал
         return {
             "id": self.newID(name),
             "type": stmt_type,
             "name": name,
             "act_name": action(stmt_type, name=name, **kw),
+            **data,
         }
+
+    def detect_function_calls(self, expr_str):
+        called = find_func_calls_in_expr(expr_str)
+        if called:
+            # добавить глобально - на уровень алгоритма (объединить два множества)
+            self.algorithm["functions_called"] = list({*self.algorithm["functions_called"], *called})
+        return called
 
     def parse_algorithm_ids(self, line_list: "list(str)", start_line=0, end_line=None) -> list:
         """Формирует список словарей объектов алгоритма в формате alg.json для ctrlstrct_run.py
