@@ -194,7 +194,7 @@ class AlgorithmParser:
             if func["is_entry"]:
                 self.algorithm["entry_point"] = func  # надеемся, что объект с id сформируется в ссылку на функцию ...
                 break
-        else:  # нет функции
+        else:  # нет главной функции
             self.algorithm["entry_point"] = self.algorithm["global_code"]  # надеемся с id
 
     def parse_expr(self, name: str, values=None) -> dict:
@@ -235,7 +235,7 @@ class AlgorithmParser:
     def parse_algorithm_ids(self, line_list: "list(str)", start_line=0, end_line=None) -> list:
         """Формирует список словарей объектов алгоритма в формате alg.json для ctrlstrct_run.py
             Функции автоматически добавляются в self.algorithm["functions"].
-            Глобальный код возввращается списком statement'ов верхнего уровня.
+            Глобальный код возвращается списком statement'ов верхнего уровня.
         """
 
         parse_algorithm = self.parse_algorithm_ids  # синоним для простоты написания
@@ -255,7 +255,7 @@ class AlgorithmParser:
         line_indents = [len(s) - len(s.lstrip()) for s in line_list]
 
         current_level_stmt_line_idx = []
-        current_level = None  # отступ текущего уровня (найдём в цикле как отступ первой строки кода, но не { }. )
+        current_level = None  # Отступ текущего уровня (найдём в цикле как отступ первой строки кода, но не { }. )
 
         for i, idt in enumerate(line_indents):
             if line_indents[i] == current_level or current_level is None:  # элемент текущего уровня
@@ -283,7 +283,7 @@ class AlgorithmParser:
             # print(ci, e)
             # print(*line_list[ci:e+1])
 
-            # функция main
+            # функция proc_235
             m = re.match(r"(?:function|функция)\s+([\w_][\w\d_]*)\s*(.*)", current_line, re.I)
             if m:
                 if self.verbose: print("function")
@@ -1420,24 +1420,28 @@ def parse_algorithms_and_traces_from_text(text: str):
             if not re.search(r"\{|функция|function", lines[i + 1]):
                 print("Ignored (no alg. begin): line", i, lines[i])
                 continue
-            # найти конец алгоритма: не ранее 3-х строк ниже названия и далее
-            for j in range(i + 3, last_line):
-                next_line = lines[j + 1].strip()
-                if not next_line or re.match(r"/\*|//|#", next_line):  # следующая - пустая или комментарий
-                    if "}" in lines[j]:
+            # найти конец алгоритма: [не ранее 3-х строк ??] ниже названия и далее
+            # все открывшиеся фигурные скобки должны быть закрыты
+            depth = 0
+            for j in range(i + 1, last_line):
+                curr_line = lines[j].strip()
+                if not curr_line or re.match(r"/\*|//|#", curr_line):  # пустая или комментарий
+                    continue
+                if "{" == curr_line[0]:  # Первый символ — скобка (далее возможен комментарий)
+                    depth += 1
+                elif "}" == curr_line[0]:  # Первый символ — скобка (далее возможен комментарий)
+                    depth -= 1
+                    if depth == 0:
                         # найдено
                         name = extract_alg_name(lines[i])
                         alg_data[name] = {
                             "lines": (i + 1, j),  # строки текста алгоритма (вкл-но)
                         }
-                        ## ### !!! save the text
-                        ## if True:
-                        ##     alg_data[name]['text'] = lines[i+1:j+1]
                         # print("line", i, name)  # , lines[i])
-                    # иначе - не найдено
-                    else:
-                        print(f"Ignored line {i}: {lines[i]}\n\tas no '{'}'}' found at line {j}: {lines[j]}")
-                    break
+                        break
+                # иначе - не найдено
+                else:
+                    print(f"Ignored line {i}: {lines[i]}\n\tas no '{'}'}' found at line {j}: {lines[j]}")
 
     # Трассы ....
 
