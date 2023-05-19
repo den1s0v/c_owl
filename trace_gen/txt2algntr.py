@@ -260,10 +260,19 @@ class AlgorithmParser:
             # print(*line_list[ci:e+1])
 
             # функция main
-            m = re.match(r"(?:function|функция)\s+(\S+)", current_line, re.I)
+            m = re.match(r"(?:function|функция)\s+([\w_][\w\d_]*)\s*(.*)", current_line, re.I)
             if m:
                 if self.verbose: print("function")
                 name = m.group(1)  # имя функции
+                params_str = m.group(2).strip()  # опциональные скобки с опциональными параметрами
+                param_list = []
+                if params_str.startswith('(') and ')' in params_str:
+                    params_str = params_str[params_str.index('(') + 1 : params_str.index(')')]
+                    # simple split
+                    param_list = [
+                        s.strip() for s in params_str.split(',')
+                    ]
+
                 body_name = name+"-body"
                 self.algorithm["functions"].append({
                       "id": self.newID(name),
@@ -271,7 +280,7 @@ class AlgorithmParser:
                       "name": name,  # имя функции
                       "act_name": action('function', name=name),
                       "is_entry": name == "main",
-                      "param_list": [],
+                      "param_list": param_list,
                       "body" : {   #  stmts -> global_code  !!!
                             "id": self.newID(body_name),
                             "type": "sequence",
