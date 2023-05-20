@@ -95,9 +95,7 @@ if FIX_DOUBLE_ESCAPING_ISSUE:
 def render_code(alg_dict, locale='ru', **kwargs):
     keyed_alg_data = transform_alg_dict_for_mustache(alg_dict, locale)
     if not 'debug':
-        from pprint import pprint
-        pprint(keyed_alg_data)
-        return 'debug....'
+        return 'debug....\n\n' + json.dumps(keyed_alg_data, indent=1, ensure_ascii=False)
     return run_rendering(keyed_alg_data, locale=locale, **kwargs)
 
 
@@ -259,6 +257,7 @@ if 1:
         #### ["sequence"],  #  moved above to other regular statements
         ['expr', 'cond_values_hint'],
         ['algorithm', 'functions'],
+        ['func'],
     ]
     siblings = {s: siblings for siblings in siblings_list for s in siblings}
     renamings = {k: [('name', 'branch_name')] for k in if_branches}
@@ -327,11 +326,13 @@ if 1:
                     node_type = 'loop-body'
 
             return action(node_type, name=name, **kwargs)
+        # end of make_act_name() definition
 
 
-        replacings = {"stmt_name": lambda d: {"name": escape_name_yaml(d["stmt_name"]), 'act_name': make_act_name(d)},
+        replacings = {"stmt_name": lambda d: {
+                          "name": escape_name_yaml(d["stmt_name"]), 'act_name': make_act_name(d)},
                       "name": lambda d: {"name": escape_name_yaml(d["name"]), 'act_name': make_act_name(d)},
-                      "act_name": lambda d: {"act_name": d["act_name"][locale] if type(d["act_name"]) is dict else d["act_name"]},
+                      "act_name": lambda d: {"act_name": escape_name_yaml(d["act_name"][locale]) if type(d["act_name"]) is dict else d["act_name"]},
                       "type": lambda d: ({
                                 'act_type-play': 'performed',
                                 'phase-label-play': BUTTON_TIP_FREFIX[locale]['performed'],
@@ -341,8 +342,8 @@ if 1:
                                 #### 'act_type-stop': 'finished',  # always constant
                                 'phase-label-play':  BUTTON_TIP_FREFIX[locale]['started'],
                                 'phase-label-stop': BUTTON_TIP_FREFIX[locale]['finished'],
-                          }
-                      ),}
+                          })
+                      }
 
         def inject_first_last(d, i, length):
             if type(d) is dict:
@@ -361,7 +362,8 @@ if 1:
 
                     # indent = 1 if ('body' in d and t != 'sequence') else 0
                     indent = 1 if ('body' in d and (
-                        type(d['body']) is list and d['body'][0].get('type') != 'sequence') # do not fall to deep in a loop body
+                        d['type'] == 'func' or
+                        type(d['body']) is list and d['body'][0].get('type') != 'sequence') # do not fall too deep in a loop body
                     ) else 0
                     inner_d = {k: type2key(v, depth=depth+indent) for k, v in d.items() if k != 'type'}
                     if t in renamings:
@@ -626,14 +628,15 @@ if __name__ == '__main__':
     # alg_json_file = r'c:/Temp2/cntrflowoutput_v6_json/ijk_av_tree_insert__17603408635188800781__1643030101.json'
     # alg_json_file = r'c:/Temp2/manual_json/while_110.json'
     # alg_json_file = r'nk_style_from_table.json'
-    alg_json_file = r'c:/Temp2/cntrflowoutput_v7_json/cJSON_GetArraySize.json'
+    # alg_json_file = r'c:/Temp2/cntrflowoutput_v7_json/cJSON_GetArraySize.json'
+    alg_json_file = r'../trace_gen/alg_dbg.json'
 
     with open(alg_json_file, encoding='utf8' or '1251') as f:
         data = json.load(f)
     if isinstance(data, list):
         data = data[0]
 
-    rendered = render_code(data, text_mode='html', locale='en', show_buttons=True, raise_on_error=True)
+    rendered = render_code(data, text_mode='html', locale='ru', show_buttons=True, raise_on_error=True)
     with open(r'c:\D\Work\YDev\CompPr\c_owl\code_gen\test.html', 'w') as f:
         f.write(rendered)
 

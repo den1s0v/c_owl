@@ -170,8 +170,8 @@ class AlgorithmParser:
             },
             "entry_point": None,
             "expr_values": {},  # expr name -> list of boolean
-            "functions_called": [],  # set of names (without parameters so far)
-            # ^ все функции, которые когда-либо вызывались в алгоритме
+            "functions_called_in_algorithm": [],  # set of names (without parameters so far)
+            # ^ Все функции, которые когда-либо вызывались в алгоритме
             # (пользовательские функции из этого множества нужно будет
             # отображать на экране вместе с главным кодом)
         }
@@ -231,7 +231,7 @@ class AlgorithmParser:
         called = find_func_calls_in_expr(expr_str)
         if called:
             # добавить глобально - на уровень алгоритма (объединить два множества)
-            self.algorithm["functions_called"] = list({*self.algorithm["functions_called"], *called})
+            self.algorithm["functions_called_in_algorithm"] = list({*self.algorithm["functions_called_in_algorithm"], *called})
         return called
 
     def parse_algorithm_ids(self, line_list: "list(str)", start_line=0, end_line=None) -> list:
@@ -286,17 +286,27 @@ class AlgorithmParser:
             # print(*line_list[ci:e+1])
 
             # функция proc_235
-            m = re.match(r"(?:function|функция)\s+([\w_][\w\d_]*)\s*(.*)", current_line, re.I)
+            # функция proc_235 ()
+            # функция proc_235 (int x)
+            # функция proc_235 (int x1, long _v2) : bool
+            m = re.match(r"(?:function|функция)\s+([\w_][\w\d_]*)\s*(\(.*\))\s*(?:\:\s*(.*))?", current_line, re.I)
             if m:
                 if self.verbose: print("function")
                 name = m.group(1)  # имя функции
                 params_str = m.group(2).strip()  # опциональные скобки с опциональными параметрами
+                if m.group(3):
+                    # опциональное двоеточие и тип возвращаемого значения
+                    return_type = m.group(3).strip() or 'int'
+                else:
+                    return_type = 'int'
+                    
                 param_list = []
                 if params_str.startswith('(') and ')' in params_str:
                     params_str = params_str[params_str.index('(') + 1: params_str.index(')')]
                     # simple split
                     param_list = [
-                        s.strip() for s in params_str.split(',')
+                        {'param': s.strip()}
+                        for s in params_str.split(',') if s.strip()
                     ]
 
                 body_name = name + "-body"
@@ -307,6 +317,7 @@ class AlgorithmParser:
                     "act_name": action('function', name=name),
                     "is_entry": name == "main",
                     "param_list": param_list,
+                    "return_type": return_type,
                     "body": {  # stmts -> global_code  !!!
                         "id": self.newID(body_name),
                         "type": "sequence",

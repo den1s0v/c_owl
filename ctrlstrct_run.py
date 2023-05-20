@@ -1247,6 +1247,10 @@ def init_persistent_structure(onto):
         # новое свойство stmt_name
         prop_stmt_name = types.new_class("stmt_name", (Thing >> str, DataProperty, FunctionalProperty))
 
+        # Строковые свойства
+        prop_functions_called = types.new_class("functions_called", (Thing >> str, DataProperty))
+        prop_functions_called_in_algorithm = types.new_class("functions_called_in_algorithm", (Thing >> str, DataProperty))
+
         # новое свойство next
         types.new_class("next", (Thing >> Thing, ))
         types.new_class("next_act", (correct_act >> correct_act, FunctionalProperty, InverseFunctionalProperty))
