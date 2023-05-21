@@ -191,6 +191,8 @@ class AlgorithmParser:
 
     def parse(self, line_list: "list[str]"):
         self.algorithm["global_code"]["body"] += self.parse_algorithm_ids(line_list)
+        self.mark_up_function_call_within_actions()
+
         # найдём точку входа
         for func in self.algorithm["functions"]:
             if func["is_entry"]:
@@ -225,6 +227,67 @@ class AlgorithmParser:
             "name": name,
             "act_name": action(stmt_type, name=name, **kw),
             **data,
+        }
+
+    def make_func_call(self, func_name: str, action_str: str) -> dict:
+        """Создать узел для вызова функции, который может быть частью простого действия (либо, по смыслу,
+        заменить его)
+        Примеры:
+
+        0.0 + our_func (1+2+3) * (4+5)
+         --->
+        [▶]0.0 + [▶]our_func[■] (1+2+3) * (4+5)
+
+
+        our_func(1+2+3)
+         --->
+        [▶]our_func[■](1+2+3)
+
+        """
+        # find the function called
+        funcs = [f for f in self.algorithm["functions"] if f['name'] == func_name]
+        if not funcs:
+            return {}
+        func = funcs[0]
+
+        m = re.search(r'\b(%s)\s*\((?=.*?\))' % re.escape(func_name), action_str)
+        if not m:
+            return {}
+
+        call_pos = m.start(0)
+        prefix_part_of_action = action_str[:call_pos]
+
+        call_with_args = ''
+        tokens = re.split(r'([()])', action_str[call_pos:])
+        depth = 0
+        for t in tokens:
+            call_with_args += t
+            if t == '(':
+                depth += 1
+            if t == ')':
+                depth -= 1
+                if depth == 0:
+                    break
+        args_only = call_with_args[call_with_args.index('('):].lstrip()
+        rest_of_action = action_str[call_pos + len(call_with_args):]
+
+        func_call_node = {
+            "id": self.newID(call_with_args),
+            "type": 'func_call',
+            "name": call_with_args,
+            "func_name": func_name,
+            "func_args": args_only,  # with parens
+            "func_id": func['id'],
+            "act_name": action('func_call', name=func_name, func_args=args_only),
+        }
+
+        return {
+            'has_func_call': func_call_node,
+            'prefix_part_of_action': prefix_part_of_action,
+            'rest_of_action': rest_of_action,
+            # признаки для подготовки трассы:
+            'merge_child_begin_act': (prefix_part_of_action == ''),
+            'merge_child_end_act': True,
         }
 
     def detect_function_calls(self, expr_str):
@@ -741,9 +804,59 @@ class AlgorithmParser:
 
         return result
 
+    def mark_up_function_call_within_actions(self):
+        """Разметить все вызовы функций внутри действий, сделать ссылки на вызываемые функции.
+            Call after everything parsed."""
+
+        functions_in_alg = {f['name'] for f in self.algorithm["functions"]}
+        relevant_func_names = set(self.algorithm["functions_called_in_algorithm"]) & functions_in_alg
+        if not relevant_func_names:
+            return
+
+        for action_dict in list(find_by_key_in('functions_called', self.algorithm)):
+            called_here = set(action_dict['functions_called']) & relevant_func_names
+
+            if not called_here:
+                # nothing called we can enter:
+                # just clear this information
+                del action_dict['functions_called']
+                continue
+
+            if len(called_here) > 1:
+                # it's possible to enter several functions in different order,
+                # but we don't know which order is correct since we cannot operate expr AST in current implementation
+                d = action_dict
+                print('[WARN] Multiple function calls detected in action:')
+                print(f'\t\t[{d["type"]}]\t{d["name"]}')
+                print('[----] Enterable functions called:', sorted(called_here))
+                print('[----] Skipped this action since '
+                      'it is not possible to determine correct order to evaluate them. '
+                      'Consider splitting the action into several '
+                      'so no more then one entarable func call remains in each. '
+                      'Sorry, this is a limitation of current approach.')
+                # just skip this
+                del d['functions_called']
+                continue
+
+            # Assuming len(called_here) == 1
+            name_of_called = list(called_here)[0]
+            # func = [f for f in self.algorithm["functions"] if f['name'] == name_of_called][0]
+
+            # Set back so new list reflects which func we are going to process
+            action_dict['functions_called'] = [name_of_called]
+
+            # add child func_call node
+            # Split tokens of the action to insert buttons around func name
+            exp_str = action_dict['return_expr'] if action_dict['type'] == 'return' else action_dict['name']
+            func_call_fields = self.make_func_call(name_of_called, exp_str)
+            # add 'has_func_call' field (as wel as 'prefix_part_of_action', 'rest_of_action'), if needed to action dict
+            action_dict.update(func_call_fields)
+
+            # ...
+
 
 def create_algorithm_from_text(lines: list) -> AlgorithmParser:
-    'just a wrapper for AlgorithmParser constructor'
+    """just a wrapper for AlgorithmParser constructor"""
     try:
         return AlgorithmParser(lines)
     except Exception as e:

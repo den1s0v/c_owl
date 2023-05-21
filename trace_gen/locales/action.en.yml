@@ -12,10 +12,11 @@ en:
   else-if: ELSE-IF branch with condition `%{cond_name}`
   else: ELSE branch of selection `%{alt_name}`
   function: function `%{name}`
+  func_call: call of function `%{name}` with arguments `%{func_args}`
   function-body: body of function `%{name}`
   stmt: statement `%{name}`
   condition: condition `%{name}`
   expr:      condition `%{name}`
-  return: return %{return_expr}
+  return: return `%{return_expr}`
   break: break
   continue: continue

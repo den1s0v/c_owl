@@ -21,9 +21,9 @@
 {
 	printf("Hello, %s!", "World");
 
-	функция fact(int n, bool _flag) :
+	функция fact(int n) :
 	{
-		если условие (n <= 2) -> 0,0,1  // проверка_базы
+		если условие (n <= 2)  // проверка_базы
 			return 1
 		иначе
 			value = fact(n-1)
@@ -31,16 +31,16 @@
 	}
 	assert(fact(4) == 120)
 	
-	функция fact2(int x) : long
+	функция fact2(int x) : int
 	{
-		если условие (x <= 2) -> 0,0,1  // проверка_базы (в fact2)
+		если условие (1 == fact(x))  // проверка_базы (в fact2)
 			result = 1
 			return result
 		иначе
 			return fact2(x-1) * x
 	}
 	
-	assert(fact2(4) == 120)
+	fact2(6)
 }
 // alg_fact1 - (0)
 // трасса 

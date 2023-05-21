@@ -255,9 +255,10 @@ if 1:
         "stmt return sequence alternative while_loop do_while_loop for_loop foreach_loop".split(),   # add new action classes here
         if_branches,
         #### ["sequence"],  #  moved above to other regular statements
-        ['expr', 'cond_values_hint'],
+        ['expr', 'cond_values_hint', 'func_call'],
         ['algorithm', 'functions'],
         ['func'],
+        ['func_call'],
     ]
     siblings = {s: siblings for siblings in siblings_list for s in siblings}
     renamings = {k: [('name', 'branch_name')] for k in if_branches}
@@ -337,7 +338,7 @@ if 1:
                                 'act_type-play': 'performed',
                                 'phase-label-play': BUTTON_TIP_FREFIX[locale]['performed'],
                                 ## 'phase-label-stop':  False,
-                          } if d["type"] in ('stmt', 'expr') else {
+                          } if d["type"] in ('expr', 'stmt', 'return', 'break', 'continue') else {
                                 'act_type-play': 'started',
                                 #### 'act_type-stop': 'finished',  # always constant
                                 'phase-label-play':  BUTTON_TIP_FREFIX[locale]['started'],

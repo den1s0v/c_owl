@@ -45,8 +45,9 @@ def get_translations(_namespace, _key, _default=None, **kwargs) -> dict:
 
 #### Getters for specific namespaces ####
 
-def action(key, **kwargs):
-	return get_translations('action', key, _default='<%s>' % key, **kwargs)
+def action(key: str, **translation_kwargs) -> dict[str, str]:
+	"""returns dict with translations for each available locale (if present)"""
+	return get_translations('action', key, _default='<%s>' % key, **translation_kwargs)
 
 
 if __name__ == '__main__':

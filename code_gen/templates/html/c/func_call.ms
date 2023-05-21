@@ -1,0 +1,1 @@
+{{#partial}}btn_play{{/partial}}{{#partial}}span | {class: variable, content: '{{func_name}}'}{{/partial}}{{#partial}}btn_stop{{/partial}}{{func_args}}

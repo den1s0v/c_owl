@@ -1188,6 +1188,7 @@ def init_persistent_structure(onto):
         #     alt_branch.label = ['Ветки развилки']
 
         class func(action): pass
+        class func_call(action): pass
         # class func(sequence): pass
         class alternative(action): pass
         if WRITE_CONCEPT_FLAG_LABEL:
@@ -1362,6 +1363,7 @@ def init_persistent_structure(onto):
         class branches_item(parent_of): pass
         class body(parent_of): pass
         class body_item(parent_of): pass
+        class functions_item(DataProperty): pass
 
         # объекты, спровоцировавшие ошибку
         if not onto["Erroneous"]:

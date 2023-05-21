@@ -1,5 +1,6 @@
 ru:
-  question-prompt:   <big>Постройте трассу программы, нажимая на начало <br> и конец операторов в порядке их выполнения.</big> <br>
+  __question-prompt:   <big>Постройте трассу программы, нажимая на начало <br> и конец операторов в порядке их выполнения.</big> <br>
+  question-prompt:   <big>Постройте трассу программы, нажимая на начало<i class="play small icon"></i> <br> и конец<i class="stop small icon"></i> операторов в порядке их выполнения.</big> <br>
   program:   программа
   algorithm: программа
   sequence: следование `%{name}`
@@ -11,10 +12,11 @@ ru:
   else-if: ветка ИНАЧЕ-ЕСЛИ с условием `%{cond_name}`
   else: ветка ИНАЧЕ развилки `%{alt_name}`
   function: функция `%{name}`
+  func_call: вызов функции `%{name}` с аргументами `%{func_args}`
   function-body: тело функции `%{name}`
   stmt: действие `%{name}`
   condition: условие `%{name}`
   expr:      условие `%{name}`
-  return: возврат %{return_expr}
+  return: возврат `%{return_expr}`
   break: break
   continue: continue
