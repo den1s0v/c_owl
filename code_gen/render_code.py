@@ -630,7 +630,8 @@ if __name__ == '__main__':
     # alg_json_file = r'c:/Temp2/manual_json/while_110.json'
     # alg_json_file = r'nk_style_from_table.json'
     # alg_json_file = r'c:/Temp2/cntrflowoutput_v7_json/cJSON_GetArraySize.json'
-    alg_json_file = r'../trace_gen/alg_dbg.json'
+    # alg_json_file = r'../trace_gen/alg_dbg.json'
+    alg_json_file = r'../test_data/debug/1__fill.json'
 
     with open(alg_json_file, encoding='utf8' or '1251') as f:
         data = json.load(f)
