@@ -164,6 +164,7 @@ class TraceTester():
             while 1:
                 yield None
 
+        self.indent_depth = 0  # should increase on entering a function
         self.last_cond_tuple = (-1, False)
         self.consequent_mode = "normal"  # other values: "return", "break", "continue"
 
@@ -255,10 +256,14 @@ class TraceTester():
 
                 for body_node in node["body"]["body"]:
                     make_correct_trace_for_alg_node(body_node)
+                    if self.consequent_mode == "return":
+                        self.consequent_mode = "normal"
+                        break
 
-                if self.consequent_mode != "normal":
-                    # return encountered
-                    self.consequent_mode = "normal"
+
+            if self.consequent_mode != "normal":
+                # return encountered
+                self.consequent_mode = "normal"
 
                 # phase = "finished"
                 # ith = 1 + len([x for x in find_by_keyval_in("executes", node["body"]["id"], result) if x["phase"] == phase])
@@ -286,11 +291,14 @@ class TraceTester():
                       "executes": node["id"],
                       "phase": phase,
                       "n": ith,
+                      "indent_depth": self.indent_depth,
                       # "text_line": None,
                       # "comment": None,
                 })
 
+                self.indent_depth += 1
                 make_correct_trace_for_alg_node(func)
+                self.indent_depth -= 1
 
                 phase = "finished"
                 ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
@@ -300,6 +308,7 @@ class TraceTester():
                       "executes": node["id"],
                       "phase": phase,
                       "n": ith,
+                      "indent_depth": self.indent_depth,
                       # "text_line": None,
                       # "comment": None,
                 })
@@ -316,6 +325,7 @@ class TraceTester():
                           "executes": node["id"],
                           "phase": phase,
                           "n": ith,
+                          "indent_depth": self.indent_depth,
                           # "text_line": None,
                           # "comment": None,
                     })
@@ -335,6 +345,7 @@ class TraceTester():
                           "executes": node["id"],
                           "phase": phase,
                           "n": ith,
+                          "indent_depth": self.indent_depth,
                           # "text_line": None,
                           # "comment": None,
                     })
@@ -349,6 +360,7 @@ class TraceTester():
                       "executes": node["id"],
                       "phase": phase,
                       "n": ith,
+                      "indent_depth": self.indent_depth,
                       # "text_line": None,
                       # "comment": None,
                 })
@@ -368,6 +380,7 @@ class TraceTester():
                       "executes": node["id"],
                       "phase": phase,
                       "n": ith,
+                      "indent_depth": self.indent_depth,
                       # "text_line": None,
                       # "comment": None,
                 })
@@ -384,6 +397,7 @@ class TraceTester():
                           "executes": node["id"],
                           "phase": phase,
                           "n": ith,
+                          "indent_depth": self.indent_depth,
                           # "text_line": None,
                           # "comment": None,
                     })
@@ -401,26 +415,34 @@ class TraceTester():
                           "executes": node["id"],
                           "phase": phase,
                           "n": ith,
+                          "indent_depth": self.indent_depth,
                           # "text_line": None,
                           # "comment": None,
                     })
 
 
             if node["type"] in {"expr"}:
-                phase = "performed"
-                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
-                value = next_cond_value(node["name"], node["id"], ith)
-                self.expr_id2values[node["id"]] = self.expr_id2values.get(node["id"], []) + [value]
-                result.append({
-                      "id": self.newID(),
-                      "name": node["name"],
-                      "value": value,
-                      "executes": node["id"],
-                      "phase": phase,
-                      "n": ith,
-                      # "text_line": None,
-                      # "comment": None,
-                })
+                if "has_func_call" in node:
+                    make_correct_trace_for_alg_node(node["has_func_call"])
+
+                # "else":
+                if "has_func_call" not in node or ("merge_child_begin_act" in node and not node["merge_child_begin_act"]):
+                    # just an ordinary trace line
+                    phase = "performed"
+                    ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                    value = next_cond_value(node["name"], node["id"], ith)
+                    self.expr_id2values[node["id"]] = self.expr_id2values.get(node["id"], []) + [value]
+                    result.append({
+                          "id": self.newID(),
+                          "name": node["name"],
+                          "value": value,
+                          "executes": node["id"],
+                          "phase": phase,
+                          "n": ith,
+                          "indent_depth": self.indent_depth,
+                          # "text_line": None,
+                          # "comment": None,
+                    })
 
             if node["type"] in {"stmt", "break", "continue", "return"}:
                 if "has_func_call" in node:
@@ -432,6 +454,7 @@ class TraceTester():
                     #     # separate "run" button
                     #     # ... integrated into following `if`.
 
+                # "else":
                 if "has_func_call" not in node or ("merge_child_begin_act" in node and not node["merge_child_begin_act"]):
                     # just an ordinary trace line
                     phase = "performed"
@@ -442,6 +465,7 @@ class TraceTester():
                           "executes": node["id"],
                           "phase": phase,
                           "n": ith,
+                          "indent_depth": self.indent_depth,
                           # "text_line": None,
                           # "comment": None,
                     })
@@ -460,6 +484,7 @@ class TraceTester():
                       "executes": node["id"],
                       "phase": phase,
                       "n": ith,
+                      "indent_depth": self.indent_depth,
                       # "text_line": None,
                       # "comment": None,
                 })
@@ -518,6 +543,7 @@ class TraceTester():
                       "executes": node["id"],
                       "phase": phase,
                       "n": ith,
+                      "indent_depth": self.indent_depth,
                       # "text_line": None,
                       # "comment": None,
                 })

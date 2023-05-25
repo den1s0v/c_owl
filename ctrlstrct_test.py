@@ -352,7 +352,7 @@ def make_act_json(algorithm_json, algorithm_element_id: int, act_type: str, exis
 		return f"Server error in make_act_json() - {type(e).__name__}:\n\t{str(e)}"
 
 
-def add_styling_to_trace(algorithm_json, trace_json, user_language=None, comment_style=None, add_tags=False) -> list:
+def add_styling_to_trace(algorithm_json, trace_json, user_language=None, comment_style=None, add_tags=False, indent_unit='• ' * 1) -> list:
 	'''Adds text line, tags and html form for each act in given trace and returns the same reference to the trace list
 	
 	comment_style: {None | 'use' | 'highlight'}'''
@@ -380,6 +380,9 @@ def add_styling_to_trace(algorithm_json, trace_json, user_language=None, comment
 				)
 			if 'comment' in act_dict and act_dict['comment'] and comment_style is not None:
 				act_text += "    // " + act_dict['comment']
+
+			if 'indent_depth' in act_dict and act_dict['indent_depth'] > 0:
+				act_text = indent_unit * act_dict['indent_depth'] + act_text
 				
 			html_tags = styling.prepare_tags_for_line(act_text)
 
@@ -1076,7 +1079,7 @@ if __name__ == '__main__':
 	if 1:
 		test_algtr_to_question_html()
 		###
-		exit()
+		# exit()
 		###
 
 	if 0:
