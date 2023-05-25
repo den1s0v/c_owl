@@ -904,7 +904,12 @@ def make_question_dict_for_alg_json(alg_json, algorithm_name='generated'):
 	return q_dict
 
 
-def save_algorithms_to_questions_as_json(inspect_questions_via_dot=False, mistakes_via_grid=False):
+def save_algorithms_to_questions_as_json(
+		inspect_questions_via_dot=False,
+		mistakes_via_grid=False,
+		debug_save_alg_json=False,
+		debug_save_rdf=False,
+):
 
 	print("SPECIAL MODE: algorithm_to_triples (saving questions to JSON)")
 
@@ -919,7 +924,10 @@ def save_algorithms_to_questions_as_json(inspect_questions_via_dot=False, mistak
 	alg_names = set()
 
 	### [-1::]
-	for alg_tr in alg_trs:
+	for i, alg_tr in enumerate(alg_trs):
+		if debug_save_alg_json:
+			with open(f'test_data/debug/{i + 1}__{alg_tr["algorithm_name"]}.json', 'w') as f:
+				json.dump(alg_tr, f, indent=2, ensure_ascii=False)
 		# print(alg_tr)
 		if alg_tr["algorithm_name"] in alg_names:
 			# skip the same algorithms
@@ -930,6 +938,10 @@ def save_algorithms_to_questions_as_json(inspect_questions_via_dot=False, mistak
 
 		# ctrlstrct_run.algorithm_only_to_onto(alg_tr, onto)
 		q_dict = export2json.export_algtr2dict(alg_tr, onto)
+		if debug_save_rdf:
+			# онтология уже наполнена данными
+			onto.save(f'test_data/debug/{i + 1}__{alg_tr["algorithm_name"]}.n3', 'ntriples')
+
 		if mistakes_via_grid:
 			# rewrite basic method with full tracing
 			print(" >>> Griding ", alg_tr["algorithm_name"])
@@ -958,7 +970,7 @@ def save_algorithms_to_questions_as_json(inspect_questions_via_dot=False, mistak
 	print('Done:', len(questions), 'questions written to JSON !')
 
 
-def test_algtr_to_question_html(read_from="handcrafted_traces/one4html.txt", save_as="handcrafted_traces/one_q.html"):
+def test_algtr_to_question_html(read_from="handcrafted_traces/test_func.txt", save_as="handcrafted_traces/one_q.html"):
 
 	print("SPECIAL MODE: test_algtr_to_question_html (making question HTML from text)")
 
@@ -1000,11 +1012,15 @@ def test_algtr_to_question_html(read_from="handcrafted_traces/one4html.txt", sav
 	alg_html = styling.to_html(algorithm_tags)
 	
 	tr_data = alg_tr['trace']
-	
+
+	trace_json = ctrlstrct_run.make_trace_for_algorithm(alg_data)
+	tr_data = add_styling_to_trace(alg_data, trace_json, user_language, add_tags=True)
+
+
 	question_type = None  # 'correct' or 'error'
 	
 	for tr_line in tr_data:
-		if tr_line["comment"]:
+		if "comment" in tr_line and tr_line["comment"]:
 			if not question_type:
 				comment_str = tr_line["comment"]
 				question_type = 'error' if comment_str.startswith(("error", "ошибк")) else 'correct'
@@ -1017,12 +1033,13 @@ def test_algtr_to_question_html(read_from="handcrafted_traces/one4html.txt", sav
 				
 	print("guessed question_type:", question_type)
 	
-	tr_data = add_styling_to_trace(alg_data, tr_data, user_language, comment_style="highlight", add_tags=True)
+	# tr_data = add_styling_to_trace(alg_data, tr_data, user_language, comment_style="highlight", add_tags=True)
 	
 	trace_html = "<br>\n".join(
-		styling.to_html(styling.inline_class_as_style(a['as_tags'] , STYLE_HEAD))
+		styling.to_html(a['as_tags'])
+		# styling.to_html(styling.inline_class_as_style(a['as_tags'] , STYLE_HEAD))
 		for a in tr_data
-	)
+	) + STYLE_HEAD
 
 	preamble = "Объясните, почему выделенное действие должно стоять в указанном месте (почему именно это действие и почему именно здесь)." if question_type == 'correct' else "Объясните, почему выделенное действие является ошибочным (почему именно это действие не должно быть в указанном месте)."
 	
@@ -1056,7 +1073,7 @@ def test_grid():
 
 if __name__ == '__main__':
 
-	if 0:
+	if 1:
 		test_algtr_to_question_html()
 		###
 		exit()
@@ -1070,10 +1087,14 @@ if __name__ == '__main__':
 		exit()
 		###
 
-	if 1:
+	if 0:
 		# test_make_act_line()
 		# test_algorithm_to_tags()
-		save_algorithms_to_questions_as_json(inspect_questions_via_dot=0, mistakes_via_grid=0)
+		pass
+	if 1:
+		#
+		debug_save = True
+		save_algorithms_to_questions_as_json(debug_save_alg_json=debug_save, debug_save_rdf=debug_save)
 		###
 		print()
 		print('Exit as in custom debug mode.')

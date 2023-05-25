@@ -38,7 +38,7 @@ def make_lexer():
 	'''
 	keyword_re = re.compile(r"(?:начался|началась|началось|began|закончился|закончилась|закончилось|ended|выполнился|выполнилась|выполнилось|executed|evaluated|calculated|если|иначе|делать|пока|для|от|до|шаг|с\s+шагом|if|else|do|while|for|from|to|with\s+step|step|каждого|в|из|по|к|foreach|each|in|break|continue|return)(?=\s|\b|$)", re.I)
 
-	struct_re = re.compile(r"(?:развилка|развилки|альтернативная|ветка|branch|alternative|selection|условия|переход|update|итерация|iteration|иначe|условие|цикла|condition|of|loop|инициализация|init|initialization|цикл|следование|sequence)(?=\s|\b|$)", re.I)
+	struct_re = re.compile(r"(?:развилка|развилки|альтернативная|ветка|branch|alternative|selection|условия|переход|update|итерация|iteration|иначe|условие|цикла|condition|of|loop|инициализация|init|initialization|цикл|следование|sequence|вызова?\sфункции|функци.)(?=\s|\b|$)", re.I)
 
 	simple_mode = {
 	  # The start state contains the rules that are intially used

@@ -57,6 +57,7 @@ def tr(word_en, case='nomn'):
         "algorithm": ("алгоритм", "алгоритма"),
         "program" : ("программа", "программы"),
         "func" 		: ("функция", "функции"),
+        "func_call" : ("вызов функции", "вызова функции"),
         "alternative" : ("развилка", "развилки"),
         "branch" 	: ("ветка", "ветки"),
         "cond" 		: ("условие", "условия"),
@@ -850,6 +851,55 @@ if TraceJsonVisitor:
 
 
     TraceJsonVisitor.visit_FuncJN = _
+
+
+class FuncCallJN(GenericAlgorithmJsonNode):
+    def __init__(self, jn_type="unkn", func_name="func_name", func_args='()', **kw):
+        super(FuncCallJN, self).__init__(jn_type, name=func_name.strip() + func_args.strip(), **kw)
+        assert jn_type == "func_call", jn_type
+        self.func_name = func_name
+        self.func_args = func_args  # string, not list so far
+        self.func = None
+        self.gen = 'he'
+
+    def setup(self, parent_node, setup_children=True):
+        super(FuncCallJN, self).setup(parent_node, setup_children=False)
+        root = self.search_up()
+        functions = root.data.get("functions", [])
+        if functions := [f for f in functions if f['name'] == self.func_name]:
+            self.func = functions[0]
+
+        if setup_children: self.setup_children()
+
+    def to_dict(self):
+        """ Преобразование к простым словарям и массивам, для сериализации в JSON """
+        return {"type": self.jn_type,
+                "name": self.name,
+                "func_name": self.func_name,
+                "func_args": self.func_args,
+               }
+
+    def accept(self, visitor):
+        return visitor.visit_FuncCallJN(self)
+
+
+if AlgTextVisitor: pass
+if TraceTextVisitor:
+    def _(self, node):
+        i = self.register_act(node.display_name() + '_started')
+        # self.add_line("%s %s %s" % (tr("(she) started"), tr(node.jn_type), node.name)).append_nth_str(i)
+        self.add_line("%s %s" % (tr("(he) started"), node.display_name())).append_nth_str(i)
+        if node.func.body:
+            self.indent()
+            self.accept_line_list(node.body)
+            self.unindent()
+        i = self.register_act(node.display_name() + '_finished')
+        self.add_line("%s %s" % (tr("(he) finished"), node.display_name())).append_nth_str(i)
+        return self
+
+
+    TraceTextVisitor.visit_FuncCallJN = _
+if TraceJsonVisitor: pass
 
 
 class AlternativeJN(GenericAlgorithmJsonNode):
@@ -2190,6 +2240,11 @@ _alg_node_map = [
                         {"name"},  # forbidden
                         FuncJN, {"jn_type": "func"}
                         ),
+    TypeRecognizeOption({"func_name", "func_args"},
+                        {"name", "func_id"},
+                        set(),  ##{"name"},  # forbidden
+                        FuncCallJN, {"jn_type": "func_call"}
+                        ),
     # a basic form "alternative"
     TypeRecognizeOption({"alternative", "branches"},
                         set(),
@@ -2428,6 +2483,12 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
 
         if 'algorithm' == elem_type:
             kwargs[elem_type] = ["dummy"]
+
+        if 'func_call' == elem_type:
+            kwargs.update({
+                "func_name": alg_element["func_name"],
+                "func_args": alg_element["func_args"],
+            })
 
         # print("### creating element of type:", class_)
         node = class_(jn_type=elem_type, **kwargs)

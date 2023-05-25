@@ -241,17 +241,17 @@ class TraceTester():
 
             if node["type"] in {"func"}:
 
-                phase = "started"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
-                result.append({
-                      "id": self.newID(),
-                      "name": node["name"],
-                      "executes": node["body"]["id"],
-                      "phase": phase,
-                      "n": ith,
-                      # "text_line": None,
-                      # "comment": None,
-                })
+                # phase = "started"
+                # ith = 1 + len([x for x in find_by_keyval_in("executes", node["body"]["id"], result) if x["phase"] == phase])
+                # result.append({
+                #       "id": self.newID(),
+                #       "name": node["name"],
+                #       "executes": node["body"]["id"],
+                #       "phase": phase,
+                #       "n": ith,
+                #       # "text_line": None,
+                #       # "comment": None,
+                # })
 
                 for body_node in node["body"]["body"]:
                     make_correct_trace_for_alg_node(body_node)
@@ -260,12 +260,44 @@ class TraceTester():
                     # return encountered
                     self.consequent_mode = "normal"
 
-                phase = "finished"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                # phase = "finished"
+                # ith = 1 + len([x for x in find_by_keyval_in("executes", node["body"]["id"], result) if x["phase"] == phase])
+                # result.append({
+                #       "id": self.newID(),
+                #       "name": node["name"],
+                #       "executes": node["body"]["id"],
+                #       "phase": phase,
+                #       "n": ith,
+                #       # "text_line": None,
+                #       # "comment": None,
+                # })
+
+            if node["type"] in {"func_call"}:
+
+                func_id = node["func_id"]
+                # self.algorithm['functions']
+                func = self.id2obj[func_id]
+
+                phase = "started"
+                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
-                      "executes": node["body"]["id"],
+                      "executes": node["id"],
+                      "phase": phase,
+                      "n": ith,
+                      # "text_line": None,
+                      # "comment": None,
+                })
+
+                make_correct_trace_for_alg_node(func)
+
+                phase = "finished"
+                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                result.append({
+                      "id": self.newID(),
+                      "name": node["name"],
+                      "executes": node["id"],
                       "phase": phase,
                       "n": ith,
                       # "text_line": None,
@@ -277,7 +309,7 @@ class TraceTester():
                 # do not wrap 'global_code'
                 if node["name"] != 'global_code':
                     phase = "started"
-                    ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                    ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                     result.append({
                           "id": self.newID(),
                           "name": node["name"],
@@ -296,7 +328,7 @@ class TraceTester():
                 # do not wrap 'global_code'
                 if node["name"] != 'global_code':
                     phase = "finished"
-                    ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                    ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                     result.append({
                           "id": self.newID(),
                           "name": node["name"],
@@ -310,7 +342,7 @@ class TraceTester():
             if node["type"] in {"alternative"}:
 
                 phase = "started"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
@@ -329,7 +361,7 @@ class TraceTester():
                         break
 
                 phase = "finished"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
@@ -345,7 +377,7 @@ class TraceTester():
                 _,cond_v = self.last_cond_tuple
                 if cond_v:
                     phase = "started"
-                    ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                    ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                     result.append({
                           "id": self.newID(),
                           "name": node["name"],
@@ -362,7 +394,7 @@ class TraceTester():
                             break
 
                     phase = "finished"
-                    ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                    ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                     result.append({
                           "id": self.newID(),
                           "name": node["name"],
@@ -376,7 +408,7 @@ class TraceTester():
 
             if node["type"] in {"expr"}:
                 phase = "performed"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                 value = next_cond_value(node["name"], node["id"], ith)
                 self.expr_id2values[node["id"]] = self.expr_id2values.get(node["id"], []) + [value]
                 result.append({
@@ -391,26 +423,37 @@ class TraceTester():
                 })
 
             if node["type"] in {"stmt", "break", "continue", "return"}:
-                phase = "performed"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
-                result.append({
-                      "id": self.newID(),
-                      "name": node["name"],
-                      "executes": node["id"],
-                      "phase": phase,
-                      "n": ith,
-                      # "text_line": None,
-                      # "comment": None,
-                })
+                if "has_func_call" in node:
+                    # relevant for "stmt" & "return"
+
+                    make_correct_trace_for_alg_node(node["has_func_call"])
+
+                    # if not node["merge_child_begin_act"]:
+                    #     # separate "run" button
+                    #     # ... integrated into following `if`.
+
+                if "has_func_call" not in node or ("merge_child_begin_act" in node and not node["merge_child_begin_act"]):
+                    # just an ordinary trace line
+                    phase = "performed"
+                    ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                    result.append({
+                          "id": self.newID(),
+                          "name": node["name"],
+                          "executes": node["id"],
+                          "phase": phase,
+                          "n": ith,
+                          # "text_line": None,
+                          # "comment": None,
+                    })
                 if node["type"] in {"break", "continue", "return"}:
                     self.consequent_mode = node["type"]
                     return  # just stupidly stop current sequence
 
-            # TODO: keep list of loop classes up-to-date
+            # TODO: keep the list of loop classes up-to-date
             if node["type"] in {"while_loop", "do_while_loop", "do_until_loop", "for_loop", "foreach_loop", "infinite_loop", }:
 
                 phase = "started"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
@@ -468,7 +511,7 @@ class TraceTester():
                 _loop_context()  # make a loop
 
                 phase = "finished"
-                ith = 1 + len([x for x in find_by_keyval_in("name", node["name"], result) if x["phase"] == phase])
+                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
