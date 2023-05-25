@@ -401,7 +401,7 @@ class AlgorithmParser:
                 (?:if|если)
                 (?:\s+condition|\s+условие)?   # optional
                 \s+
-                (\(.+\)|\S+)  # 1 cond_name
+                (\(.+\)|\S+|[^:]+(?=:)):?  # 1 cond_name
                 (?:
                     \s+ - >?    # - or ->
                     \s+ (\S+)   # 2 optional values
