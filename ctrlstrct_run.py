@@ -605,6 +605,17 @@ class TraceTester():
                         bound = class_(prop_name + "_" + iri)
                         make_triple(bound, onto[prop_name], obj)
 
+                # Добавляем скалярные поля
+                for field in ('func_name', "func_args", "func_id", "merge_child_begin_act", "merge_child_end_act"):
+                    if field in d:
+                        prop = onto[field]
+                        if not prop:
+                            assert False, f'{field} property not in onto!'
+                            # with onto:
+                            #     # новое свойство по заданному имени
+                            #     prop = types.new_class(field, (DataProperty, ))
+                        make_triple(obj, prop, d[field])
+
 
             # link the instances: repeat the structure completely
             for d in alg_objects:
@@ -1021,6 +1032,7 @@ def init_persistent_structure(onto):
         class algorithm(Concept): pass
 
         class entry_point(algorithm >> action, FunctionalProperty): pass
+        class global_code(algorithm >> action, FunctionalProperty): pass
 
         ##### Граф между действиями алгоритма
         class boundary(Thing): pass  # begin or end of an action
@@ -1191,6 +1203,11 @@ def init_persistent_structure(onto):
 
         class func(action): pass
         class func_call(action): pass
+        class has_func_call(action >> func_call): pass
+        class merge_child_begin_act(action >> bool): pass
+        class merge_child_end_act(action >> bool): pass
+        class func_id(action >> int): pass
+
         # class func(sequence): pass
         class alternative(action): pass
         if WRITE_CONCEPT_FLAG_LABEL:
@@ -1247,12 +1264,16 @@ def init_persistent_structure(onto):
         # новое свойство expr_value
         prop_expr_value = types.new_class("expr_value", (DataProperty, FunctionalProperty, ))
 
+        prop_func_id = types.new_class("func_id", (func_call >> int, ))
+
         # новое свойство stmt_name
         prop_stmt_name = types.new_class("stmt_name", (Thing >> str, DataProperty, FunctionalProperty))
 
         # Строковые свойства
-        prop_functions_called = types.new_class("functions_called", (Thing >> str, DataProperty))
-        prop_functions_called_in_algorithm = types.new_class("functions_called_in_algorithm", (Thing >> str, DataProperty))
+        # prop_functions_called = types.new_class("functions_called", (Thing >> str, DataProperty))
+        # prop_functions_called_in_algorithm = types.new_class("functions_called_in_algorithm", (Thing >> str, DataProperty))
+        prop_func_name = types.new_class("func_name", (Thing >> str, DataProperty))
+        prop_func_args = types.new_class("func_args", (Thing >> str, DataProperty))
 
         # новое свойство next
         types.new_class("next", (Thing >> Thing, ))
@@ -1365,7 +1386,7 @@ def init_persistent_structure(onto):
         class branches_item(parent_of): pass
         class body(parent_of): pass
         class body_item(parent_of): pass
-        class functions_item(DataProperty): pass
+        class functions_item(ObjectProperty): pass
 
         # объекты, спровоцировавшие ошибку
         if not onto["Erroneous"]:
