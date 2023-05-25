@@ -926,7 +926,7 @@ def save_algorithms_to_questions_as_json(inspect_questions_via_dot=False, mistak
 			continue
 
 		alg_names.add(alg_tr["algorithm_name"])
-		print(" >>> ", alg_tr["algorithm_name"])
+		print(f" >>>  {i + 1}:", alg_tr["algorithm_name"])
 
 		# ctrlstrct_run.algorithm_only_to_onto(alg_tr, onto)
 		q_dict = export2json.export_algtr2dict(alg_tr, onto)
@@ -951,8 +951,9 @@ def save_algorithms_to_questions_as_json(inspect_questions_via_dot=False, mistak
 		return
 
 
-	with open("jena/control-flow-statements-domain-questions.json", "w") as f:
-		json.dump(questions, f, indent=2)
+	# with open("jena/control-flow-statements-domain-questions.json", "w") as f:
+	with open("jena/debug-questions.json", "w") as f:
+		json.dump(questions, f, indent=2, ensure_ascii=False)
 
 	print('Done:', len(questions), 'questions written to JSON !')
 
@@ -1079,23 +1080,24 @@ if __name__ == '__main__':
 		exit()
 		###
 
-	success_all = run_tests(process_kwargs=dict(
-		# reasoning=None,
-		# reasoning="pellet",
-		# reasoning="clingo",
-		# reasoning="dlv",
-		reasoning="jena",
-		# reasoning="prolog",
-		# reasoning="sparql",
-		# reasoning="stardog",
-		extra_act_entries=0
+	if 0:
+		success_all = run_tests(process_kwargs=dict(
+			# reasoning=None,
+			# reasoning="pellet",
+			# reasoning="clingo",
+			# reasoning="dlv",
+			reasoning="jena",
+			# reasoning="prolog",
+			# reasoning="sparql",
+			# reasoning="stardog",
+			extra_act_entries=0
+			)
 		)
-	)
 
-	# save LOG
-	fpath = os.path.join(TEST_DIR, REPORT_FNM)
-	with open(fpath, "w", encoding="utf8") as f:
-		f.write("\n".join(LOG))
+		# save LOG
+		fpath = os.path.join(TEST_DIR, REPORT_FNM)
+		with open(fpath, "w", encoding="utf8") as f:
+			f.write("\n".join(LOG))
 
-	# indicate tests success with exit code
-	exit(0 if success_all else 1)
+		# indicate tests success with exit code
+		exit(0 if success_all else 1)

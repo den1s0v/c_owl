@@ -337,7 +337,6 @@ user_alg {boolean_chain}user_trace
 
 def process_algorithm_and_trace_as_json_request(json):
 
-
     feedback = process_algorithm_and_trace_from_json(json, process_kwargs={'reasoning': "jena", 'debug_rdf_fpath': 'test_data/http_task_dump.rdf'})
     ###
     # from pprint import pprint

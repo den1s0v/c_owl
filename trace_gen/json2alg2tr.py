@@ -90,7 +90,6 @@ def tr(word_en, case='nomn'):
         "(he) performed" 	: ("выполнился", ),
         "(it) performed" 	: ("выполнилось", ),
         "iteration" 	: ("итерация", "итерации"),
-        "branch" 		: ("ветка", "ветки"),
         "loop" 			: ("цикл", "цикла"),
         "init" 			: ("инициализация", ),
         "update" 		: ("переход", ),
@@ -512,8 +511,8 @@ class GenericAlgorithmJsonNode(JsonNode, WithID):
         super().__init__(*args, **kw)
         self.expand_act = expand_act
         self.noexpand_act = noexpand_act
-        self.gen = 'she'  # род (м., ж., ср.) для акта элемента в трассе на рус. яз. (can be redifined)
-        self.act_line_format_str = "{name} {phase_str}{nth_str}"  # can be redifined
+        self.gen = 'she'  # род (м., ж., ср.) для акта элемента в трассе на рус. яз. (can be redefined)
+        self.act_line_format_str = "{name} {phase_str}{nth_str}"  # can be redefined
 
     def list_expand_strs2Stmts(self, seq):
         return [
@@ -2182,7 +2181,7 @@ _any_alg_node_option = TypeRecognizeOption(
 # спецификация для конкретных узлов
 _alg_node_map = [
     TypeRecognizeOption({"algorithm"},
-                        {"noexpand_types"},
+                        {"noexpand_types"},  # optional
                         {"name"},  # forbidden
                         AlgorithmRootJN, {"jn_type": "algorithm"}
                         ),
@@ -2366,9 +2365,10 @@ def boolean_line_usage_report(boolean_line, visitor_obj):
 
 
 def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, use_exec_time=0, lang=None) -> dict:
-    ''' Produce trace acts strings separately with minimum of config (no whole algorithm tree is required). We tried to maintain maximum flexibility.
+    """ Produce trace acts strings separately with minimum of config (no whole algorithm tree is required).
+        We tried to maintain maximum flexibility.
     Not all algorithm structures are covered, but only the most frequently used ones.
-    '''
+    """
     if lang:
         set_target_lang(lang)
 
@@ -2388,7 +2388,7 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
         node = NameOnlyStatementJN(elem_type, name=alg_element["name"])
     elif elem_type == "expr":
         node = GenericCondition(cond=None, name=alg_element["name"])
-    # в случае со сложными действиями создаётся акт целиком, со всеми вложенными действиями?..  phase указывает, еачало или конец нам нужно взять
+    # в случае со сложными действиями создаётся акт целиком, со всеми вложенными действиями?..  phase указывает, начало или конец нам нужно взять
     if not node:  # elem_type in ("if", "else if"):
         tro = find_tro_for_act_type(elem_type)
         assert tro, "act_line_for_alg_element(): node type not found: alg_element['type'] == " + alg_element["type"]

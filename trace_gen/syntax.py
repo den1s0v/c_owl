@@ -274,7 +274,8 @@ def _make_block_with_braces(indent, block_json, inner=()):
 	]
 
 
-def algorithm_to_tags(algorithm_json:dict or list, user_language: str=None, syntax:str=None, existing_trace=None, indent=0, as_type=None) -> list:
+def algorithm_to_tags(algorithm_json: dict or list, user_language: str=None, syntax: str=None, existing_trace=None,
+					  indent=0, as_type=None) -> list:
 	""" Create new tree of html-tags with additional info about nodes """
 	if user_language:
 		set_target_lang(user_language)  # usually set once on the topmost recursive call

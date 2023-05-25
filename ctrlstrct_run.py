@@ -49,6 +49,7 @@ def link_objects(onto, iri_subj : str, prop_name : str, iri_obj : str, prop_supe
     if not prop:
         with onto:
             # новое свойство по заданному имени
+            print('!! найдено свойство вне онтологии:', prop_name)
             prop = types.new_class(prop_name, prop_superclasses)
     # связываем объекты свойством
     make_triple(onto[iri_subj], prop, onto[iri_obj])
@@ -175,11 +176,12 @@ class TraceTester():
             self.values_source = "boolean_chain"
             self.condition_value_generator = _gen(self.data["header_boolean_chain"])
         elif self.data["algorithm"]["expr_values"]:
-            # source №2: the values defined beside algorithm lines (this is used for 1-1 case when no boolean chain specified)
+            # source №2: the values defined beside algorithm lines
+            # (this is used for 1-1 case when no boolean chain specified)
             self.values_source = "algorithm"
         else:
             # source №3: the values defined beside trace lines
-            #  (this is less preffered as the trace may contain errors)
+            #  (this is less preferred as the trace may contain errors)
             self.values_source = "trace"
 
         # print(f'Trace {self.data["trace_name"]}: values_source detected:', self.values_source)
@@ -420,7 +422,7 @@ class TraceTester():
                 })
 
                 inverse_cond = node["type"] == "do_until_loop"
-                stop_cond_value = True == inverse_cond
+                stop_cond_value = (True == inverse_cond)
 
                 def _loop_context():  # wrapper for return
                     # loop begin
@@ -434,7 +436,7 @@ class TraceTester():
 
                     # loop cycle
 
-                    while(True):
+                    while True:
 
                         if node["type"] in {"foreach_loop"}:
                             make_correct_trace_for_alg_node(node["update"])
@@ -885,7 +887,7 @@ class TraceTester():
 
 
 def make_trace_for_algorithm(alg_dict):
-    'just a wrapper for TraceTester.make_correct_trace() method'
+    """just a wrapper for TraceTester.make_correct_trace() method"""
     try:
         trace_data = {
             "algorithm": alg_dict,
@@ -911,8 +913,8 @@ def make_trace_for_algorithm(alg_dict):
 
 
 def algorithm_only_to_onto(alg_tr, onto):
-    '''just a wrapper for TraceTester.inject_algorithm_to_ontology() method:
-        inject only the algorithm, omit any trace-related triples'''
+    """just a wrapper for TraceTester.inject_algorithm_to_ontology() method:
+        inject only the algorithm, omit any trace-related triples"""
     try:
         alg_dict = alg_tr["algorithm"]
         trace_data = {
