@@ -284,11 +284,13 @@ class TraceTester():
                 func = self.id2obj[func_id]
 
                 phase = "started"
-                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                # ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                ith = 1 + len([x for x in find_by_keyval_in("func_id", func_id, result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
                       "executes": node["id"],
+                      "func_id": func_id,
                       "phase": phase,
                       "n": ith,
                       "indent_depth": self.indent_depth,
@@ -301,11 +303,13 @@ class TraceTester():
                 self.indent_depth -= 1
 
                 phase = "finished"
-                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                # ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                ith = 1 + len([x for x in find_by_keyval_in("func_id", func_id, result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
                       "executes": node["id"],
+                      "func_id": func_id,
                       "phase": phase,
                       "n": ith,
                       "indent_depth": self.indent_depth,
