@@ -36,9 +36,9 @@ def make_lexer():
 		0) count of chars consumed by token
 		1) type of token found or None
 	'''
-	keyword_re = re.compile(r"(?:начался|началась|началось|began|закончился|закончилась|закончилось|ended|выполнился|выполнилась|выполнилось|executed|evaluated|calculated|если|иначе|делать|пока|для|от|до|шаг|с\s+шагом|if|else|do|while|for|from|to|with\s+step|step|каждого|в|из|по|к|foreach|each|in|break|continue|return)(?=\s|\b|$)", re.I)
+	keyword_re = re.compile(r"(?:начался|началась|началось|began|закончился|закончилась|закончилось|ended|выполнился|выполнилась|выполнилось|executed|выполнение|execution|evaluated|calculated|если|иначе|делать|пока|для|от|до|шаг|с\s+шагом|if|else|do|while|for|from|to|with\s+step|step|каждого|в|из|по|к|foreach|each|in|break|continue|return)(?=\s|\b|$)", re.I)
 
-	struct_re = re.compile(r"(?:развилка|развилки|альтернативная|ветка|branch|alternative|selection|условия|переход|update|итерация|iteration|иначe|условие|цикла|condition|of|loop|инициализация|init|initialization|цикл|следование|sequence|вызова?\sфункции|функци.)(?=\s|\b|$)", re.I)
+	struct_re = re.compile(r"(?:развилка|развилки|альтернативная|ветк[аи]|branch|alternative|selection|условия|переход|update|итерация|iteration|иначe|условие|цикла|condition|of|loop|инициализация|init|initialization|цикл|следование|sequence|вызова?\sфункции|функци[яи])(?=\s|\b|$)", re.I)
 
 	simple_mode = {
 	  # The start state contains the rules that are intially used
@@ -54,7 +54,7 @@ def make_lexer():
 		{'regex': re.compile(r"действие|action|statement|stmt", re.I), 'token': "action"},
 		{'regex': re.compile(r"программа|program", re.I), 'token': "program"},
 		{'regex': re.compile(r"функция|function", re.I), 'token': "function"},
-		{'regex': re.compile(r"й|раз|time", re.I), 'token': None},
+		{'regex': re.compile(r"-е|-й|раз|time", re.I), 'token': None},
 		{'regex': re.compile(r"[\wа-яё\d]+", re.I), 'token': "variable"}
 	  ],
 	}

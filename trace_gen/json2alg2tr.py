@@ -41,6 +41,7 @@ def tr(word_en, case='nomn'):
                 .replace("(branch)", '')
                 .replace("comment", '// ')
                 .replace("nth time", 'th time')
+                .replace("nth", 'th')
                 .replace("started", 'began')
                 .replace("finished", 'ended')
                 .replace("performed", 'executed')
@@ -56,54 +57,58 @@ def tr(word_en, case='nomn'):
         "comment": ("// ",),
         "algorithm": ("алгоритм", "алгоритма"),
         "program" : ("программа", "программы"),
-        "func" 		: ("функция", "функции"),
-        "func_call" : ("вызов функции", "вызова функции"),
+        "func"      : ("функция", "функции"),
+        # "func_call" : ("вызов функции", "вызова функции"),
+        "func_call" : ("функция", "функции"),
         "alternative" : ("развилка", "развилки"),
-        "branch" 	: ("ветка", "ветки"),
-        "cond" 		: ("условие", "условия"),
-        "cond of" 		: ("условие", "условия"),
-        "if" 		: ("если", ),
-        "else if" 	: ("иначе если", ),
-        "else-if" 	: ("иначе если", ),
-        "else" 		: ("иначе", ),
+        "branch"    : ("ветка", "ветки"),
+        "cond"      : ("условие", "условия"),
+        "cond of"       : ("условие", "условия"),
+        "if"        : ("если", ),
+        "else if"   : ("иначе если", ),
+        "else-if"   : ("иначе если", ),
+        "else"      : ("иначе", ),
         "(branch) else" : ("иначe", ), # (e латинск.)
-        "while" 	: ("пока", ),
-        "do" 		: ("делать", ),
-        "for" 		: ("для", ),
-        "foreach" 	: ("для каждого", ),
-        "in" 		: ("в", ),
-        "trace" 	: ("трасса", ),
-        "nth time" 	: ("-й раз", ),
-        "True" 		: ("истина", ),
-        "False" 	: ("ложь", ),
-        True 		: ("истина", ),
-        False 		: ("ложь", ),
-        "None"		: ("ничего!", ),
-        None		: ("ничего!", ),
-        "not evaluated"		: ("не вычислено", ),
-        "(she) started" 	: ("началась", ),
-        "(she) finished"	: ("закончилась", ),
-        "(he) started" 		: ("начался", ),
-        "(he) finished" 	: ("закончился", ),
-        "(it) started" 		: ("началось", ),
-        "(it) finished" 	: ("закончилось", ),
-        "(she) performed" 	: ("выполнилась", ),
-        "(he) performed" 	: ("выполнился", ),
-        "(it) performed" 	: ("выполнилось", ),
-        "iteration" 	: ("итерация", "итерации"),
-        "loop" 			: ("цикл", "цикла"),
-        "init" 			: ("инициализация", ),
-        "update" 		: ("переход", ),
-        "from" 		: ("от", ),
-        "to" 		: ("до", ),
+        "while"     : ("пока", ),
+        "do"        : ("делать", ),
+        "for"       : ("для", ),
+        "foreach"   : ("для каждого", ),
+        "in"        : ("в", ),
+        "trace"     : ("трасса", ),
+        "nth time"  : ("-й раз", ),
+        "(it) nth"  : ("-е", ),  # 1-е, 2-е, и т.д.
+        "True"      : ("истина", ),
+        "False"     : ("ложь", ),
+        True        : ("истина", ),
+        False       : ("ложь", ),
+        "None"      : ("ничего!", ),
+        None        : ("ничего!", ),
+        "not evaluated"     : ("не вычислено", ),
+        "(she) started"     : ("началась", ),
+        "(she) finished"    : ("закончилась", ),
+        "(he) started"      : ("начался", ),
+        "(he) finished"     : ("закончился", ),
+        "(it) started"      : ("началось", ),
+        "(it) finished"     : ("закончилось", ),
+        "(she) performed"   : ("выполнилась", ),
+        "(he) performed"    : ("выполнился", ),
+        "(it) performed"    : ("выполнилось", ),
+        "execution"     : ("выполнение", ),
+        "execution of"  : ("выполнение", ),
+        "iteration"     : ("итерация", "итерации"),
+        "loop"          : ("цикл", "цикла"),
+        "init"          : ("инициализация", ),
+        "update"        : ("переход", ),
+        "from"      : ("от", ),
+        "to"        : ("до", ),
         "with step" : ("с шагом", ),
-        # "container is not empty"	: ("контейнер не пуст", ),
-        "first element exists" 		: ("первый элемент существует", ),
-        "next element exists" 		: ("следующий элемент существует", ),
-        "to first element" 			: ("к первому элементу", ),
-        "to next element" 			: ("к следующему элементу", ),
-        "sequence" 			: ("следование", "следования"),
-        "stmt"				: ("действие", "действия", ),
+        # "container is not empty"  : ("контейнер не пуст", ),
+        "first element exists"      : ("первый элемент существует", ),
+        "next element exists"       : ("следующий элемент существует", ),
+        "to first element"          : ("к первому элементу", ),
+        "to next element"           : ("к следующему элементу", ),
+        "sequence"          : ("следование", "следования"),
+        "stmt"              : ("действие", "действия", ),
     }.get(word_en, ())
     try:
         return res[grammemes.index(case)]
@@ -284,9 +289,9 @@ class TraceTextVisitor(TextVisitor):
         return v
 
     @classmethod
-    def format_nth_str(self, n=-1):
+    def format_nth_str(self, n=-1, suffix_tr_key="nth time"):
         """ if n <= 0, return empty string """
-        return (" %d%s" % (n, tr("nth time"))) if n > 0 else ''
+        return (" %d%s" % (n, tr(suffix_tr_key))) if n > 0 else ''
 
     def append_nth_str(self, n=-1):
         """ if n <= 0, do nothing  """
@@ -513,13 +518,34 @@ class GenericAlgorithmJsonNode(JsonNode, WithID):
         self.expand_act = expand_act
         self.noexpand_act = noexpand_act
         self.gen = 'she'  # род (м., ж., ср.) для акта элемента в трассе на рус. яз. (can be redefined)
-        self.act_line_format_str = "{name} {phase_str}{nth_str}"  # can be redefined
+        self.is_complex = False  # two acts (started/finished) of single act (executed) otherwise.
+        self.act_line_format_str_executed = "{name} {phase_str}{nth_str}"  # can be redefined
+        self.act_line_format_str_started_finished = "{phase_str} {nth_str} {name}"  # can be redefined
+        self.act_line_format_str = self.act_line_format_str_executed  # can be redefined
+
+    def set_is_complex(self, is_complex: bool):
+        self.is_complex = is_complex
+        if is_complex:
+            self.act_line_format_str = self.act_line_format_str_started_finished
+            self.gen = 'it'  # началОсь 4-е выполнение ...
+        else:
+            self.act_line_format_str = self.act_line_format_str_executed
 
     def list_expand_strs2Stmts(self, seq):
         return [
             StatementAtomJN("stmt", json_node) if isinstance(json_node, str) else json_node
             for json_node in seq
         ]
+
+    def get_nth_str(self, n=-1, include_of=True):
+        if self.is_complex:
+            nth_tr_key = "(it) nth"
+            execution = " " + tr("execution of" if include_of else "execution")
+            self.gen = 'it'  # началОсь 5-е выполнение ...
+        else:
+            nth_tr_key = "nth time"
+            execution = ""
+        return TraceTextVisitor.format_nth_str(n, nth_tr_key) + execution
 
     def display_name(self, case='nomn', include_type_only=False):
         """ Получение имени для отображения, например, "развилка_5", "функция main", "ветка иначе".
@@ -557,12 +583,12 @@ class GenericAlgorithmJsonNode(JsonNode, WithID):
 
     def make_act_line(self, phase='performed', n=0, format_str=None, **kwargs):
         if 'name' not in kwargs:
-            name = self.display_name()
+            name = self.display_name("gent" if self.is_complex else 'nomn')  ###
         if 'phase_str' not in kwargs:
             if '(' not in phase:  # 'performed' but not '(she) performed'
                 phase = '(%s) %s' % (self.gen, phase)
             phase_str = tr(phase)
-        nth_str = TraceTextVisitor.format_nth_str(n)
+        nth_str = self.get_nth_str(n)
         return (format_str or self.act_line_format_str).format(**locals(), **kwargs)
 
     def accept(self, visitor):
@@ -783,6 +809,7 @@ class FuncJN(GenericAlgorithmJsonNode):
             self.is_entry = False
 
         self.param_list = param_list  # or []
+        self.set_is_complex(True)
 
     def setup(self, parent_node, setup_children=True):
         super(FuncJN, self).setup(parent_node, setup_children=False)
@@ -861,6 +888,7 @@ class FuncCallJN(GenericAlgorithmJsonNode):
         self.func_args = func_args  # string, not list so far
         self.func = None
         self.gen = 'he'
+        self.set_is_complex(True)
 
     def setup(self, parent_node, setup_children=True):
         super(FuncCallJN, self).setup(parent_node, setup_children=False)
@@ -908,6 +936,7 @@ class AlternativeJN(GenericAlgorithmJsonNode):
         assert jn_type == "alternative", jn_type
         self.branches = branches
         self.act_line_format_str = "{phase_str} {name}{nth_str}"
+        self.set_is_complex(True)
 
     def setup(self, parent_node, setup_children=True):
         super().setup(parent_node, setup_children=False)
@@ -985,6 +1014,7 @@ class GenericAlternativeBranch(GenericAlgorithmJsonNode):
         assert jn_type in ("if", "else if", "else"), jn_type
         assert stmt
         self.stmts = self.list_expand_strs2Stmts(stmt)
+        self.set_is_complex(True)
 
     def children_to_dict(self):
         return {"branch": [to_dict_or_self(ch, "to_dict_4onto") for ch in self.stmts]}
@@ -1233,6 +1263,7 @@ class GenericLoop(GenericAlgorithmJsonNode):
         self.body = self.list_expand_strs2Stmts(body)
         self.gen = 'he'
         self.act_line_format_str = "{phase_str} {name}{nth_str}"
+        self.set_is_complex(True)
 
     def to_dict(self):
         return {"name": self.name,
@@ -1888,6 +1919,7 @@ class NamedSequenceJN(SequenceJN):
         # print("NamedSequenceJN", kw)
         super(NamedSequenceJN, self).__init__(stmts=sequence, jn_type=jn_type, name=name, **kw)
         assert jn_type == "sequence", jn_type
+        self.set_is_complex(True)
     # self.stmts = self.list_expand_strs2Stmts(sequence)
 
 
