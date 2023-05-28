@@ -266,7 +266,7 @@ class TraceTester():
                 self.consequent_mode = "normal"
 
                 # phase = "finished"
-                # ith = 1 + len([x for x in find_by_keyval_in("executes", node["body"]["id"], result) if x["phase"] == phase])
+                # # ith = 1 + len([x for x in find_by_keyval_in("executes", node["body"]["id"], result) if x["phase"] == phase])
                 # result.append({
                 #       "id": self.newID(),
                 #       "name": node["name"],
@@ -303,8 +303,8 @@ class TraceTester():
                 self.indent_depth -= 1
 
                 phase = "finished"
-                # ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
-                ith = 1 + len([x for x in find_by_keyval_in("func_id", func_id, result) if x["phase"] == phase])
+                # # ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                # ith = 1 + len([x for x in find_by_keyval_in("func_id", func_id, result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
@@ -342,7 +342,7 @@ class TraceTester():
                 # do not wrap 'global_code'
                 if node["name"] != 'global_code':
                     phase = "finished"
-                    ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                    # ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                     result.append({
                           "id": self.newID(),
                           "name": node["name"],
@@ -377,7 +377,7 @@ class TraceTester():
                         break
 
                 phase = "finished"
-                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                # ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
@@ -412,7 +412,7 @@ class TraceTester():
                             break
 
                     phase = "finished"
-                    ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                    # ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                     result.append({
                           "id": self.newID(),
                           "name": node["name"],
@@ -540,7 +540,7 @@ class TraceTester():
                 _loop_context()  # make a loop
 
                 phase = "finished"
-                ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
+                # ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
                 result.append({
                       "id": self.newID(),
                       "name": node["name"],
