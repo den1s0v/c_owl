@@ -52,6 +52,71 @@ def find_func_calls_in_expr(s) -> list[str]:
     ]
 
 
+def string_to_tree_of_parenthisized(data: str):
+    """
+    Example.
+    >>> data = 'x = f() + g(3 - f((r * 4), y**3) % (2 + 8)))) (-678):) = (; // It works!'
+    >>> string_to_tree_of_parenthisized(data)
+        {'index': 0,
+         'content': 'x = f() + g(3 - f((r * 4), y**3) % (2 + 8)))) (-678):) = (; // It works!',
+         'children': [{'index': 6, 'content': '', 'children': []},
+          {'index': 12,
+           'content': '3 - f((r * 4), y**3) % (2 + 8)',
+           'children': [{'index': 6,
+             'content': '(r * 4), y**3',
+             'children': [{'index': 1, 'content': 'r * 4', 'children': []}]},
+            {'index': 24, 'content': '2 + 8', 'children': []}]},
+          {'index': 47, 'content': '-678', 'children': []},
+          {'index': 58, 'content': None, 'children': []}]}
+    """
+    stack = [{'index': 0, 'content': data, 'children': []}]
+    tokens = re.finditer(r'([()])', data)
+
+    for m in tokens:
+        t = m[1]
+        if t == '(':
+            deepest = stack[-1]
+            child = {'index': m.start() + 1, 'content': None, 'children': []}
+            deepest['children'].append(child)
+            stack.append(child)
+        if t == ')':
+            if len(stack) <= 1:
+                continue
+
+            deepest = stack.pop()
+            deepest['content'] = data[deepest['index'] : m.start()]
+            deepest['index'] = deepest['index'] - stack[-1]['index']  # reindex to align parent's content
+
+    return stack[0]
+
+
+FUNC_NAME__RE = re.compile(r'\b([a-z_]\w*)\s*\(?\s*$', re.I)
+
+
+def func_calls_in_chrono_order(tree_node):
+    """generator -> ('func_name', '(func_arg1, func_arg2)')
+        returns (function, args) 2-tuple in deep-first order of func calls nested in parens.
+
+        Example.
+        >>> data = 'x = f() + g(3 - f((r * 4), y**3) % (2 + 8))'
+        >>> tree = string_to_tree_of_parenthisized(data)
+        >>> [*func_calls_in_chrono_order(tree)]
+            [('f', '()'),
+             ('f', '((r * 4), y**3)'),
+             ('g', '(3 - f((r * 4), y**3) % (2 + 8))')]
+    """
+    if not tree_node['content']:
+        return
+
+    for child in tree_node['children']:
+        yield from func_calls_in_chrono_order(child)
+
+        # emit self after inner calls:
+        m = FUNC_NAME__RE.search(tree_node['content'][:child['index'] - 1])
+        if m:
+            yield m[1], '(%s)' % child['content']
+
+
 def parse_expr_values(s: str) -> list:
     """
     '101'             -> (True, False, True)
