@@ -49,7 +49,7 @@ def tr(word_en, case='nomn'):
                 .lstrip()
         )
     # if TARGET_LANG != "ru":
-    # 	raise ValueError("TARGET_LANG variable must contain one of {%s}, but has `%s`" % (str(SUPPORTED_LANGS), TARGET_LANG))
+    #   raise ValueError("TARGET_LANG variable must contain one of {%s}, but has `%s`" % (str(SUPPORTED_LANGS), TARGET_LANG))
 
     grammemes = ('nomn', 'gent')
     assert case in grammemes, "Unknown case: " + case
@@ -651,7 +651,7 @@ class AlgorithmRootJN(GenericAlgorithmJsonNode):
             return self.data["stmts"]
         # stmts = [st for st in self.funcs_and_stmts if st.jn_type != 'func']
         # if stmts:
-        # 	return stmts
+        #   return stmts
 
         # операторов верхнего уровня тоже нет
         return None
@@ -1686,9 +1686,9 @@ class ForEachLoopCondition(GenericCondition):
         return conditional_name
 
     # if self.cond:
-    # 	return "%s (%s) %s" % (tr("cond", case), self.cond, self.owner.display_name('gent'))
+    #   return "%s (%s) %s" % (tr("cond", case), self.cond, self.owner.display_name('gent'))
     # else:
-    # 	return "%s %s %s" % (tr("cond", case), self.name, self.owner.display_name('gent'))
+    #   return "%s %s %s" % (tr("cond", case), self.name, self.owner.display_name('gent'))
     # return "%s %s%s %s" % (tr("cond", case), self.name, insert_cond, self.owner.display_name('gent'))
     def accept(self, visitor):
         return visitor.visit_ForEachLoopCondition(self)
@@ -2066,7 +2066,7 @@ class IterationActLine(ActLine):
 # d.update( self.action_to_dict() )
 # d.update( {f:getattr(self, f) for f in self.json_mandatory_fields} )
 # if self.loop_act_id:
-# 	d.update( {"loop_act_id": self.loop_act_id} )
+#   d.update( {"loop_act_id": self.loop_act_id} )
 # d.update( self.comment_to_dict() )
 # return d
 
@@ -2546,12 +2546,12 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
     # node.accept(tr_v)
 
     # if phase != 'performed':
-    # 	# limit generated lines to desired one only
-    # 	index = {
-    # 		'started': 0,
-    # 		'finished': -1,
-    # 	}.get(phase)
-    # 	tr_v.lines = [tr_v.lines[index]]
+    #   # limit generated lines to desired one only
+    #   index = {
+    #       'started': 0,
+    #       'finished': -1,
+    #   }.get(phase)
+    #   tr_v.lines = [tr_v.lines[index]]
 
     # assert len(tr_v.lines) == 1, tr_v.lines
     # text_trace = str(tr_v)
@@ -2560,8 +2560,8 @@ def act_line_for_alg_element(alg_element: dict, phase: str, expr_value=False, us
 
     # # set exec_time
     # if use_exec_time > 1:
-    # 	text_trace = text_trace.replace('1th time', '%sth time' % use_exec_time)
-    # 	text_trace = text_trace.replace('1-й раз', '%s-й раз' % use_exec_time)
+    #   text_trace = text_trace.replace('1th time', '%sth time' % use_exec_time)
+    #   text_trace = text_trace.replace('1-й раз', '%s-й раз' % use_exec_time)
 
     return patch_trace(text_trace)
 
