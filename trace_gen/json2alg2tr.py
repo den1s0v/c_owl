@@ -509,7 +509,7 @@ class JsonNode(object):
 
 
 # def accept(self, visitor):
-# 	return visitor.visit_JsonNode(self)
+#   return visitor.visit_JsonNode(self)
 
 
 class GenericAlgorithmJsonNode(JsonNode, WithID):

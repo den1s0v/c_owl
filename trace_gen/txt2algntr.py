@@ -230,18 +230,18 @@ class AlgorithmParser:
         }
 
     def make_func_call(self, func_name: str, action_str: str) -> dict:
-        """Создать узел для вызова функции, который может быть частью простого действия (либо, по смыслу,
-        заменить его)
+        """Создать узел для вызова функции, который может быть частью простого действия
+        (либо, по смыслу, заменить его)
         Примеры:
 
         0.0 + our_func (1+2+3) * (4+5)
          --->
-        [▶]0.0 + [▶]our_func[■] (1+2+3) * (4+5)
+        [▶]0.0 + [▶]our_func(1+2+3)[■] * (4+5)
 
 
         our_func(1+2+3)
          --->
-        [▶]our_func[■](1+2+3)
+        [▶]our_func(1+2+3)[■]
 
         """
         # find the function called
@@ -286,8 +286,8 @@ class AlgorithmParser:
             'prefix_part_of_action': prefix_part_of_action,
             'rest_of_action': rest_of_action,
             # признаки для подготовки трассы:
-            'merge_child_begin_act': (prefix_part_of_action == ''),
-            'merge_child_end_act': True,
+            'merge_child_end_act': (prefix_part_of_action == ''),
+            # 'merge_child_!end_act': True,
         }
 
     def detect_function_calls(self, expr_str):

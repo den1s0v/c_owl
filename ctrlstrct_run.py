@@ -430,7 +430,7 @@ class TraceTester():
                     make_correct_trace_for_alg_node(node["has_func_call"])
 
                 # "else":
-                if "has_func_call" not in node or ("merge_child_begin_act" in node and not node["merge_child_begin_act"]):
+                if "has_func_call" not in node or ("merge_child_end_act" in node and not node["merge_child_end_act"]):
                     # just an ordinary trace line
                     phase = "performed"
                     ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
@@ -454,12 +454,12 @@ class TraceTester():
 
                     make_correct_trace_for_alg_node(node["has_func_call"])
 
-                    # if not node["merge_child_begin_act"]:
+                    # if not node["merge_child_end_act"]:
                     #     # separate "run" button
                     #     # ... integrated into following `if`.
 
                 # "else":
-                if "has_func_call" not in node or ("merge_child_begin_act" in node and not node["merge_child_begin_act"]):
+                if "has_func_call" not in node or ("merge_child_end_act" in node and not node["merge_child_end_act"]):
                     # just an ordinary trace line
                     phase = "performed"
                     ith = 1 + len([x for x in find_by_keyval_in("executes", node["id"], result) if x["phase"] == phase])
