@@ -1478,7 +1478,8 @@ def init_persistent_structure(onto):
             # make Erroneous subclasses
             # (class, [bases])
             for class_spec in [
-                # (name, [bases], err_level, {related, concepts})
+                # (name, [bases], err_level, {set of related concepts})
+                # err_level: one of: "general_wrong", "wrong_context", "missing", "extra".
 
                 # Sequence mistakes ...
                 ("CorrespondingEndMismatched", (), "trace_structure", {'action'}),
@@ -1570,6 +1571,9 @@ def init_persistent_structure(onto):
                 ("ForeachUpdateNotAfterSuccessfulCondition", (), "extra", {'foreach_loop', }),
                 ("NoIterationAfterForeachUpdate", (), "missing", {'foreach_loop', }),
                 ("IterationNotAfterForeachUpdate", (), "extra", {'foreach_loop', }),
+
+                # Ошибки для дерева решений
+                ("BadBeginOfTrace", ["TooEarlyInSequence"], "extra", {'trace', }),
             ]:
                 if isinstance(class_spec, str):
                     types.new_class(class_spec, (Erroneous,))
