@@ -1,4 +1,9 @@
 owlready2>=0.30	
+
+### optional, for exporting owlready2 ontologies with rdflib:
+# rdflib
+ttlser
+
 transliterate
 
 ### Web server ###
