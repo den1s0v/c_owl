@@ -98,14 +98,14 @@ def export_algtr2dict(alg_tr, onto):
 						'subject': ind.name,
 						'verb': prop.name,
 						**({
-							'objectType': "owl:NamedIndividual",
-							'object': value.name,
-						  }
-						  if isinstance(value, Thing) else
-						  {
-							'objectType': type_of(value),
-							'object': value,
-						  })
+							   'objectType': "owl:NamedIndividual",
+							   'object': value.name,
+						   }
+						   if isinstance(value, Thing) or isinstance(value, entity.ThingClass) else
+						   {
+							   'objectType': type_of(value),
+							   'object': value,
+						   })
 					})
 
 	# expr_values
