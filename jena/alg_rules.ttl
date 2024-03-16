@@ -25,7 +25,7 @@
 
 
 ###############################
-# action-boundaries-polyfill
+# decision-tree action-boundaries-polyfill
 ###############################
 
 [action-boundary-polyfill-begin_of:
@@ -90,7 +90,55 @@
 
 
 ###############################
-# helper
+# decision-tree alternative helper
+###############################
+
+[alternative-to-alternative_multi_with_else:
+
+	(?a rdf:type my:alternative),
+	(?a my:branches_item ?b),
+	(?b rdf:type my:else-if),
+	(?a my:branches_item ?b2),
+	(?b2 rdf:type my:else),
+	 ->
+	 (?a rdf:type my:alternative_multi_with_else),
+]
+
+[alternative-to-alternative_multi_without_else:
+
+	(?a rdf:type my:alternative),
+	(?a my:branches_item ?b),
+	(?b rdf:type my:else-if),
+	noValue(?b, my:next),
+	 ->
+	 (?a rdf:type my:alternative_multi_without_else),
+]
+
+[alternative-to-alternative_single_with_else:
+
+	(?a rdf:type my:alternative),
+	(?a my:branches_item ?b),
+	(?b rdf:type my:if),
+	(?b my:next ?b2),
+	(?b2 rdf:type my:else),
+	 ->
+	 (?a rdf:type my:alternative_single_with_else),
+]
+
+[alternative-to-alternative_simple:
+
+	(?a rdf:type my:alternative),
+	(?a my:branches_item ?b),
+	(?b rdf:type my:if),
+	noValue(?b, my:next),
+	 ->
+	 (?a rdf:type my:alternative_simple),
+]
+
+
+
+###############################
+# decision-tree helper
 ###############################
 
 
@@ -107,6 +155,19 @@
 	(?Loop my:cond ?c)
 	 -> (?Loop my:parent_of ?c)
 ]
+
+[seq-of-loop-to-loop_body:
+# Обновляем тип следования для старых вопросов, в которых был использован просто тип sequence
+	(?Loop rdf:type my:loop),
+	(?block rdf:type my:sequence),
+	(?Loop my:body ?block)
+	 -> (?block rdf:type my:loop_body)
+]
+
+
+###############################
+# helper
+###############################
 
 ##[normal_consequent_to_verbose-a-a:
 
@@ -171,6 +232,95 @@
 	noValue(?b my:boundary_of ?st),
 	 -> (?a my:collapse_bound ?b)
 ]
+
+
+
+##################################
+# decision-tree action helper
+##################################
+# helper: polyfill info for decision tree
+
+
+#[interrupt_kind-for-return:
+#	(?action rdf:type my:return),
+#	 -> (?action my:has_interrupt_kind my:return)
+#]
+#[interrupt_kind-for-break:
+#	(?action rdf:type my:break),
+#	 -> (?action my:has_interrupt_kind my:break)
+#]
+#[interrupt_kind-for-continue:
+#	(?action rdf:type my:continue),
+#	 -> (?action my:has_interrupt_kind my:continue)
+#]
+
+
+[role-for-func_body:
+	(?action rdf:type my:sequence),
+	(?parent rdf:type my:func),
+	(?parent my:body ?action),
+	 -> (?action my:has_role my:func_body)
+]
+[role-for-func_call:
+	(?action rdf:type my:func_call),
+#	(?parent rdf:type my:stmt_with_calls),
+#	(?parent my:has_func_call ?action),
+	 -> (?action my:has_role my:func_call)
+]
+[role-for-loop_body:
+	(?action rdf:type my:sequence),
+	(?parent rdf:type my:loop),
+	(?parent my:body ?action),
+	 -> (?action my:has_role my:loop_body)
+]
+[role-for-sequence_element:
+	(?parent rdf:type my:sequence),
+	(?parent my:body_item ?action),
+	 -> (?action my:has_role my:sequence_element)
+]
+[role-for-alt_branch:
+	(?action rdf:type my:alt_branch),
+	 -> (?action my:has_role my:alt_branch)
+]
+[role-for-alt_cond:
+	(?action rdf:type my:expr),
+	(?parent rdf:type my:alt_branch),
+	(?parent my:cond ?action),
+	 -> (?action my:has_role my:alt_cond)
+]
+[role-for-loop_init:
+	(?action rdf:type my:stmt),
+	(?parent rdf:type my:loop),
+	(?parent my:init ?action),
+	 -> (?action my:has_role my:loop_init)
+]
+[role-for-loop_cond:
+	(?action rdf:type my:expr),
+	(?parent rdf:type my:loop),
+	(?parent my:cond ?action),
+	 -> (?action my:has_role my:loop_cond)
+]
+[role-for-loop_update:
+	(?action rdf:type my:stmt),
+	(?parent rdf:type my:loop),
+	(?parent my:update ?action),
+	 -> (?action my:has_role my:loop_update)
+]
+
+
+## polyfill changed markers (for questions generated before 2024):
+
+[type-prop-first_item:
+	(?st rdf:type my:first_item),
+	 ->
+	(?st my:list_item_role my:first_item),
+]
+[type-prop-last_item:
+	(?st rdf:type my:last_item),
+	 ->
+	(?st my:list_item_role my:last_item),
+]
+
 
 
 
@@ -340,7 +490,7 @@
 	(?b my:begin_of ?block),
 
 	(?block my:body_item ?st),
-	(?st rdf:type my:first_item),
+	(?st my:list_item_role my:first_item),
 	(?b2 my:begin_of ?st),
 
 	makeNamedSkolem(?R, my:Reason, ?b, ?b2),
@@ -382,7 +532,7 @@
 	(?block rdf:type my:sequence),
 	(?e my:end_of ?block),
 	(?block my:body_item ?st),
-	(?st rdf:type my:last_item),
+	(?st my:list_item_role my:last_item),
 	(?e1 my:end_of ?st),
 
 	makeNamedSkolem(?R, my:Reason, ?e1, ?e),
@@ -410,7 +560,7 @@
 	(?alt rdf:type my:alternative),
 	(?b my:begin_of ?alt),
 	(?alt my:branches_item ?br),
-	(?br rdf:type my:first_item),
+	(?br my:list_item_role my:first_item),
 
 	(?br my:cond ?cnd),
 	(?b2 my:begin_of ?cnd),
@@ -525,7 +675,7 @@
 	(?br rdf:type my:alt_branch),
 	(?alt my:branches_item ?br),
 
-	(?br rdf:type my:last_item),
+	(?br my:list_item_role my:last_item),
 	(?alt rdf:type my:alternative),
 	(?e my:end_of ?alt),
 

@@ -13,8 +13,9 @@
 
 
 ###############################
-# trace helper
+# decision-tree trace helper
 ###############################
+# semantic structure for a trace as sequence of acts
 
 # Rule: student_DepthIncr_rule_s6 [helper & mistake]
 [student_DepthIncr_rule_s6:
@@ -71,6 +72,15 @@
 ]
 
 
+[student_corresponding_end-to-corresponding_end:
+# corresponding_end relation for correct act b
+	(?a my:student_corresponding_end ?b),
+	noValue(?_x my:student_next_latest ?b),
+	 ->
+	 (?a my:corresponding_end ?b)
+]
+
+
 [Erroneous-class-to-wrong_next_act:
 	(?b rdf:type my:Erroneous),
 	(?a my:student_next ?b),
@@ -109,6 +119,62 @@
 	 ->
 	 (?a rdf:type my:finish_trace_act)
 ]
+
+[seq-of-loop-to-loop_body-2:
+# Обновляем тип следования для старых вопросов, в которых был использован просто тип sequence
+	(?Loop rdf:type my:loop),
+	(?block rdf:type my:sequence),
+	(?Loop my:body ?block)
+	 -> (?block rdf:type my:loop_body)
+]
+
+
+##################################
+# decision-tree act helper
+##################################
+# helper: polyfill act info for decision tree
+
+
+[act_kind-for-atom:
+	(?action_class my:atom_action "true"^^xsd:boolean),
+	(?action rdf:type ?action_class),
+
+	(?a my:executes ?bnd), (?bnd my:boundary_of ?action),
+
+	 -> (?a my:act_kind my:atom)
+]
+
+[act_kind-for-begin:
+	noValue(?action_class my:atom_action "true"^^xsd:boolean),
+	(?action_class rdfs:subClassOf my:action),
+	(?action rdf:type ?action_class),
+
+	(?a my:executes ?bnd), (?bnd my:begin_of ?action),
+	(?a rdf:type ?act_begin),
+
+	 -> (?a my:act_kind my:begin)
+]
+[act_kind-for-end:
+	noValue(?action_class my:atom_action "true"^^xsd:boolean),
+	(?action_class rdfs:subClassOf my:action),
+	(?action rdf:type ?action_class),
+
+	(?a my:executes ?bnd), (?bnd my:end_of ?action),
+	(?a rdf:type ?act_end),
+
+	 -> (?a my:act_kind my:end)
+]
+[act_kind-for-halt:
+	noValue(?action_class my:atom_action "true"^^xsd:boolean),
+	(?action_class rdfs:subClassOf my:action),
+	(?action rdf:type ?action_class),
+
+	(?a my:executes ?bnd), (?bnd my:halt_of ?action),
+	(?a rdf:type ?act_end),
+
+	 -> (?a my:act_kind my:end)
+]
+
 
 
 
@@ -886,7 +952,7 @@
 #		notEqual(?i1, ?i2),
 
 	(?alt my:branches_item ?br),
-	(?br rdf:type my:first_item),
+	(?br my:list_item_role my:first_item),
 	(?br my:cond ?cnd),
 
 	(?alt my:stmt_name ?a_name),
@@ -1384,7 +1450,8 @@
 	(?br my:cond ?cnd),
 	(?alt my:branches_item ?br),
 	(?alt rdf:type my:alternative),
-	(?br rdf:type my:last_item),
+#	no ELSE:
+	(?br my:list_item_role my:last_item),
 
 	(?a my:student_next ?b),
 	(?b rdf:type my:WrongNext),

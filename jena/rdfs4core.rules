@@ -4,7 +4,7 @@
 
 (?a ?p ?b), (?p rdfs:subPropertyOf ?q) -> (?a ?q ?b) .
 
-(?x owl:subClassOf ?y), (?y owl:subClassOf ?z) -> (?a owl:subClassOf ?z) .
+# (?x rdfs:subClassOf ?y), (?y rdfs:subClassOf ?z) -> (?x rdfs:subClassOf ?z) .
 
 (?x rdfs:subClassOf ?y), (?a rdf:type ?x) -> (?a rdf:type ?y) .
 

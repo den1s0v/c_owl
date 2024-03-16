@@ -12,8 +12,9 @@ TASK_MAP = [
 	("rdfs4core.rules", {
 		"name": "rdfs_subset_positive",
 		"positive": True,
+		"tags": [{'name': 'decision-tree'}],
 	}),
-	# Duplicate this as there no way to include these to both positive and negative
+	# Duplicate this as there is no way to include as both positive and negative
 	("rdfs4core.rules", {
 		"name": "rdfs_subset_negative",
 		"positive": False,
@@ -27,7 +28,7 @@ TASK_MAP = [
 		"name": None,
 		"positive": True,
 	}),
-	# Duplicate this as there no way to include these to both positive and negative
+	# Duplicate this as there is no way to include as both positive and negative
 	("update_names.ttl", {
 		"name": None,
 		"positive": False,
@@ -90,7 +91,7 @@ def read_laws_from_file(fname, config) -> list:
 		law = create_Law(config)
 		for line in lines:
 			line = line.strip()
-			if line:
+			if line and not line.startswith('#'):
 				law["formulations"].append(create_Rule(gen_name(), line))
 		return [law]
 	else:
@@ -106,8 +107,10 @@ def create_Rule(name, formulation=None):
 	  }
 
 def create_Law(law_config, formulations=None):
-	if "concepts" not in law_config: law_config["concepts"] = None
-	if "tags" not in law_config: law_config["tags"] = None
+	if "concepts" not in law_config:
+		law_config["concepts"] = None
+	if "tags" not in law_config:
+		law_config["tags"] = None
 
 	## !!! Filter rules not needed for CompPrehension. TODO: make this more explicit.
 	# if formulations:

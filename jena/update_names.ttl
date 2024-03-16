@@ -6,7 +6,7 @@
 @prefix my: <http://vstu.ru/poas/code#> .
 
 ###############################
-# loop alternative helper
+# decision-tree loop alternative helper
 ###############################
 
 # Rule: name-branch-if-helper [alternative]
@@ -26,7 +26,7 @@
 	 ->
 	 drop(0),
 	 (?b my:stmt_name ?new_name),
-	 (?b my:_stmt_name_updated 1)
+#	 (?b my:_stmt_name_updated 1)
 ]
 
 # Rule: name-branch-else-if-helper [alternative]
@@ -45,7 +45,7 @@
 	 ->
 	 drop(0),
 	 (?b my:stmt_name ?new_name),
-	 (?b my:_stmt_name_updated 1)
+#	 (?b my:_stmt_name_updated 1)
 ]
 
 # Rule: name-branch-else-helper [alternative]
@@ -63,7 +63,7 @@
 	 ->
 	 drop(0),
 	 (?b my:stmt_name ?new_name),
-	 (?b my:_stmt_name_updated 1)
+#	 (?b my:_stmt_name_updated 1)
 ]
 
 
@@ -82,7 +82,24 @@
 	 ->
 	 drop(0),
 	 (?b my:stmt_name ?new_name),
-	 (?b my:_stmt_name_updated 1)
+#	 (?b my:_stmt_name_updated 1)
+]
+
+
+# Rule: name-global-code-helper [loop]
+[
+#	 this link is to be deleted:
+	(?b my:stmt_name ?old_name),
+#	noValue(?b my:_stmt_name_updated 1),
+	(?b rdf:type my:sequence ),
+	(?a my:entry_point ?b),
+
+	strConcat( "«!{locale:text.global_scope}»", ?new_name),
+	notEqual(?old_name, ?new_name)
+	 ->
+	 drop(0),
+	 (?b my:stmt_name ?new_name),
+#	 (?b my:_stmt_name_updated 1)
 ]
 
 

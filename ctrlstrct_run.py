@@ -21,6 +21,7 @@ from explanations import format_explanation, get_leaf_classes
 from external_run import timer, run_swiprolog_reasoning, run_jena_reasoning, invoke_jena_reasoning_service, JENA_RULE_PATHS, JENA_RULE_PATHS_SOLVE_ALG, measure_stats_for_pellet_running, measure_stats_for_clingo_running, measure_stats_for_dlv_running, get_process_run_stats
 
 from common_helpers import Uniqualizer, delete_file
+from onto_helpers import make_triple
 
 onto_path.append(".")
 
@@ -32,19 +33,22 @@ WRITE_INVOLVES_CONCEPT = False
 WRITE_PRINCIPAL_VIOLATION = False
 WRITE_SKOS_CONCEPT = False
 WRITE_CONCEPT_FLAG_LABEL = False
+WRITE_DESICION_TREE_INFO = True
 
 def prepare_name(s):
     """Transliterate given word is needed"""
     try:
         return slugify(s, "ru") or s
     except:
-        print(' slugify() threw error for action name: ', name)
+        print(' slugify() threw error for action name: ', s)
         return s
 
 
 # наладим связи между элементами алгоритма
 def link_objects(onto, iri_subj : str, prop_name : str, iri_obj : str, prop_superclasses=(Thing >> Thing, )):
-    """Make a relation between two individuals that must exist in the ontology. The property, however, is created if does not exist (the `prop_superclasses` are applied to the new property)."""
+    """Make a relation between two individuals that must exist in the ontology.
+    The property, however, is created if does not exist
+    (the `prop_superclasses` are applied to the new property)."""
     prop = onto[prop_name]
     if not prop:
         with onto:
@@ -709,10 +713,10 @@ class TraceTester():
 
                         iri = d["iri"]
 
-                        # всякий список (действий, веток, ...) должен быть оформлен как linked_list.
-                        if k == "body" and isinstance(v, list):
-                            # делаем объект последовательностью (нужно для тел циклов, веток, функций)
-                            onto[iri].is_a.append( onto.linked_list )
+                        # всякий список (действий, веток, ...) должен быть оформлен как linked_list (НЕ пригодилось нигде!).
+                        # if k == "body" and isinstance(v, list):
+                        #     # делаем объект последовательностью (нужно для тел циклов, веток, функций)
+                        #     onto[iri].is_a.append( onto.linked_list )
                         # else:  # это нормально для других списков
                         #     print("Warning: key of sequence is '%s' (consider using 'body')" % k)
 
@@ -731,10 +735,10 @@ class TraceTester():
                                 # первый / последний
                                 if i == 0:
                                     # mark as first elem of the list
-                                    onto[subiri].is_a.append(onto.first_item)
+                                    onto[subiri].list_item_role.append(onto.first_item)
                                 if i == len(subobject_iri_list)-1:
                                     # mark as last act of the list
-                                    onto[subiri].is_a.append(onto.last_item)
+                                    onto[subiri].list_item_role.append(onto.last_item)
 
 
     def prepare_act_candidates(self, onto, extra_act_entries=0):
@@ -1048,6 +1052,26 @@ def init_persistent_structure(onto):
                 namespace = skos
 
 
+        # метки для использования с деревом решений
+
+        if WRITE_DESICION_TREE_INFO:
+            prop_localizedName_RU = types.new_class("RU.localizedName", (AnnotationProperty, ))
+            prop_localizedName_EN = types.new_class("EN.localizedName", (AnnotationProperty, ))
+
+        def set_localizedName(onto_entity, **localized_strings):
+            """
+            Ex.: `set_localizedName(for_loop, RU='цикл FOR', EN='FOR loop')`
+            """
+            if WRITE_DESICION_TREE_INFO:
+              for locale_code, s in localized_strings.items():
+                prop_name = locale_code + ".localizedName"
+                prop = onto[prop_name]
+                assert prop, prop_name
+                setattr(onto_entity, prop_name, s)
+
+
+
+
         # annotation `has_bitflags`
         class has_bitflags(AnnotationProperty):
             '''a Concept can have label & flags '''
@@ -1061,16 +1085,20 @@ def init_persistent_structure(onto):
             id_prop = types.new_class("id", (Thing >> int, FunctionalProperty, ))
         # ->
         class act(Concept): pass
+        set_localizedName(act, RU='выполнение', EN='execution')
         # -->
         class act_begin(act): pass
+        set_localizedName(act_begin, RU='начало выполнения', EN='the beginning of execution')
         # --->
         class trace(act_begin): pass
         if WRITE_CONCEPT_FLAG_LABEL:
             trace.has_bitflags = 0 | FLAGS_target;
             trace.label = ['трасса выполнения']
+        set_localizedName(trace, RU='начало трассы выполнения', EN='the beginning of the trace execution')
 
         # -->
         class act_end(act): pass
+        set_localizedName(act_end, RU='окочание выполнения', EN='the ending of execution')
         # -->
         class implicit_act(act):
             'act that skipped by student but added instead by rules'
@@ -1094,28 +1122,33 @@ def init_persistent_structure(onto):
         # ])
 
         # ->
-        class linked_list(Thing): pass
-
-        # ->
         class action(Concept): pass
+        set_localizedName(action, RU='действие', EN='action')
+
         # annotation `atom_action`
         class atom_action(AnnotationProperty):
             '''action that is is atomic and always shown in 'performed' phase '''
 
-        class algorithm(Concept): pass
-
-        class entry_point(algorithm >> action, FunctionalProperty): pass
-        class global_code(algorithm >> action, FunctionalProperty): pass
+        # ->
+        class linked_list(Thing): pass
+        class list_item_role(action >> Thing): pass
 
         ##### Граф между действиями алгоритма
         class boundary(Thing): pass  # begin or end of an action
         class boundary_of(boundary >> action, FunctionalProperty): pass
         class begin_of(boundary_of): pass
+        set_localizedName(begin_of, RU='начало', EN='the beginning of')
         class   end_of(boundary_of): pass
+        set_localizedName(end_of  , RU='окочание', EN='the ending of')
         class  halt_of(boundary_of): pass  # interrupted_end_of
         class interrupt_origin(boundary >> boundary): pass
         # class statement_begin(Thing): pass
         # class statement_end  (Thing): pass
+
+        class algorithm(boundary): pass
+
+        class entry_point(algorithm >> action, FunctionalProperty): pass
+        class global_code(algorithm >> action, FunctionalProperty): pass
 
         # annotation `act_class`
         class act_class(AnnotationProperty):
@@ -1124,6 +1157,37 @@ def init_persistent_structure(onto):
         begin_of.act_class = act_begin
         end_of  .act_class = act_end
         halt_of .act_class = act_end
+
+
+        # Для дерева решений >
+        if WRITE_DESICION_TREE_INFO:
+            class act_kind(AnnotationProperty):
+                ''' act -> one of: 'begin', 'end', 'atom' '''
+
+            class action_kind(AnnotationProperty):
+                ''' action -> one of: 'alternative', 'sequence', 'loop', 'expr', 'stmt', 'stmt_with_calls', 'call', 'func'
+                '''
+
+            class has_role(AnnotationProperty):
+                ''' action -> one of: 'func_body', 'func_call', 'loop_body', 'sequence_element', 'alt_branch', 'alt_cond', 'loop_init', 'loop_cond', 'loop_update'
+                '''
+
+            class has_interrupt_kind(AnnotationProperty):
+                ''' action -> one of: 'return', 'break', 'continue' '''
+
+            class continues_on_true_condition(AnnotationProperty):
+                ''' loop -> bool '''
+
+            def set_enum_value(cls, prop, value):
+                value_object = onto[value] or types.new_class(value, (Thing,))
+                prop_name = prop.name
+                setattr(cls, prop_name, value_object)
+                # prop = onto[prop_name]
+                # make_triple(cls, prop, value_object)
+
+        # ^ Для дерева решений
+
+
 
         # hide so far
         # class hide_boundaries(action):
@@ -1163,6 +1227,20 @@ def init_persistent_structure(onto):
         if WRITE_CONCEPT_FLAG_LABEL:
             sequence.has_bitflags = 0
             sequence.label = 'последовательность'
+        if WRITE_DESICION_TREE_INFO:
+            # sequence.action_kind = 'sequence'
+            set_enum_value(sequence, action_kind, 'sequence')
+        set_localizedName(sequence, RU='последовательность', EN='sequence')
+
+        # -->
+        class loop_body(sequence): pass
+        # if WRITE_CONCEPT_FLAG_LABEL:
+        #     loop_body.has_bitflags = 0;
+        #     loop_body.label = ['итерация цикла']
+        if WRITE_DESICION_TREE_INFO:
+            set_enum_value(loop_body, action_kind, 'sequence')
+            # set_enum_value(loop_body, has_role, 'loop_body')
+            set_localizedName(loop_body, RU='итерация', EN='iteration')
 
 
         # признак first
@@ -1177,12 +1255,17 @@ def init_persistent_structure(onto):
         if WRITE_CONCEPT_FLAG_LABEL:
             loop.has_bitflags = FLAGS_visible | FLAGS_target;
             loop.label = ['Циклы']
+        if WRITE_DESICION_TREE_INFO:
+            set_enum_value(loop, action_kind, 'loop')
+        set_localizedName(loop, RU='цикл', EN='loop')
 
-        if loop:  # hide a block under code folding
+        if loop:  # hide the block under code folding
             # classes that regulate the use of condition in a loop
 
             # normal condition effect (false->stop, true->start a body) like in while, do-while, for loop types
             class conditional_loop(loop): pass
+            if WRITE_DESICION_TREE_INFO:
+                conditional_loop.continues_on_true_condition = True
 
             # no condition at all: infinite loop like while(true){...}. The only act endlessly executed is the loop body.
             class unconditional_loop(loop): pass
@@ -1196,14 +1279,24 @@ def init_persistent_structure(onto):
             class ntimes_loop(unconditional_loop): pass
 
 
+            # Для дерева решений >
+            class loop_with_pre_condition(conditional_loop): pass
+            class loop_with_post_condition(conditional_loop): pass
+            class loop_with_initialization(loop_with_pre_condition): pass
+
+
+            # ^ Для дерева решений
+
+
+
             # classes that regulate a loop execution start (which act should be first)
             #
             # start with cond
-            class start_with_cond(conditional_loop): pass
+            class start_with_cond(loop_with_pre_condition): pass
             # start with body
-            class start_with_body(loop): pass
+            class start_with_body(loop_with_post_condition): pass
             # start with init
-            class start_with_init(conditional_loop): pass
+            class start_with_init(loop_with_pre_condition): pass
 
             # The constraint is not useful so far
             # AllDisjoint([start_with_cond, start_with_body, start_with_init])
@@ -1212,9 +1305,9 @@ def init_persistent_structure(onto):
             # classes that regulate the use of "update" step in a for-like loop (both subclasses of "loop_with_initialization" as that loop have "update" step too)
             #
             # update first, then the body, like in foreach loop type
-            class pre_update_loop(conditional_loop): pass
+            class pre_update_loop(loop_with_initialization): pass
             # body first, then the update, like in for(;;) loop type
-            class post_update_loop(conditional_loop): pass
+            class post_update_loop(loop_with_initialization): pass
 
             AllDisjoint([pre_update_loop, post_update_loop])
 
@@ -1233,6 +1326,7 @@ def init_persistent_structure(onto):
             class while_loop(start_with_cond): pass
             while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
             while_loop.label = ["WHILE"]
+            set_localizedName(while_loop, RU='цикл WHILE', EN='WHILE loop')
 
             if WRITE_CONCEPT_FLAG_LABEL:
                 while_loop.has_bitflags = FLAGS_visible | FLAGS_target;
@@ -1241,6 +1335,7 @@ def init_persistent_structure(onto):
             class do_while_loop(start_with_body): pass
             do_while_loop.is_a += [cond_then_body, body_then_cond]  # workaround
             do_while_loop.label = ["DO-WHILE"]
+            set_localizedName(do_while_loop, RU='цикл DO-WHILE', EN='DO-WHILE loop')
 
             if WRITE_CONCEPT_FLAG_LABEL:
                 do_while_loop.has_bitflags = FLAGS_visible | FLAGS_target;
@@ -1253,6 +1348,7 @@ def init_persistent_structure(onto):
             class for_loop(post_update_loop, start_with_init): pass
             for_loop.is_a += [cond_then_body]  # workaround
             for_loop.label = ["FOR"]
+            set_localizedName(for_loop, RU='цикл FOR', EN='FOR loop')
 
             if WRITE_CONCEPT_FLAG_LABEL:
                 for_loop.has_bitflags = FLAGS_visible | FLAGS_target;
@@ -1261,6 +1357,7 @@ def init_persistent_structure(onto):
             class foreach_loop(pre_update_loop, start_with_cond): pass
             foreach_loop.is_a += [body_then_cond]  # workaround
             foreach_loop.label = ["FOREACH"]
+            set_localizedName(foreach_loop, RU='цикл FOREACH', EN='FOREACH loop')
 
             # if WRITE_CONCEPT_FLAG_LABEL:
             #     foreach_loop.has_bitflags = FLAGS_visible | FLAGS_target;
@@ -1273,9 +1370,27 @@ def init_persistent_structure(onto):
         # if WRITE_CONCEPT_FLAG_LABEL:
         #     alt_branch.has_bitflags = FLAGS_visible | FLAGS_target;
         #     alt_branch.label = ['Ветки развилки']
+        if WRITE_DESICION_TREE_INFO:
+            set_enum_value(alt_branch, action_kind, 'sequence')
+            # set_enum_value(alt_branch, has_role, 'alt_branch')
+            set_localizedName(alt_branch, RU='ветка', EN='branch')
 
         class func(action): pass
+        if WRITE_DESICION_TREE_INFO:
+            set_enum_value(func, action_kind, 'func')
+            #
+
         class func_call(action): pass
+        if WRITE_DESICION_TREE_INFO:
+            set_enum_value(func_call, action_kind, 'call')
+            # set_enum_value(func_call, has_role, 'func_call')
+            #
+
+        class stmt_with_calls(action): pass
+        if WRITE_DESICION_TREE_INFO:
+            set_enum_value(stmt_with_calls, action_kind, 'stmt_with_calls')
+            #
+
         class has_func_call(action >> func_call): pass
         class merge_child_begin_act(action >> bool): pass
         class merge_child_end_act(action >> bool): pass
@@ -1286,6 +1401,14 @@ def init_persistent_structure(onto):
         if WRITE_CONCEPT_FLAG_LABEL:
             alternative.has_bitflags = FLAGS_visible | FLAGS_target;
             alternative.label = ['if']
+        if WRITE_DESICION_TREE_INFO:
+            set_enum_value(alternative, action_kind, 'alternative')
+            set_localizedName(alternative, RU='развилка', EN='selection statement')
+
+        class alternative_simple(alternative): pass
+        class alternative_single_with_else(alternative): pass
+        class alternative_multi_without_else(alternative): pass
+        class alternative_multi_with_else(alternative): pass
 
         for class_name in [
             "if", "else-if", "else",
@@ -1294,6 +1417,7 @@ def init_persistent_structure(onto):
             if WRITE_CONCEPT_FLAG_LABEL:
                 cls.has_bitflags = FLAGS_visible | FLAGS_target;
                 cls.label = [class_name]
+            set_localizedName(cls, RU=f'ветка {class_name.upper()}', EN=f'{class_name.upper()} branch')
         if WRITE_CONCEPT_FLAG_LABEL:
             onto["if"].has_bitflags = 0 | FLAGS_target;
             onto["if"]     .broader = [alternative]
@@ -1305,6 +1429,10 @@ def init_persistent_structure(onto):
         ]:
             cls = types.new_class(class_name, (action, ))  ### hide_boundaries
             cls.atom_action = True
+            if WRITE_DESICION_TREE_INFO:
+                set_enum_value(cls, action_kind, 'expr' if class_name == 'expr' else 'stmt'); # ????!
+        set_localizedName(onto['expr'], RU='условие', EN='condition')
+        set_localizedName(onto['stmt'], RU='действие', EN='statement')
 
         for class_name in [
             "return", "break", "continue",  # have optional `interrupt_target`
@@ -1315,6 +1443,13 @@ def init_persistent_structure(onto):
             cls.atom_action = True
             if WRITE_CONCEPT_FLAG_LABEL:
                 cls.has_bitflags = FLAGS_visible | FLAGS_target;
+            if WRITE_DESICION_TREE_INFO:
+                set_enum_value(cls, action_kind, 'stmt')  # ????!
+                set_enum_value(cls, has_interrupt_kind, class_name)
+                # set_localizedName(cls, RU=class_name.upper(), EN=class_name.upper())
+                set_localizedName(cls, RU='оператор', EN='operator')
+
+
         if WRITE_CONCEPT_FLAG_LABEL:
             # making schema for export
             class loop_break_continue(Thing): pass
@@ -1326,7 +1461,7 @@ def init_persistent_structure(onto):
             onto["continue"].broader = [loop_break_continue]
 
         # make some properties
-        for prop_name in ("body", "cond", "init", "update", "wrong_next_act", "interrupt_target", ):
+        for prop_name in ("wrong_next_act", "interrupt_target", ):
             if not onto[prop_name]:
                 types.new_class(prop_name, (Thing >> Thing,))
 
@@ -1441,8 +1576,8 @@ def init_persistent_structure(onto):
                     prop_class_ = ObjectProperty
                 types.new_class(prop_name, (prop_class_, ))
 
-        class fetch_kind_of_loop(act >> action, ): pass
-        class reason_kind(boundary >> Thing, ): pass
+        class fetch_kind_of_loop(Thing >> action, ): pass
+        class reason_kind(Thing >> Thing, ): pass
         class to_reason(Thing >> Thing, ): pass
         class from_reason(Thing >> Thing, ): pass
 
@@ -1453,13 +1588,18 @@ def init_persistent_structure(onto):
         class hasPartTransitive(Thing >> Thing, TransitiveProperty): pass
         # новое свойство parent_of
         # class parent_of(act_begin >> act, InverseFunctionalProperty): pass
+        # parent_of: связь между действиями алгоритма
         class parent_of(hasPartTransitive, InverseFunctionalProperty): pass
+        # student_parent_of: связь между актами трассы
         class student_parent_of(Thing >> Thing, InverseFunctionalProperty): pass
 
         class branches_item(parent_of): pass
         class body(parent_of): pass
         class body_item(parent_of): pass
         class functions_item(ObjectProperty): pass
+        # class cond(parent_of): pass
+        class init(parent_of): pass
+        class update(parent_of): pass
 
         # объекты, спровоцировавшие ошибку
         if not onto["Erroneous"]:
@@ -1636,7 +1776,7 @@ def init_persistent_structure(onto):
             ("PreCondLoopBegin", 0, ['LoopStartIsNotCondition']),
             ("PostCondLoopBegin", 0, ['LoopStartIsNotIteration']),
             ("IterationBeginOnTrueCond", on_true_consequent, ['NoIterationAfterSuccessfulCondition']),
-            # "IterationBeginOnFalseCond",
+            # "IterationBeginOnFalseCond",  # Future TODO
             ("LoopUpdateOnTrueCond", on_true_consequent, ['NoForeachUpdateAfterSuccessfulCondition']),
             ("IterationAfterUpdate", 0, ['NoIterationAfterForeachUpdate']),
             ("LoopEndOnFalseCond", on_false_consequent, ['NoLoopEndAfterFailedCondition']),
@@ -2055,21 +2195,75 @@ def find_by_type(dict_or_list, types=(dict,), _not_entry=None):
                 yield from find_by_type(v, types, _not_entry)
 
 
-def save_schema(file_path='jena/control-flow-statements-domain-schema.rdf'):
+def serialize_with_rdflib(onto, file_path, format='turtle', base=None):
+    """
+    @see rdflib.graph.Graph::serialize
+    :param destination:
+       The destination to serialize the graph to
+    :param format:
+   The format that the output should be written in. This value
+   references a :class:`~rdflib.serializer.Serializer` plugin. Format
+   support can be extended with plugins, but ``"xml"``, ``"n3"``,
+   ``"turtle"``, ``"nt"``, ``"pretty-xml"``, ``"trix"``, ``"trig"``,
+   ``"nquads"``, ``"json-ld"`` and ``"hext"`` are built in. Defaults to
+   ``"turtle"``.
+   :param base:
+      The base IRI for formats that support it. For the turtle format this
+      will be used as the ``@base`` directive.
+    """
+    if format == 'turtle':
+        import ttlser  # register some more serializers for rdflib
+        # format = 'cmpttl'
+        format = 'nifttl'
+        # format = 'uncmpttl'
+        # format = 'scottl'
+        # format = 'rktttl'
+        ## err # format = 'htmlttl'
+        # @see all formats in: C:\D\Work\Python\Python312\Lib\site-packages\ttlser\utils.py
+
+    g = onto.world.as_rdflib_graph()
+    # instead of `base=` param of serialize
+    g.bind('', onto.base_iri)
+    #
+    with onto:
+        if 'xml' in format:
+            # try make it stable via saving sorted version
+            g.serialize(destination=file_path, format='uncmpttl')
+            import rdflib
+            g = rdflib.Graph()
+            g = g.parse(file_path, format='turtle')
+
+        g.serialize(destination=file_path, format=format)  ## , base=onto.base_iri
+
+
+def save_schema(
+    file_path='jena/control-flow-statements-domain-schema.ttl',
+    # file_path='jena/control-flow-statements-domain-schema.rdf',
+    update_global_constants=True):
     global WRITE_INVOLVES_CONCEPT
     global WRITE_PRINCIPAL_VIOLATION
     # global WRITE_SKOS_CONCEPT
     global WRITE_CONCEPT_FLAG_LABEL
-    WRITE_INVOLVES_CONCEPT = True
-    WRITE_PRINCIPAL_VIOLATION = True
-    # WRITE_SKOS_CONCEPT = True  # ! SKOS.Concept is no longer in use in CompPrehension project!
-    WRITE_CONCEPT_FLAG_LABEL = True
-    create_ontology_tbox().save(file_path)
+    if update_global_constants:
+        WRITE_INVOLVES_CONCEPT = True
+        WRITE_PRINCIPAL_VIOLATION = True
+        # WRITE_SKOS_CONCEPT = True  # ! SKOS.Concept is no longer in use in CompPrehension project!
+        WRITE_CONCEPT_FLAG_LABEL = True
+
+    onto = create_ontology_tbox()
+    file_ext = file_path.rpartition('.')[2]
+    if False:
+        rdf_format = 'ntriples' if file_ext == 'ttl' else 'rdfxml'
+        onto.save(file_path, format=rdf_format)
+    else:
+        rdf_format = 'turtle' if file_ext == 'ttl' else 'pretty-xml'
+        serialize_with_rdflib(onto, file_path, format=rdf_format)
 
     print("Saved as:\t", file_path)
     print()
-    print("Don't forget to copy the result to:")
-    print(r"c:\D\Work\YDev\CompPr\CompPrehension\modules\core\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
+    if update_global_constants:
+        print("Don't forget to copy the result to:")
+        print(r"c:\D\Work\YDev\CompPr\CompPrehension\modules\core\src\main\resources\org\vstu\compprehension\models\businesslogic\domains" '\\')
 
 
 def _play_with_classes():
@@ -2088,6 +2282,7 @@ if __name__ == '__main__':
     if 1:
         print("Special run mode activated:")
         print("Saving schema only to file.")
+        save_schema('decision_tree/domain.ttl', update_global_constants=False)
         save_schema()
         exit()
 
