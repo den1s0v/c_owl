@@ -4,23 +4,23 @@ owlready2>=0.30
 # rdflib
 ttlser
 
-transliterate
+transliterate~=1.10.2
 
 ### Web server ###
-Flask
+Flask~=1.1.2
 waitress
 
 # connecting to java daemon process
-thrift
+thrift~=0.14.2
 
 # unified translations
 python-i18n[YAML]
 
 ### Java (11+, 14) is currently in use ###
-psutil
+psutil~=5.8.0
 
 ### handling of Blockly's XML ###
-xmltodict
+xmltodict~=0.12.0
 
 ### ASP support ###
 # clyngor-with-clingo
@@ -28,6 +28,9 @@ xmltodict
 ### Export questions data to DOT format (GraphViz itself required, too) ###
 # graphviz
 
-### render code ###
-# chevron
-
+fs~=2.4.14
+PyYAML~=6.0
+chevron~=0.14.0
+# graphviz~=0.17
+rdflib~=6.1.1
+# Werkzeug~=1.0.1
