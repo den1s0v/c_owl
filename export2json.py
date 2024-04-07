@@ -280,7 +280,18 @@ def type_of(literal):
 _MISTAKES_MAP = None
 
 
-def find_mistakes_for_task(concepts, alg_data=None):
+def find_mistakes_for_task(concepts, alg_data=None) -> list:
+    """
+    !! Deprecated.
+    Use data from generated questions instead (see: service.py:1670 , analyze_alg.py).
+
+    :param concepts:
+    :param alg_data:
+    :return:
+    """
+    return []
+
+    ### TODO: remove
     global _MISTAKES_MAP
     if not _MISTAKES_MAP:
         _MISTAKES_MAP = read_mistakes_map()
