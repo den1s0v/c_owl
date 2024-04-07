@@ -1077,6 +1077,7 @@ def init_persistent_structure(onto):
             '''a Concept can have label & flags '''
         FLAGS_visible = 1;
         FLAGS_target = 2;
+        FLAGS_visible_target = FLAGS_visible | FLAGS_target;
 
         # class related_to_concept(DatatypeProperty): pass
 
@@ -1253,7 +1254,7 @@ def init_persistent_structure(onto):
         # ->
         class loop(action): pass
         if WRITE_CONCEPT_FLAG_LABEL:
-            loop.has_bitflags = FLAGS_visible | FLAGS_target;
+            loop.has_bitflags = FLAGS_visible_target;
             loop.label = ['Циклы']
         if WRITE_DESICION_TREE_INFO:
             set_enum_value(loop, action_kind, 'loop')
@@ -1329,7 +1330,7 @@ def init_persistent_structure(onto):
             set_localizedName(while_loop, RU='цикл WHILE', EN='WHILE loop')
 
             if WRITE_CONCEPT_FLAG_LABEL:
-                while_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+                while_loop.has_bitflags = FLAGS_visible_target;
                 while_loop.broader = [loop]
 
             class do_while_loop(start_with_body): pass
@@ -1338,7 +1339,7 @@ def init_persistent_structure(onto):
             set_localizedName(do_while_loop, RU='цикл DO-WHILE', EN='DO-WHILE loop')
 
             if WRITE_CONCEPT_FLAG_LABEL:
-                do_while_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+                do_while_loop.has_bitflags = FLAGS_visible_target;
                 do_while_loop.broader = [loop]
 
             # class do_until_loop(inverse_conditional_loop, postconditional_loop): pass
@@ -1351,7 +1352,7 @@ def init_persistent_structure(onto):
             set_localizedName(for_loop, RU='цикл FOR', EN='FOR loop')
 
             if WRITE_CONCEPT_FLAG_LABEL:
-                for_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+                for_loop.has_bitflags = FLAGS_visible_target;
                 for_loop.broader = [loop]
 
             class foreach_loop(pre_update_loop, start_with_cond): pass
@@ -1360,7 +1361,7 @@ def init_persistent_structure(onto):
             set_localizedName(foreach_loop, RU='цикл FOREACH', EN='FOREACH loop')
 
             # if WRITE_CONCEPT_FLAG_LABEL:
-            #     foreach_loop.has_bitflags = FLAGS_visible | FLAGS_target;
+            #     foreach_loop.has_bitflags = FLAGS_visible_target;
             #     foreach_loop.broader = [loop]
 
 
@@ -1368,7 +1369,7 @@ def init_persistent_structure(onto):
         # -->
         class alt_branch(sequence): pass
         # if WRITE_CONCEPT_FLAG_LABEL:
-        #     alt_branch.has_bitflags = FLAGS_visible | FLAGS_target;
+        #     alt_branch.has_bitflags = FLAGS_visible_target;
         #     alt_branch.label = ['Ветки развилки']
         if WRITE_DESICION_TREE_INFO:
             set_enum_value(alt_branch, action_kind, 'sequence')
@@ -1399,7 +1400,7 @@ def init_persistent_structure(onto):
         # class func(sequence): pass
         class alternative(action): pass
         if WRITE_CONCEPT_FLAG_LABEL:
-            alternative.has_bitflags = FLAGS_visible | FLAGS_target;
+            alternative.has_bitflags = FLAGS_visible_target;
             alternative.label = ['if']
         if WRITE_DESICION_TREE_INFO:
             set_enum_value(alternative, action_kind, 'alternative')
@@ -1415,7 +1416,7 @@ def init_persistent_structure(onto):
         ]:
             cls = types.new_class(class_name, (alt_branch,))
             if WRITE_CONCEPT_FLAG_LABEL:
-                cls.has_bitflags = FLAGS_visible | FLAGS_target;
+                cls.has_bitflags = FLAGS_visible_target;
                 cls.label = [class_name]
             set_localizedName(cls, RU=f'ветка {class_name.upper()}', EN=f'{class_name.upper()} branch')
         if WRITE_CONCEPT_FLAG_LABEL:
@@ -1442,7 +1443,7 @@ def init_persistent_structure(onto):
             cls.label = [class_name]
             cls.atom_action = True
             if WRITE_CONCEPT_FLAG_LABEL:
-                cls.has_bitflags = FLAGS_visible | FLAGS_target;
+                cls.has_bitflags = FLAGS_visible_target;
             if WRITE_DESICION_TREE_INFO:
                 set_enum_value(cls, action_kind, 'stmt')  # ????!
                 set_enum_value(cls, has_interrupt_kind, class_name)
@@ -1453,7 +1454,7 @@ def init_persistent_structure(onto):
         if WRITE_CONCEPT_FLAG_LABEL:
             # making schema for export
             class loop_break_continue(Thing): pass
-            loop_break_continue.has_bitflags = FLAGS_visible | FLAGS_target;
+            loop_break_continue.has_bitflags = FLAGS_visible_target;
             loop_break_continue.label = ['Прерывание цикла']
             # loop_break_continue.label = ['break & continue']
 
@@ -1630,7 +1631,7 @@ def init_persistent_structure(onto):
                 # "ActStartsAfterItsEnd", "ActEndsWithoutStart",
                 # "AfterTraceEnd",
                 # "DuplicateActInSequence",
-                ("ConditionMisuse", ["WrongNext"], "general_wrong", {'expr'}),
+                ("ConditionMisuse", ["WrongNext"], "general_wrong", {'expr'}, dict(law_bitflags = FLAGS_visible_target)),
 
                 ("WrongContext", (), "wrong_context", {'action'}),
                 # ("MisplacedBefore", ["WrongContext"]),
@@ -1726,6 +1727,13 @@ def init_persistent_structure(onto):
                         related_concepts = class_spec[3]
                         created_class.involves_concept = list(map(onto.__getattr__, sorted(related_concepts)))
 
+                    if len(class_spec) >= 5:
+                        # write what is defined as dict
+                        data = class_spec[4]
+                        assert isinstance(data, dict), data
+                        for prop_name, value in data.items():
+                            setattr(created_class, prop_name, value)
+
                     ## if len(class_spec) >= 3:
                     ##     category = class_spec[2]
                     ##     if not category2priority:
@@ -1744,6 +1752,10 @@ def init_persistent_structure(onto):
                     ## # set error_priority
                     ## ## ??????
                     ## make_triple(created_class, error_priority, priority)
+                else:
+                    print('unknown kind of class_spec in negative_law_specs:')
+                    print(class_spec)
+                    raise ValueError(class_spec)
 
 
         for prop_name in ("precursor", "cause", "has_causing_condition", "should_be", "should_be_before", "should_be_after", "context_should_be"):
@@ -2273,7 +2285,7 @@ def _play_with_classes():
     showable = get_leaf_classes(descendants)
     print(showable)
     showable = [n.name for n in showable]
-    print("as strings:", showable)
+    print("as strings:", sorted(showable))
 
 
 
