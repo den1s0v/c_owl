@@ -1,0 +1,409 @@
+ /*
+ Note: this file is meant to be preprocessed to remove "long" comments like this one.
+*/
+
+[
+	/* Invisible laws: these may present in question metadata. */
+
+	/* Old violations */
+{
+	"name": "DuplicateOfAct",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["Sequence_error_base"],
+	"concepts": [{"name": "sequence"} ]
+},
+{
+	"name": "SequenceFinishedTooEarly",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["Sequence_error_base"],
+	"concepts": [{"name": "sequence"} ]
+},
+{
+	"name": "TooEarlyInSequence",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["Sequence_of_length_gte_2_error_base"],
+	"concepts": [{"name": "sequence"} ]
+},
+
+
+	/* new violations (since 03.2024) >> */
+
+{
+	"name": "AltAnotherBranch",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["AltBranch_error_base"],
+	"concepts": [{"name": "alternative"} ]
+},
+{
+	"name": "AltBranchOnFalse",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["AltAllFalseNoElse_error_base", "AltNextCond_error_base"],
+	"concepts": [
+		{"name": "alternative_multi_without_else"},
+		{"name": "alternative_simple"},
+		{"name": "alternative"} ]
+},
+{
+	"name": "AltCondAfterTrue",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["AltBranch_error_base"],
+	"concepts": [
+		{"name": "alternative_multi_without_else"},
+		{"name": "alternative_multi_with_else"},
+		{"name": "alternative"} ]
+},
+{
+	"name": "AltEarlyEndNoCond",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["AltEndingErrors"],
+	"concepts": [{"name": "alternative"} ]
+},
+{
+	"name": "AltEarlyEndNoBranch",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["AltBranch_error_base"],
+	"concepts": [{"name": "alternative"} ]
+},
+{
+	"name": "AltBranchDup",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["AltBranch_error_base"],
+	"concepts": [{"name": "alternative"} ]
+},
+{
+	"name": "AltCondAfterBranch",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["AltBranch_error_base"],
+	"concepts": [{"name": "alternative"} ]
+},
+{
+	"name": "AltElseOnTrue",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["AltBranch_error_base", "AltElseBegin_error_base"],
+	"concepts": [
+		{"name": "alternative_single_with_else"},
+		{"name": "alternative_multi_with_else"} ]
+},
+{
+	"name": "AltEarlyEndNoElse",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["AltBranch_error_base", "AltElseBegin_error_base"],
+	"concepts": [
+		{"name": "alternative_single_with_else"},
+		{"name": "alternative_multi_with_else"} ]
+},
+
+
+{
+	"name": "PostCondLoopCondBeforeIter",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopBeginIsIter_error_base"],
+	"concepts": [{"name": "do_while_loop"} ]
+},
+{
+	"name": "PostCondLoopEarlyEndNoIter",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopCondTrue_error_base"],
+	"concepts": [{"name": "do_while_loop"} ]
+},
+{
+	"name": "PostCondLoopNoCondBtwIters",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopCondTrue_error_base", "LoopCondAfterIter_error_base"],
+	"concepts": [{"name": "do_while_loop"} ]
+},
+{
+	"name": "LoopEarlyEndCondStillTrue",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopCondTrue_error_base"],
+	"concepts": [
+		{"name": "do_while_loop"},
+		{"name": "while_loop"},
+		{"name": "for_loop"},
+		{"name": "foreach_loop"} ]
+},
+{
+	"name": "LoopNoEndOnFalseCond",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["Loop_error_base"],
+	"concepts": [
+		{"name": "do_while_loop"},
+		{"name": "while_loop"},
+		{"name": "for_loop"},
+		{"name": "foreach_loop"} ]
+},
+{
+	"name": "LoopIterBeforeCond",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopBeginIsCond_error_base"],
+	"concepts": [
+		{"name": "while_loop"},
+		{"name": "for_loop"},
+		{"name": "foreach_loop"} ]
+},
+{
+	"name": "PreCondLoopEarlyEndNoCond",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopEndingErrors", "LoopCondAfterIter_error_base"],
+	"concepts": [{"name": "while_loop"} ]
+},
+{
+	"name": "LoopInitDup",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopBeginIsInit_error_base"],
+	"concepts": [
+		{"name": "for_loop"},
+		{"name": "foreach_loop"} ]
+},
+{
+	"name": "LoopUpdateBeforeIter",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopUpdateAfterIter_error_base"],
+	"concepts": [{"name": "for_loop"} ]
+},
+{
+	"name": "LoopCondBeforeUpdate",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopCondTrue_error_base", "LoopUpdateBeforeIter_error_base"],
+	"concepts": [{"name": "for_loop"} ]
+},
+{
+	"name": "LoopCondBeforeInit",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopBeginIsInit_error_base"],
+	"concepts": [
+		{"name": "for_loop"},
+		{"name": "foreach_loop"} ]
+},
+{
+	"name": "LoopUpdateTwice",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopCondTrue_error_base", "LoopUpdateAfterIter_error_base"],
+	"concepts": [
+		{"name": "for_loop"},
+		{"name": "foreach_loop"} ]
+},
+{
+	"name": "PreUpdateLoopIterBeforeUpdate",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopCondTrue_error_base", "LoopCondAfterIter_error_base", "LoopUpdateBeforeIter_error_base"],
+	"concepts": [{"name": "foreach_loop"} ]
+},
+{
+	"name": "LoopCondBeforeIter",
+	"bitflags": 2,
+	"positive": false,
+	"impliesLaws": ["LoopCondAfterIter_error_base"],
+	"concepts": [{"name": "foreach_loop"} ]
+},
+
+
+
+	/* Visible laws: these aggregate other laws that in turn may present in question metadata to match. */
+
+{
+	"name": "Sequence_error_base",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"sortOrder": 1,
+	"concepts": []
+},
+	{
+		"name": "Sequence_of_length_gte_2_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Sequence_error_base"],
+		"concepts": []
+	},
+
+
+{
+	"name": "Alternative_error_base",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"sortOrder": 2,
+	"concepts": []
+},
+	{
+		"name": "AltBranch_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Alternative_error_base"],
+		"sortOrder": 21,
+		"concepts": []
+	},
+	{
+		"name": "AltAllFalseNoElse_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Alternative_error_base"],
+		"sortOrder": 22,
+		"concepts": []
+	},
+	{
+		"name": "AltElseBegin_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Alternative_error_base"],
+		"sortOrder": 23,
+		"concepts": []
+	},
+	{
+		"name": "AltNextCond_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Alternative_error_base"],
+		"sortOrder": 24,
+		"concepts": []
+	},
+
+{
+	"name": "Loop_error_base",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"sortOrder": 3,
+	"concepts": []
+},
+	{
+		"name": "LoopCondTrue_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Loop_error_base"],
+		"sortOrder": 31,
+		"concepts": []
+	},
+	{
+		"name": "LoopCondAfterIter_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Loop_error_base"],
+		"sortOrder": 32,
+		"concepts": []
+	},
+	{
+		"name": "LoopBeginIsCond_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Loop_error_base"],
+		"sortOrder": 33,
+		"concepts": []
+	},
+	{
+		"name": "LoopBeginIsIter_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Loop_error_base"],
+		"sortOrder": 34,
+		"concepts": []
+	},
+	{
+		"name": "LoopBeginIsInit_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Loop_error_base"],
+		"sortOrder": 35,
+		"concepts": []
+	},
+	{
+		"name": "LoopUpdateAfterIter_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Loop_error_base"],
+		"sortOrder": 36,
+		"concepts": []
+	},
+	{
+		"name": "LoopUpdateBeforeIter_error_base",
+		"bitflags": 3,
+		"positive": false,
+		"impliesLaws": ["Loop_error_base"],
+		"sortOrder": 37,
+		"concepts": []
+	}
+
+/*{
+	"name": "SeqEndingErrors",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"concepts": []
+},
+{
+	"name": "AltConditionMisuse",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"concepts": []
+},
+{
+	"name": "AltElseBranchMisuse",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"concepts": []
+},
+{
+	"name": "AltEndingErrors",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"concepts": []
+},
+
+{
+	"name": "LoopConditionMisuse",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"concepts": []
+},
+{
+	"name": "LoopInitMisuse",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"concepts": []
+},
+{
+	"name": "LoopUpdateMisuse",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"concepts": []
+},
+{
+	"name": "LoopEndingErrors",
+	"bitflags": 3,
+	"positive": false,
+	"impliesLaws": [],
+	"concepts": []
+}*/
+]

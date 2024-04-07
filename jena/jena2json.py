@@ -7,6 +7,8 @@ import re
 # OUT_FILE = "domain_laws.json"
 OUT_FILE = "control-flow-statements-domain-laws.json"
 
+ADD_LAWS_FROM = "cf-targetable-laws (manual).json"
+
 
 TASK_MAP = [
 	("rdfs4core.rules", {
@@ -72,6 +74,17 @@ def main():
 		all_laws.extend(laws)
 		# print(laws)
 		print(end='.')
+
+	if ADD_LAWS_FROM:
+		print()
+		with open(ADD_LAWS_FROM) as f:
+			file_content = f.read()
+		# process text: remove "long" comments.
+		file_content = re.sub(r'/\*.*?\*/', '', file_content, flags=re.DOTALL)
+		# load json
+		laws = json.loads(file_content)
+		all_laws.extend(laws)
+		print('. Used explicitly specified file with laws:', ADD_LAWS_FROM)
 
 	with open(OUT_FILE, 'w', encoding='utf-8') as f:
 		json.dump(all_laws, f, ensure_ascii=False, indent=2)
