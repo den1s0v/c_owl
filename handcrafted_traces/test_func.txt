@@ -106,7 +106,7 @@
 // int[10][10] 
 	   // if color != old_color && color == new_color: -> 00111111 // готово
 
-// алгоритм fill (заливка)
+// алгоритм fill_rus (заливка)
 {
 	matrix = random_matrix()
 
@@ -125,7 +125,30 @@
 	   if (y + 1 < H): -> 1,1,1 // вниз
 			flood_fill(x, y + 1)
 
-	flood_fill(3, 2, 9, matrix[3][2])
+	flood_fill(3, 2, 0xff, matrix[3][2])
+}
+
+
+// алгоритм fill (заливка)
+{
+	matrix = random_matrix()
+
+	function flood_fill(int x, int y, int new_color, int old_color):
+	   color = matrix[x][y]
+	   if color != old_color: -> 00111111 // done
+		   return
+		   
+	   matrix[x][y] = new_color
+	   if (x >= 1): -> 1,0,1 // left
+			flood_fill(x - 1, y)
+	   if (y >= 1): -> 1,1,1 // up
+			flood_fill(x, y - 1)
+	   if (x + 1 < W): -> 1,1,1 // right
+			flood_fill(x + 1, y)
+	   if (y + 1 < H): -> 1,1,1 // down
+			flood_fill(x, y + 1)
+
+	flood_fill(3, 2, 255, matrix[3][2])
 }
 // fill - (0)
 // трасса 

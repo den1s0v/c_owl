@@ -638,8 +638,10 @@ if __name__ == '__main__':
     if isinstance(data, list):
         data = data[0]
 
-    rendered = render_code(data, text_mode='html', locale='ru', show_buttons=True, raise_on_error=True)
-    with open(r'c:\D\Work\YDev\CompPr\c_owl\code_gen\test.html', 'w') as f:
+    # out_locale = 'ru'
+    out_locale = 'en'
+    rendered = render_code(data, text_mode='html', locale=out_locale, show_buttons=True, raise_on_error=True)
+    with open(r'test-%s.html' % out_locale, 'w') as f:
         f.write(rendered)
 
     print("saved debug file.")
