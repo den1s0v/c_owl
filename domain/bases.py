@@ -17,15 +17,22 @@ class ControlFlowStructure:
         self._ports_out = dict()
         self.inner = dict()
 
+    def make_consequent(self, spec: tuple[4]):
+        ### TODO: указать направлние порта: вход/выход !!!!!!!!
+        from_, role_from, to, role_to = spec
+        s_from = self.inner[from_] if from_ else self
+        s_to = self.inner[to] if to else self
+
+
     def input(self):
         if not self._port_in:
-            self._port_in = CFG_Port(role='normal', structure=self).set_IN_direction()
+            self._port_in = CFG_Port.make_with_role(role='normal', structure=self).with_IN_direction()
 
         return self._port_in
 
     def output(self, role='normal'):
         if role not in self._ports_out:
-            self._ports_out[role] = CFG_Port(role=role, structure=self).set_OUT_direction()
+            self._ports_out[role] = CFG_Port.make_with_role(role=role, structure=self).with_OUT_direction()
             ### debug.
             if role != 'normal':
                 print(f'Added port with role="{role}" for structure {self.__class__.__name__}')
@@ -33,10 +40,19 @@ class ControlFlowStructure:
 
         return self._ports_out[role]
 
+    def connect_inner_in_parent_classes(self):
+        try:
+            super().connect_inner()
+        except Exception as e: ## TODO: method\attribute not found Exception
+            pass
+            ###
+            print(" :::exception in connect_inner_in_parent_classes():::", e.__class__.__name__, e)
+            ###
+
     def connect_inner(self):
+        """ создать структуру внутренних объектов/структур, соединяя начало и конец этой структуры """
         # TODO: implement in subclassses.
-        raise NotImplementedError(f'Added port with role="{role}" for structure {self.__class__.__name__}')
-        pass
+        raise NotImplementedError()
 
     pass
 
@@ -82,28 +98,34 @@ class CFG_Port(adict):
     "abstract"
 
     direction: PortDirection # in|out — 0: in, 1: out
-    role = "any"
+    role = "any"  # static ??
     structure: ControlFlowStructure = None
     
     role2class = adict()
     
     @classmethod   ### ???
-    def register_port_class(cls, role: str):  CFG_Port.role2class[role] = cls;   ### , cls: type
+    def register_port_class(cls, role: str):
+        CFG_Port.role2class[role] = cls;   ### , cls: type
     
-    def __init__(self, role = "any", structure: ControlFlowStructure = None):
+    @classmethod   ### ???
+    def make_with_role(cls, role: str, *args, **kw):
+        return CFG_Port.role2class[role](*args, **kw)
+
+    def __init__(self, structure: ControlFlowStructure = None, role = None):
         self.direction = PortDirection.NOT_SET
-        self.role = role
         self.structure = structure
+        if role:
+            self.role = role
 
         self.outgoing_transitions = []
         self.incoming_transitions = []
         self._connected_ports = []  # all linked ports, both IN & OUT
     
-    def set_IN_direction(self):
+    def with_IN_direction(self):
         self.direction = PortDirection.IN
         return self
     
-    def set_OUT_direction(self):
+    def with_OUT_direction(self):
         self.direction = PortDirection.OUT
         return self
     
