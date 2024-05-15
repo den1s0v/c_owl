@@ -1,44 +1,87 @@
 # bases.py
 
+"""
+    Наброски классов данных для представления и анализа алгоритмов с точки зрения свойств и поведения алгоритмических структур.
+
+    Что изменить в текущем "дизайне":
+    • направление порта — не выделять отдельно, сделать функцией роли (input - единственая роль для входа).
+    • CFG_Transition — корректный переход между портами описываемых структур. Но возможны и произвольные прыжки (GFG_Jump), о которых мы тоже можем что-то знать (какие ошибки  порождает некорректный прыжок)
+    • ...
+    
+"""
+
 import enum
 
 import adict
 
 
-class ControlFlowStructure:
-
-    _port_in: 'CFG_Port' = None
-    _ports_out: dict[str, 'CFG_Port'] = dict()
-
-    inner: dict[str, 'ControlFlowStructure']
+class CFG_Node(adict):
+    """ A node of a CFG (Control Flow Graph). 
+    Normally, contains one input port and at least one output port. """
+    
+    # _port_in: 'CFG_Port' = None
+    _ports: dict[str, 'CFG_Port'] = dict()
 
     def __init__(self):
-        self._port_in = None
-        self._ports_out = dict()
-        self.inner = dict()
-
-    def make_consequent(self, spec: tuple[4]):
-        ### TODO: указать направлние порта: вход/выход !!!!!!!!
-        from_, role_from, to, role_to = spec
-        s_from = self.inner[from_] if from_ else self
-        s_to = self.inner[to] if to else self
-
-
+        self._ports = adict()
+        
     def input(self):
-        if not self._port_in:
-            self._port_in = CFG_Port.make_with_role(role='normal', structure=self).with_IN_direction()
+        """Get or create an input port (with 'input' role) """
+        if 'input' not in self._ports:
+            self._ports['input'] = CFG_Port.make_with_role(role='input', structure=self).with_IN_direction()
+            ### debug.
+            print(f'Added port with role="input" for structure {self.__class__.__name__}')
+            ###
 
-        return self._port_in
+        return self._ports[input]
 
     def output(self, role='normal'):
-        if role not in self._ports_out:
-            self._ports_out[role] = CFG_Port.make_with_role(role=role, structure=self).with_OUT_direction()
+        """Get or create an output port with provided role ('normal' is the default) """
+        if role not in self._ports:
+            self._ports[role] = CFG_Port.make_with_role(role=role, structure=self).with_OUT_direction()
             ### debug.
             if role != 'normal':
                 print(f'Added port with role="{role}" for structure {self.__class__.__name__}')
             ###
 
-        return self._ports_out[role]
+        return self._ports[role]
+
+    def outputs(self):
+        """ Get a list of all not-input ports """
+        return [p for role, p in self._ports.items() if role != 'input']
+
+    # def add_port(self, role='normal', direction: 'PortDirection' = None):
+    #     pass
+
+
+class ControlFlowStructure(CFG_Node):
+
+    _inner: dict[str, 'ControlFlowStructure']
+
+    def __init__(self):
+        super().__init__()
+        self._inner = adict()
+
+    def make_consequent(self, spec: tuple[4]):
+        ### TODO: указать направление порта: вход/выход !!!!!!!!
+        from_, role_from, to, role_to = spec
+        s_from = self.inner(from_) if from_ else self
+        s_to = self.inner(to) if to else self
+        ...
+
+
+    def inner(self, name) -> 'ControlFlowStructure':
+        """ Get existing inner structure and raise KeyError if it is not in self._inner.
+            If passed 'this' of falsy value, self will be returned.
+        """
+        if isinstance(name, ControlFlowStructure):
+            return name
+        if name == 'this' or not name:
+            return self
+        return self._inner[name]
+
+    def __getattr__(self, field):
+        return self._inner[field]
 
     def connect_inner_in_parent_classes(self):
         try:
@@ -63,14 +106,6 @@ class ControlFlowGraph:
     pass
 
 
-class CFG_Node(adict):
-    
-    def __init__(self):
-        self.input_ports = adict()
-        self.output_ports = adict()
-        
-    def add_port(self, direction: 'PortDirection', role='normal'):
-        pass
 
 
 class CFG_Transition(adict):
@@ -95,7 +130,7 @@ class PortDirection(enum.Enum):
     NOT_SET = 99
 
 class CFG_Port(adict):
-    "abstract"
+    "abstract ?? "
 
     direction: PortDirection # in|out — 0: in, 1: out
     role = "any"  # static ??
