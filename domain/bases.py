@@ -15,6 +15,75 @@ import enum
 import adict
 
 
+    
+def allowed(obj, black_list=None, white_list=None) -> bool:
+    """General check if an object mathes black & white list (assume no restriction if related list is empty)"""
+    if black_list and obj in black_list:
+        return False
+    if white_list and obj not in white_list:
+        return False
+    return True
+
+
+class CallWrapper:
+    """ Helper class: wrapper over function or method call, somewhat like functools.partial(). 
+        The first argument of unbound method ('self', 'this' object) can be set & changed any time.
+    """
+    def __init__(self, func, args=(), kwargs=None, this=None) -> None:
+        self.func = func # function or method
+        self.args = args
+        self.kwargs = kwargs or {}
+        self.this = this  # object to call the method on
+    def with_this(self, this=None):
+        self.this = this
+        return self
+    def call_as_function(self, *more_args, **more_kwargs) -> enum.Any:
+        """ Use also for bound methods. """
+        all_kwargs = {**self.kwargs, **(more_kwargs)}
+        return self.func(*self.args, *more_args, **all_kwargs)
+    def call_as_method(self, *more_args, **more_kwargs) -> enum.Any:
+        """ Use for unbound methods. """
+        all_kwargs = {**self.kwargs, **(more_kwargs)}
+        return self.func(self.this, *self.args, *more_args, **all_kwargs)
+    def call(self, *more_args, **more_kwargs) -> enum.Any:
+        if self.this:
+            self.call_as_method(*more_args, **more_kwargs)
+        else:
+            self.call_as_function(*more_args, **more_kwargs)
+
+    __call__ = call
+
+
+class ConceptFeature:
+    concept_class: type
+
+    def check_concept_class(self, concept_instance) -> bool:
+        if self.concept_class:
+            return isinstance(concept_instance, self.concept_class)
+        return True
+
+    def applicable_to(self, concept_instance) -> bool:
+        return self.check_concept_class(concept_instance)
+        # raise NotImplementedError()
+        pass
+        
+    def _apply_to_concept_instance(self, concept_instance) -> bool:
+        # raise NotImplementedError()
+        pass
+        
+    def apply_to(self, concept_instance) -> bool:
+        if not self.applicable_to(concept_instance):
+            return False
+        return self._apply_to_concept_instance(concept_instance) or True
+        
+
+class CorrectTransitionFeature(ConceptFeature):
+    pass
+
+class WrongJumpFeature(ConceptFeature):
+    pass
+
+
 class CFG_Node(adict):
     """ A node of a CFG (Control Flow Graph). 
     Normally, contains one input port and at least one output port. """
@@ -52,27 +121,60 @@ class CFG_Node(adict):
 
     # def add_port(self, role='normal', direction: 'PortDirection' = None):
     #     pass
-
+    
 
 class ControlFlowStructure(CFG_Node):
 
     _inner: dict[str, 'ControlFlowStructure']
+    parent: 'ControlFlowStructure' | None
+    features: dict[str, 'function']
 
     def __init__(self):
         super().__init__()
         self._inner = adict()
+        self.parent = None
+        self.features = adict()
 
-    def make_consequent(self, spec: tuple[4]):
-        ### TODO: указать направление порта: вход/выход !!!!!!!!
+    def make_consequent(self, transition_id: str, spec: tuple[4]):
+        ### not-TODO: указать направление порта: вход/выход !!!!!!!!
         from_, role_from, to, role_to = spec
         s_from = self.inner(from_) if from_ else self
         s_to = self.inner(to) if to else self
         ...
 
+    def register_feature_maker(self, name: str, call: CallWrapper) -> None:
+        if name in self.features:
+            raise ValueError(f'feature with key "{name}" has already been registered.')
+        self.features[name] = call
+
+    # def connect_inner_in_parent_classes(self, black_list=None, white_list=None):
+    #     try:
+    #         super().connect_inner(black_list, white_list)
+    #     except Exception as e: ## TODO: method\attribute not found Exception
+    #         pass
+    #         ###
+    #         print(" :::exception in connect_inner_in_parent_classes():::", e.__class__.__name__, e)
+    #         ###
+
+    def apply_features(self, black_list=None, white_list=None):
+        """ Внести/записать в объект фичи, определяемые этим классом. Возможно отключить некоторые из фич через чёрный и белый списки. """
+        for name in self.features.keys():
+            if allowed(name, black_list, white_list):
+                self.apply_feature(name)
+
+    def apply_feature(self, name):
+        """ Внести/записать в объект фичу, определяемую этим классом. """
+        func = self.features[name]
+        try:
+            
+            func()  ### ...TODO!
+
+        except Exception as e:
+            print(f'Error appying feature "{name}" for class {self.__class__.__name__}: {e.__class__,__name__} — {e}.')
 
     def inner(self, name) -> 'ControlFlowStructure':
         """ Get existing inner structure and raise KeyError if it is not in self._inner.
-            If passed 'this' of falsy value, self will be returned.
+            If passed 'this' or falsy value, self will be returned.
         """
         if isinstance(name, ControlFlowStructure):
             return name
@@ -83,19 +185,20 @@ class ControlFlowStructure(CFG_Node):
     def __getattr__(self, field):
         return self._inner[field]
 
-    def connect_inner_in_parent_classes(self):
+    def connect_inner_in_parent_classes(self, black_list=None, white_list=None):
         try:
-            super().connect_inner()
+            super().connect_inner(black_list, white_list)
         except Exception as e: ## TODO: method\attribute not found Exception
             pass
             ###
             print(" :::exception in connect_inner_in_parent_classes():::", e.__class__.__name__, e)
             ###
 
-    def connect_inner(self):
+    def connect_inner(self, black_list=None, white_list=None):
         """ создать структуру внутренних объектов/структур, соединяя начало и конец этой структуры """
         # TODO: implement in subclassses.
-        raise NotImplementedError()
+        # raise NotImplementedError()
+        pass
 
     pass
 
