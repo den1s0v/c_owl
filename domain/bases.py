@@ -12,49 +12,67 @@
 
 import enum
 
-import adict
+from adict import adict
+from attrs import define, field
 
+from domain.helpers import CallWrapper
 
+try:
+    from domain.helpers import allowed
+except ImportError:
+    from helpers import allowed
     
-def allowed(obj, black_list=None, white_list=None) -> bool:
-    """General check if an object mathes black & white list (assume no restriction if related list is empty)"""
-    if black_list and obj in black_list:
-        return False
-    if white_list and obj not in white_list:
-        return False
-    return True
 
 
-class CallWrapper:
-    """ Helper class: wrapper over function or method call, somewhat like functools.partial(). 
-        The first argument of unbound method ('self', 'this' object) can be set & changed any time.
-    """
-    def __init__(self, func, args=(), kwargs=None, this=None) -> None:
-        self.func = func # function or method
-        self.args = args
-        self.kwargs = kwargs or {}
-        self.this = this  # object to call the method on
-    def with_this(self, this=None):
-        self.this = this
-        return self
-    def call_as_function(self, *more_args, **more_kwargs) -> enum.Any:
-        """ Use also for bound methods. """
-        all_kwargs = {**self.kwargs, **(more_kwargs)}
-        return self.func(*self.args, *more_args, **all_kwargs)
-    def call_as_method(self, *more_args, **more_kwargs) -> enum.Any:
-        """ Use for unbound methods. """
-        all_kwargs = {**self.kwargs, **(more_kwargs)}
-        return self.func(self.this, *self.args, *more_args, **all_kwargs)
-    def call(self, *more_args, **more_kwargs) -> enum.Any:
-        if self.this:
-            self.call_as_method(*more_args, **more_kwargs)
-        else:
-            self.call_as_function(*more_args, **more_kwargs)
 
-    __call__ = call
+### Abstract Domain logic. ### 
+
+@define
+class JenaRule:
+    name: str = None
+    formulation: str
+    role: str = None
+    salience: int = 0
+    comment: str = None
 
 
-class ConceptFeature:
+@define
+class DomainDefinitionContent:
+    key: str
+    assertions: list = field(factory=list)
+    jena_rules: list[JenaRule] = field(factory=list)
+    user_data: adict = field(factory=adict)
+
+    # def __init__(self, key: str, assertions: list=None, jena_rules: list=None, **kwargs):
+    #     self.key = key
+    #     self.assertions = assertions or []
+    #     self.jena_rules = jena_rules or []
+    #     self.user_data = adict(kwargs)
+
+    def __add__(self, other: 'DomainDefinitionContent') -> 'DomainDefinitionContent':
+        return DomainDefinitionContent(
+            f"{self.key}+{other.key}",
+            self.assertions + other.assertions,
+            self.jena_rules + other.jena_rules,
+            **(self.user_data | other.user_data),
+        )
+        
+    ### ... 
+
+
+class DomainFeature:
+    """Abstract domain element having related definitions & statements describing it."""
+        
+    def get_tbox(self) -> DomainDefinitionContent:
+        """Obtain static definitions (TBox) for this concept/feature/etc. This can include related productional rules."""
+        raise NotImplementedError()
+    
+    def get_abox(self) -> DomainDefinitionContent:
+        """Obtain "dynamic" definitions (ABox) for this specific instance. This can also include related productional rules, but this is not recommended."""
+        raise NotImplementedError()
+
+
+class ConceptFeature(DomainFeature):
     concept_class: type
 
     def check_concept_class(self, concept_instance) -> bool:
@@ -121,19 +139,43 @@ class CFG_Node(adict):
 
     # def add_port(self, role='normal', direction: 'PortDirection' = None):
     #     pass
+
+@define
+class ControlFlowStructure(CFG_Node, DomainFeature):
+    """
+    Что и для каких целей хранит этот класс:
     
+    - компоненты (дочерние атомы и другие алг. структуры)
+    - переходы между компонентами (для анализа путей через алгоритм)
+    - ошибочные переходы (принципиально возможные, допустимые) для аннотирования вопросов
+    
+    - для ризонинга на данных вопроса:
+        ○ статическя схема (структура классов и связей)
+        ○ продукционные правила для вычисления CFG
+        ○ продукционные правила для вычисления ошибок в частичном ответе
+    """
+    
+    name: 'ControlFlowStructure' = field(init=False, default=None)
+    parent: 'ControlFlowStructure' = None
+    alg_data: adict = field(init=False, factory=adict)
+    
+    _inner: adict[str, 'ControlFlowStructure'] = field(init=False, factory=adict)
+    features: adict[str, DomainFeature] = field(init=False, factory=adict)
 
-class ControlFlowStructure(CFG_Node):
+    # def __init__(self):
+    #     super().__init__()
+    #     self._inner = adict()
+    #     self.parent = None
+    #     self.features = adict()
+    def __attrs_post_init__(self):
+        self.prepare()
 
-    _inner: dict[str, 'ControlFlowStructure']
-    parent: 'ControlFlowStructure' | None
-    features: dict[str, 'function']
-
-    def __init__(self):
-        super().__init__()
-        self._inner = adict()
-        self.parent = None
-        self.features = adict()
+    def prepare(self):
+        self.prepare_components()
+        pass
+           
+        
+    ####
 
     def make_consequent(self, transition_id: str, spec: tuple[4]):
         ### not-TODO: указать направление порта: вход/выход !!!!!!!!
@@ -198,6 +240,8 @@ class ControlFlowStructure(CFG_Node):
         """ создать структуру внутренних объектов/структур, соединяя начало и конец этой структуры """
         # TODO: implement in subclassses.
         # raise NotImplementedError()
+        
+        self.connect_inner_in_parent_classes()
         pass
 
     pass
