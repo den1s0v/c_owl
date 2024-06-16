@@ -145,32 +145,37 @@
 ]
 
 [act_kind-for-begin:
-	noValue(?action_class my:atom_action "true"^^xsd:boolean),
+#	noValue(?action_class my:atom_action "true"^^xsd:boolean),
+	(?action_class my:atom_action "false"^^xsd:boolean),
 	(?action_class rdfs:subClassOf my:action),
+	notEqual(?action_class, my:action),
 	(?action rdf:type ?action_class),
 
 	(?a my:executes ?bnd), (?bnd my:begin_of ?action),
-	(?a rdf:type ?act_begin),
+	(?a rdf:type my:act_begin),
 
 	 -> (?a my:act_kind my:begin)
 ]
+
 [act_kind-for-end:
-	noValue(?action_class my:atom_action "true"^^xsd:boolean),
+#	noValue(?action_class my:atom_action "true"^^xsd:boolean),
+	(?action_class my:atom_action "false"^^xsd:boolean),
 	(?action_class rdfs:subClassOf my:action),
+	notEqual(?action_class, my:action),
 	(?action rdf:type ?action_class),
 
 	(?a my:executes ?bnd), (?bnd my:end_of ?action),
-	(?a rdf:type ?act_end),
+	(?a rdf:type my:act_end),
 
 	 -> (?a my:act_kind my:end)
 ]
 [act_kind-for-halt:
-	noValue(?action_class my:atom_action "true"^^xsd:boolean),
+	(?action_class my:atom_action "false"^^xsd:boolean),
 	(?action_class rdfs:subClassOf my:action),
 	(?action rdf:type ?action_class),
 
 	(?a my:executes ?bnd), (?bnd my:halt_of ?action),
-	(?a rdf:type ?act_end),
+	(?a rdf:type my:act_end),
 
 	 -> (?a my:act_kind my:end)
 ]

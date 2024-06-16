@@ -1046,7 +1046,8 @@ def init_persistent_structure(onto):
             # use shortcut instead of adding unnecessary class
             Concept = Thing
 
-        if WRITE_CONCEPT_FLAG_LABEL:
+        # if WRITE_CONCEPT_FLAG_LABEL:
+        if True:
             # skos:broader  (has broader, is sub-concept-of)
             class broader(AnnotationProperty):
                 namespace = skos
@@ -1075,6 +1076,9 @@ def init_persistent_structure(onto):
         # annotation `has_bitflags`
         class has_bitflags(AnnotationProperty):
             '''a Concept can have label & flags '''
+        # annotation `has_bitflags`
+        class law_bitflags(AnnotationProperty):
+            '''a Law can have label & flags '''
         FLAGS_visible = 1;
         FLAGS_target = 2;
         FLAGS_visible_target = FLAGS_visible | FLAGS_target;
@@ -1229,6 +1233,7 @@ def init_persistent_structure(onto):
             sequence.has_bitflags = 0
             sequence.label = 'последовательность'
         if WRITE_DESICION_TREE_INFO:
+            sequence.atom_action = False
             # sequence.action_kind = 'sequence'
             set_enum_value(sequence, action_kind, 'sequence')
         set_localizedName(sequence, RU='последовательность', EN='sequence')
@@ -1571,11 +1576,13 @@ def init_persistent_structure(onto):
         ):
             prop_name = "field_" + suffix
             if not onto[prop_name]:
-                prop_class_ = string_placeholder
-                ### ???
-                if not WRITE_INVOLVES_CONCEPT and suffix.endswith(('_act', '_bound')):
+                prop_class_ = DataProperty
+                if suffix.endswith(('_act', '_bound')):
                     prop_class_ = ObjectProperty
-                types.new_class(prop_name, (prop_class_, ))
+                cls = types.new_class(prop_name, (prop_class_, ))
+
+                cls.broader = [string_placeholder]
+
 
         class fetch_kind_of_loop(Thing >> action, ): pass
         class reason_kind(Thing >> Thing, ): pass
@@ -1616,11 +1623,13 @@ def init_persistent_structure(onto):
             # reason node can be associated with violations poassible at the step of solution
             class possible_violation(ObjectProperty): pass
 
-            # make Erroneous subclasses
+            # make Erroneous subclasses ...
             # (class, [bases])
-            for class_spec in [
-                # (name, [bases], err_level, {set of related concepts})
-                # err_level: one of: "general_wrong", "wrong_context", "missing", "extra".
+            #  or
+            # (name, [bases], err_level, {set of related concepts})
+            #
+            # err_level: one of: "general_wrong", "wrong_context", "missing", "extra".
+            negative_law_specs = [
 
                 # Sequence mistakes ...
                 ("CorrespondingEndMismatched", (), "trace_structure", {'action'}),
@@ -1715,10 +1724,50 @@ def init_persistent_structure(onto):
 
                 # Ошибки для дерева решений
                 ("BadBeginOfTrace", ["TooEarlyInSequence"], "extra", {'trace', }),
-            ]:
-                if isinstance(class_spec, str):
-                    types.new_class(class_spec, (Erroneous,))
-                elif isinstance(class_spec, tuple):
+            ]
+
+            # add negative laws for decision tree ...
+            # use 5th item of the tuple: law data ("bitflags", "impliesLaws", ...)
+            #
+            # result format:
+            # (name, [bases], err_level, {set of related concepts}, data)
+            # negative_law_specs += [
+            _ = [
+                ("AltBranchOnFalse", ["ConditionMisuse"], "extra", {'alternative_multi_without_else', 'alternative_simple', 'alternative', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("AltCondAfterTrue", ["ConditionMisuse"], "extra", {'alternative_multi_without_else', 'alternative_multi_with_else', 'alternative', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("AltEarlyEndNoCond", ["WrongNext"], "extra", {'alternative', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("AltEarlyEndNoBranch", ["WrongNext"], "extra", {'alternative', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("AltAnotherBranch", ["WrongNext"], "extra", {'alternative', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("AltBranchDup", ["WrongNext"], "extra", {'alternative', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("AltCondAfterBranch", ["WrongNext"], "extra", {'alternative', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("AltElseOnTrue", ["ConditionMisuse"], "extra", {'alternative_single_with_else', 'alternative_multi_with_else', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("AltEarlyEndNoElse", ["ConditionMisuse"], "extra", {'alternative_single_with_else', 'alternative_multi_with_else', }, dict(law_bitflags = FLAGS_visible_target)),
+
+
+                ("PostCondLoopCondBeforeIter", ["ConditionMisuse"], "extra", {'do_while_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("PostCondLoopEarlyEndNoIter", ["WrongNext"], "extra", {'do_while_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("PostCondLoopNoCondBtwIters", ["WrongNext"], "extra", {'do_while_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("LoopEarlyEndCondStillTrue", ["ConditionMisuse"], "extra", {'do_while_loop', 'while_loop', 'for_loop', 'foreach_loop',}, dict(law_bitflags = FLAGS_visible_target)),
+                ("LoopNoEndOnFalseCond", ["ConditionMisuse"], "extra", {'do_while_loop', 'while_loop', 'for_loop', 'foreach_loop',}, dict(law_bitflags = FLAGS_visible_target)),
+
+                ("LoopIterBeforeCond", ["ConditionMisuse"], "extra", {'while_loop', 'for_loop', 'foreach_loop',}, dict(law_bitflags = FLAGS_visible_target)),
+                ("PreCondLoopEarlyEndNoCond", ["ConditionMisuse"], "extra", {'while_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+
+                ("LoopInitDup", ["WrongNext"], "extra", {'for_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("LoopUpdateBeforeIter", ["WrongNext"], "extra", {'for_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("LoopCondBeforeUpdate", ["WrongNext"], "extra", {'for_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("LoopCondBeforeInit", ["WrongNext"], "extra", {'for_loop', 'foreach_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("LoopUpdateTwice", ["WrongNext"], "extra", {'for_loop', 'foreach_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+
+                ("PreUpdateLoopIterBeforeUpdate", ["WrongNext"], "extra", {'foreach_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+                ("LoopCondBeforeIter", ["WrongNext"], "extra", {'foreach_loop', }, dict(law_bitflags = FLAGS_visible_target)),
+            ]
+
+            for class_spec in negative_law_specs:
+                # if isinstance(class_spec, str):
+                #     types.new_class(class_spec, (Erroneous,))
+                # elif
+                if isinstance(class_spec, tuple):
                     class_name, base_names = class_spec[:2]
                     bases = tuple((onto[base_name] if type(base_name) is str else base_name) for base_name in base_names)
                     # print(bases)
@@ -1814,6 +1863,13 @@ def init_persistent_structure(onto):
         for prop_name in ("reason", ):  # for correct acts !
             if not onto[prop_name]:
                 types.new_class(prop_name, (correct_act >> Thing,))
+
+        # polyfill the required for valid reasoning: mark non-atom action classes as such.
+        for cls in action.descendants():
+            if not cls.atom_action:
+                cls.atom_action = False
+
+        # end of init_persistent_structure().
 
 
 def load_swrl_rules(onto, rules_list, rules_filter=None):
