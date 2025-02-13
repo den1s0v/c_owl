@@ -369,6 +369,16 @@ class AlgArea extends Location {
 		this.alg_name = false;  // assigned in create_alg_for()
 		this.name_visible = false;  // assigned in .fit()
 	}
+	find_parent(class_, default_is_root = true) {  // search up along the hierarchy
+		if (this.parent) {
+			if (this.parent instanceof class_)
+				return this.parent;
+		} else if (default_is_root) {
+			return this;
+		} else {
+			return null;
+		}
+	}
 	slot(direction, role) {  // getter & default creator
 		if (!this.slots[direction])
 			return this.create_slot(direction, null, role);
@@ -885,7 +895,45 @@ class AlternativeArea extends AlgArea {
 	}
 }
 
-class WhileLoopArea extends AlgArea {
+class LoopArea extends AlgArea {
+	constructor(corner, config, parent) {
+		super(corner, config, parent);
+		this.interruption_stmts_to_connect = [];
+		this.interruption_connectors = {
+			continue: [],  // left side, up
+			break: [],    // right side, down
+		};
+	}
+	register_interrupting_stmt(box_area, role='break') {
+		this.interruption_stmts_to_connect.push({ box_area, role });
+	}
+	connect_interrupting_stmts() {
+		this.interruption_stmts_to_connect.forEach(element => {
+			this.connect_interrupting_stmt(...element);
+		});
+	}
+	connect_interrupting_stmt(box_area, role='break') {
+		let in_slot_dir, out_slot_dir;
+		if (role === 'break') {
+			in_slot_dir = 180;  // [br] ===> []
+			out_slot_dir = 0;   //           || 
+		} else {
+			in_slot_dir = 0;    // ||
+			out_slot_dir = 180; // [] <=== [con]
+		}
+
+		// find insertion point
+
+		// insert new helper TransitDiamond, splitting old link to old shortened and new one (new link should coinside other TD, thus linking two TDs).
+
+		// connect with horizontal link (with arrow)
+
+		// ... TODO
+		// add new method??
+	}
+}
+
+class WhileLoopArea extends LoopArea {
 	fit(alg_node) {
 		this.name_visible = true;
 		const seph = U * 1.4;
@@ -966,7 +1014,7 @@ class WhileLoopArea extends AlgArea {
 	}
 }
 
-class DoLoopArea extends AlgArea {
+class DoLoopArea extends LoopArea {
 	fit(alg_node) {
 		this.name_visible = true;
 		const seph = U * 1.1;
@@ -1038,7 +1086,7 @@ class DoLoopArea extends AlgArea {
 	}
 }
 
-class ForLoopArea extends AlgArea {
+class ForLoopArea extends LoopArea {
 	fit(alg_node) {
 		this.name_visible = true;
 		const seph = U * 1.4;
@@ -1104,12 +1152,14 @@ class ForLoopArea extends AlgArea {
 			  : update.slot(270, 'in').corner.add(offsetv)), 
 			this, {hidden: true});
 		this.inner.push(helper_vertex_left);
+		this.interruption_connectors.continue.push({transit_vertex: helper_vertex_left});
+
 		const helper_vertex_bottom = new TransitDiamond(new paper.Point(body_bbox.bottomLeft.add(offsetv)), this, {hidden: true});
 		this.inner.push(helper_vertex_bottom);
 
 		let body_out = body.slot(270, "out");
 
-		// link from body to cond
+		// link from body to update (then to cond)
 		this.links.push(new Link(body_out, helper_vertex_bottom.slot(0, "in")));
 		this.links.push(new Link(helper_vertex_bottom.slot(180, "out"), helper_vertex_left.slot(270, "in")));
 		this.links.push(new Link(helper_vertex_left.slot(90, "out"), update.slot(too_wide_body? 180 : 270), {arrow: true}));
@@ -1123,6 +1173,7 @@ class ForLoopArea extends AlgArea {
 		// link down to join_diamond by right side ...
 		const helper_vertex_right = new TransitDiamond(new paper.Point(body_bbox.bottomRight.add(offseth)), this, {hidden: true});
 		this.inner.push(helper_vertex_right);
+		this.interruption_connectors.break.push({transit_vertex: helper_vertex_right});
 
 		// link from cond to the join_diamond
 		this.links.push(new Link(cond.slot(0), helper_vertex_right.slot(90), {text: LBL[0]}));
@@ -1141,6 +1192,7 @@ class ForLoopArea extends AlgArea {
 		this.links.push(new Link(join_diamond.slot(270), output_diamond.slot(90)));
 
 		this.actualize_rect();
+		this.connect_interrupting_stmts();
 	}
 }
 
@@ -1167,6 +1219,29 @@ class BoxArea extends AlgArea {
 			bbox: this.bbox(),
 		});
 	}
+}
+
+
+class LoopInterruptArea extends BoxArea {
+	fit(alg_node) {
+		// Set this visibility as option!
+		// this.name_visible = true;
+		super.fit(alg_node)
+		// 'labelled break' is not supported [here].
+		const closest_loop = this.find_parent(LoopArea);
+		const role = alg_node.type;  // "break" || "continue"
+		closest_loop.register_interrupting_stmt(this, role);
+		/// ... TODO
+	}
+}
+
+// class BreakArea extends LoopInterruptArea {
+// }
+// class ContinueArea extends LoopInterruptArea {
+// }
+
+class ReturnArea extends BoxArea {
+	// ??
 }
 
 

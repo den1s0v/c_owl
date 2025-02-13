@@ -1103,7 +1103,7 @@ def init_persistent_structure(onto):
 
         # -->
         class act_end(act): pass
-        set_localizedName(act_end, RU='окочание выполнения', EN='the ending of execution')
+        set_localizedName(act_end, RU='окончание выполнения', EN='the ending of execution')
         # -->
         class implicit_act(act):
             'act that skipped by student but added instead by rules'
@@ -1144,7 +1144,7 @@ def init_persistent_structure(onto):
         class begin_of(boundary_of): pass
         set_localizedName(begin_of, RU='начало', EN='the beginning of')
         class   end_of(boundary_of): pass
-        set_localizedName(end_of  , RU='окочание', EN='the ending of')
+        set_localizedName(end_of  , RU='окончание', EN='the ending of')
         class  halt_of(boundary_of): pass  # interrupted_end_of
         class interrupt_origin(boundary >> boundary): pass
         # class statement_begin(Thing): pass
