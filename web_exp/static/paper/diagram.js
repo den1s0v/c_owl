@@ -1257,9 +1257,13 @@ function create_alg_for(alg_node, parent) {
 	else if (alg_node.type == "stmt") {
 		a = new BoxArea();
 	}
-	else if (alg_node.type == "return" || alg_node.type == "break" || alg_node.type == "continue") {
+	else if (alg_node.type == "break" || alg_node.type == "continue") {
 		/// TODO !!!
-		a = new BoxArea();
+		a = new LoopInterruptArea();
+	}
+	else if (alg_node.type == "return") {
+		/// TODO !!!
+		a = new ReturnArea();
 	}
 	else if (alg_node.type == "expr") {
 		a = new ConditionDiamond();

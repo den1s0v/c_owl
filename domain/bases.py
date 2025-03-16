@@ -11,11 +11,12 @@
 """
 
 import enum
+from typing import Iterable
 
 from adict import adict
 from attrs import define, field
 
-from domain.helpers import CallWrapper
+from domain.helpers import CallWrapper, recursive_dive_along_attribute
 
 try:
     from domain.helpers import allowed
@@ -27,328 +28,310 @@ except ImportError:
 
 ### Abstract Domain logic. ### 
 
+### Meta-domain layer. ### 
+
 @define
-class JenaRule:
+class Domain:
+    name: str
+    # features: adict[str, 'DomainFeature'] = field(factory=adict)
+    features: adict[str, 'type'] = field(factory=adict)
+    # definitions: adict[str, 'DomainDef'] = field(factory=adict)
+    # rules: adict[str, DomainRule] = field(factory=adict)
+
+    def register_feature(self, feature: 'DomainFeature'):
+        name = feature.name
+        if name in self.features:
+            # raise KeyError
+            print(f"Feature with name '{name}' has been already registered!")
+            return
+        self.features[name] = feature
+        print(type(feature), feature, 'registered in domain as', name)
+        
+    def register_feature_class(self, feature_class: type):
+        # print(1, feature_class)
+        # print(2, repr(feature_class))
+        # print(3, type(feature_class))
+        
+        # feature = feature_class.__call__()  # !!!!!!!!!!!! ←←←← `TypeError: object.__new__(): not enough arguments`
+        # ??????????????? ↑
+        
+        feature = feature_class
+        # if not isinstance(feature, DomainFeature):
+        #     raise TypeError(f'{feature_class} is not a subclass of DomainFeature!')
+        self.register_feature(feature)
+        return feature
+        
+    def get_tbox(self, require: Iterable['DomainFeature']=(), deny: Iterable['DomainFeature']=()) -> 'DefinitionContent':
+        dc = DefinitionContent()
+        for feat in self.features.values():
+            dc += feat.get_tbox(require, deny)
+        return dc    
+    
+    
+@define
+class DomainFeature:
+    """Abstract domain element having related definitions & statements describing it."""
+
+    name: str = None  # unique key
+    definition: 'DefinitionContent' = None
+    depends_on_features: set['DomainFeature'] = field(factory=set)
+    incompatible_with_features: set['DomainFeature'] = field(factory=set)
+    comment: str = None
+
+    _full_set_depends_on_features: set['DomainFeature'] = None
+    _full_set_incompatible_with_features: set['DomainFeature'] = None
+    
+    def __eq__(self, other) -> bool:
+        return isinstance(other, self.__class__) and self.name == other.name
+
+    def __str__(self) -> str:
+        return f"DomainFeature<{self.name}>"
+    
+    __repr__ = __str__
+
+    def get_base_classes(self) -> Iterable['DomainFeature']:
+        return self.__class__.mro()
+
+    def all_required_features(self) -> set['DomainFeature']:
+        if not self._full_set_depends_on_features:
+            # note: infinite recurseion is not checked.
+            self._full_set_depends_on_features = {*recursive_dive_along_attribute(self, 'depends_on_features')}
+        return self._full_set_depends_on_features
+
+    def all_incompatible_features(self) -> set['DomainFeature']:
+        if not self._full_set_incompatible_with_features:
+            # note: infinite recurseion is not checked.
+            self._full_set_incompatible_with_features = {*recursive_dive_along_attribute(self, 'incompatible_with_features')}
+        return self._full_set_incompatible_with_features
+            
+    def is_needed_for(self, require: Iterable['DomainFeature']=(), deny: Iterable['DomainFeature']=()) -> bool:
+        # check if lookup sets are filled
+        if set(deny) & self.all_required_features():
+            return False
+        if set(require) & self.all_incompatible_features():
+            return True
+        return False  # Not denied but not required as well.
+        
+    def get_tbox(self, require: Iterable['DomainFeature']=(), deny: Iterable['DomainFeature']=()) -> 'DefinitionContent':
+
+        if not self.is_needed_for(require, deny):
+            return None
+        
+        dc = DefinitionContent()
+        
+        if self.definition:
+            dc += self.definition
+        
+        # for base in self.get_base_classes():  ## ???
+        for base in self.all_required_features():
+            dc += base.get_tbox()
+        return dc
+
+
+# @define
+class DomainElement(DomainFeature):
+    """ A domain object that may be 'instantiated', i.e. it may present as holistic domain object, not as 'transparent' feature of such. """
+    # name: str = None
+    pass
+    
+
+
+
+
+@define
+class DomainSituation:
+    name: str
+    elements: list['SituationElement'] = None
+    
+    def get_abox(self) -> 'DefinitionContent':
+        dc = DefinitionContent()
+
+        for elt in self.elements or ():
+            dc += elt.get_abox()
+        return dc
+
+
+class SituationElement(adict):
+    name: str  # unique key; must not match any other names
+    definition: DomainElement = None
+    components: adict = None
+    
+    def get_abox(self) -> 'DefinitionContent':
+        """Obtain "dynamic" definitions (ABox) for this specific instance. This can also include related productional rules, but this is not recommended."""
+        dc = DefinitionContent()
+        # TODO return name assertion, at least
+        ...
+        return dc
+
+
+
+# ========================================== #
+
+
+### Generalized domain component kinds. ###
+
+# # @define
+# class __DomainConcept(DomainElement):
+#     # name: str = None
+#     requires_concepts: Iterable['DomainConcept' | str] = None
+
+#     structure : 'StructureModel' = None
+#     # behaviour : 'BehaviourModel' = None
+    
+#     def possible_reasons(self) -> Iterable['Reason']:
+#         return ()
+#     def possible_violations(self) -> Iterable['Violation']:
+#         return ()
+
+#     @property
+#     def depends_on_features(self) -> set['DomainFeature']:
+#         'unsafe recursion over "bases" '
+#         return {self} | {
+#             dc.depends_on_features
+#             for dc in self.requires_concepts or ()
+#         }
+#     # @property def incompatible_with_features() ...?
+    
+
+# class StructureModel:
+#     elements: adict[str, 'StructureElement'] = field(factory=adict)
+
+# class StructureElement:
+#     parent_element : 'StructureElement'
+
+# class StructuralRelation:
+#     domain_class: type
+#     range_class: type
+
+
+# class BehaviourModel:
+#     # elements: adict[str, 'StructureElement'] = field(factory=adict)
+#     pass
+
+
+class Reason:
+    """I.e. positive Law"""
+    name: str
+
+class Violation:
+    """I.e. negative Law"""
+    name: str
+
+
+
+
+# ... ### Перенести в конкретную реализацию домена ###  ??
+
+
+class DomainAssertion(tuple):
+    """ Container for a single triple. """
+    
+    def __init__(self, s_or_t, p=None, o=None):
+        # unpack tuple if needed
+        if p and o is not None:
+            s = s_or_t
+        elif isinstance(s_or_t, tuple) and len(s_or_t) == 3:
+            t = s_or_t
+            s, p, o = t
+        else:
+            raise ValueError(f"incompatible tuple for DomainAssertion: {(s_or_t, p, o)}")
+        
+        # expand/convert shortcuts
+        if p == 'a':
+            p = 'rdf:type'
+        
+        # init tuple
+        super().__init__(s, p, o)
+    
+    @property
+    def subject(self): return self[0]
+    s = subject
+
+    @property
+    def predicate(self): return self[1]
+    p = predicate
+
+    @property
+    def object(self): return self[2]
+    o = object
+
+    def apply(ontology_or_graph):
+        raise NotImplementedError()
+    # triple: list = field(factory=list)
+    # def get_tbox(self) -> DefinitionContent:
+    #     """Obtain static definitions (TBox) for this concept/feature/etc. This can include related productional rules."""
+    #     raise NotImplementedError()
+
+
+@define
+class DomainRule:
     name: str = None
-    formulation: str
-    role: str = None
+    formulation: str = None
+    backend: str = field(default='Jena')
+    role: str = None  # for grouping rules by purpose
     salience: int = 0
     comment: str = None
 
 
 @define
-class DomainDefinitionContent:
-    key: str
-    assertions: list = field(factory=list)
-    jena_rules: list[JenaRule] = field(factory=list)
-    user_data: adict = field(factory=adict)
+class DefinitionContent:
+    key: str = None
+    assertions: list['DomainAssertion'] = field(factory=list)
+    # assertions: rdflib.Graph = None # ???
+    rules: list[DomainRule] = field(factory=list)
+    user_data: adict = None # field(factory=adict)
 
-    # def __init__(self, key: str, assertions: list=None, jena_rules: list=None, **kwargs):
+    # def __init__(self, key: str, assertions: list=None, rules: list=None, **kwargs):
     #     self.key = key
     #     self.assertions = assertions or []
-    #     self.jena_rules = jena_rules or []
+    #     self.rules = rules or []
     #     self.user_data = adict(kwargs)
 
-    def __add__(self, other: 'DomainDefinitionContent') -> 'DomainDefinitionContent':
-        return DomainDefinitionContent(
+    def __add__(self, other: 'DefinitionContent') -> 'DefinitionContent':
+        return DefinitionContent(
             f"{self.key}+{other.key}",
             self.assertions + other.assertions,
-            self.jena_rules + other.jena_rules,
+            self.rules + other.rules,
             **(self.user_data | other.user_data),
         )
+        
+    def __iadd__(self, other: 'DefinitionContent'):
+        if not other:
+            # ignore if empty
+            return self
+        if (other.key): 
+            self.key += other.key
+        if (other.assertions): 
+            self.assertions += other.assertions
+        if (other.rules): 
+            self.rules += other.rules
+        if (other.user_data): 
+            self.user_data |= other.user_data
+        return self
         
     ### ... 
 
 
-class DomainFeature:
-    """Abstract domain element having related definitions & statements describing it."""
+
+# @define
+# class DomainDef:
+#     name: str
+#     # features: adict = field(factory=adict)
+#     user_data: adict = field(factory=adict)
+#     # rules: adict = field(factory=adict)
+
+#     def get_tbox(self) -> DefinitionContent:
+#         """Obtain static definitions (TBox) for this concept/feature/etc. This can include related productional rules."""
+#         raise NotImplementedError()
+
+#     def get_rules(self) -> DomainRule:
+#         """Obtain productional rules for this concept/feature/etc. """
+#         raise NotImplementedError()
         
-    def get_tbox(self) -> DomainDefinitionContent:
-        """Obtain static definitions (TBox) for this concept/feature/etc. This can include related productional rules."""
-        raise NotImplementedError()
-    
-    def get_abox(self) -> DomainDefinitionContent:
-        """Obtain "dynamic" definitions (ABox) for this specific instance. This can also include related productional rules, but this is not recommended."""
-        raise NotImplementedError()
-
-
-class ConceptFeature(DomainFeature):
-    concept_class: type
-
-    def check_concept_class(self, concept_instance) -> bool:
-        if self.concept_class:
-            return isinstance(concept_instance, self.concept_class)
-        return True
-
-    def applicable_to(self, concept_instance) -> bool:
-        return self.check_concept_class(concept_instance)
-        # raise NotImplementedError()
-        pass
-        
-    def _apply_to_concept_instance(self, concept_instance) -> bool:
-        # raise NotImplementedError()
-        pass
-        
-    def apply_to(self, concept_instance) -> bool:
-        if not self.applicable_to(concept_instance):
-            return False
-        return self._apply_to_concept_instance(concept_instance) or True
-        
-
-class CorrectTransitionFeature(ConceptFeature):
-    pass
-
-class WrongJumpFeature(ConceptFeature):
-    pass
-
-
-class CFG_Node(adict):
-    """ A node of a CFG (Control Flow Graph). 
-    Normally, contains one input port and at least one output port. """
-    
-    # _port_in: 'CFG_Port' = None
-    _ports: dict[str, 'CFG_Port'] = dict()
-
-    def __init__(self):
-        self._ports = adict()
-        
-    def input(self):
-        """Get or create an input port (with 'input' role) """
-        if 'input' not in self._ports:
-            self._ports['input'] = CFG_Port.make_with_role(role='input', structure=self).with_IN_direction()
-            ### debug.
-            print(f'Added port with role="input" for structure {self.__class__.__name__}')
-            ###
-
-        return self._ports[input]
-
-    def output(self, role='normal'):
-        """Get or create an output port with provided role ('normal' is the default) """
-        if role not in self._ports:
-            self._ports[role] = CFG_Port.make_with_role(role=role, structure=self).with_OUT_direction()
-            ### debug.
-            if role != 'normal':
-                print(f'Added port with role="{role}" for structure {self.__class__.__name__}')
-            ###
-
-        return self._ports[role]
-
-    def outputs(self):
-        """ Get a list of all not-input ports """
-        return [p for role, p in self._ports.items() if role != 'input']
-
-    # def add_port(self, role='normal', direction: 'PortDirection' = None):
+    # @classmethod
+    # def register_in_domain(cls, domain: Domain):
+    #     """ Этот статический метод обязателен для каждого подкласса фичи домена. Должен быть вызван вскоре после объявления класса (чтобы к моменту обработки пользовательских данных домен был готов к этому). """
+    #     feature_instance = cls()
+    #     domain.register_feature(feature_instance)
     #     pass
-
-@define
-class ControlFlowStructure(CFG_Node, DomainFeature):
-    """
-    Что и для каких целей хранит этот класс:
     
-    - компоненты (дочерние атомы и другие алг. структуры)
-    - переходы между компонентами (для анализа путей через алгоритм)
-    - ошибочные переходы (принципиально возможные, допустимые) для аннотирования вопросов
-    
-    - для ризонинга на данных вопроса:
-        ○ статическя схема (структура классов и связей)
-        ○ продукционные правила для вычисления CFG
-        ○ продукционные правила для вычисления ошибок в частичном ответе
-    """
-    
-    name: 'ControlFlowStructure' = field(init=False, default=None)
-    parent: 'ControlFlowStructure' = None
-    alg_data: adict = field(init=False, factory=adict)
-    
-    _inner: adict[str, 'ControlFlowStructure'] = field(init=False, factory=adict)
-    features: adict[str, DomainFeature] = field(init=False, factory=adict)
-
-    # def __init__(self):
-    #     super().__init__()
-    #     self._inner = adict()
-    #     self.parent = None
-    #     self.features = adict()
-    def __attrs_post_init__(self):
-        self.prepare()
-
-    def prepare(self):
-        self.prepare_components()
-        pass
-           
-        
-    ####
-
-    def make_consequent(self, transition_id: str, spec: tuple[4]):
-        ### not-TODO: указать направление порта: вход/выход !!!!!!!!
-        from_, role_from, to, role_to = spec
-        s_from = self.inner(from_) if from_ else self
-        s_to = self.inner(to) if to else self
-        ...
-
-    def register_feature_maker(self, name: str, call: CallWrapper) -> None:
-        if name in self.features:
-            raise ValueError(f'feature with key "{name}" has already been registered.')
-        self.features[name] = call
-
-    # def connect_inner_in_parent_classes(self, black_list=None, white_list=None):
-    #     try:
-    #         super().connect_inner(black_list, white_list)
-    #     except Exception as e: ## TODO: method\attribute not found Exception
-    #         pass
-    #         ###
-    #         print(" :::exception in connect_inner_in_parent_classes():::", e.__class__.__name__, e)
-    #         ###
-
-    def apply_features(self, black_list=None, white_list=None):
-        """ Внести/записать в объект фичи, определяемые этим классом. Возможно отключить некоторые из фич через чёрный и белый списки. """
-        for name in self.features.keys():
-            if allowed(name, black_list, white_list):
-                self.apply_feature(name)
-
-    def apply_feature(self, name):
-        """ Внести/записать в объект фичу, определяемую этим классом. """
-        func = self.features[name]
-        try:
-            
-            func()  ### ...TODO!
-
-        except Exception as e:
-            print(f'Error appying feature "{name}" for class {self.__class__.__name__}: {e.__class__,__name__} — {e}.')
-
-    def inner(self, name) -> 'ControlFlowStructure':
-        """ Get existing inner structure and raise KeyError if it is not in self._inner.
-            If passed 'this' or falsy value, self will be returned.
-        """
-        if isinstance(name, ControlFlowStructure):
-            return name
-        if name == 'this' or not name:
-            return self
-        return self._inner[name]
-
-    def __getattr__(self, field):
-        return self._inner[field]
-
-    def connect_inner_in_parent_classes(self, black_list=None, white_list=None):
-        try:
-            super().connect_inner(black_list, white_list)
-        except Exception as e: ## TODO: method\attribute not found Exception
-            pass
-            ###
-            print(" :::exception in connect_inner_in_parent_classes():::", e.__class__.__name__, e)
-            ###
-
-    def connect_inner(self, black_list=None, white_list=None):
-        """ создать структуру внутренних объектов/структур, соединяя начало и конец этой структуры """
-        # TODO: implement in subclassses.
-        # raise NotImplementedError()
-        
-        self.connect_inner_in_parent_classes()
-        pass
-
-    pass
-
-
-### CFG ###
-
-class ControlFlowGraph:
-    pass
-
-
-
-
-class CFG_Transition(adict):
-    # kind of transition
-    _kind = 'consequent'
-    
-    port_src: 'CFG_Port'
-    port_dst: 'CFG_Port'
-
-    @property
-    def kind(self):
-        return self.__class__._kind
-    
-    
-    
-
-## PORTS for CFG ###
-    
-class PortDirection(enum.Enum):
-    IN = 0
-    OUT = 1
-    NOT_SET = 99
-
-class CFG_Port(adict):
-    "abstract ?? "
-
-    direction: PortDirection # in|out — 0: in, 1: out
-    role = "any"  # static ??
-    structure: ControlFlowStructure = None
-    
-    role2class = adict()
-    
-    @classmethod   ### ???
-    def register_port_class(cls, role: str):
-        CFG_Port.role2class[role] = cls;   ### , cls: type
-    
-    @classmethod   ### ???
-    def make_with_role(cls, role: str, *args, **kw):
-        return CFG_Port.role2class[role](*args, **kw)
-
-    def __init__(self, structure: ControlFlowStructure = None, role = None):
-        self.direction = PortDirection.NOT_SET
-        self.structure = structure
-        if role:
-            self.role = role
-
-        self.outgoing_transitions = []
-        self.incoming_transitions = []
-        self._connected_ports = []  # all linked ports, both IN & OUT
-    
-    def with_IN_direction(self):
-        self.direction = PortDirection.IN
-        return self
-    
-    def with_OUT_direction(self):
-        self.direction = PortDirection.OUT
-        return self
-    
-    def connect_to_port_with_transition(self, other: 'CFG_Port', transition: CFG_Transition):
-        # no.> # assert other.direction != self.direction, f"Expected inequal directions: {other.direction} != {self.direction}"
-        if other not in self._connected_ports:
-            # ensure correct config of transition ...
-            # connect
-            transition.port_src = self
-            transition.port_dst = other
-            self. outgoing_transitions.append(transition)
-            other.incoming_transitions.append(transition)
-            # remember to not to add this one twice
-            self._connected_ports.append(transition)
-        return self
-
-
-class CFG_Port_for_NormalFlow(CFG_Port):
-    role = "normal"
-    register_port_class(role, )
-
-class CFG_Port_for_Condition(CFG_Port):
-    "abstract"
-    role = "condition"
-class CFG_Port_for_TrueCondition(CFG_Port_for_Condition):
-    role = "true_condition"
-class CFG_Port_for_FalseCondition(CFG_Port_for_Condition):
-    role = "false_condition"
-    
-
-class CFG_Port_for_Interrupting(CFG_Port):
-    "abstract"
-    role = "interrupting"
-
-class CFG_Port_for_Return(CFG_Port_for_Interrupting):
-    role = "return"
-
-class CFG_Port_for_Break(CFG_Port_for_Interrupting):
-    role = "break"
-
-class CFG_Port_for_Continue(CFG_Port_for_Interrupting):
-    role = "continue"
-
-

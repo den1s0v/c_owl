@@ -1583,6 +1583,11 @@ def init_persistent_structure(onto):
 
                 cls.broader = [string_placeholder]
 
+                # prop_class_ = string_placeholder
+                # ### ???
+                # if not WRITE_INVOLVES_CONCEPT and suffix.endswith(('_act', '_bound')):
+                #     prop_class_ = ObjectProperty
+                # types.new_class(prop_name, (prop_class_, ))
 
         class fetch_kind_of_loop(Thing >> action, ): pass
         class reason_kind(Thing >> Thing, ): pass
