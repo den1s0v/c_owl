@@ -29,3 +29,4 @@ web_exp/static/quick-guide-syntax.files/*.thmx
 
 node_modules
 *.code-workspace
+.idea
