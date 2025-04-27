@@ -1,26 +1,41 @@
+from adict import adict
+
 from __eval.expression_makeup import *
 from ctrlstrct_run import *
+from external_run import run_maxperson_reasoning
 
 # main()
-    
+
 DATA = test_items_to_expressions(load_all_test_items())
 PREV_COUNT = {}
 
 
-def proccess_onto_with_reasoner(reasoning, count=30):
-    
+def proccess_onto_with_reasoner(reasoning, count=30, **kwargs):
+    if reasoning == 'its.Reasoner':
+
+        eval_stats = run_maxperson_reasoning(kwargs['filepath'], verbose=1)
+
+        eval_stats.update({"count": count})
+        return eval_stats
+
     expr_chain = make_expr_chain(DATA, count)
-        
+
+    # if 0:
+    #     # Debug print out all prepared expressions
+    #     print(len(expr_chain), end='>>> ')
+    #     print(' '.join(expr_chain))
+    #     return None
+
     if reasoning in PREV_COUNT and len(expr_chain) == PREV_COUNT[reasoning]:
         print('Skip this iteration')
         return None
-        
+
     PREV_COUNT[reasoning] = len(expr_chain)
-    
+
     if reasoning == "pellet":
-        
+
         onto = prepare_ontology(expr_chain, inject_swrl=True)
-        
+
         if True:
             debug_rdf_fpath = 'exprs_dump.rdf'  # +"_ext.rdf"
             onto.save(file=debug_rdf_fpath, format='rdfxml')
@@ -30,67 +45,63 @@ def proccess_onto_with_reasoner(reasoning, count=30):
         else:
             debug_rdf_fpath = None
 
-
         print(">_ running Pellet ...")
-        
+
         # if _eval_max_traces is not None:
         measure_stats_for_pellet_running()
-        
+
         start = timer()
-        
+
         with onto:
             # запуск Pellet
             try:
                 sync_reasoner_pellet(infer_property_values=True, infer_data_property_values=True, debug=0)
             except Exception as e:
                 print(e)
-            
+
         end = timer()
         seconds = end - start
         time_report = "   Time elapsed: %.3f s." % seconds
         print(">_ Pellet finished")
         print(time_report)
-        
+
         # if _eval_max_traces is not None:
         run_stats = get_process_run_stats()
         run_stats.update({"wall_time": seconds})
         run_stats.update({"count": len(expr_chain)})
 
         if debug_rdf_fpath:
-            onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
+            onto.save(file=debug_rdf_fpath + "_ext.rdf", format='rdfxml')
             print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
         return run_stats
-            
-    
+
     onto = prepare_ontology(expr_chain, inject_swrl=False)
 
-            
-            
     if reasoning in ("clingo", "dlv"):
         # raise RuntimeError("ASP solver does not support match(regex, str)!")
         print(f">_ running {reasoning} ...")
-        
+
         import asp_helpers
-        
+
         measure_f, run_f = {
             "clingo": (measure_stats_for_clingo_running, asp_helpers.run_clingo_on_ontology),
             "dlv": (measure_stats_for_dlv_running, asp_helpers.run_DLV_on_ontology),
         }.get(reasoning)
-        
+
         # if _eval_max_traces is not None:
         measure_f()
-            
+
         start = timer()
-        
+
         # запуск Clingo / DLV
         onto, elapsed_times = run_f(onto, rules_fpath='expr_penskoy.asp', stats=True)  # ?
-            
+
         end = timer()
         seconds = end - start
         time_report = "   Time elapsed: %.3f s." % seconds
         print(f">_ {reasoning} finished")
         print(time_report)
-        
+
         # if _eval_max_traces is not None:
         run_stats = get_process_run_stats()
         run_stats.update(elapsed_times)  # add data from dict
@@ -101,59 +112,61 @@ def proccess_onto_with_reasoner(reasoning, count=30):
         #     onto.save(file=debug_rdf_fpath+"_ext.rdf", format='rdfxml')
         #     print(f"Saved RDF file: {debug_rdf_fpath}_ext.rdf !")
 
-            
     if reasoning == "prolog":
         name_in = "pl_in_expr.rdf"
         name_out = "pl_out_expr.rdf"
         onto.save(file=name_in, format='rdfxml')
-        
+
         eval_stats = run_swiprolog_reasoning(name_in, name_out, verbose=1, command_name="run_ontology")
-        
+
         # if _eval_max_traces is not None:
         eval_stats.update({"count": len(expr_chain)})
         return eval_stats
-        
+
         # clear_ontology(onto)
         # onto = get_ontology("file://" + name_out).load()
         # seconds = eval_stats['wall_time']
-        
-            
+
     if reasoning in ('sparql', 'jena'):
         name_in = f"{reasoning}_in_expr.n3"
         name_out = f"{reasoning}_out_expr.n3"
         onto.save(file=name_in, format='ntriples')
-        
+
         rules_path = {
             'jena': "jena/all_for_exprs.rules",
-            'sparql': "expr_penskoy.ru", 
+            'sparql': "expr_penskoy.ru",
         }[reasoning]
-        
+
         eval_stats = run_jena_reasoning(name_in, name_out, reasoning_mode=reasoning, verbose=1, rules_path=rules_path)
-        
+
         # if _eval_max_traces is not None:
         eval_stats.update({"count": len(expr_chain)})
         return eval_stats
-        
+
         # clear_ontology(onto)
         # onto = get_ontology("file://" + name_out).load()
         # seconds = eval_stats['wall_time']
+
     raise ValueError(reasoning)
-        
-    
+
+
 def eval_expressions():
     eval_results = []
     # 46
     for n in sorted({
-                        17
-                        # *range(50, 52 + 1, 6),
-                        # *range(5, 20 + 1, 5),
-                        # *range(25, 30 + 1, 5),
-                        # *range(18, 29 + 1, 1),
-                        # 29
-                    }):
-        # reasoners = ("pellet", )
-        # reasoners = ("prolog", );
-        reasoners = ("sparql", )
+        # 3
+        *range(3, 35 + 1, 2),  # expr (2025)
+        # 17
+        # *range(50, 52 + 1, 6),
+        # *range(5, 20 + 1, 5),
+        # *range(25, 30 + 1, 5),
+        # *range(18, 29 + 1, 1),
+        # 29
+    }):
+        # reasoners = ("its.Reasoner", )
+        reasoners = ("pellet", )
+        # reasoners = ("prolog", )  # ???
+        # reasoners = ("sparql",)  # 2025+
         # reasoners = ("jena", )
         # reasoners = ("jena", "sparql")
         # reasoners = ("prolog", "sparql")
@@ -161,41 +174,110 @@ def eval_expressions():
         # reasoners = ("jena", "prolog", "sparql")
         # reasoners = ("clingo", "jena", "prolog", "sparql")
         # reasoners = ("pellet", "clingo", "jena", "prolog", "sparql")
-            
+
         for reasoning_type in reasoners:
             print(' >  >  >  >  >  >  >  >  >  >  >  >  > ')
             print(f"  Running {n} operands with {reasoning_type}")
             print(' <  <  <  <  <  <  <  <  <  <  <  <  < ')
-            
+
             eval_result = proccess_onto_with_reasoner(count=n, reasoning=reasoning_type)
-            
+
             if eval_result is None:
                 continue
-            
+
             eval_item = {
                 'dataset': 'penskoy-expressions',
                 'reasoner': reasoning_type,
                 'count': n,
             }
             eval_item.update(eval_result)
-            
+
             # dump current result
             with open('partial_eval_expr.txt', "a") as file:
                 file.write(str(eval_item))
                 file.write('\n')
-            
+
             eval_results.append(eval_item)
-            
+
         # break
-            
+
     # dump full result
     with open('saved_eval_expr.txt', "a") as file:
         for eval_item in eval_results:
             file.write(str(eval_item))
             file.write('\n')
-            
-    print(' ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^ ')    
-    print("Expr eval finished.") 
+
+    print(' ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^ ')
+    print("Expr eval finished.")
+    # exit()
+
+
+LOQI_files = ['c:/Temp2/loqi/clean/' + filename
+              for filename in """
+# A comment starts with # !
+2__+b_c++-1685101343_v.loqi
+3__a_+_b_c++-1264471167_v.loqi
+4__var[var1]_c++-769614198_v.loqi
+6__var[(var)]_c++1469561343_v.loqi
+8__--var_x_+_(var--)--_c++-1188019685_v.loqi
+10__func(((1)),_2)_c++-1241287249_v.loqi
+11__+-~--++&!var1.var2_c++-151220142_v.loqi
+13__var6_%=_var7_=_var8_=_var9_-=_var10_+=_var11_=_var12;_c++1187598784_v.loqi
+17__var1__(var2__(var3_+_var4))__var5_&&_!var--_c++1184701014_v.loqi
+19__var1__(var2__(var3_+_var4)),_var5,_var1.var2.var3_c++-963585539_v.loqi
+21__var1__(var2__(var3_+_var4)),_var5,_var_&_var2_^_var3__var4_c++1327963214_v.loqi
+25__var1__(var2__(var3_+_var4)),_var5,_+-~--++&!var1.var2_c++1719077944_v.loqi
+27__var1__(var2__(var3_+_var4)),_var5,_var6_%=_var7_=_var8_=_var9_-=_c++408973931_v.loqi
+29__var1__(var2__(var3_+_var4)),_var5,_var_^=_var2_=_var3_&=_var4__(_c++-2120147110_v.loqi
+31__var1__(var2__(var3_+_var4)),_var5,_var_^=_var2_=_var3_&=_var4__(_c++-1571336237_v.loqi
+33__var1__(var2__(var3_+_var4)),_var5,_var_^=_var2_=_var3_&=_var4__(_c++720237502_v.loqi              """.strip().splitlines()
+              if not filename.startswith('#')
+              ]
+
+
+def eval_expressions_with_maxpersons_reasoner():
+    eval_results = []
+    # 46
+    for filepath in LOQI_files:
+
+        reasoners = ("its.Reasoner", )
+        n = int(re.search(r'/(\d+)__', filepath)[1])
+
+        for reasoning_type in reasoners:
+            print()
+            print(' >  >  >  >  >  >  >  >  >  >  >  >  > ')
+            print(f"  Running {n} operands with {reasoning_type}")
+            print(' <  <  <  <  <  <  <  <  <  <  <  <  < ')
+
+            eval_result = proccess_onto_with_reasoner(count=n, reasoning=reasoning_type, filepath=filepath)
+
+            if eval_result is None:
+                continue
+
+            eval_item = {
+                'dataset': 'penskoy-expressions',
+                'reasoner': reasoning_type,
+                'count': n,
+            }
+            eval_item.update(eval_result)
+
+            # dump current result
+            with open('partial_eval_expr.txt', "a") as file:
+                file.write(str(eval_item))
+                file.write('\n')
+
+            eval_results.append(eval_item)
+
+        # break
+
+    # dump full result
+    with open('saved_eval_expr.txt', "a") as file:
+        for eval_item in eval_results:
+            file.write(str(eval_item))
+            file.write('\n')
+
+    print(' ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^  ^ ')
+    print("Expr eval finished.")
     # exit()
 
 
@@ -211,7 +293,9 @@ def convert_rules():
 
 def main():
     # convert_rules()
-    eval_expressions()
+    # eval_expressions()
+    eval_expressions_with_maxpersons_reasoner()
+
 
 if __name__ == '__main__':
     main()

@@ -86,6 +86,16 @@ def ext_stdout_handler(stdout, stderr):
 		if ms:
 			REASONING_STAT_DICT["iterations"] = int(ms[-1])
 			
+	elif OUTPUT_TYPE == 'its.Reasoner':
+		m = re.search(r"\[decisionTree\.solve has finished in: ([\d.]+) s\]", stdout)
+		if m:
+			dur_s = float(m[1])
+			OUTPUT_TIME_LIST.append(dur_s)
+		else:
+			print("An error occurred examining the output of its.Reasoner...")
+
+
+
 	elif SHOW_PRINTOUT:
 		print('The printout of the process (%s):' % OUTPUT_TYPE)
 		print(stdout)
@@ -363,4 +373,14 @@ def run_jena_reasoning(rdf_path_in:str, rdf_path_out:str, reasoning_mode='jena',
 	return get_run_stats()
 	
 
-	
+def run_maxperson_reasoning(loqi_path_in:str, verbose=True):
+	# java -jar c:/D/Work/YDev/CompPr/Max-Person/its_Reasoner/target/its_Reasoner-2.10.3-jar-with-dependencies.jar
+	# <*.loqi>
+
+	global OUTPUT_TYPE; OUTPUT_TYPE = 'its.Reasoner'
+
+	cmd = f'java -jar c:/D/Work/YDev/CompPr/Max-Person/its_Reasoner/target/its_Reasoner-2.10.3-jar-with-dependencies.jar "{loqi_path_in}" '
+	run_cmd(cmd, verbose=verbose)
+	return get_run_stats()
+
+
